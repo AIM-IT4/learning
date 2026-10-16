@@ -8,7 +8,7 @@ const p = await b.newPage({ viewport: { width: 1920, height: 1080 } });
 const errs = [];
 p.on('console', (m) => { if (m.type() === 'error' || m.type() === 'warning') errs.push(m.text()); });
 p.on('pageerror', (e) => errs.push('PAGEERROR ' + e.message));
-await p.goto('file://' + web);
+await p.goto('file://' + web + '?rs=' + (process.env.RS || '0.6667'));
 try { await p.evaluate(() => window.ready); } catch (e) { console.log('READY FAIL', e.message.slice(0, 4000)); }
 if (errs.length) console.log(errs.join('\n').slice(0, 6000));
 console.log('duration', await p.evaluate(() => window.DURATION));

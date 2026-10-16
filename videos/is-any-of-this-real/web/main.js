@@ -1,9 +1,9 @@
 // Composition: scene targets → transition → post FX → 2D typography overlay
 'use strict';
-const TC = makeTarget(W, H, false);
+const TC = makeTarget(GW, GH, false);
 const TGT = {};
-function tgt(scale) { const k = scale.toFixed(3); if (!TGT[k]) TGT[k] = { A: makeTarget(Math.round(W * scale), Math.round(H * scale), false), B: makeTarget(Math.round(W * scale), Math.round(H * scale), false) }; return TGT[k]; }
-const BL = [1, 2, 3, 4, 5].map((i) => makeTarget(W >> i, H >> i, false));
+function tgt(scale) { const k = scale.toFixed(3); if (!TGT[k]) TGT[k] = { A: makeTarget(Math.round(GW * scale), Math.round(GH * scale), false), B: makeTarget(Math.round(GW * scale), Math.round(GH * scale), false) }; return TGT[k]; }
+const BL = [1, 2, 3, 4, 5].map((i) => makeTarget(GW >> i, GH >> i, false));
 const downFS = fsProgram(`
 uniform sampler2D uSrc; uniform vec2 uTexel; uniform float uThresh;
 void main(){
@@ -22,7 +22,7 @@ void main(){
   fragColor=vec4(c/16.*uW,1);
 }`);
 function bloomChain() {
-  bindTarget(BL[0]); drawFS(downFS, { uSrc: { tex: TC.tex }, uTexel: [1 / W, 1 / H], uThresh: 0.9 });
+  bindTarget(BL[0]); drawFS(downFS, { uSrc: { tex: TC.tex }, uTexel: [1 / GW, 1 / GH], uThresh: 0.9 });
   for (let i = 1; i < BL.length; i++) { bindTarget(BL[i]); drawFS(downFS, { uSrc: { tex: BL[i - 1].tex }, uTexel: [1 / BL[i - 1].w, 1 / BL[i - 1].h], uThresh: 0 }); }
   gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE);
   for (let i = BL.length - 2; i >= 0; i--) { bindTarget(BL[i]); drawFS(upFS, { uSrc: { tex: BL[i + 1].tex }, uTexel: [1 / BL[i + 1].w, 1 / BL[i + 1].h], uW: 1.0 }); }

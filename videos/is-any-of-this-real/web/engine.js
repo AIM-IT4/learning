@@ -1,8 +1,10 @@
 // Deterministic WebGL2 renderer: every frame is a pure function of t.
 'use strict';
-const W = 1920, H = 1080;
+const W = 1920, H = 1080;                 // output / typography resolution
+const RS = +(new URLSearchParams(location.search).get('rs') || 0.6667);  // GL render scale (CPU-only GPU)
+const GW = Math.round(W * RS), GH = Math.round(H * RS);
 const glc = document.getElementById('gl');
-glc.width = W; glc.height = H;
+glc.width = GW; glc.height = GH;
 const gl = glc.getContext('webgl2', { antialias: false, preserveDrawingBuffer: true, alpha: false, premultipliedAlpha: false });
 const HDR = !!gl.getExtension('EXT_color_buffer_float');
 gl.getExtension('OES_texture_float_linear');
@@ -129,7 +131,7 @@ function makeTarget(w, h, mip) {
   gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, 0);
   return { fb, tex, w, h };
 }
-const SCREEN = { fb: null, w: W, h: H };
+const SCREEN = { fb: null, w: GW, h: GH };
 let curTarget = SCREEN;
 function bindTarget(t) { curTarget = t; gl.bindFramebuffer(gl.FRAMEBUFFER, t.fb); gl.viewport(0, 0, t.w, t.h); }
 
