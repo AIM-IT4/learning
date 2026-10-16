@@ -1,8 +1,8 @@
 #!/bin/bash
 # render all segments with 2 workers; each segment is an independent x264 file
-V=$1; FPS=30
+V=$1; FPS=24
 TOTAL=$(python3 -c "import json,math;print(math.ceil(json.load(open('$V/audio/cues.json'))['DURATION']*$FPS))")
-SEG=282
+SEG=258
 cd $V/src
 worker() {
   for ((s=$1; s*SEG<TOTAL; s+=2)); do

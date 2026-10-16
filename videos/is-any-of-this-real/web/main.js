@@ -121,7 +121,7 @@ function fx(t) {
   let fade = sstep(0.0, 0.9, t);
   fade *= 1 - sstep(K.eyes + 0.25, K.eyes + 0.75, t) * (t < K.open ? 1 : 0);
   fade *= 1 - sstep(K.cut + 0.05, K.cut + 0.35, t);
-  const glitch = Math.min(1, 0.9 * spike(t, K.fake + 0.12, 0.12) + 0.8 * spike(t, K.projection + 0.2, 0.18) + 0.6 * spike(t, K.late + 0.1, 0.1)
+  const glitch = Math.min(1, 0.5 * spike(t, K.dream + 0.15, 0.1) + 0.9 * spike(t, K.fake + 0.12, 0.12) + 0.8 * spike(t, K.projection + 0.2, 0.18) + 0.6 * spike(t, K.late + 0.1, 0.1)
     + 0.4 * spike(t, K.seen + 0.05, 0.07) + 0.9 * spike(t, K.cut, 0.12) + 0.5 * spike(t, K.open, 0.06) + 0.35 * spike(t, K.moment, 0.05));
   const scan = sstep(K.universe1 - 0.5, K.projection, t) * (1 - sstep(K.humans - 0.3, K.humans + 0.2, t)) + 0.3 * sstep(K.title, K.title + 0.5, t);
   const bloom = 1 + 0.4 * sstep(K.edge - 0.5, K.edge + 1, t) * (1 - sstep(K.humans - 0.5, K.humans, t)) + 0.5 * sstep(K.dying, K.stars2, t) * (1 - sstep(K.so, K.so + 1, t));
@@ -160,7 +160,7 @@ function renderGL(t) {
 
 async function boot() {
   const faces = ['300 48px "Cormorant Garamond"', 'italic 300 48px "Cormorant Garamond"', 'italic 400 48px "Cormorant Garamond"',
-    '500 48px "Cormorant Garamond"', '400 48px Cinzel', '600 48px Cinzel'];
+    '500 48px "Cormorant Garamond"', '400 48px Cinzel', '600 48px Cinzel', '400 48px "Tiro Devanagari Sanskrit"'];
   await Promise.all(faces.map((f) => document.fonts.load(f)));
   await document.fonts.ready;
   S6.init();

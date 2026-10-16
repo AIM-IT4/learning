@@ -4,9 +4,9 @@ const ui = document.getElementById('ui');
 ui.width = W; ui.height = H;
 const cx = ui.getContext('2d');
 
-const KEYWORDS = new Set(['atoms', 'empty', 'space', 'touched', 'force', 'disappears', 'ripples', 'fields', 'probability', 'seen',
-  'color', 'sound', 'paints', 'darkness', 'late', 'stars', 'gone', 'ghosts', 'light', 'surface', 'projection',
-  'humans', 'animals', 'pattern', 'borrowing', 'back', 'carbon', 'dying', 'fake', 'seems', 'wonder', 'eyes', 'watching', 'dissolve', 'anything']);
+const KEYWORDS = new Set(['solid', 'real', 'dissolve', 'touched', 'love', 'between', 'rumor', 'looks', 'colors', 'sounds',
+  'voice', 'paints', 'darkness', 'story', 'memories', 'died', 'projection', 'dream', 'atoms', 'thoughts', 'gone', 'maya',
+  'seems', 'fake', 'noticing', 'eyes', 'disappears', "don't", 'watching']);
 const CAP_FONT = (px) => `italic 300 ${px}px "Cormorant Garamond", "DejaVu Serif", serif`;
 
 // group words into caption chunks (sentences; long ones split at a pause near the middle)
@@ -25,7 +25,7 @@ const CHUNKS = (() => {
   }
   return out.map((ws, i) => ({ ws, start: ws[0].s - 0.18, end: ws[ws.length - 1].e + 0.9 })).map((c, i, a) => {
     if (i + 1 < a.length) c.end = Math.min(c.end, a[i + 1].start + 0.12);
-    c.center = c.ws[0].s >= K.now - 0.05;
+    c.center = c.ws[0].s >= K.eyes + 0.3;
     if (c.center) c.end = Math.min(c.end, K.open + 0.12);
     return c;
   });
@@ -87,7 +87,7 @@ const fmtTC = (s) => { const m = Math.floor(s / 60), ss = s - m * 60; return `00
 function drawCallouts(t) {
   // cold-open title
   if (t < K.dissolve) {
-    const a = sstep(0.15, 0.7, t) * (1 - sstep(K.look + 0.9, K.anything + 0.3, t));
+    const a = sstep(0.15, 0.7, t) * (1 - sstep(K.anything + 0.2, K.look + 0.5, t));
     if (a > 0) {
       cx.save(); cx.filter = `blur(${((1 - a) * 6).toFixed(1)}px)`;
       spaced('IS ANY OF THIS REAL?', W / 2, H / 2 + 14, '600 46px Cinzel', 18 + t * 6, '#F1EBE0', a, 'rgba(255,255,255,0.35)');
@@ -115,7 +115,7 @@ function drawCallouts(t) {
     const fa = sstep(K.force - 0.1, K.force + 0.4, t) * (1 - sstep(K.go - 0.6, K.go, t));
     if (fa > 0) {
       const C = projectPx([st.C1[0] + Math.min(st.sep, 41) / 2, 0, 0], st.ro, st.ta, 1.5);
-      spaced('ELECTROMAGNETIC REPULSION', C.x, C.y - 250, '400 20px Inter', 7, '#FFD2A6', fa * 0.95);
+      spaced('NO CONTACT \u00B7 ONLY REPULSION', C.x, C.y - 250, '400 20px Inter', 7, '#FFD2A6', fa * 0.95);
       cx.save(); cx.globalAlpha = fa * 0.5; cx.strokeStyle = '#FFD2A6'; cx.beginPath(); cx.moveTo(C.x, C.y - 225); cx.lineTo(C.x, C.y - 80); cx.stroke(); cx.restore();
     }
   }
@@ -168,13 +168,23 @@ function drawCallouts(t) {
       cx.save(); cx.globalAlpha = a * 0.5; cx.strokeStyle = '#9FDDEA'; cx.beginPath(); cx.moveTo(p.x + 90, p.y - 60); cx.lineTo(p.x + 320, p.y - 160); cx.stroke(); cx.restore();
     }
   }
-  // carbon
-  if (t > K.carbon - 0.3 && t < K.stars2 + 0.3) {
+  // borrowed atoms → the old self
+  if (t > K.animals - 0.3 && t < K.stars2 + 0.3) {
     const p = S6.labels(t).chest;
-    const a = sstep(K.carbon, K.carbon + 0.4, t) * (1 - sstep(K.dying - 0.3, K.dying + 0.1, t));
-    spaced('C', p.x + 210, p.y - 6, '500 54px "Cormorant Garamond"', 0, '#FFE2B8', a, 'rgba(255,190,120,0.6)', 'left');
-    tag(p.x + 212, p.y + 22, '6 · CARBON', a * 0.85, '#E9C9A0', 13);
-    tag(p.x + 212, p.y + 42, 'MADE IN A STAR', a * 0.7, '#B9A089', 12);
+    const a = sstep(K.animals, K.animals + 0.4, t) * (1 - sstep(K.person - 0.4, K.person, t));
+    spaced('\u2248 7 \u00D7 10\u00B2\u2077 ATOMS', p.x + 200, p.y - 6, '300 40px "Cormorant Garamond"', 2, '#FFE2B8', a, 'rgba(255,190,120,0.5)', 'left');
+    tag(p.x + 204, p.y + 24, 'NONE OF THEM PERMANENT', a * 0.8, '#E9C9A0', 13);
+    const b = sstep(K.person + 0.2, K.person + 0.6, t) * (1 - sstep(K.dying - 0.2, K.dying + 0.2, t));
+    tag(p.x + 150, p.y + 40, 'YOU \u00B7 TEN YEARS AGO', b * 0.85, '#E9C9A0', 15);
+  }
+  // maya
+  if (t > K.maya - 0.4 && t < K.strangest + 0.4) {
+    const a = sstep(K.maya - 0.1, K.maya + 0.5, t) * (1 - sstep(K.seems + 0.2, K.strangest, t));
+    cx.save(); cx.filter = `blur(${((1 - a) * 5).toFixed(1)}px)`;
+    spaced('\u092E\u093E\u092F\u093E', W / 2, 205, '400 104px "Tiro Devanagari Sanskrit"', 6, '#F6E7CC', a, 'rgba(255,200,130,0.55)');
+    cx.restore();
+    spaced('M\u0100Y\u0100', W / 2, 262, '400 22px Cinzel', 16, '#E9C9A0', a * 0.9);
+    tag(W / 2 - 205, 300, 'NOT FALSE \u00B7 NOT WHAT IT SEEMS', a * 0.75 * sstep(K.maybe2 - 0.2, K.maybe2 + 0.4, t), '#BBA98F', 15);
   }
   // final title
   if (t > K.title - 0.1) {

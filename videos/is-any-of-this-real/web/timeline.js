@@ -6,24 +6,37 @@ function at(word, n = 0, which = 's') {
   for (const w of WORDS) if (normW(w.w) === word) { if (k === n) return w[which]; k++; }
   throw new Error('word not found: ' + word + ' #' + n);
 }
-const K = {
-  look: at('look'), anything: at('anything'), dissolve: at('dissolve'),
-  atoms: at('you', 0), every: at('every'), empty: at('empty'), space: at('space'), never: at('never'),
-  touched: at('touched'), what: at('what'), force: at('force'), pushing: at('pushing'), back: at('back'),
-  go: at('go'), deeper: at('deeper'), matter: at('matter'), disappears: at('disappears'), particles: at('particles'),
-  balls: at('balls'), ripples: at('ripples'), fields: at('fields'), clouds: at('clouds'), seen: at('seen'),
-  color: at('color'), sound: at('sound'), brain: at('brain'), paints: at('paints'), darkness: at('darkness'),
-  skull: at('skull'), shows: at('shows'), world: at('world'), moment: at('moment'), late: at('late'),
-  lookup: at('look', 1), some: at('some'), gone: at('gone'), ghosts: at('ghosts'), light: at('light'),
-  edge: at('edge'), physics: at('physics'), stranger: at('stranger'), everything: at('everything'),
-  written: at('written'), surface: at('surface'), universe1: at('universe', 0), projection: at('projection'),
-  humans: at('humans'), animals: at('animals'), living: at('living'), pattern: at('pattern'),
-  borrowing: at('borrowing'), giving: at('giving'), carbon: at('carbon'), forged: at('forged'),
-  dying: at('dying'), stars2: at('stars', 1), so: at('so'), fake: at('fake'), maybe2: at('maybe', 1),
-  seems: at('seems'), strangest: at('strangest'), universe2: at('universe', 1), something: at('something', 1),
-  wonder: at('wonder'), close: at('close'), eyes: at('eyes'), now: at('now'), who: at('who'),
-  watching: at('watching'), watchingEnd: at('watching', 0, 'e'),
-};
+// cue map for the philosophical script: scene logic keeps its beat names, words drive the times
+const K = {};
+K.look = at('look'); K.anything = at('real'); K.dissolve = at('dissolve');
+// the space between
+K.atoms = at('you', 1); K.touched = at('touched'); K.every = K.atoms + 0.2; K.empty = at('anything');
+K.space = at('ground'); K.never = at('people') - 0.25; K.what = at('only'); K.force = at('space');
+K.pushing = at('between'); K.back = at('between', 0, 'e');
+// matter is a rumour
+K.go = at('even', 0); K.deeper = at('matter'); K.matter = at('matter'); K.particles = at('matter');
+K.balls = at('rumor'); K.disappears = at('rumor'); K.ripples = at('rumor', 0, 'e') + 0.1; K.fields = at('nothing');
+K.clouds = at('nothing') - 0.2; K.seen = at('looks');
+// the brain's story
+K.color = at('colors'); K.sound = at('sounds'); K.voice = at('voice'); K.brain = at('brain'); K.paints = at('paints');
+K.darkness = at('darkness'); K.skull = K.darkness + 0.9; K.shows = at('seen'); K.world = at('world', 0);
+K.moment = at('story'); K.late = at('story') + 0.35;
+// memories in the sky
+K.lookup = at('look', 1); K.some = at('memories'); K.gone = at('died'); K.born = at('born');
+// a dream with rules
+K.edge = at('some', 1); K.physics = at('physicists'); K.stranger = at('suspect'); K.everything = at('entire');
+K.written = at('universe'); K.surface = at('universe') + 0.6; K.projection = at('projection');
+K.universe1 = K.projection - 0.7; K.dream = at('dream');
+// the self is a pattern
+K.humans = at('you', 5); K.animals = at('atoms'); K.pattern = at('atoms'); K.borrowing = at('thoughts');
+K.living = at('thoughts'); K.giving = at('thoughts') + 0.5; K.person = at('person'); K.forged = at('ten');
+K.carbon = at('ago') - 0.35; K.dying = at('gone') - 0.35; K.stars2 = at('gone') + 0.2;
+// maya → the eye
+K.so = at('ancients'); K.maya = at('maya'); K.maybe2 = at('false'); K.seems = at('seems');
+K.strangest = at('so'); K.fake = at('fake'); K.universe2 = at('fake'); K.something = at('something', 1);
+K.wonder = at('noticing'); K.close = at('close'); K.eyes = at('eyes'); K.disappear = at('disappears');
+K.now = at('now'); K.who = at('who'); K.watching = at('watching'); K.watchingEnd = at('watching', 0, 'e');
+K.ghosts = Math.min(K.gone + 1.2, K.edge - 0.4); K.light = K.ghosts + 0.6;
 K.open = K.watchingEnd + 0.25;      // the eye snaps open
 K.title = K.open + 0.55;            // final title card
 K.cut = K.open + 2.95;              // glitch to black

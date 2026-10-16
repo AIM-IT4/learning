@@ -196,7 +196,7 @@ function drawHuman(x, S) {
   limb([[50, 17], [50, 23]], 4.6, 4.6, '#e0e0e0');
   x.fillStyle = '#ffffff'; x.beginPath(); x.ellipse(50 * u, 11.5 * u, 5.4 * u, 6.6 * u, 0, 0, Math.PI * 2); x.fill();
 }
-function sampleEmoji(ch, n, seed, height) {
+function sampleEmoji(ch, n, seed, height, yOff) {
   const S = 400, c = document.createElement('canvas');
   c.width = c.height = S;
   const x = c.getContext('2d');
@@ -223,7 +223,7 @@ function sampleEmoji(ch, n, seed, height) {
   for (let i = 0; i < n; i++) {
     const p = px[Math.floor(r() * px.length)];
     pos[i * 3] = -(p[0] + r() - 0.5 - cx) * sc;
-    pos[i * 3 + 1] = -(p[1] + r() - 0.5 - cy) * sc;
+    pos[i * 3 + 1] = -(p[1] + r() - 0.5 - cy) * sc + (yOff || 0);
     pos[i * 3 + 2] = (r() - 0.5) * 0.28;
     lum[i] = p[2];
   }
@@ -254,7 +254,7 @@ void main(){
   }
   fragColor=vec4(col,1);
 }`);
-  const SEQ = [[K.humans - 0.6, 0], [K.animals - 0.15, 1], [K.living - 0.2, 2], [K.living + 0.6, 3], [K.pattern - 0.35, 0]];
+  const SEQ = [[K.humans - 0.6, 0], [K.person - 0.05, 1]];
   function weights(t) {
     const w = [0, 0, 0, 0];
     let cur = SEQ[0][1], prev = SEQ[0][1], k = 1;
@@ -265,7 +265,7 @@ void main(){
   const STAR = [0, 0.35, 0];
   function cam(t) { return { ro: [0.9 * Math.sin(0.28 * t + 1), 0.12, -4.5 + 0.15 * Math.sin(t * 0.2)], ta: [0, 0.05, 0] }; }
   function init() {
-    const shapes = [['human', 2.4], ['\u{1F98C}', 2.05], ['\u{1F98B}', 2.0], ['\u{1F333}', 2.35]].map(([ch, h], i) => sampleEmoji(ch, N, 100 + i, h));
+    const shapes = [['human', 2.4, 0], ['\u{1F9CD}', 1.5, -0.45], ['\u{1F98B}', 2.0, 0], ['\u{1F333}', 2.35, 0]].map(([ch, h, y], i) => sampleEmoji(ch, N, 100 + i, h, y));
     const r = rng(5), rnd = new Float32Array(N * 4), lum = new Float32Array(N * 4);
     for (let i = 0; i < N * 4; i++) rnd[i] = r();
     for (let i = 0; i < N; i++) for (let s = 0; s < 4; s++) lum[i * 4 + s] = shapes[s].lum[i];
