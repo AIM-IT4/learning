@@ -1191,7 +1191,8 @@ async function loadFile(file, sample = false) {
 function setBusy(b) {
   S.busy = b;
   document.body.classList.toggle('busy', b);
-  for (const el of document.querySelectorAll('.panel select, .panel input, .preset, #markIn, #markOut, #playSel, #fullRange, #inT, #outT, #openBtn, #hIn, #hOut')) el.disabled = b;
+  for (const el of document.querySelectorAll('.panel select, .panel input, .preset, #markIn, #markOut, #playSel, #fullRange, #inT, #outT, #file, #hIn, #hOut')) el.disabled = b;
+  ui.openBtn.classList.toggle('off', b);
   ui.go.hidden = b; ui.prog.hidden = !b;
   if (S.videoOK) ui.video.controls = !b;
 }
@@ -1326,7 +1327,6 @@ for (const b of document.querySelectorAll('.preset')) {
 for (const el of document.querySelectorAll('.panel select, .panel input[type="radio"]')) el.addEventListener('change', updateReadout);
 
 // ----- file input / drag & drop -----
-ui.openBtn.addEventListener('click', () => ui.file.click());
 ui.file.addEventListener('change', () => { const f = ui.file.files[0]; ui.file.value = ''; if (f) loadFile(f); });
 let dragDepth = 0;
 const hasFiles = (e) => e.dataTransfer && Array.from(e.dataTransfer.types || []).includes('Files');
