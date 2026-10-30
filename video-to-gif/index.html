@@ -155,7 +155,7 @@ kbd {
 .preset small { display: block; margin-top: 3px; font-weight: 400; font-size: 0.7rem; color: var(--muted); }
 .preset[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--accent); }
 .preset:disabled { opacity: 0.55; cursor: not-allowed; }
-.fields { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) minmax(0, 0.85fr); gap: 10px; }
+.fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 .field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
 .field select {
   width: 100%; padding: 7px 8px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--ink);
@@ -333,7 +333,7 @@ body.busy .rail { cursor: default; }
   .panel { position: static; }
 }
 @media (max-width: 420px) {
-  .fields { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 0.8fr); gap: 6px; }
+  .fields { gap: 8px; }
   .field select { padding-inline: 5px; }
   .presets { grid-template-columns: minmax(0, 1fr); }
   .brand h1 { font-size: 1.45rem; }
@@ -489,6 +489,13 @@ body.busy .rail { cursor: default; }
           <select id="speed">
             <option value="0.5">0.5×</option><option value="0.75">0.75×</option><option value="1" selected>1×</option><option value="1.25">1.25×</option>
             <option value="1.5">1.5×</option><option value="2">2×</option><option value="3">3×</option><option value="4">4×</option>
+          </select>
+        </div>
+        <div class="field"><label class="label" for="maxmb">Max size</label>
+          <select id="maxmb">
+            <option value="0">No limit</option><option value="5">5 MB</option><option value="8">8 MB</option><option value="10">10 MB</option>
+            <option value="15">15 MB</option><option value="20" selected>20 MB</option><option value="25">25 MB</option>
+            <option value="50">50 MB</option><option value="100">100 MB</option>
           </select>
         </div>
       </div>
@@ -1513,8 +1520,9 @@ const POOL = {
 
 let pipeSeq = 0;
 class Pipeline {
-  constructor(o) {
+  constructor(o, maxBytes = 0) {
     this.o = o;
+    this.maxBytes = maxBytes;
     this.id = ++pipeSeq;
     this.nw = POOL.n;
     const fb = o.w * o.h * 4;
@@ -1606,6 +1614,15 @@ class Pipeline {
     this.out(new Uint8Array([0x21, 0xF9, 4, 4 | p.t, d & 255, d >> 8, p.t ? 255 : 0, 0]));
     this.out(new Uint8Array(p.data));
     this.written++;
+    // size limit: stop as soon as the GIF is sure (or clearly projected) to overshoot
+    if (this.maxBytes && !this.failed) {
+      const proj = this.cum ? this.bytes / this.cum * this.o.ticks : 0;
+      if (this.bytes > this.maxBytes || (this.cum >= Math.max(20, this.o.ticks * 0.08) && proj > this.maxBytes * 1.1)) {
+        const e = new Error('The GIF would be larger than the size limit.');
+        e.name = 'Oversize'; e.projected = Math.max(proj, this.bytes);
+        this.fail(e);
+      }
+    }
   }
   async room(extra = 0) {
     while (this.inflight + extra >= this.limit) { if (this.failed) throw this.failed; await this.nap(); }
@@ -1682,6 +1699,7 @@ async function runWC(info, src, o, pipe, sig) {
     try {
       dec.configure(cfg(info, attempt ? 'prefer-software' : undefined));
       for (let i = k0; i <= last && nextTick < o.ticks; i++) {
+        if (pipe.failed) throw pipe.failed;
         while (dec.decodeQueueSize > 8 || pipe.inflight + grabs >= pipe.limit) {
           if (sig.aborted) throw abortError();
           if (failed) throw failed;
@@ -1859,7 +1877,7 @@ async function sampleVideo(v, o, sig, count = 12) {
 // ---------- UI ----------
 const ui = {};
 for (const id of ['video', 'poster', 'tc', 'fname', 'chips', 'file', 'file2', 'inT', 'outT', 'len', 'rail', 'railIn', 'sel', 'ph', 'hIn', 'hOut',
-  'markIn', 'markOut', 'playSel', 'fullRange', 'width', 'fps', 'speed', 'readout', 'go', 'goAll', 'applyAll', 'prog', 'pstage', 'bar', 'pstats', 'cancel',
+  'markIn', 'markOut', 'playSel', 'fullRange', 'width', 'fps', 'speed', 'maxmb', 'readout', 'go', 'goAll', 'applyAll', 'prog', 'pstage', 'bar', 'pstats', 'cancel',
   'engine', 'result', 'resultTitle', 'gif', 'stats', 'save', 'again', 'saveNote', 'toast', 'drop', 'alert', 'monitor', 'openBtn', 'empty', 'hint',
   'cropper', 'cropBox', 'cropBtn', 'cropReset', 'cropAll', 'cropPanel', 'cropSum', 'cX', 'cY', 'cW', 'cH',
   'qList', 'qAdd', 'qCount', 'qSum', 'qAll', 'qZip', 'qCancel']) ui[id] = $(id);
@@ -1901,7 +1919,7 @@ const PRESETS = {
   balanced: { width: 640, fps: 20, pal: 'frame', dither: 'fs' },
   max: { width: 1080, fps: 25, pal: 'frame', dither: 'fs' },
 };
-const DEFAULT_SET = { width: 640, worig: false, fps: 20, speed: 1, pal: 'frame', dither: 'fs', loop: true };
+const DEFAULT_SET = { width: 640, worig: false, fps: 20, speed: 1, pal: 'frame', dither: 'fs', loop: true, maxMB: 20 };
 const fpsAtMost = (f) => FPS_OPTS.filter((x) => x <= f + 0.5).pop() || FPS_OPTS[0];
 
 // ----- clip plan (pure: works for the editor and for any queued clip) -----
@@ -1921,16 +1939,16 @@ function optsFor(J) {
     bw: rot % 180 ? p.h : p.w, bh: rot % 180 ? p.w : p.h, dither: p.dither, shared: p.pal === 'shared', loop: p.loop,
     crop: full ? null : p.crop, fcrop: full ? null : frameCrop(J.crop, rot) };
 }
-const sigOf = (J) => { const p = planFor(J); return JSON.stringify([p.w, p.h, p.fps, p.speed, p.pal, p.dither, p.loop, J.inT, J.outT, p.crop]); };
+const sigOf = (J) => { const p = planFor(J); return JSON.stringify([p.w, p.h, p.fps, p.speed, p.pal, p.dither, p.loop, J.inT, J.outT, p.crop, J.set.maxMB || 0]); };
 // a finished clip shows as edited once its settings no longer match the GIF it produced
 const restatus = (J) => { if (J.res && !ACTIVE.has(J.status)) J.status = sigOf(J) === J.res.sig ? 'done' : 'idle'; };
 
 function readSet() {
   return { width: +ui.width.value || 640, worig: ui.width.selectedIndex === 0, fps: +ui.fps.value, speed: +ui.speed.value,
-    pal: radio('pal'), dither: radio('dither'), loop: radio('loop') === 'loop' };
+    pal: radio('pal'), dither: radio('dither'), loop: radio('loop') === 'loop', maxMB: +ui.maxmb.value || 0 };
 }
 function writeSet(set) {
-  ui.fps.value = String(set.fps); ui.speed.value = String(set.speed);
+  ui.fps.value = String(set.fps); ui.speed.value = String(set.speed); ui.maxmb.value = String(set.maxMB || 0);
   setRadio('pal', set.pal); setRadio('dither', set.dither); setRadio('loop', set.loop ? 'loop' : 'once');
   fillWidths(set.worig ? Infinity : set.width);
 }
@@ -1982,6 +2000,8 @@ function updateReadout() {
     const rows = [['Output', `${p.w} × ${p.h} px`]];
     if (!isFull(S.crop)) rows.push(['Crop', `${p.crop.w} × ${p.crop.h} at ${p.crop.x}, ${p.crop.y}`]);
     rows.push(['Frames', `${p.ticks.toLocaleString()} @ ${p.fps} fps`], ['Clip', fmtSec(p.span)], ['Plays in', fmtSec(p.span / p.speed)]);
+    const mb = +ui.maxmb.value;
+    rows.push(['Max size', mb ? `${mb} MB, fits automatically` : 'No limit']);
     for (const [k, v] of rows) {
       const dt = document.createElement('dt'); dt.textContent = k;
       const dd = document.createElement('dd'); dd.textContent = v;
@@ -2439,8 +2459,8 @@ function statusText(J) {
     case 'probing': return J.stage || 'Reading…';
     case 'unsupported': return 'Can’t decode';
     case 'queued': return 'Waiting';
-    case 'running': return `Converting ${Math.round(jobFrac(J) * 100)}%`;
-    case 'done': return 'Done · ' + fmtBytes(J.res.size);
+    case 'running': return `${J.pass > 1 ? `Fitting (pass ${J.pass})` : 'Converting'} ${Math.round(jobFrac(J) * 100)}%`;
+    case 'done': return (J.res.over ? 'Over limit · ' : 'Done · ') + fmtBytes(J.res.size);
     case 'error': return 'Failed';
     case 'cancelled': return 'Cancelled';
     default: return J.res ? 'Edited' : 'Ready';
@@ -2632,37 +2652,73 @@ function schedule() {
   }
   refreshButtons();
 }
+// Shrink a plan to roughly f times its byte size: frame rate first (down to 15 fps), then width,
+// then frame rate again (down to 8 fps). Returns null when nothing is left to reduce.
+const MIN_W = 160, MIN_FPS = 8;
+function shrink(o, f) {
+  let fps = o.fps, w = o.w, rem = Math.min(f, 0.95);
+  if (fps > 15) { const nf = Math.max(15, Math.floor(fps * rem)); rem *= fps / nf; fps = nf; }
+  if (rem < 1 && w > MIN_W) { const nw = Math.max(MIN_W, Math.floor(w * Math.sqrt(rem) / 2) * 2); rem *= (w / nw) ** 2; w = nw; }
+  if (rem < 0.97 && fps > MIN_FPS) { const nf = Math.max(MIN_FPS, Math.floor(fps * rem)); rem *= fps / nf; fps = nf; }
+  if (w === o.w && fps === o.fps) return null;
+  const h = Math.max(1, Math.round(w * o.h / o.w)), ticks = Math.max(1, Math.round((o.end - o.start) * fps));
+  return { ...o, w, h, fps, ticks, bw: o.rot % 180 ? h : w, bh: o.rot % 180 ? w : h };
+}
+
 async function runJob(J) {
-  const o = optsFor(J), ctrl = new AbortController(), pipe = new Pipeline(o), sig = ctrl.signal;
-  Object.assign(J, { status: 'running', opts: o, ctrl, pipe, stage: 'Starting', t0: performance.now(), runSig: sigOf(J) });
-  sig.addEventListener('abort', () => pipe.fail(abortError()));
+  const ctrl = new AbortController(), sig = ctrl.signal, maxMB = J.set.maxMB || 0, maxBytes = maxMB * 1e6;
+  const first = optsFor(J);
+  Object.assign(J, { status: 'running', opts: first, ctrl, pipe: null, pass: 1, stage: 'Starting', t0: performance.now(), runSig: sigOf(J) });
   renderRow(J);
   if (J === S.job) applyLock();
-  let v = null;
+  let v = null, o = first, out = null, over = false, guard = true;
   try {
-    pipe.start();
-    const src = new Src(J.file);
     if (J.engine === 'video') v = await hiddenVideo(J.url);
-    if (o.shared) {
-      J.stage = 'Sampling colors for the shared palette';
-      const bmps = J.engine === 'wc' ? await sampleWC(J.info, src, o, sig) : await sampleVideo(v, o, sig);
-      await pipe.buildPalette(bmps);
+    for (let pass = 1; ; pass++) {
+      const pipe = new Pipeline(o, guard ? maxBytes : 0), onAbort = () => pipe.fail(abortError());
+      Object.assign(J, { pass, opts: o, pipe });
+      sig.addEventListener('abort', onAbort);
+      const fit = pass > 1 ? ` (pass ${pass}: ${o.w} px, ${o.fps} fps to fit ${maxMB} MB)` : '';
+      let next = null;
+      try {
+        pipe.start();
+        const src = new Src(J.file);
+        if (o.shared) {
+          J.stage = 'Sampling colors for the shared palette' + fit;
+          const bmps = J.engine === 'wc' ? await sampleWC(J.info, src, o, sig) : await sampleVideo(v, o, sig);
+          await pipe.buildPalette(bmps);
+        }
+        pipe.begin();
+        J.stage = (J.engine === 'wc' ? 'Decoding and encoding' : 'Stepping through frames and encoding') + fit;
+        if (J.engine === 'wc') await runWC(J.info, src, o, pipe, sig);
+        else await runVideo(v, o, pipe, sig, true);
+        J.stage = 'Writing GIF' + fit;
+        const blob = await pipe.finish();
+        out = { blob, written: pipe.written, o, passes: pass };
+        if (!maxBytes || blob.size <= maxBytes) break;
+        // finished but still over: shrink by the measured ratio
+        next = pass < 6 ? shrink(o, maxBytes * 0.92 / blob.size) : null;
+        if (!next) { over = true; break; }
+      } catch (e) {
+        if (!e || e.name !== 'Oversize' || sig.aborted) throw e;
+        next = pass < 6 ? shrink(o, maxBytes * 0.9 / e.projected) : null;
+        // nothing left to reduce: finish at the smallest settings and report the size
+        if (!next) { guard = false; next = o; }
+      } finally {
+        sig.removeEventListener('abort', onAbort);
+        pipe.dispose();
+      }
+      o = next;
     }
-    pipe.begin();
-    J.stage = J.engine === 'wc' ? 'Decoding and encoding' : 'Stepping through frames and encoding';
-    if (J.engine === 'wc') await runWC(J.info, src, o, pipe, sig);
-    else await runVideo(v, o, pipe, sig, true);
-    J.stage = 'Writing GIF';
-    const blob = await pipe.finish();
     if (J.res) URL.revokeObjectURL(J.res.url);
-    J.res = { blob, url: URL.createObjectURL(blob), size: blob.size, o, written: pipe.written, secs: (performance.now() - J.t0) / 1000, sig: J.runSig };
+    J.res = { blob: out.blob, url: URL.createObjectURL(out.blob), size: out.blob.size, o: out.o, written: out.written, secs: (performance.now() - J.t0) / 1000,
+      sig: J.runSig, maxMB, over, passes: out.passes, from: out.o.w !== first.w || out.o.fps !== first.fps ? first : null };
     J.status = 'done'; J.err = null;
   } catch (e) {
     J.status = sig.aborted ? 'cancelled' : 'error';
     J.err = sig.aborted ? null : (e && e.message) || String(e);
     if (!sig.aborted) console.error(e);
   } finally {
-    pipe.dispose();
     if (v) { v.removeAttribute('src'); v.load(); v.remove(); }
     J.pipe = null; J.ctrl = null;
     if (J.status === 'cancelled') restatusAfterStop(J);
@@ -2743,7 +2799,7 @@ function renderResult() {
   if (!r) { ui.result.hidden = true; return; }
   const o = r.o;
   ui.gif.src = r.url; ui.gif.width = o.w; ui.gif.height = o.h;
-  ui.resultTitle.textContent = J.status === 'done' ? 'GIF ready' : 'Last GIF (settings changed since)';
+  ui.resultTitle.textContent = J.status !== 'done' ? 'Last GIF (settings changed since)' : r.over ? 'GIF ready, but over the size limit' : 'GIF ready';
   const rows = [
     ['File size', fmtBytes(r.size)],
     ['Dimensions', `${o.w} × ${o.h}`],
@@ -2752,6 +2808,8 @@ function renderResult() {
     ...(o.crop ? [['Crop', `${o.crop.w} × ${o.crop.h} at ${o.crop.x}, ${o.crop.y}`]] : []),
     ['Palette', o.shared ? 'Shared, 255 colors' : 'Per frame, 255 colors'],
     ['Dither', { fs: 'Floyd–Steinberg', bayer: 'Bayer 8×8', none: 'Off' }[o.dither]],
+    ...(r.maxMB ? [['Size limit', `${r.maxMB} MB · ${r.over ? 'not met' : 'met'}`]] : []),
+    ...(r.from ? [['Fitted', `${r.from.w} px @ ${r.from.fps} fps → ${o.w} px @ ${o.fps} fps (${r.passes} passes)`]] : []),
     ['Encode time', `${r.secs.toFixed(1)} s · ${((o.end - o.start) / r.secs).toFixed(1)}× realtime`],
   ];
   ui.stats.replaceChildren();
@@ -2760,7 +2818,7 @@ function renderResult() {
     const dd = document.createElement('dd'); dd.textContent = v;
     ui.stats.append(dt, dd);
   }
-  ui.saveNote.textContent = '';
+  ui.saveNote.textContent = r.over ? `Even at ${o.w} px and ${o.fps} fps this clip is ${fmtBytes(r.size)}. Shorten the range, or choose Pattern dither or the Shared palette, which compress better.` : '';
   ui.result.hidden = false;
 }
 

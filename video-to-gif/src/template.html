@@ -155,7 +155,7 @@ kbd {
 .preset small { display: block; margin-top: 3px; font-weight: 400; font-size: 0.7rem; color: var(--muted); }
 .preset[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--accent); }
 .preset:disabled { opacity: 0.55; cursor: not-allowed; }
-.fields { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) minmax(0, 0.85fr); gap: 10px; }
+.fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 .field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
 .field select {
   width: 100%; padding: 7px 8px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--ink);
@@ -333,7 +333,7 @@ body.busy .rail { cursor: default; }
   .panel { position: static; }
 }
 @media (max-width: 420px) {
-  .fields { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 0.8fr); gap: 6px; }
+  .fields { gap: 8px; }
   .field select { padding-inline: 5px; }
   .presets { grid-template-columns: minmax(0, 1fr); }
   .brand h1 { font-size: 1.45rem; }
@@ -489,6 +489,13 @@ body.busy .rail { cursor: default; }
           <select id="speed">
             <option value="0.5">0.5×</option><option value="0.75">0.75×</option><option value="1" selected>1×</option><option value="1.25">1.25×</option>
             <option value="1.5">1.5×</option><option value="2">2×</option><option value="3">3×</option><option value="4">4×</option>
+          </select>
+        </div>
+        <div class="field"><label class="label" for="maxmb">Max size</label>
+          <select id="maxmb">
+            <option value="0">No limit</option><option value="5">5 MB</option><option value="8">8 MB</option><option value="10">10 MB</option>
+            <option value="15">15 MB</option><option value="20" selected>20 MB</option><option value="25">25 MB</option>
+            <option value="50">50 MB</option><option value="100">100 MB</option>
           </select>
         </div>
       </div>
