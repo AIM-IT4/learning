@@ -356,29 +356,40 @@ function encodeChunk(m) {
   return { outs, tr };
 }
 
+// Workers are shared by every conversion, so each message carries its job's settings;
+// switching jobs only reallocates buffers when the frame size changes.
+let CFG = null;
+function configure(c) {
+  if (!cv || W !== c.W || H !== c.H) {
+    W = c.W; H = c.H;
+    cv = new OffscreenCanvas(W, H);
+    cx = cv.getContext('2d', { willReadFrequently: true, alpha: false });
+    cx.imageSmoothingEnabled = true;
+    cx.imageSmoothingQuality = 'high';
+    idxA = new Uint8Array(W * H); idxB = new Uint8Array(W * H);
+    E0 = new Float32Array((W + 2) * 3); E1 = new Float32Array((W + 2) * 3);
+  }
+  BW = c.BW; BH = c.BH; ROT = c.ROT; DITHER = c.DITHER;
+  SHARED = !!c.pal;
+  if (SHARED) usePalette(c.pal, c.n);
+  CFG = c.key;
+}
+
 self.onmessage = (ev) => {
   const m = ev.data;
   try {
-    if (m.type === 'init') {
-      W = m.W; H = m.H; BW = m.BW; BH = m.BH; ROT = m.ROT; DITHER = m.DITHER;
-      cv = new OffscreenCanvas(W, H);
-      cx = cv.getContext('2d', { willReadFrequently: true, alpha: false });
-      cx.imageSmoothingEnabled = true;
-      cx.imageSmoothingQuality = 'high';
-      idxA = new Uint8Array(W * H); idxB = new Uint8Array(W * H);
-      E0 = new Float32Array((W + 2) * 3); E1 = new Float32Array((W + 2) * 3);
-    } else if (m.type === 'palette') {
+    if (m.cfg && m.cfg.key !== CFG) configure(m.cfg);
+    if (m.type === 'palette') {
       histReset();
       for (const b of m.frames) histAdd(pixels(b));
       const q = wuPalette(255);
       self.postMessage({ type: 'palette', pal: q.pal, n: q.n }, [q.pal.buffer]);
-    } else if (m.type === 'setPalette') {
-      usePalette(m.pal, m.n); SHARED = true;
     } else if (m.type === 'chunk') {
       const r = encodeChunk(m);
       self.postMessage({ type: 'done', id: m.id, outs: r.outs }, r.tr);
     }
   } catch (err) {
+    CFG = null;
     self.postMessage({ type: 'error', id: m.id, message: (err && err.message) || String(err) });
   }
 };

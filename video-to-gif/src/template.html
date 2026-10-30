@@ -176,6 +176,7 @@ kbd {
   display: grid; grid-template-columns: auto 1fr; gap: 3px 12px; margin: 0; padding: 10px 12px; border-radius: 9px;
   border: 1px dashed var(--line); background: var(--bg); font-family: var(--f-mono); font-size: 0.78rem; font-variant-numeric: tabular-nums;
 }
+.readout:empty { display: none; }
 .readout dt { color: var(--muted); }
 .readout dd { margin: 0; text-align: right; }
 .hint { margin: 0; font-size: 0.78rem; color: var(--ink); padding: 8px 10px; border-radius: 8px; background: var(--accent-soft); }
@@ -236,6 +237,51 @@ kbd {
 .toast.on { opacity: 1; transform: translate(-50%, 0); }
 body.busy .rail { cursor: default; }
 
+/* clips strip */
+.clips { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.clips-head { display: flex; align-items: center; justify-content: space-between; gap: 8px 14px; flex-wrap: wrap; }
+.clips-title { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.clips-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.qlist { position: relative; list-style: none; margin: 0; padding: 2px 2px 8px; display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x proximity; }
+.clip {
+  flex: 0 0 196px; min-width: 0; display: flex; flex-direction: column; gap: 6px; padding: 8px; scroll-snap-align: start;
+  border: 1px solid var(--line); border-radius: 12px; background: var(--surface);
+}
+.clip.on { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.clip-pick {
+  position: relative; display: block; width: 100%; aspect-ratio: 16 / 9; padding: 0; border: 0; border-radius: 8px; overflow: hidden;
+  background: var(--monitor); cursor: pointer;
+}
+.clip-thumb { display: block; width: 100%; height: 100%; object-fit: contain; }
+.clip-badge {
+  position: absolute; left: 6px; top: 6px; max-width: calc(100% - 12px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  padding: 2px 6px; border-radius: 4px; background: rgba(0, 0, 0, 0.66); color: #e7eaee;
+  font-family: var(--f-mono); font-size: 0.68rem; font-variant-numeric: tabular-nums;
+}
+.clip[data-status="running"] .clip-badge, .clip[data-status="queued"] .clip-badge { color: #ffc928; }
+.clip[data-status="done"] .clip-badge { color: #7be0a3; }
+.clip[data-status="error"] .clip-badge, .clip[data-status="unsupported"] .clip-badge { color: #ff9a87; }
+.clip-bar { position: absolute; left: 0; right: 0; bottom: 0; height: 4px; display: none; background: rgba(255, 255, 255, 0.18); }
+.clip[data-status="running"] .clip-bar, .clip[data-status="queued"] .clip-bar { display: block; }
+.clip-bar i { display: block; height: 100%; width: 0; background: var(--accent); transition: width 0.25s linear; }
+.clip-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.clip-name { font-weight: 650; font-size: 0.84rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.clip-meta { font-family: var(--f-mono); font-size: 0.7rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-variant-numeric: tabular-nums; }
+.clip-actions { display: flex; flex-wrap: wrap; gap: 4px; }
+.btn.xs { padding: 4px 7px; font-size: 0.72rem; border-radius: 7px; }
+.clip.add { border-style: dashed; background: transparent; padding: 0; }
+.addtile {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-height: 168px; padding: 12px;
+  border-radius: 12px; color: var(--ink); font-weight: 650; font-size: 0.88rem; text-align: center;
+}
+.addtile:hover { background: var(--accent-soft); }
+.btn.alt { background: var(--surface); }
+.linkbtn {
+  align-self: flex-start; padding: 0; border: 0; background: none; cursor: pointer; color: var(--ink);
+  font-size: 0.8rem; font-weight: 600; text-decoration: underline; text-decoration-color: var(--accent); text-underline-offset: 3px;
+}
+.linkbtn:disabled { opacity: 0.5; cursor: not-allowed; }
+
 .crop-actions { display: flex; gap: 6px; margin-left: auto; }
 .cropcard .trim-head { justify-content: flex-start; }
 .crop-panel { display: flex; flex-direction: column; gap: 10px; }
@@ -293,7 +339,7 @@ body.busy .rail { cursor: default; }
   .brand h1 { font-size: 1.45rem; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .bar i, .toast { transition: none; }
+  .bar i, .toast, .clip-bar i { transition: none; }
 }
 </style>
 
@@ -315,6 +361,27 @@ body.busy .rail { cursor: default; }
 
   <div class="alert" id="alert" role="alert" hidden></div>
 
+  <section class="clips" aria-label="Clips">
+    <div class="clips-head">
+      <div class="clips-title"><span class="label">Clips</span><span class="len" id="qCount">0</span><span class="sub" id="qSum"></span></div>
+      <div class="clips-actions">
+        <button class="btn sm" id="qCancel" type="button" hidden>Cancel all</button>
+        <button class="btn sm" id="qZip" type="button" hidden>Save all (.zip)</button>
+        <button class="btn sm primary" id="qAll" type="button" hidden>Convert all</button>
+      </div>
+    </div>
+    <ol class="qlist" id="qList">
+      <li class="clip add" id="qAdd">
+        <label class="filebtn addtile">
+          <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M11 4v14M4 11h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          Add videos
+          <span class="sub">Select several at once</span>
+          <input type="file" id="file2" multiple accept="video/*,.mp4,.m4v,.mov,.webm,.mkv,.3gp,.3g2,.ogv,.avi,.wmv,.flv,.ts,.mts" aria-label="Add videos">
+        </label>
+      </li>
+    </ol>
+  </section>
+
   <main class="grid">
     <section class="stage" aria-label="Source video">
       <div class="monitor" id="monitor">
@@ -330,7 +397,7 @@ body.busy .rail { cursor: default; }
           </div>
         </div>
         <div class="tc" id="tc" aria-live="off">00:00.00</div>
-        <div class="empty" id="empty" hidden>Open a video, or drop one anywhere on this page.</div>
+        <div class="empty" id="empty" hidden>Open videos, or drop them anywhere on this page. You can add several at once.</div>
       </div>
 
       <div class="srcbar">
@@ -341,8 +408,8 @@ body.busy .rail { cursor: default; }
         <!-- the real file input covers the button, so a tap reaches the native picker directly -->
         <label class="btn filebtn" id="openBtn">
           <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 4.5A1.5 1.5 0 0 1 3.5 3h3l1.5 1.5h4.5A1.5 1.5 0 0 1 14 6v5.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 11.5z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
-          Open video
-          <input type="file" id="file" accept="video/*,.mp4,.m4v,.mov,.webm,.mkv,.3gp,.3g2,.ogv,.avi,.wmv,.flv,.ts,.mts" aria-label="Open video">
+          Open videos
+          <input type="file" id="file" multiple accept="video/*,.mp4,.m4v,.mov,.webm,.mkv,.3gp,.3g2,.ogv,.avi,.wmv,.flv,.ts,.mts" aria-label="Open videos">
         </label>
       </div>
 
@@ -376,6 +443,7 @@ body.busy .rail { cursor: default; }
           <span class="label">Crop</span>
           <span class="len" id="cropSum">Full frame</span>
           <div class="crop-actions">
+            <button class="btn sm" id="cropAll" type="button" hidden>Apply crop to all clips</button>
             <button class="btn sm" id="cropReset" type="button" hidden>Reset</button>
             <button class="btn sm primary" id="cropBtn" type="button" aria-expanded="false" aria-controls="cropPanel">Crop frame</button>
           </div>
@@ -455,11 +523,13 @@ body.busy .rail { cursor: default; }
       <p class="hint" id="hint" hidden></p>
 
       <button class="btn primary big" id="go" type="button" disabled>Convert to GIF</button>
+      <button class="btn big alt" id="goAll" type="button" hidden>Convert all clips</button>
       <div class="prog" id="prog" hidden>
         <div class="prog-top"><span class="pstage" id="pstage">Starting</span><button class="btn sm" id="cancel" type="button">Cancel</button></div>
         <div class="bar" role="progressbar" aria-label="Conversion progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="bar"></i></div>
         <div class="pstats" id="pstats"></div>
       </div>
+      <button class="linkbtn" id="applyAll" type="button" hidden>Apply these settings to all clips</button>
       <p class="engine" id="engine"></p>
     </aside>
   </main>
@@ -467,7 +537,7 @@ body.busy .rail { cursor: default; }
   <section class="result" id="result" aria-label="Converted GIF" hidden>
     <div class="result-img"><img id="gif" alt="Converted GIF preview"></div>
     <div class="result-side">
-      <h2>GIF ready</h2>
+      <h2 id="resultTitle">GIF ready</h2>
       <dl class="stats" id="stats"></dl>
       <div class="row">
         <button class="btn primary" id="save" type="button">Save GIF</button>

@@ -503,52 +503,101 @@ function gifHeader(w, h, gct, loop) {
   return out;
 }
 
+const closeBmp = (b) => { try { b && b.close(); } catch {} };
+const HC = navigator.hardwareConcurrency || 4;
+const LOW_MEM = !!(navigator.deviceMemory && navigator.deviceMemory <= 4);
+// clips converted at the same time; they share one warm encoder pool
+const MAX_JOBS = HC >= 4 && !LOW_MEM ? 2 : 1;
+
+// One set of encoder threads for every conversion: they stay warm between clips, and while one
+// clip is decoding or finishing, chunks from another keep the cores busy.
+const POOL = {
+  n: clamp(HC - 1, 1, 12), workers: [], idle: [], q: [], busy: new Map(), url: null,
+  ensure() {
+    if (this.workers.length) return;
+    this.url = this.url || URL.createObjectURL(new Blob([WORKER_SRC], { type: 'text/javascript' }));
+    for (let i = 0; i < this.n; i++) this.spawn();
+  },
+  spawn() {
+    const w = new Worker(this.url);
+    w.onmessage = (e) => this.done(w, e.data);
+    w.onerror = (e) => { if (e.preventDefault) e.preventDefault(); this.crash(w, e); };
+    this.workers.push(w); this.idle.push(w);
+  },
+  submit(task) { this.q.push(task); this.pump(); },
+  pump() {
+    while (this.idle.length && this.q.length) {
+      const t = this.q.shift();
+      if (t.pipe.dead) { t.bitmaps.forEach(closeBmp); continue; }
+      const w = this.idle.pop();
+      this.busy.set(w, t);
+      w.postMessage(t.msg, t.bitmaps);
+    }
+  },
+  done(w, m) {
+    const t = this.busy.get(w);
+    this.busy.delete(w); this.idle.push(w);
+    if (t && !t.pipe.dead) t.onDone(m);
+    this.pump();
+  },
+  crash(w, e) {
+    const t = this.busy.get(w);
+    this.busy.delete(w);
+    this.workers = this.workers.filter((x) => x !== w); this.idle = this.idle.filter((x) => x !== w);
+    w.terminate();
+    this.spawn();
+    if (t) t.pipe.fail(new Error('An encoder thread stopped: ' + ((e && e.message) || 'unknown error')));
+    this.pump();
+  },
+  drop(pipe) {
+    this.q = this.q.filter((t) => { if (t.pipe !== pipe) return true; t.bitmaps.forEach(closeBmp); return false; });
+  },
+};
+
+let pipeSeq = 0;
 class Pipeline {
   constructor(o) {
     this.o = o;
-    const hc = navigator.hardwareConcurrency || 4;
-    this.nw = clamp(hc - 1, 1, 12);
+    this.id = ++pipeSeq;
+    this.nw = POOL.n;
     const fb = o.w * o.h * 4;
-    const budget = (navigator.deviceMemory && navigator.deviceMemory <= 4 ? 160 : 384) * 1048576;
+    const budget = (LOW_MEM ? 160 : 384) * 1048576 / MAX_JOBS;
     this.limit = Math.max(4, Math.floor(budget / fb));
     // small chunks keep every thread busy on short clips; longer chunks amortize the re-quantized
     // previous frame each chunk needs for diffing
     this.C = clamp(Math.min(Math.floor(this.limit / (this.nw * 2)), Math.ceil(o.ticks / (this.nw * 4))), 2, 12);
-    this.workers = []; this.idle = []; this.queue = []; this.busy = new Map(); this.results = new Map();
+    this.cfg = { key: String(this.id), W: o.w, H: o.h, BW: o.bw, BH: o.bh, ROT: o.rot, DITHER: o.dither, pal: null, n: 0 };
+    this.queue = []; this.results = new Map();
     this.cur = null; this.nextPrevP = null; this.chunkId = 0; this.writeId = 0;
     this.ticks = []; this.frames = 0; this.inflight = 0; this.ticksDone = 0; this.framesDone = 0; this.written = 0;
-    this.parts = []; this.bytes = 0; this.cum = 0; this.pend = null; this.failed = null; this.waiters = [];
+    this.parts = []; this.bytes = 0; this.cum = 0; this.pend = null; this.failed = null; this.waiters = []; this.dead = false;
     this.unit = 100 / (o.fps * o.speed);
     this.gct = null; this.palWait = null;
   }
   kick() { const w = this.waiters; this.waiters = []; for (const f of w) f(); }
   nap() { return new Promise((r) => { this.waiters.push(r); setTimeout(r, 40); }); }
-  fail(e) { if (!this.failed) this.failed = e; if (this.palWait) this.palWait.rej(e); this.kick(); }
-  start() {
-    this.url = URL.createObjectURL(new Blob([WORKER_SRC], { type: 'text/javascript' }));
-    const o = this.o;
-    for (let i = 0; i < this.nw; i++) {
-      const w = new Worker(this.url);
-      w.onmessage = (e) => this.onMsg(w, e.data);
-      w.onerror = (e) => { e.preventDefault?.(); this.fail(new Error('An encoder thread stopped: ' + (e.message || 'unknown error'))); };
-      w.postMessage({ type: 'init', W: o.w, H: o.h, BW: o.bw, BH: o.bh, ROT: o.rot, DITHER: o.dither });
-      this.workers.push(w); this.idle.push(w);
-    }
-  }
+  fail(e) { if (!this.failed) this.failed = e; if (this.palWait) { this.palWait.rej(e); this.palWait = null; } this.kick(); }
+  start() { POOL.ensure(); }
   buildPalette(bmps) {
     return new Promise((res, rej) => {
       this.palWait = { res, rej };
-      const w = this.workers[0];
-      this.idle = this.idle.filter((x) => x !== w);
-      w.postMessage({ type: 'palette', frames: bmps }, bmps);
+      POOL.submit({
+        pipe: this, bitmaps: bmps, msg: { type: 'palette', cfg: this.cfg, frames: bmps },
+        onDone: (m) => {
+          if (m.type !== 'palette') { this.fail(new Error('Encoder error: ' + m.message)); return; }
+          this.gct = new Uint8Array(m.pal);
+          this.cfg = { ...this.cfg, key: this.id + ':shared', pal: this.gct, n: m.n };
+          const pw = this.palWait; this.palWait = null; pw && pw.res();
+        },
+      });
     });
   }
   begin() { for (const p of gifHeader(this.o.w, this.o.h, this.gct, this.o.loop)) this.out(p); }
   out(u8) { this.parts.push(u8); this.bytes += u8.byteLength; }
   push(bmp, n) {
-    if (this.failed) { bmp.close(); throw this.failed; }
+    if (this.failed || this.dead) { bmp.close(); throw this.failed || abortError(); }
     this.ticks.push(n);
-    if (!this.cur) this.cur = { id: this.chunkId++, first: this.frames, frames: [], prevP: this.nextPrevP, prev: null, ready: false };
+    if (!this.cur) this.cur = { id: this.chunkId++, first: this.frames, frames: [], prevP: this.nextPrevP, prev: null };
     this.cur.frames.push(bmp);
     this.frames++; this.inflight++;
     if (this.cur.frames.length >= this.C) this.seal(false);
@@ -562,33 +611,19 @@ class Pipeline {
     const clone = final ? null : createImageBitmap(c.frames[c.frames.length - 1]);
     this.nextPrevP = clone;
     this.queue.push(c);
-    Promise.all([c.prevP, clone]).then(([prev]) => { c.prev = prev || null; c.ready = true; this.pump(); }, (e) => this.fail(e));
+    Promise.all([c.prevP, clone]).then(([prev]) => {
+      this.queue = this.queue.filter((x) => x !== c);
+      if (this.dead) { c.frames.forEach(closeBmp); closeBmp(prev); return; }
+      const bitmaps = prev ? [prev, ...c.frames] : c.frames.slice();
+      POOL.submit({ pipe: this, bitmaps, msg: { type: 'chunk', cfg: this.cfg, id: c.id, prev: prev || null, frames: c.frames }, onDone: (m) => this.chunkDone(c, m) });
+    }, (e) => this.fail(e));
   }
-  pump() {
-    while (this.idle.length && !this.failed) {
-      const i = this.queue.findIndex((c) => c.ready);
-      if (i < 0) break;
-      const c = this.queue.splice(i, 1)[0], w = this.idle.pop();
-      this.busy.set(w, c);
-      w.postMessage({ type: 'chunk', id: c.id, prev: c.prev, frames: c.frames }, c.prev ? [c.prev, ...c.frames] : c.frames.slice());
-    }
-  }
-  onMsg(w, m) {
-    if (m.type === 'palette') {
-      this.idle.push(w);
-      this.gct = new Uint8Array(m.pal);
-      for (const x of this.workers) x.postMessage({ type: 'setPalette', pal: this.gct, n: m.n });
-      const pw = this.palWait; this.palWait = null; pw && pw.res();
-      return;
-    }
-    if (m.type === 'error') { this.fail(new Error('Encoder error: ' + m.message)); return; }
-    if (m.type !== 'done') return;
-    const c = this.busy.get(w);
-    this.busy.delete(w); this.idle.push(w);
+  chunkDone(c, m) {
+    if (m.type !== 'done') { this.fail(new Error('Encoder error: ' + m.message)); return; }
     this.results.set(m.id, { first: c.first, outs: m.outs });
     this.inflight -= c.frames.length; this.framesDone += c.frames.length;
     for (let f = c.first; f < c.first + c.frames.length; f++) this.ticksDone += this.ticks[f];
-    this.drain(); this.pump(); this.kick();
+    this.drain(); this.kick();
   }
   drain() {
     while (this.results.has(this.writeId)) {
@@ -620,7 +655,7 @@ class Pipeline {
   }
   async finish() {
     if (this.cur) this.seal(true);
-    else if (this.nextPrevP) this.nextPrevP.then((b) => b && b.close(), () => {});
+    else if (this.nextPrevP) this.nextPrevP.then(closeBmp, () => {});
     this.nextPrevP = null;
     if (!this.frames) throw new Error('No frames were decoded in the selected range.');
     while (this.writeId < this.chunkId) { if (this.failed) throw this.failed; await this.nap(); }
@@ -629,13 +664,12 @@ class Pipeline {
     return new Blob(this.parts, { type: 'image/gif' });
   }
   dispose() {
-    for (const w of this.workers) w.terminate();
-    const close = (b) => { try { b && b.close(); } catch {} };
-    for (const c of this.queue) { c.frames.forEach(close); close(c.prev); }
-    if (this.cur) this.cur.frames.forEach(close);
-    if (this.nextPrevP) this.nextPrevP.then(close, () => {});
-    if (this.url) URL.revokeObjectURL(this.url);
-    this.workers = []; this.queue = []; this.kick();
+    this.dead = true;
+    POOL.drop(this);
+    for (const c of this.queue) c.frames.forEach(closeBmp);
+    if (this.cur) this.cur.frames.forEach(closeBmp);
+    if (this.nextPrevP) this.nextPrevP.then(closeBmp, () => {});
+    this.queue = []; this.cur = null; this.kick();
   }
 }
 
@@ -784,7 +818,7 @@ function seekVideo(v, t) {
   });
 }
 
-async function runVideo(v, o, pipe, sig) {
+async function runVideo(v, o, pipe, sig, seekOnly = false) {
   const T = (k) => o.start + k / o.fps;
   // draw synchronously so the captured frame is exactly the one the frame callback reported
   const oc = new OffscreenCanvas(o.bw, o.bh), ocx = oc.getContext('2d', { alpha: false });
@@ -800,7 +834,7 @@ async function runVideo(v, o, pipe, sig) {
     } catch (e) { failed = failed || e; }
   };
   v.pause(); v.muted = true; v.loop = false;
-  if (typeof v.requestVideoFrameCallback !== 'function') {
+  if (seekOnly || typeof v.requestVideoFrameCallback !== 'function') {
     for (let k = 0; k < o.ticks; k++) {
       if (sig.aborted) throw abortError();
       await pipe.room();
@@ -867,14 +901,21 @@ async function sampleVideo(v, o, sig, count = 12) {
 
 // ---------- UI ----------
 const ui = {};
-for (const id of ['video', 'poster', 'tc', 'fname', 'chips', 'file', 'inT', 'outT', 'len', 'rail', 'railIn', 'sel', 'ph', 'hIn', 'hOut',
-  'markIn', 'markOut', 'playSel', 'fullRange', 'width', 'fps', 'speed', 'readout', 'go', 'prog', 'pstage', 'bar', 'pstats', 'cancel',
-  'engine', 'result', 'gif', 'stats', 'save', 'again', 'saveNote', 'toast', 'drop', 'alert', 'monitor', 'openBtn', 'empty', 'hint',
-  'cropper', 'cropBox', 'cropBtn', 'cropReset', 'cropPanel', 'cropSum', 'cX', 'cY', 'cW', 'cH']) ui[id] = $(id);
+for (const id of ['video', 'poster', 'tc', 'fname', 'chips', 'file', 'file2', 'inT', 'outT', 'len', 'rail', 'railIn', 'sel', 'ph', 'hIn', 'hOut',
+  'markIn', 'markOut', 'playSel', 'fullRange', 'width', 'fps', 'speed', 'readout', 'go', 'goAll', 'applyAll', 'prog', 'pstage', 'bar', 'pstats', 'cancel',
+  'engine', 'result', 'resultTitle', 'gif', 'stats', 'save', 'again', 'saveNote', 'toast', 'drop', 'alert', 'monitor', 'openBtn', 'empty', 'hint',
+  'cropper', 'cropBox', 'cropBtn', 'cropReset', 'cropAll', 'cropPanel', 'cropSum', 'cX', 'cY', 'cW', 'cH',
+  'qList', 'qAdd', 'qCount', 'qSum', 'qAll', 'qZip', 'qCancel']) ui[id] = $(id);
 
-const S = { file: null, url: null, info: null, src: null, engine: null, dur: 0, dw: 0, dh: 0, rot: 0, srcFps: 0, inT: 0, outT: 0,
-  busy: false, ctrl: null, videoOK: false, scrubT: 0, blob: null, gifURL: null, loopRange: false, sample: false, loadId: 0,
-  crop: { ...FULL }, ratioKey: 'free', cropOn: false };
+// Every video you add is a clip with its own trim, crop and settings. The editor shows the
+// selected clip through S, a mirror of its fields; edits are written back by sync().
+const jobs = [];
+let jobSeq = 0;
+const S = { job: null, file: null, url: null, info: null, engine: null, dur: 0, dw: 0, dh: 0, rot: 0, srcFps: 0, inT: 0, outT: 0,
+  videoOK: false, scrubT: 0, loopRange: false, loadId: 0, crop: { ...FULL }, ratioKey: 'free', cropOn: false };
+const ACTIVE = new Set(['queued', 'running']);
+Object.defineProperty(S, 'busy', { get: () => !!S.job && ACTIVE.has(S.job.status) });
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 const dlP = window.claude && typeof window.claude.use === 'function'
   ? Promise.resolve().then(() => window.claude.use('downloads')).catch(() => null) : Promise.resolve(null);
@@ -897,17 +938,57 @@ const radio = (name) => document.querySelector(`input[name="${name}"]:checked`).
 const setRadio = (name, v) => { const r = document.querySelector(`input[name="${name}"][value="${v}"]`); if (r) r.checked = true; };
 
 const WIDTHS = [1920, 1440, 1280, 1080, 960, 800, 720, 640, 540, 480, 400, 320, 240];
+const FPS_OPTS = [8, 10, 12, 15, 20, 24, 25, 30, 50];
 const PRESETS = {
   share: { width: 480, fps: 15, pal: 'shared', dither: 'bayer' },
   balanced: { width: 640, fps: 20, pal: 'frame', dither: 'fs' },
   max: { width: 1080, fps: 25, pal: 'frame', dither: 'fs' },
 };
+const DEFAULT_SET = { width: 640, worig: false, fps: 20, speed: 1, pal: 'frame', dither: 'fs', loop: true };
+const fpsAtMost = (f) => FPS_OPTS.filter((x) => x <= f + 0.5).pop() || FPS_OPTS[0];
 
-// the crop in source pixels of the displayed picture
-function cropPx() {
-  const c = S.crop, x = Math.round(c.x * S.dw), y = Math.round(c.y * S.dh);
-  return { x, y, w: clamp(Math.round(c.w * S.dw), 1, S.dw - x), h: clamp(Math.round(c.h * S.dh), 1, S.dh - y) };
+// ----- clip plan (pure: works for the editor and for any queued clip) -----
+function cropPxOf(J) {
+  const c = J.crop, x = Math.round(c.x * J.dw), y = Math.round(c.y * J.dh);
+  return { x, y, w: clamp(Math.round(c.w * J.dw), 1, J.dw - x), h: clamp(Math.round(c.h * J.dh), 1, J.dh - y) };
 }
+function planFor(J) {
+  const s = J.set, fps = Math.min(s.fps, Math.floor(50 / s.speed + 1e-9)), cp = cropPxOf(J);
+  const w = s.worig ? cp.w : Math.min(s.width, cp.w), h = Math.max(1, Math.round(w * cp.h / cp.w));
+  const span = Math.max(0, J.outT - J.inT);
+  return { w, h, crop: cp, fps, fpsSel: s.fps, speed: s.speed, span, ticks: Math.max(1, Math.round(span * fps)), pal: s.pal, dither: s.dither, loop: s.loop };
+}
+function optsFor(J) {
+  const p = planFor(J), rot = J.engine === 'wc' ? J.rot : 0, full = isFull(J.crop);
+  return { start: J.inT, end: J.outT, fps: p.fps, speed: p.speed, ticks: p.ticks, w: p.w, h: p.h, rot,
+    bw: rot % 180 ? p.h : p.w, bh: rot % 180 ? p.w : p.h, dither: p.dither, shared: p.pal === 'shared', loop: p.loop,
+    crop: full ? null : p.crop, fcrop: full ? null : frameCrop(J.crop, rot) };
+}
+const sigOf = (J) => { const p = planFor(J); return JSON.stringify([p.w, p.h, p.fps, p.speed, p.pal, p.dither, p.loop, J.inT, J.outT, p.crop]); };
+// a finished clip shows as edited once its settings no longer match the GIF it produced
+const restatus = (J) => { if (J.res && !ACTIVE.has(J.status)) J.status = sigOf(J) === J.res.sig ? 'done' : 'idle'; };
+
+function readSet() {
+  return { width: +ui.width.value || 640, worig: ui.width.selectedIndex === 0, fps: +ui.fps.value, speed: +ui.speed.value,
+    pal: radio('pal'), dither: radio('dither'), loop: radio('loop') === 'loop' };
+}
+function writeSet(set) {
+  ui.fps.value = String(set.fps); ui.speed.value = String(set.speed);
+  setRadio('pal', set.pal); setRadio('dither', set.dither); setRadio('loop', set.loop ? 'loop' : 'once');
+  fillWidths(set.worig ? Infinity : set.width);
+}
+const editorJob = () => ({ dw: S.dw, dh: S.dh, crop: S.crop, inT: S.inT, outT: S.outT, set: readSet() });
+const plan = () => planFor(editorJob());
+const cropPx = () => cropPxOf(S);
+
+function sync() {
+  const J = S.job;
+  if (!J || !J.engine || ACTIVE.has(J.status)) return;
+  J.inT = S.inT; J.outT = S.outT; J.crop = { ...S.crop }; J.ratioKey = S.ratioKey; J.set = readSet();
+  restatus(J);
+  renderRow(J);
+}
+
 function fillWidths(keep) {
   const base = cropPx().w;
   ui.width.replaceChildren();
@@ -921,16 +1002,7 @@ const refreshWidths = () => fillWidths(ui.width.selectedIndex === 0 ? Infinity :
 function setWidth(v) {
   let best = null;
   for (const o of ui.width.options) { const n = +o.value; if (n <= v && (best === null || n > +best.value)) best = o; }
-  ui.width.value = (best || ui.width.options[ui.width.options.length - 1]).value;
-}
-
-function plan() {
-  const fpsSel = +ui.fps.value, speed = +ui.speed.value;
-  const fps = Math.min(fpsSel, Math.floor(50 / speed + 1e-9));
-  const cp = cropPx();
-  const w = Math.min(+ui.width.value || cp.w, cp.w), h = Math.max(1, Math.round(w * cp.h / cp.w));
-  const span = Math.max(0, S.outT - S.inT);
-  return { w, h, crop: cp, fps, fpsSel, speed, span, ticks: Math.max(1, Math.round(span * fps)), pal: radio('pal'), dither: radio('dither'), loop: radio('loop') === 'loop' };
+  if (ui.width.options.length) ui.width.value = (best || ui.width.options[ui.width.options.length - 1]).value;
 }
 
 function markPreset() {
@@ -944,25 +1016,29 @@ function markPreset() {
   }
 }
 
+// the one hook every edit goes through: refresh the summary and write the edit back to the clip
 function updateReadout() {
   ui.readout.replaceChildren();
-  if (!S.dur) return;
-  const p = plan();
-  const rows = [['Output', `${p.w} × ${p.h} px`]];
-  if (!isFull(S.crop)) rows.push(['Crop', `${p.crop.w} × ${p.crop.h} at ${p.crop.x}, ${p.crop.y}`]);
-  rows.push(['Frames', `${p.ticks.toLocaleString()} @ ${p.fps} fps`], ['Clip', fmtSec(p.span)], ['Plays in', fmtSec(p.span / p.speed)]);
-  for (const [k, v] of rows) {
-    const dt = document.createElement('dt'); dt.textContent = k;
-    const dd = document.createElement('dd'); dd.textContent = v;
-    ui.readout.append(dt, dd);
+  ui.hint.hidden = true;
+  if (S.dur && S.engine) {
+    const p = plan();
+    const rows = [['Output', `${p.w} × ${p.h} px`]];
+    if (!isFull(S.crop)) rows.push(['Crop', `${p.crop.w} × ${p.crop.h} at ${p.crop.x}, ${p.crop.y}`]);
+    rows.push(['Frames', `${p.ticks.toLocaleString()} @ ${p.fps} fps`], ['Clip', fmtSec(p.span)], ['Plays in', fmtSec(p.span / p.speed)]);
+    for (const [k, v] of rows) {
+      const dt = document.createElement('dt'); dt.textContent = k;
+      const dd = document.createElement('dd'); dd.textContent = v;
+      ui.readout.append(dt, dd);
+    }
+    const notes = [];
+    if (p.fps < p.fpsSel) notes.push(`GIF timing tops out at 50 fps, so ${p.speed}× speed uses ${p.fps} fps.`);
+    if (p.w * p.h * p.ticks > 6e8) notes.push('Long, large clip: expect a big file. Lower the width or frame rate for a smaller GIF.');
+    ui.hint.textContent = notes.join(' ');
+    ui.hint.hidden = !notes.length;
+    markPreset();
   }
-  const notes = [];
-  if (p.fps < p.fpsSel) notes.push(`GIF timing tops out at 50 fps, so ${p.speed}× speed uses ${p.fps} fps.`);
-  const px = p.w * p.h * p.ticks;
-  if (px > 6e8) notes.push('Long, large clip: expect a big file. Lower the width or frame rate for a smaller GIF.');
-  ui.hint.textContent = notes.join(' ');
-  ui.hint.hidden = !notes.length;
-  markPreset();
+  sync();
+  refreshButtons();
 }
 
 // ----- trim rail -----
@@ -1086,9 +1162,17 @@ async function previewAt(t) {
   }
   pvBusy = false;
 }
-async function drawPoster(t) {
-  const info = S.info, Sm = info.S, src = new Src(S.file);
-  const k = keyBefore(Sm, t);
+function drawRotated(x, img, rot, W, H) {
+  x.save();
+  if (rot === 90) { x.translate(W, 0); x.rotate(Math.PI / 2); }
+  else if (rot === 180) { x.translate(W, H); x.rotate(Math.PI); }
+  else if (rot === 270) { x.translate(0, H); x.rotate(-Math.PI / 2); }
+  x.drawImage(img, 0, 0, rot % 180 ? H : W, rot % 180 ? W : H);
+  x.restore();
+}
+// first frame at or before t, decoded on its own (thumbnails, and the preview when <video> is blocked)
+async function frameAt(info, file, t) {
+  const Sm = info.S, src = new Src(file), k = keyBefore(Sm, t);
   let best = null;
   const dec = new VideoDecoder({
     output: (f) => { if (!best || f.timestamp / 1e6 <= t + 1e-6) { best && best.close(); best = f; } else f.close(); },
@@ -1098,20 +1182,21 @@ async function drawPoster(t) {
   for (let i = k; i < Sm.n && i < k + 900; i++) {
     if (i > k && Sm.key[i] && Sm.pts[i] > t) break;
     dec.decode(await chunkAt(src, Sm, i, i === k));
-    if (dec.decodeQueueSize > 16) await new Promise((r) => setTimeout(r, 4));
+    if (dec.decodeQueueSize > 16) await sleep(4);
   }
   await dec.flush();
   dec.close();
-  if (!best) return;
-  const c = ui.poster, sc = Math.min(1, 1280 / Math.max(S.dw, S.dh));
-  c.width = Math.round(S.dw * sc); c.height = Math.round(S.dh * sc);
-  const x = c.getContext('2d');
-  x.save();
-  const rot = S.rot, W = c.width, H = c.height;
-  if (rot === 90) { x.translate(W, 0); x.rotate(Math.PI / 2); } else if (rot === 180) { x.translate(W, H); x.rotate(Math.PI); } else if (rot === 270) { x.translate(0, H); x.rotate(-Math.PI / 2); }
-  x.drawImage(best, 0, 0, rot % 180 ? H : W, rot % 180 ? W : H);
-  x.restore();
-  best.close();
+  return best;
+}
+async function drawPoster(t) {
+  const J = S.job, f = await frameAt(S.info, S.file, t);
+  if (!f) return;
+  if (S.job === J) {
+    const c = ui.poster, sc = Math.min(1, 1280 / Math.max(S.dw, S.dh));
+    c.width = Math.round(S.dw * sc); c.height = Math.round(S.dh * sc);
+    drawRotated(c.getContext('2d'), f, S.rot, c.width, c.height);
+  }
+  f.close();
 }
 
 function loadVideoEl(url) {
@@ -1122,17 +1207,10 @@ function loadVideoEl(url) {
       if (done) return;
       done = true; clearTimeout(to);
       v.removeEventListener('loadedmetadata', onMeta); v.removeEventListener('error', onErr);
-      res({ ok: ok && v.videoWidth > 0, dur: v.duration, w: v.videoWidth, h: v.videoHeight });
+      res({ ok: ok && v.videoWidth > 0 });
     };
     const onErr = () => fin(false);
-    const onMeta = async () => {
-      if (!isFinite(v.duration)) {
-        // recordings without a duration header: seek far ahead once so the browser computes it
-        await new Promise((r) => { const tt = setTimeout(r, 3000); v.addEventListener('durationchange', () => { if (isFinite(v.duration)) { clearTimeout(tt); r(); } }); v.currentTime = 1e101; });
-        v.currentTime = 0;
-      }
-      fin(true);
-    };
+    const onMeta = () => fin(true);
     const to = setTimeout(() => fin(v.readyState >= 1), 8000);
     v.addEventListener('loadedmetadata', onMeta);
     v.addEventListener('error', onErr);
@@ -1140,81 +1218,45 @@ function loadVideoEl(url) {
     v.load();
   });
 }
+// a separate element, so reading a new file never disturbs the preview
+function probeVideoMeta(url) {
+  return new Promise((res) => {
+    const v = document.createElement('video');
+    v.muted = true; v.preload = 'metadata';
+    let done = false;
+    const fin = (ok) => {
+      if (done) return;
+      done = true; clearTimeout(to);
+      const r = { ok: ok && v.videoWidth > 0 && isFinite(v.duration) && v.duration > 0, dur: v.duration, w: v.videoWidth, h: v.videoHeight };
+      v.removeAttribute('src'); v.load();
+      res(r);
+    };
+    const to = setTimeout(() => fin(v.readyState >= 1), 8000);
+    v.addEventListener('loadedmetadata', async () => {
+      if (!isFinite(v.duration)) {
+        // recordings without a duration header: seek far ahead once so the browser computes it
+        await new Promise((r) => { const t = setTimeout(r, 3000); v.addEventListener('durationchange', () => { if (isFinite(v.duration)) { clearTimeout(t); r(); } }); v.currentTime = 1e101; });
+      }
+      fin(true);
+    });
+    v.addEventListener('error', () => fin(false));
+    v.src = url;
+  });
+}
+// the compatibility engine steps through a clip on its own hidden element
+function hiddenVideo(url) {
+  return new Promise((res, rej) => {
+    const v = document.createElement('video');
+    v.muted = true; v.playsInline = true; v.preload = 'auto';
+    v.style.cssText = 'position:fixed;left:0;top:0;width:2px;height:2px;opacity:0;pointer-events:none';
+    v.addEventListener('loadeddata', () => res(v), { once: true });
+    v.addEventListener('error', () => { v.remove(); rej(new Error('The browser could not play this file.')); }, { once: true });
+    document.body.append(v);
+    v.src = url;
+  });
+}
 
 function chip(text, cls) { const s = document.createElement('span'); s.className = 'chip' + (cls ? ' ' + cls : ''); s.textContent = text; return s; }
-
-async function loadFile(file, sample = false) {
-  if (S.busy || !file) return;
-  const id = ++S.loadId;
-  ui.alert.hidden = true; ui.result.hidden = true; ui.empty.hidden = true;
-  ui.go.disabled = true;
-  S.file = file; S.sample = sample; S.info = null; S.engine = null; S.dur = 0; S.loopRange = false;
-  setCropMode(false); S.crop = { ...FULL }; S.dw = 0; layoutCrop();
-  ui.fname.textContent = file.name;
-  ui.chips.replaceChildren(chip(sample ? 'Sample clip' : 'Reading…', sample ? 'hl' : ''));
-  if (S.url) URL.revokeObjectURL(S.url);
-  S.url = URL.createObjectURL(file);
-  ui.video.hidden = false; ui.poster.hidden = true;
-  const videoP = loadVideoEl(S.url);
-  let info = null, err = null, wcOK = false;
-  try {
-    info = await demux(file, (f) => { if (id === S.loadId) ui.chips.replaceChildren(chip(`Indexing ${Math.round(f * 100)}%`)); });
-    wcOK = await wcSupported(info);
-  } catch (e) { err = e; }
-  // if the fast decoder works, don't hold the page for a preview player that may never load
-  const v = wcOK ? await Promise.race([videoP, new Promise((r) => setTimeout(r, 2500)).then(() => ({ ok: false }))]) : await videoP;
-  if (id !== S.loadId) return;
-  S.videoOK = v.ok;
-  if (wcOK) {
-    S.engine = 'wc'; S.info = info; S.src = new Src(file);
-    S.dur = info.dur; S.rot = info.rot;
-    S.dw = info.rot % 180 ? info.h : info.w; S.dh = info.rot % 180 ? info.w : info.h;
-    S.srcFps = info.fps;
-  } else if (v.ok && isFinite(v.dur) && v.dur > 0) {
-    S.engine = 'video'; S.info = info; S.dur = v.dur; S.rot = 0; S.dw = v.w; S.dh = v.h; S.srcFps = info ? info.fps : 0;
-  } else {
-    ui.chips.replaceChildren(chip('Cannot decode', 'bad'));
-    ui.video.removeAttribute('src'); ui.video.load();
-    const what = info ? `${info.label} video in ${info.container}` : (err && err.message === 'fragmented' ? 'fragmented MP4' : (file.name.split('.').pop() || 'this').toUpperCase() + ' files');
-    showAlert('This browser can’t decode ' + what + '.',
-      'Framepress reads MP4, MOV, M4V, 3GP, WebM and MKV with H.264, HEVC, VP8, VP9 or AV1 video (HEVC needs a browser with HEVC support, such as Safari, or Chrome/Edge on a machine with HEVC hardware). Remux or re-encode other files to MP4 first, for example:',
-      'ffmpeg -i input.' + ((file.name.split('.').pop() || 'avi').toLowerCase()) + ' -c:v libx264 -crf 16 -preset fast output.mp4');
-    S.file = null;
-    return;
-  }
-  if (!S.videoOK) {
-    ui.video.hidden = true; ui.poster.hidden = false;
-    S.scrubT = 0; previewAt(0);
-  }
-  ui.playSel.hidden = !S.videoOK;
-  ui.monitor.style.setProperty('--ar', `${S.dw} / ${S.dh}`);
-  setRatio('free');
-  const chips = [];
-  if (sample) chips.push(chip('Sample clip', 'hl'));
-  chips.push(chip(info ? info.container : (file.name.split('.').pop() || '').toUpperCase()));
-  if (info) chips.push(chip(info.label));
-  chips.push(chip(`${S.dw}×${S.dh}`));
-  if (S.srcFps) chips.push(chip(`${(Math.round(S.srcFps * 100) / 100).toString()} fps`));
-  chips.push(chip(fmtTC(S.dur)));
-  chips.push(chip(fmtBytes(file.size)));
-  if (S.rot) chips.push(chip(`Rotated ${S.rot}°`));
-  ui.chips.replaceChildren(...chips);
-  const keepW = +ui.width.value || 640;
-  fillWidths(S.sample ? 640 : keepW);
-  if (S.srcFps && +ui.fps.value > S.srcFps + 0.5) {
-    let best = ui.fps.options[0].value;
-    for (const o of ui.fps.options) if (+o.value <= S.srcFps + 0.5) best = o.value;
-    ui.fps.value = best;
-  }
-  S.inT = 0; S.outT = S.dur;
-  drawTrim(); drawHead(0); updateReadout();
-  const threads = clamp((navigator.hardwareConcurrency || 4) - 1, 1, 12);
-  const th = `${threads} encoder thread${threads > 1 ? 's' : ''}`;
-  ui.engine.textContent = S.engine === 'wc'
-    ? `Fast path: WebCodecs ${info.label} decoding, frame-exact, ${th}.`
-    : `Compatibility path: the clip plays through once in real time, ${th}. Keep this tab visible while it converts.`;
-  ui.go.disabled = false;
-}
 
 // ----- crop box -----
 const RATIOS = { free: 0, '1:1': 1, '4:5': 4 / 5, '9:16': 9 / 16, '16:9': 16 / 9, '4:3': 4 / 3 };
@@ -1342,21 +1384,392 @@ document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && S.cropOn
 if (typeof ResizeObserver === 'function') new ResizeObserver(() => layoutCrop()).observe(ui.monitor);
 else window.addEventListener('resize', layoutCrop);
 
-// ----- convert -----
-function setBusy(b) {
-  S.busy = b;
-  document.body.classList.toggle('busy', b);
-  for (const el of document.querySelectorAll('.panel select, .panel input, .preset, #markIn, #markOut, #playSel, #fullRange, #inT, #outT, #file, #hIn, #hOut')) el.disabled = b;
-  ui.openBtn.classList.toggle('off', b);
-  if (b) setCropMode(false);
-  for (const el of [ui.cropBtn, ui.cropReset]) el.disabled = b;
-  ui.go.hidden = b; ui.prog.hidden = !b;
-  if (S.videoOK) ui.video.controls = !b;
+// ----- clips -----
+const extOf = (n) => (n.split('.').pop() || '').toLowerCase();
+function newJob(file, set, extra = {}) {
+  const J = { id: ++jobSeq, file, name: file.name, url: URL.createObjectURL(file), info: null, engine: null, dur: 0, dw: 0, dh: 0, rot: 0, srcFps: 0,
+    inT: 0, outT: 0, crop: { ...FULL }, ratioKey: 'free', set: { ...set }, status: 'probing', stage: '', videoOK: undefined,
+    res: null, card: null, thumb: null, thumbKey: '', ...extra };
+  jobs.push(J);
+  return J;
 }
 
-function renderProgress(pipe, o, t0, stage) {
-  const el = (performance.now() - t0) / 1000;
-  const frac = clamp(pipe.ticksDone / o.ticks, 0, 1);
+async function probe(J) {
+  J.status = 'probing'; J.stage = 'Reading…'; renderRow(J);
+  let info = null, err = null, wcOK = false;
+  try {
+    info = await demux(J.file, (f) => { J.stage = `Indexing ${Math.round(f * 100)}%`; renderRow(J); });
+    wcOK = await wcSupported(info);
+  } catch (e) { err = e; }
+  J.info = info;
+  if (wcOK) {
+    Object.assign(J, { engine: 'wc', dur: info.dur, rot: info.rot, srcFps: info.fps,
+      dw: info.rot % 180 ? info.h : info.w, dh: info.rot % 180 ? info.w : info.h });
+  } else {
+    const m = await probeVideoMeta(J.url);
+    if (!m.ok) {
+      const what = info ? `${info.label} video in ${info.container}` : (extOf(J.name) || 'this').toUpperCase() + ' files';
+      J.status = 'unsupported';
+      J.err = { title: 'This browser can’t decode ' + what + '.', cmd: `ffmpeg -i input.${extOf(J.name) || 'avi'} -c:v libx264 -crf 16 -preset fast output.mp4` };
+      renderRow(J);
+      return;
+    }
+    Object.assign(J, { engine: 'video', dur: m.dur, rot: 0, dw: m.w, dh: m.h, srcFps: info ? info.fps : 0, videoOK: true });
+  }
+  J.inT = 0; J.outT = J.dur;
+  if (J.srcFps && J.set.fps > J.srcFps + 0.5) J.set.fps = fpsAtMost(J.srcFps);
+  J.status = 'idle';
+  renderRow(J);
+  makeThumb(J).then(() => renderRow(J), () => {});
+}
+
+async function makeThumb(J) {
+  const c = document.createElement('canvas');
+  c.width = 240; c.height = Math.max(1, Math.round(240 * J.dh / J.dw));
+  const x = c.getContext('2d');
+  if (J.engine === 'wc') {
+    const f = await frameAt(J.info, J.file, J.inT);
+    if (!f) return;
+    drawRotated(x, f, J.rot, c.width, c.height);
+    f.close();
+  } else {
+    const v = await hiddenVideo(J.url);
+    try { await seekVideo(v, Math.min(0.1, J.dur / 2)); x.drawImage(v, 0, 0, c.width, c.height); }
+    finally { v.removeAttribute('src'); v.load(); v.remove(); }
+  }
+  J.thumb = c; J.thumbKey = '';
+}
+
+function addTile() {
+  return ui.qAdd;
+}
+// scroll the strip sideways only, never the page
+function revealCard(J) {
+  const li = J.card, q = ui.qList;
+  if (!li || !q.clientWidth) return;
+  if (li.offsetLeft < q.scrollLeft) q.scrollLeft = li.offsetLeft - 8;
+  else if (li.offsetLeft + li.offsetWidth > q.scrollLeft + q.clientWidth) q.scrollLeft = li.offsetLeft + li.offsetWidth - q.clientWidth + 8;
+}
+function renderQueue() {
+  ui.qList.replaceChildren(...jobs.map((J) => { if (!J.card) J.card = buildCard(J); renderRow(J); return J.card; }), addTile());
+  refreshButtons();
+}
+function buildCard(J) {
+  const li = document.createElement('li');
+  li.className = 'clip';
+  li.innerHTML = '<button class="clip-pick" type="button"><canvas class="clip-thumb" width="16" height="9"></canvas>'
+    + '<span class="clip-badge"></span><span class="clip-bar"><i></i></span></button>'
+    + '<div class="clip-body"><span class="clip-name"></span><span class="clip-meta"></span></div>'
+    + '<div class="clip-actions"><button class="btn xs" type="button" data-a="save">Save</button>'
+    + '<button class="btn xs" type="button" data-a="stop">Cancel</button>'
+    + '<button class="btn xs" type="button" data-a="dup">Duplicate</button>'
+    + '<button class="btn xs" type="button" data-a="del">Remove</button></div>';
+  li.querySelector('.clip-pick').addEventListener('click', () => { if (J.status !== 'probing') select(J); });
+  li.querySelector('.clip-actions').addEventListener('click', (e) => {
+    const b = e.target.closest('button');
+    if (!b) return;
+    const a = b.dataset.a;
+    if (a === 'save' && J.res) saveBlob(gifName(J), J.res.blob);
+    else if (a === 'stop') cancelJob(J);
+    else if (a === 'dup') duplicate(J);
+    else if (a === 'del') removeJob(J);
+  });
+  return li;
+}
+const jobFrac = (J) => (J.pipe && J.opts ? clamp(J.pipe.ticksDone / J.opts.ticks, 0, 1) : 0);
+function statusText(J) {
+  switch (J.status) {
+    case 'probing': return J.stage || 'Reading…';
+    case 'unsupported': return 'Can’t decode';
+    case 'queued': return 'Waiting';
+    case 'running': return `Converting ${Math.round(jobFrac(J) * 100)}%`;
+    case 'done': return 'Done · ' + fmtBytes(J.res.size);
+    case 'error': return 'Failed';
+    case 'cancelled': return 'Cancelled';
+    default: return J.res ? 'Edited' : 'Ready';
+  }
+}
+function renderRow(J) {
+  const li = J.card;
+  if (!li) return;
+  li.classList.toggle('on', J === S.job);
+  li.dataset.status = J.status;
+  const pick = li.querySelector('.clip-pick');
+  pick.setAttribute('aria-current', J === S.job ? 'true' : 'false');
+  pick.setAttribute('aria-label', `Edit ${J.name}`);
+  li.querySelector('.clip-name').textContent = J.name;
+  li.querySelector('.clip-name').title = J.name;
+  let meta = '';
+  if (J.engine) {
+    const p = planFor(J);
+    meta = `${fmtTC(J.inT)}–${fmtTC(J.outT)} · ${p.w}×${p.h}${isFull(J.crop) ? '' : ' · cropped'}`;
+  } else if (J.status === 'unsupported') meta = 'Format not supported here';
+  li.querySelector('.clip-meta').textContent = meta;
+  li.querySelector('.clip-badge').textContent = statusText(J);
+  li.querySelector('.clip-bar i').style.width = (jobFrac(J) * 100).toFixed(1) + '%';
+  const show = (a, on) => { li.querySelector(`[data-a="${a}"]`).hidden = !on; };
+  show('save', !!J.res); show('stop', ACTIVE.has(J.status)); show('dup', !!J.engine);
+  // the thumbnail shows the clip's crop
+  const key = J.thumb ? JSON.stringify(J.crop) : '';
+  if (J.thumb && key !== J.thumbKey) {
+    J.thumbKey = key;
+    const t = J.thumb, cv = li.querySelector('.clip-thumb');
+    const sx = J.crop.x * t.width, sy = J.crop.y * t.height, sw = Math.max(1, J.crop.w * t.width), sh = Math.max(1, J.crop.h * t.height);
+    const k = Math.min(240 / sw, 135 / sh);
+    cv.width = Math.max(1, Math.round(sw * k)); cv.height = Math.max(1, Math.round(sh * k));
+    cv.getContext('2d').drawImage(t, sx, sy, sw, sh, 0, 0, cv.width, cv.height);
+  }
+}
+
+function renderChips(J) {
+  const chips = [];
+  if (J.sample) chips.push(chip('Sample clip', 'hl'));
+  if (J.status === 'unsupported') chips.push(chip('Cannot decode', 'bad'));
+  else {
+    chips.push(chip(J.info ? J.info.container : extOf(J.name).toUpperCase()));
+    if (J.info) chips.push(chip(J.info.label));
+    chips.push(chip(`${J.dw}×${J.dh}`));
+    if (J.srcFps) chips.push(chip(`${Math.round(J.srcFps * 100) / 100} fps`));
+    chips.push(chip(fmtTC(J.dur)));
+    chips.push(chip(fmtBytes(J.file.size)));
+    if (J.rot) chips.push(chip(`Rotated ${J.rot}°`));
+  }
+  ui.chips.replaceChildren(...chips);
+}
+
+async function select(J) {
+  if (!J) { clearEditor(); return; }
+  if (S.job === J) return;
+  sync();
+  setCropMode(false);
+  S.job = J;
+  for (const k of ['file', 'url', 'info', 'engine', 'dur', 'dw', 'dh', 'rot', 'srcFps', 'inT', 'outT', 'ratioKey']) S[k] = J[k];
+  S.crop = { ...J.crop }; S.loopRange = false; S.scrubT = J.inT;
+  S.videoOK = J.videoOK !== false;
+  ui.alert.hidden = true; ui.empty.hidden = true;
+  ui.fname.textContent = J.name;
+  renderChips(J);
+  for (const K of jobs) renderRow(K);
+  revealCard(J);
+  ui.video.pause();
+  if (J.status === 'unsupported') {
+    S.engine = null; S.dur = 0; S.dw = 0;
+    ui.video.removeAttribute('src'); ui.video.load(); ui.video.hidden = true; ui.poster.hidden = true; ui.empty.hidden = false;
+    showAlert(J.err.title, 'Framepress reads MP4, MOV, M4V, 3GP, WebM and MKV with H.264, HEVC, VP8, VP9 or AV1 video (HEVC needs a browser with HEVC support, such as Safari, or Chrome/Edge on a machine with HEVC hardware). Re-encode other files to MP4 first, for example:', J.err.cmd);
+    ui.engine.textContent = '';
+    drawTrim(); layoutCrop(); updateReadout(); applyLock(); renderResult();
+    return;
+  }
+  ui.monitor.style.setProperty('--ar', `${J.dw} / ${J.dh}`);
+  for (const b of document.querySelectorAll('.rbtn')) b.setAttribute('aria-pressed', String(b.dataset.r === S.ratioKey));
+  writeSet(J.set);
+  drawTrim(); drawHead(J.inT); layoutCrop(); updateReadout();
+  const th = `${POOL.n} encoder thread${POOL.n > 1 ? 's' : ''}`;
+  ui.engine.textContent = J.engine === 'wc'
+    ? `Fast path: WebCodecs ${J.info.label} decoding, frame-exact, ${th}.`
+    : `Compatibility path: steps through the clip frame by frame (slower), ${th}.`;
+  applyLock(); renderResult();
+  if (J.status === 'error' && J.err) showAlert('Conversion stopped.', J.err);
+  // preview player; falls back to decoded stills when the page may not play video
+  const id = ++S.loadId;
+  ui.video.hidden = false; ui.poster.hidden = true;
+  if (J.videoOK === false) { showPoster(); return; }
+  const lv = loadVideoEl(J.url);
+  const v = J.engine === 'wc' ? await Promise.race([lv, sleep(2500).then(() => ({ ok: false }))]) : await lv;
+  if (id !== S.loadId) return;
+  J.videoOK = S.videoOK = v.ok;
+  if (!v.ok) { showPoster(); return; }
+  ui.video.currentTime = Math.min(S.inT, Math.max(0, S.dur - 0.001));
+  ui.playSel.hidden = false;
+  ui.video.controls = !S.cropOn;
+}
+function showPoster() {
+  S.videoOK = false;
+  ui.video.removeAttribute('src'); ui.video.load();
+  ui.video.hidden = true; ui.poster.hidden = false; ui.playSel.hidden = true;
+  previewAt(S.inT);
+}
+function clearEditor() {
+  sync(); setCropMode(false);
+  Object.assign(S, { job: null, file: null, url: null, info: null, engine: null, dur: 0, dw: 0, dh: 0, rot: 0, inT: 0, outT: 0, crop: { ...FULL } });
+  ++S.loadId;
+  ui.video.pause(); ui.video.removeAttribute('src'); ui.video.load();
+  ui.video.hidden = true; ui.poster.hidden = true; ui.empty.hidden = false; ui.alert.hidden = true;
+  ui.fname.textContent = 'No video yet'; ui.chips.replaceChildren(); ui.engine.textContent = '';
+  drawTrim(); drawHead(0); layoutCrop(); updateReadout(); applyLock(); renderResult();
+}
+
+async function addFiles(list) {
+  const files = Array.from(list || []).filter(Boolean);
+  if (!files.length) return;
+  sync();
+  const set = { ...(S.job && S.job.engine ? S.job.set : DEFAULT_SET) };
+  // the bundled sample steps aside once you bring your own videos
+  for (const J of jobs.slice()) if (J.sample && !J.res && !ACTIVE.has(J.status)) removeJob(J);
+  const added = files.map((f) => newJob(f, set));
+  renderQueue();
+  let shown = false;
+  for (const J of added) {
+    await probe(J);
+    if (!shown && J.status !== 'unsupported') { shown = true; select(J); }
+  }
+  if (!shown) select(added[0]);
+  if (added.length > 1) toast(`Added ${added.length} videos`);
+  refreshButtons();
+}
+function duplicate(J) {
+  if (!J.engine) return;
+  if (J === S.job) sync();
+  const n = jobs.filter((K) => K.file === J.file).length + 1, ext = J.file.name.match(/\.[^.]+$/);
+  const K = newJob(J.file, J.set, {
+    info: J.info, engine: J.engine, dur: J.dur, dw: J.dw, dh: J.dh, rot: J.rot, srcFps: J.srcFps, inT: J.inT, outT: J.outT,
+    crop: { ...J.crop }, ratioKey: J.ratioKey, status: 'idle', videoOK: J.videoOK, thumb: J.thumb, sample: J.sample,
+    name: J.file.name.replace(/\.[^.]+$/, '') + ` (${n})` + (ext ? ext[0] : ''),
+  });
+  jobs.splice(jobs.indexOf(K), 1);
+  jobs.splice(jobs.indexOf(J) + 1, 0, K);
+  if (!K.thumb) makeThumb(K).then(() => renderRow(K), () => {});
+  renderQueue();
+  select(K);
+  toast('Copy added. Give it a different crop or range.');
+}
+function removeJob(J) {
+  const i = jobs.indexOf(J);
+  if (i < 0) return;
+  cancelJob(J);
+  jobs.splice(i, 1);
+  if (J.card) J.card.remove();
+  if (S.job === J) select(jobs[Math.min(i, jobs.length - 1)] || null);
+  URL.revokeObjectURL(J.url);
+  if (J.res) URL.revokeObjectURL(J.res.url);
+  refreshButtons();
+}
+function cancelJob(J) {
+  if (J.status === 'queued') { J.status = 'cancelled'; restatusAfterStop(J); }
+  else if (J.status === 'running' && J.ctrl) J.ctrl.abort();
+}
+function restatusAfterStop(J) {
+  if (J.res && sigOf(J) === J.res.sig) J.status = 'done';
+  renderRow(J);
+  if (J === S.job) { applyLock(); renderResult(); }
+  refreshButtons();
+}
+
+// ----- conversion queue -----
+let running = 0;
+function queue(J, scroll) {
+  if (!J || !J.engine || ACTIVE.has(J.status)) return;
+  if (J === S.job) sync();
+  J.status = 'queued'; J.scroll = !!scroll;
+  renderRow(J);
+  if (J === S.job) { ui.alert.hidden = true; applyLock(); }
+  schedule();
+  tickTimer();
+}
+function schedule() {
+  while (running < MAX_JOBS) {
+    const J = jobs.find((K) => K.status === 'queued');
+    if (!J) break;
+    running++;
+    runJob(J).finally(() => { running--; schedule(); refreshButtons(); });
+  }
+  refreshButtons();
+}
+async function runJob(J) {
+  const o = optsFor(J), ctrl = new AbortController(), pipe = new Pipeline(o), sig = ctrl.signal;
+  Object.assign(J, { status: 'running', opts: o, ctrl, pipe, stage: 'Starting', t0: performance.now(), runSig: sigOf(J) });
+  sig.addEventListener('abort', () => pipe.fail(abortError()));
+  renderRow(J);
+  if (J === S.job) applyLock();
+  let v = null;
+  try {
+    pipe.start();
+    const src = new Src(J.file);
+    if (J.engine === 'video') v = await hiddenVideo(J.url);
+    if (o.shared) {
+      J.stage = 'Sampling colors for the shared palette';
+      const bmps = J.engine === 'wc' ? await sampleWC(J.info, src, o, sig) : await sampleVideo(v, o, sig);
+      await pipe.buildPalette(bmps);
+    }
+    pipe.begin();
+    J.stage = J.engine === 'wc' ? 'Decoding and encoding' : 'Stepping through frames and encoding';
+    if (J.engine === 'wc') await runWC(J.info, src, o, pipe, sig);
+    else await runVideo(v, o, pipe, sig, true);
+    J.stage = 'Writing GIF';
+    const blob = await pipe.finish();
+    if (J.res) URL.revokeObjectURL(J.res.url);
+    J.res = { blob, url: URL.createObjectURL(blob), size: blob.size, o, written: pipe.written, secs: (performance.now() - J.t0) / 1000, sig: J.runSig };
+    J.status = 'done'; J.err = null;
+  } catch (e) {
+    J.status = sig.aborted ? 'cancelled' : 'error';
+    J.err = sig.aborted ? null : (e && e.message) || String(e);
+    if (!sig.aborted) console.error(e);
+  } finally {
+    pipe.dispose();
+    if (v) { v.removeAttribute('src'); v.load(); v.remove(); }
+    J.pipe = null; J.ctrl = null;
+    if (J.status === 'cancelled') restatusAfterStop(J);
+    renderRow(J);
+    if (J === S.job) {
+      applyLock(); renderResult();
+      if (J.status === 'error') showAlert('Conversion stopped.', J.err);
+      if (J.status === 'done' && J.scroll) ui.result.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+    } else if (J.status === 'done' && !J.removed) toast(`${J.name} is ready`);
+  }
+}
+
+let timer = 0;
+function tickTimer() {
+  if (timer) return;
+  timer = setInterval(() => {
+    let any = false;
+    for (const J of jobs) if (ACTIVE.has(J.status)) { any = true; renderRow(J); }
+    if (S.busy) renderProgress(S.job);
+    if (!any) { clearInterval(timer); timer = 0; }
+  }, 250);
+}
+
+function applyLock() {
+  const J = S.job, b = S.busy, none = !J || !J.engine;
+  document.body.classList.toggle('busy', b);
+  for (const el of document.querySelectorAll('.panel select, .panel input, .preset, #markIn, #markOut, #playSel, #fullRange, #inT, #outT, #hIn, #hOut, #cropBtn, #cropReset, #cropAll, #applyAll')) el.disabled = b || none;
+  if (b) setCropMode(false);
+  ui.go.hidden = b; ui.prog.hidden = !b;
+  ui.go.disabled = none;
+  if (S.videoOK) ui.video.controls = !S.cropOn;
+  if (b) renderProgress(J);
+  refreshButtons();
+}
+function refreshButtons() {
+  const ready = jobs.filter((J) => J.engine && (J.status === 'idle' || J.status === 'error' || J.status === 'cancelled'));
+  const active = jobs.filter((J) => ACTIVE.has(J.status)), done = jobs.filter((J) => J.res);
+  const many = jobs.length > 1;
+  ui.qCount.textContent = String(jobs.length);
+  const parts = [];
+  if (done.length) parts.push(`${done.length} done`);
+  const run = active.filter((J) => J.status === 'running').length, wait = active.length - run;
+  if (run) parts.push(`${run} converting`);
+  if (wait) parts.push(`${wait} waiting`);
+  ui.qSum.textContent = parts.join(' · ');
+  ui.qAll.hidden = !many; ui.qAll.disabled = !ready.length;
+  ui.qAll.textContent = ready.length ? `Convert all (${ready.length})` : 'Convert all';
+  ui.goAll.hidden = !many || !ready.length; ui.goAll.textContent = `Convert all clips (${ready.length})`;
+  ui.qZip.hidden = done.length < 2;
+  ui.qCancel.hidden = !active.length;
+  ui.applyAll.hidden = !many; ui.cropAll.hidden = !many;
+  ui.go.textContent = S.job && S.job.status === 'done' ? 'Convert again' : 'Convert to GIF';
+}
+
+function renderProgress(J) {
+  if (!J) return;
+  if (J.status === 'queued' || !J.pipe) {
+    ui.pstage.textContent = J.status === 'queued' ? 'Waiting for a free slot' : 'Starting';
+    ui.bar.style.width = '0%';
+    ui.pstats.replaceChildren();
+    return;
+  }
+  const pipe = J.pipe, o = J.opts, el = (performance.now() - J.t0) / 1000, frac = jobFrac(J);
+  ui.pstage.textContent = J.stage;
   ui.bar.style.width = (frac * 100).toFixed(1) + '%';
   ui.bar.parentElement.setAttribute('aria-valuenow', Math.round(frac * 100));
   const parts = [`${pipe.framesDone.toLocaleString()} / ~${o.ticks.toLocaleString()} frames`, `${fmtClock(el)} elapsed`];
@@ -1366,74 +1779,23 @@ function renderProgress(pipe, o, t0, stage) {
   }
   parts.push(fmtBytes(pipe.bytes));
   ui.pstats.replaceChildren(...parts.map((t) => { const s = document.createElement('span'); s.textContent = t; return s; }));
-  if (stage) ui.pstage.textContent = stage;
 }
 
-async function convert() {
-  if (S.busy || !S.engine) return;
-  const p = plan();
-  const rot = S.engine === 'wc' ? S.rot : 0;
-  const o = { start: S.inT, end: S.outT, fps: p.fps, speed: p.speed, ticks: p.ticks, w: p.w, h: p.h, rot,
-    bw: rot % 180 ? p.h : p.w, bh: rot % 180 ? p.w : p.h, dither: p.dither, shared: p.pal === 'shared', loop: p.loop,
-    crop: isFull(S.crop) ? null : p.crop, fcrop: isFull(S.crop) ? null : frameCrop(S.crop, rot) };
-  ui.alert.hidden = true; ui.result.hidden = true;
-  const ctrl = new AbortController();
-  S.ctrl = ctrl;
-  setBusy(true);
-  S.loopRange = false;
-  if (S.videoOK) ui.video.pause();
-  const pipe = new Pipeline(o);
-  ctrl.signal.addEventListener('abort', () => pipe.fail(abortError()));
-  const t0 = performance.now();
-  let stage = 'Starting encoder threads';
-  renderProgress(pipe, o, t0, stage);
-  const timer = setInterval(() => renderProgress(pipe, o, t0, stage), 250);
-  try {
-    pipe.start();
-    if (o.shared) {
-      stage = 'Sampling colors for the shared palette';
-      renderProgress(pipe, o, t0, stage);
-      const bmps = S.engine === 'wc' ? await sampleWC(S.info, S.src, o, ctrl.signal) : await sampleVideo(ui.video, o, ctrl.signal);
-      await pipe.buildPalette(bmps);
-    }
-    pipe.begin();
-    stage = S.engine === 'wc' ? 'Decoding and encoding' : 'Playing through and encoding';
-    if (S.engine === 'wc') await runWC(S.info, S.src, o, pipe, ctrl.signal);
-    else await runVideo(ui.video, o, pipe, ctrl.signal);
-    stage = 'Writing GIF';
-    const blob = await pipe.finish();
-    const secs = (performance.now() - t0) / 1000;
-    renderProgress(pipe, o, t0, stage);
-    showResult(blob, o, pipe, secs);
-  } catch (e) {
-    if (ctrl.signal.aborted) toast('Conversion cancelled');
-    else {
-      console.error(e);
-      showAlert('Conversion stopped.', (e && e.message) || String(e));
-    }
-  } finally {
-    clearInterval(timer);
-    pipe.dispose();
-    S.ctrl = null;
-    setBusy(false);
-    if (S.videoOK) { ui.video.playbackRate = 1; drawHead(ui.video.currentTime); }
-  }
-}
-
-function showResult(blob, o, pipe, secs) {
-  if (S.gifURL) URL.revokeObjectURL(S.gifURL);
-  S.blob = blob; S.gifURL = URL.createObjectURL(blob);
-  ui.gif.src = S.gifURL;
-  ui.gif.width = o.w; ui.gif.height = o.h;
+function renderResult() {
+  const J = S.job, r = J && J.res;
+  if (!r) { ui.result.hidden = true; return; }
+  const o = r.o;
+  ui.gif.src = r.url; ui.gif.width = o.w; ui.gif.height = o.h;
+  ui.resultTitle.textContent = J.status === 'done' ? 'GIF ready' : 'Last GIF (settings changed since)';
   const rows = [
-    ['File size', fmtBytes(blob.size)],
+    ['File size', fmtBytes(r.size)],
     ['Dimensions', `${o.w} × ${o.h}`],
-    ['Frames', pipe.written === o.ticks ? `${o.ticks.toLocaleString()} at ${o.fps} fps` : `${pipe.written.toLocaleString()} (repeats merged) at ${o.fps} fps`],
+    ['Frames', r.written === o.ticks ? `${o.ticks.toLocaleString()} at ${o.fps} fps` : `${r.written.toLocaleString()} (repeats merged) at ${o.fps} fps`],
     ['Duration', fmtSec((o.end - o.start) / o.speed)],
     ...(o.crop ? [['Crop', `${o.crop.w} × ${o.crop.h} at ${o.crop.x}, ${o.crop.y}`]] : []),
     ['Palette', o.shared ? 'Shared, 255 colors' : 'Per frame, 255 colors'],
     ['Dither', { fs: 'Floyd–Steinberg', bayer: 'Bayer 8×8', none: 'Off' }[o.dither]],
-    ['Encode time', `${secs.toFixed(1)} s · ${((o.end - o.start) / secs).toFixed(1)}× realtime`],
+    ['Encode time', `${r.secs.toFixed(1)} s · ${((o.end - o.start) / r.secs).toFixed(1)}× realtime`],
   ];
   ui.stats.replaceChildren();
   for (const [k, v] of rows) {
@@ -1443,72 +1805,149 @@ function showResult(blob, o, pipe, secs) {
   }
   ui.saveNote.textContent = '';
   ui.result.hidden = false;
-  ui.result.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
 }
 
-const gifName = () => (S.file ? S.file.name.replace(/\.[^.]+$/, '') : 'clip') + '.gif';
-ui.save.addEventListener('click', async () => {
-  if (!S.blob) return;
-  const name = gifName();
+// ----- saving -----
+const gifName = (J) => J.name.replace(/\.[^.]+$/, '') + '.gif';
+async function saveBlob(name, blob) {
   const dl = await dlP;
   if (dl) {
-    try { await dl.save({ filename: name, data: S.blob }); toast('Saved ' + name); }
+    try { await dl.save({ filename: name, data: blob }); toast('Saved ' + name); }
     catch (e) {
       const code = e && e.code;
       if (code === 'declined') toast('Save cancelled');
       else if (code === 'rate_limited') toast('A save prompt is already open');
+      else if (code === 'extension_not_enabled' || code === 'rejected_extension') toast('This view can’t save .' + extOf(name) + ' files. Save the GIFs one by one.');
       else ui.saveNote.textContent = 'Saving is unavailable in this view. Right-click the GIF (long-press on a phone) and choose Save image.';
     }
     return;
   }
-  const a = document.createElement('a');
-  a.href = S.gifURL; a.download = name;
+  const url = URL.createObjectURL(blob), a = document.createElement('a');
+  a.href = url; a.download = name;
   document.body.append(a); a.click(); a.remove();
-  ui.saveNote.textContent = 'If no download starts, right-click the GIF (long-press on a phone) and choose Save image.';
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
+}
+// .zip without compression (GIF is already compressed)
+const CRC = (() => {
+  const t = new Int32Array(256);
+  for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c; }
+  return t;
+})();
+function crc32(u8) { let c = -1; for (let i = 0; i < u8.length; i++) c = CRC[(c ^ u8[i]) & 255] ^ (c >>> 8); return (c ^ -1) >>> 0; }
+async function makeZip(files) {
+  const enc = new TextEncoder(), parts = [], central = [];
+  let off = 0;
+  for (const f of files) {
+    const data = new Uint8Array(await f.blob.arrayBuffer()), name = enc.encode(f.name), crc = crc32(data);
+    const h = new DataView(new ArrayBuffer(30));
+    h.setUint32(0, 0x04034b50, true); h.setUint16(4, 20, true); h.setUint16(6, 0x0800, true); h.setUint16(12, 0x21, true);
+    h.setUint32(14, crc, true); h.setUint32(18, data.length, true); h.setUint32(22, data.length, true); h.setUint16(26, name.length, true);
+    const c = new DataView(new ArrayBuffer(46));
+    c.setUint32(0, 0x02014b50, true); c.setUint16(4, 20, true); c.setUint16(6, 20, true); c.setUint16(8, 0x0800, true); c.setUint16(14, 0x21, true);
+    c.setUint32(16, crc, true); c.setUint32(20, data.length, true); c.setUint32(24, data.length, true); c.setUint16(28, name.length, true); c.setUint32(42, off, true);
+    parts.push(h.buffer, name, data);
+    central.push(c.buffer, name);
+    off += 30 + name.length + data.length;
+  }
+  const size = central.reduce((n, b) => n + b.byteLength, 0), e = new DataView(new ArrayBuffer(22));
+  e.setUint32(0, 0x06054b50, true); e.setUint16(8, files.length, true); e.setUint16(10, files.length, true); e.setUint32(12, size, true); e.setUint32(16, off, true);
+  return new Blob([...parts, ...central, e.buffer], { type: 'application/zip' });
+}
+async function saveAll() {
+  const done = jobs.filter((J) => J.res), used = new Set();
+  const files = done.map((J) => {
+    let n = gifName(J), i = 2;
+    while (used.has(n)) n = gifName(J).replace(/\.gif$/, `-${i++}.gif`);
+    used.add(n);
+    return { name: n, blob: J.res.blob };
+  });
+  toast('Packing ' + files.length + ' GIFs…');
+  await saveBlob('framepress-gifs.zip', await makeZip(files));
+}
+
+// ----- buttons -----
+ui.save.addEventListener('click', () => { if (S.job && S.job.res) saveBlob(gifName(S.job), S.job.res.blob); });
+ui.again.addEventListener('click', () => { ui.go.focus({ preventScroll: true }); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+ui.go.addEventListener('click', () => queue(S.job, true));
+const convertAll = () => { sync(); for (const J of jobs) if (J.engine && (J.status === 'idle' || J.status === 'error' || J.status === 'cancelled')) queue(J, false); };
+ui.goAll.addEventListener('click', convertAll);
+ui.qAll.addEventListener('click', convertAll);
+ui.qZip.addEventListener('click', saveAll);
+ui.qCancel.addEventListener('click', () => { for (const J of jobs) cancelJob(J); });
+ui.cancel.addEventListener('click', () => S.job && cancelJob(S.job));
+ui.applyAll.addEventListener('click', () => {
+  sync();
+  const set = S.job.set;
+  let n = 0;
+  for (const J of jobs) {
+    if (J === S.job || !J.engine || ACTIVE.has(J.status)) continue;
+    J.set = { ...set };
+    if (J.srcFps && J.set.fps > J.srcFps + 0.5) J.set.fps = fpsAtMost(J.srcFps);
+    restatus(J); renderRow(J); n++;
+  }
+  toast(`Settings applied to ${n} other clip${n === 1 ? '' : 's'}`);
+  refreshButtons();
 });
-ui.again.addEventListener('click', () => { ui.result.hidden = true; ui.go.focus(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
-ui.go.addEventListener('click', convert);
-ui.cancel.addEventListener('click', () => S.ctrl && S.ctrl.abort());
+ui.cropAll.addEventListener('click', () => {
+  sync();
+  const c = S.job.crop, key = S.job.ratioKey;
+  let n = 0;
+  for (const J of jobs) {
+    if (J === S.job || !J.engine || ACTIVE.has(J.status)) continue;
+    // same region relative to each video; a locked ratio is re-fitted to that video's size
+    let { x, y, w, h } = c;
+    const r = key === 'orig' ? J.dw / J.dh : RATIOS[key] || 0;
+    if (r) {
+      let pw = w * J.dw, ph = pw / r;
+      if (ph > J.dh) { ph = J.dh; pw = ph * r; }
+      if (pw > J.dw) { pw = J.dw; ph = pw / r; }
+      const cx = (x + w / 2) * J.dw, cy = (y + h / 2) * J.dh;
+      w = pw / J.dw; h = ph / J.dh; x = (cx - pw / 2) / J.dw; y = (cy - ph / 2) / J.dh;
+    }
+    w = clamp(w, 0, 1); h = clamp(h, 0, 1);
+    J.crop = { x: clamp(x, 0, 1 - w), y: clamp(y, 0, 1 - h), w, h }; J.ratioKey = key;
+    restatus(J); renderRow(J); n++;
+  }
+  toast(`Crop applied to ${n} other clip${n === 1 ? '' : 's'}`);
+  refreshButtons();
+});
 
 for (const b of document.querySelectorAll('.preset')) {
   b.addEventListener('click', () => {
     const q = PRESETS[b.dataset.preset];
-    setWidth(q.width); ui.fps.value = String(q.fps); ui.speed.value = '1';
+    setWidth(q.width); ui.fps.value = String(S.srcFps && q.fps > S.srcFps + 0.5 ? fpsAtMost(S.srcFps) : q.fps); ui.speed.value = '1';
     setRadio('pal', q.pal); setRadio('dither', q.dither);
-    if (S.srcFps && q.fps > S.srcFps + 0.5) {
-      let best = ui.fps.options[0].value;
-      for (const o of ui.fps.options) if (+o.value <= S.srcFps + 0.5) best = o.value;
-      ui.fps.value = best;
-    }
     updateReadout();
   });
 }
 for (const el of document.querySelectorAll('.panel select, .panel input[type="radio"]')) el.addEventListener('change', updateReadout);
 
 // ----- file input / drag & drop -----
-ui.file.addEventListener('change', () => { const f = ui.file.files[0]; ui.file.value = ''; if (f) loadFile(f); });
+for (const inp of [ui.file, ui.file2]) inp.addEventListener('change', () => { const fs = Array.from(inp.files); inp.value = ''; addFiles(fs); });
 let dragDepth = 0;
 const hasFiles = (e) => e.dataTransfer && Array.from(e.dataTransfer.types || []).includes('Files');
-window.addEventListener('dragenter', (e) => { if (!hasFiles(e) || S.busy) return; e.preventDefault(); dragDepth++; ui.drop.hidden = false; });
+window.addEventListener('dragenter', (e) => { if (!hasFiles(e)) return; e.preventDefault(); dragDepth++; ui.drop.hidden = false; });
 window.addEventListener('dragover', (e) => { if (hasFiles(e)) e.preventDefault(); });
 window.addEventListener('dragleave', () => { dragDepth = Math.max(0, dragDepth - 1); if (!dragDepth) ui.drop.hidden = true; });
 window.addEventListener('drop', (e) => {
   if (!hasFiles(e)) return;
   e.preventDefault(); dragDepth = 0; ui.drop.hidden = true;
-  const f = e.dataTransfer.files[0];
-  if (f && !S.busy) loadFile(f);
+  addFiles(e.dataTransfer.files);
 });
 
 // ----- boot with the bundled sample -----
 (async () => {
+  renderQueue(); clearEditor();
   try {
     const b64 = $('sample-b64').textContent.trim();
     const bin = atob(b64), u8 = new Uint8Array(bin.length);
     for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
-    await loadFile(new File([u8], 'sample-mandelbrot.mp4', { type: 'video/mp4' }), true);
-    if (!S.engine) { ui.empty.hidden = false; }
-  } catch { ui.empty.hidden = false; }
+    const J = newJob(new File([u8], 'sample-mandelbrot.mp4', { type: 'video/mp4' }), DEFAULT_SET, { sample: true });
+    renderQueue();
+    await probe(J);
+    if (!S.job) await select(J);
+  } catch (e) { console.error(e); }
 })();
 
-window.__fp = { S, convert, loadFile, plan, setCrop, setRatio, setCropMode };
+window.__fp = { S, jobs, select, addFiles, queue, plan, setCrop, setRatio, setCropMode, blob: () => S.job && S.job.res && S.job.res.blob };
 })();

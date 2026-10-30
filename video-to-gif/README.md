@@ -8,6 +8,7 @@ Open `index.html` directly in Chrome, Edge, Safari or Firefox, or host it on any
 
 - **Inputs:** MP4, MOV, M4V, 3GP (including fragmented MP4), WebM and MKV, with H.264, HEVC, VP8, VP9 or AV1 video. HEVC needs a browser with HEVC decoding (Safari, or Chrome/Edge on hardware that supports it). Anything else the browser's `<video>` element can play goes through a slower compatibility path.
 - **Any length:** frames stream through a bounded pipeline. Only the compressed GIF is held in memory.
+- **Batch:** add several videos at once. Each clip keeps its own trim, crop and settings, and **Duplicate** makes several GIFs from one video. **Convert all** runs two clips at a time on one shared, always-warm encoder pool, and **Save all** downloads a single .zip. You can apply one clip's settings or crop to every clip.
 - **Controls:** trim (in/out points), crop (drag a box on the video or type pixel values; Free, Original, 1:1, 4:5, 9:16, 16:9, 4:3), width, frame rate (8–50 fps), playback speed (0.5–4×), per-frame or shared palette, dither (Floyd–Steinberg, Bayer 8×8, off), loop forever or play once.
 
 ## How it is fast
