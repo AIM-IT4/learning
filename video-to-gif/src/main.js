@@ -639,17 +639,36 @@ class Pipeline {
   }
 }
 
+// ---------- crop ----------
+// The crop is a normalized rect in the displayed (rotated) picture; decoded frames are unrotated.
+const FULL = { x: 0, y: 0, w: 1, h: 1 };
+const isFull = (c) => c.x <= 1e-6 && c.y <= 1e-6 && c.w >= 1 - 1e-6 && c.h >= 1 - 1e-6;
+function frameCrop(c, rot) {
+  if (rot === 90) return { x: c.y, y: 1 - c.x - c.w, w: c.h, h: c.w };
+  if (rot === 180) return { x: 1 - c.x - c.w, y: 1 - c.y - c.h, w: c.w, h: c.h };
+  if (rot === 270) return { x: 1 - c.y - c.h, y: c.x, w: c.h, h: c.w };
+  return c;
+}
+function srcRect(c, W, H) {
+  const x = clamp(Math.round(c.x * W), 0, W - 1), y = clamp(Math.round(c.y * H), 0, H - 1);
+  return [x, y, clamp(Math.round(c.w * W), 1, W - x), clamp(Math.round(c.h * H), 1, H - y)];
+}
+// cropped + resized on the GPU in one step; src is a VideoFrame or the <video> element
+function bitmapOf(src, o, W, H) {
+  const bmo = { resizeWidth: o.bw, resizeHeight: o.bh, resizeQuality: 'high' };
+  return o.fcrop ? createImageBitmap(src, ...srcRect(o.fcrop, W, H), bmo) : createImageBitmap(src, bmo);
+}
+
 // ---------- engine 1: WebCodecs (hardware decode, frame-exact) ----------
 async function runWC(info, src, o, pipe, sig) {
   const Sm = info.S, T = (k) => o.start + k / o.fps;
-  const bmo = { resizeWidth: o.bw, resizeHeight: o.bh, resizeQuality: 'high' };
   let k0 = keyBefore(Sm, o.start);
   const last = lastUpTo(Sm, k0, o.end);
   for (let attempt = 0; ; attempt++) {
     let outputs = 0, failed = null, prev = null, nextTick = 0, grabs = 0, chain = Promise.resolve();
     const grab = (frame, cnt) => {
       grabs++;
-      const p = createImageBitmap(frame, bmo);
+      const p = bitmapOf(frame, o, frame.displayWidth, frame.displayHeight);
       p.then(() => frame.close(), () => frame.close());
       chain = chain.then(async () => { const b = await p; grabs--; pipe.push(b, cnt); pipe.kick(); });
       chain.catch((e) => { failed = failed || e; pipe.kick(); });
@@ -710,9 +729,8 @@ async function sampleWC(info, src, o, sig, count = 16) {
   const k0 = keyBefore(Sm, o.start);
   if (ks[0] !== k0) ks.unshift(k0);
   const picks = ks.length <= count ? ks : Array.from({ length: count }, (_, j) => ks[Math.round(j * (ks.length - 1) / (count - 1))]);
-  const bmo = { resizeWidth: o.bw, resizeHeight: o.bh, resizeQuality: 'high' };
   const pend = [];
-  const grab = (f) => pend.push(createImageBitmap(f, bmo).finally(() => f.close()));
+  const grab = (f) => pend.push(bitmapOf(f, o, f.displayWidth, f.displayHeight).finally(() => f.close()));
   // keyframes decode on their own, so they are a cheap spread of samples
   let dec = null;
   const mk = () => { const d = new VideoDecoder({ output: grab, error: () => {} }); d.configure(cfg(info)); return d; };
@@ -774,7 +792,8 @@ async function runVideo(v, o, pipe, sig) {
   let nextTick = 0, emitted = 0, failed = null;
   const grab = (cnt) => {
     try {
-      ocx.drawImage(v, 0, 0, o.bw, o.bh);
+      if (o.fcrop) ocx.drawImage(v, ...srcRect(o.fcrop, v.videoWidth, v.videoHeight), 0, 0, o.bw, o.bh);
+      else ocx.drawImage(v, 0, 0, o.bw, o.bh);
       pipe.push(oc.transferToImageBitmap(), cnt);
       emitted++;
       pipe.kick();
@@ -841,7 +860,7 @@ async function sampleVideo(v, o, sig, count = 12) {
   for (let j = 0; j < count; j++) {
     if (sig.aborted) throw abortError();
     await seekVideo(v, o.start + (o.end - o.start) * (j + 0.5) / count);
-    bmps.push(await createImageBitmap(v, { resizeWidth: o.bw, resizeHeight: o.bh, resizeQuality: 'high' }));
+    bmps.push(await bitmapOf(v, o, v.videoWidth, v.videoHeight));
   }
   return bmps;
 }
@@ -850,10 +869,12 @@ async function sampleVideo(v, o, sig, count = 12) {
 const ui = {};
 for (const id of ['video', 'poster', 'tc', 'fname', 'chips', 'file', 'inT', 'outT', 'len', 'rail', 'railIn', 'sel', 'ph', 'hIn', 'hOut',
   'markIn', 'markOut', 'playSel', 'fullRange', 'width', 'fps', 'speed', 'readout', 'go', 'prog', 'pstage', 'bar', 'pstats', 'cancel',
-  'engine', 'result', 'gif', 'stats', 'save', 'again', 'saveNote', 'toast', 'drop', 'alert', 'monitor', 'openBtn', 'empty', 'hint']) ui[id] = $(id);
+  'engine', 'result', 'gif', 'stats', 'save', 'again', 'saveNote', 'toast', 'drop', 'alert', 'monitor', 'openBtn', 'empty', 'hint',
+  'cropper', 'cropBox', 'cropBtn', 'cropReset', 'cropPanel', 'cropSum', 'cX', 'cY', 'cW', 'cH']) ui[id] = $(id);
 
 const S = { file: null, url: null, info: null, src: null, engine: null, dur: 0, dw: 0, dh: 0, rot: 0, srcFps: 0, inT: 0, outT: 0,
-  busy: false, ctrl: null, videoOK: false, scrubT: 0, blob: null, gifURL: null, loopRange: false, sample: false, loadId: 0 };
+  busy: false, ctrl: null, videoOK: false, scrubT: 0, blob: null, gifURL: null, loopRange: false, sample: false, loadId: 0,
+  crop: { ...FULL }, ratioKey: 'free', cropOn: false };
 
 const dlP = window.claude && typeof window.claude.use === 'function'
   ? Promise.resolve().then(() => window.claude.use('downloads')).catch(() => null) : Promise.resolve(null);
@@ -882,13 +903,21 @@ const PRESETS = {
   max: { width: 1080, fps: 25, pal: 'frame', dither: 'fs' },
 };
 
+// the crop in source pixels of the displayed picture
+function cropPx() {
+  const c = S.crop, x = Math.round(c.x * S.dw), y = Math.round(c.y * S.dh);
+  return { x, y, w: clamp(Math.round(c.w * S.dw), 1, S.dw - x), h: clamp(Math.round(c.h * S.dh), 1, S.dh - y) };
+}
 function fillWidths(keep) {
+  const base = cropPx().w;
   ui.width.replaceChildren();
   const add = (v, label) => { const o = document.createElement('option'); o.value = v; o.textContent = label; ui.width.append(o); };
-  add(S.dw, `${S.dw} · orig`);
-  for (const w of WIDTHS) if (w < S.dw) add(w, String(w));
+  add(base, `${base} · orig`);
+  for (const w of WIDTHS) if (w < base) add(w, String(w));
   setWidth(keep);
 }
+// keep the chosen width when the crop changes; "orig" follows the new crop width
+const refreshWidths = () => fillWidths(ui.width.selectedIndex === 0 ? Infinity : +ui.width.value);
 function setWidth(v) {
   let best = null;
   for (const o of ui.width.options) { const n = +o.value; if (n <= v && (best === null || n > +best.value)) best = o; }
@@ -898,16 +927,17 @@ function setWidth(v) {
 function plan() {
   const fpsSel = +ui.fps.value, speed = +ui.speed.value;
   const fps = Math.min(fpsSel, Math.floor(50 / speed + 1e-9));
-  const w = Math.min(+ui.width.value || S.dw, S.dw), h = Math.max(1, Math.round(w * S.dh / S.dw));
+  const cp = cropPx();
+  const w = Math.min(+ui.width.value || cp.w, cp.w), h = Math.max(1, Math.round(w * cp.h / cp.w));
   const span = Math.max(0, S.outT - S.inT);
-  return { w, h, fps, fpsSel, speed, span, ticks: Math.max(1, Math.round(span * fps)), pal: radio('pal'), dither: radio('dither'), loop: radio('loop') === 'loop' };
+  return { w, h, crop: cp, fps, fpsSel, speed, span, ticks: Math.max(1, Math.round(span * fps)), pal: radio('pal'), dither: radio('dither'), loop: radio('loop') === 'loop' };
 }
 
 function markPreset() {
   const p = plan();
   for (const b of document.querySelectorAll('.preset')) {
     const q = PRESETS[b.dataset.preset];
-    const wantW = Math.min(q.width, S.dw);
+    const wantW = Math.min(q.width, p.crop.w);
     let wOpt = null;
     for (const o of ui.width.options) { const n = +o.value; if (n <= wantW && (wOpt === null || n > wOpt)) wOpt = n; }
     b.setAttribute('aria-pressed', String(p.w === wOpt && p.fpsSel === q.fps && p.pal === q.pal && p.dither === q.dither && p.speed === 1));
@@ -918,12 +948,9 @@ function updateReadout() {
   ui.readout.replaceChildren();
   if (!S.dur) return;
   const p = plan();
-  const rows = [
-    ['Output', `${p.w} × ${p.h} px`],
-    ['Frames', `${p.ticks.toLocaleString()} @ ${p.fps} fps`],
-    ['Clip', fmtSec(p.span)],
-    ['Plays in', fmtSec(p.span / p.speed)],
-  ];
+  const rows = [['Output', `${p.w} × ${p.h} px`]];
+  if (!isFull(S.crop)) rows.push(['Crop', `${p.crop.w} × ${p.crop.h} at ${p.crop.x}, ${p.crop.y}`]);
+  rows.push(['Frames', `${p.ticks.toLocaleString()} @ ${p.fps} fps`], ['Clip', fmtSec(p.span)], ['Plays in', fmtSec(p.span / p.speed)]);
   for (const [k, v] of rows) {
     const dt = document.createElement('dt'); dt.textContent = k;
     const dd = document.createElement('dd'); dd.textContent = v;
@@ -1122,6 +1149,7 @@ async function loadFile(file, sample = false) {
   ui.alert.hidden = true; ui.result.hidden = true; ui.empty.hidden = true;
   ui.go.disabled = true;
   S.file = file; S.sample = sample; S.info = null; S.engine = null; S.dur = 0; S.loopRange = false;
+  setCropMode(false); S.crop = { ...FULL }; S.dw = 0; layoutCrop();
   ui.fname.textContent = file.name;
   ui.chips.replaceChildren(chip(sample ? 'Sample clip' : 'Reading…', sample ? 'hl' : ''));
   if (S.url) URL.revokeObjectURL(S.url);
@@ -1160,6 +1188,7 @@ async function loadFile(file, sample = false) {
   }
   ui.playSel.hidden = !S.videoOK;
   ui.monitor.style.setProperty('--ar', `${S.dw} / ${S.dh}`);
+  setRatio('free');
   const chips = [];
   if (sample) chips.push(chip('Sample clip', 'hl'));
   chips.push(chip(info ? info.container : (file.name.split('.').pop() || '').toUpperCase()));
@@ -1187,12 +1216,140 @@ async function loadFile(file, sample = false) {
   ui.go.disabled = false;
 }
 
+// ----- crop box -----
+const RATIOS = { free: 0, '1:1': 1, '4:5': 4 / 5, '9:16': 9 / 16, '16:9': 16 / 9, '4:3': 4 / 3 };
+const ratio = () => (S.ratioKey === 'orig' ? S.dw / S.dh : RATIOS[S.ratioKey] || 0); // width / height in pixels, 0 = free
+const MIN = 16; // smallest crop side, source pixels
+
+// where the picture sits inside the monitor (object-fit: contain)
+function contentRect() {
+  const mw = ui.monitor.clientWidth, mh = ui.monitor.clientHeight, k = Math.min(mw / S.dw, mh / S.dh);
+  return { left: (mw - S.dw * k) / 2, top: (mh - S.dh * k) / 2, width: S.dw * k, height: S.dh * k };
+}
+function layoutCrop() {
+  if (!S.dw) { ui.cropper.hidden = true; return; }
+  const r = contentRect(), c = S.crop;
+  for (const k of ['left', 'top', 'width', 'height']) ui.cropper.style[k] = r[k] + 'px';
+  ui.cropBox.style.left = c.x * 100 + '%'; ui.cropBox.style.top = c.y * 100 + '%';
+  ui.cropBox.style.width = c.w * 100 + '%'; ui.cropBox.style.height = c.h * 100 + '%';
+  ui.cropper.hidden = !S.cropOn && isFull(c);
+  ui.cropper.classList.toggle('edit', S.cropOn);
+  ui.cropper.classList.toggle('locked', !!ratio());
+  ui.cropBox.tabIndex = S.cropOn ? 0 : -1;
+  const cp = cropPx();
+  for (const [el, v] of [[ui.cX, cp.x], [ui.cY, cp.y], [ui.cW, cp.w], [ui.cH, cp.h]]) if (document.activeElement !== el) el.value = v;
+  ui.cX.max = S.dw - 1; ui.cY.max = S.dh - 1; ui.cW.max = S.dw; ui.cH.max = S.dh;
+  ui.cropSum.textContent = isFull(c) ? `Full frame · ${S.dw} × ${S.dh}` : `${cp.w} × ${cp.h} at ${cp.x}, ${cp.y}`;
+  ui.cropReset.hidden = isFull(c) && !S.ratioKey.includes(':') && S.ratioKey !== 'orig';
+}
+function setCrop(x, y, w, h) {
+  w = clamp(w, Math.min(1, MIN / S.dw), 1); h = clamp(h, Math.min(1, MIN / S.dh), 1);
+  S.crop = { x: clamp(x, 0, 1 - w), y: clamp(y, 0, 1 - h), w, h };
+  layoutCrop(); refreshWidths(); updateReadout();
+}
+// set a box from a fixed anchor corner (ax, ay) to the pointer (px, py), honoring the ratio lock
+function cornerTo(ax, ay, px, py) {
+  const W = S.dw, H = S.dh, r = ratio(), sx = px >= ax ? 1 : -1, sy = py >= ay ? 1 : -1;
+  let w = Math.abs(px - ax), h = Math.abs(py - ay);
+  if (r) {
+    const maxW = sx > 0 ? W - ax : ax, maxH = sy > 0 ? H - ay : ay;
+    w = Math.max(w, h * r); h = w / r;
+    if (w > maxW) { w = maxW; h = w / r; }
+    if (h > maxH) { h = maxH; w = h * r; }
+    if (w < MIN) { w = MIN; h = w / r; }
+    if (h < MIN) { h = MIN; w = h * r; }
+  } else { w = Math.max(w, MIN); h = Math.max(h, MIN); }
+  setCrop((sx > 0 ? ax : ax - w) / W, (sy > 0 ? ay : ay - h) / H, w / W, h / H);
+}
+function setRatio(key) {
+  S.ratioKey = key;
+  for (const b of document.querySelectorAll('.rbtn')) b.setAttribute('aria-pressed', String(b.dataset.r === key));
+  const r = ratio();
+  if (!r) { layoutCrop(); return; }
+  // largest box of that shape, centered where the current crop is
+  const c = S.crop, cx = (c.x + c.w / 2) * S.dw, cy = (c.y + c.h / 2) * S.dh;
+  const w = Math.min(S.dw, S.dh * r), h = w / r;
+  setCrop((cx - w / 2) / S.dw, (cy - h / 2) / S.dh, w / S.dw, h / S.dh);
+}
+function setCropMode(on) {
+  S.cropOn = !!on && !!S.dw && !S.busy;
+  ui.cropPanel.hidden = !S.cropOn;
+  ui.cropBtn.textContent = S.cropOn ? 'Done' : 'Crop frame';
+  ui.cropBtn.setAttribute('aria-expanded', String(S.cropOn));
+  if (S.videoOK) { ui.video.controls = !S.cropOn && !S.busy; if (S.cropOn) ui.video.pause(); }
+  layoutCrop();
+  if (S.cropOn) ui.cropBox.focus({ preventScroll: true });
+}
+
+let cd = null;
+ui.cropper.addEventListener('pointerdown', (e) => {
+  if (!S.cropOn) return;
+  e.preventDefault();
+  const rect = ui.cropper.getBoundingClientRect(), kx = S.dw / rect.width, ky = S.dh / rect.height;
+  const c = S.crop, X0 = c.x * S.dw, Y0 = c.y * S.dh, X1 = X0 + c.w * S.dw, Y1 = Y0 + c.h * S.dh;
+  const px = (e.clientX - rect.left) * kx, py = (e.clientY - rect.top) * ky;
+  // a full-frame box can't move, so a drag inside it draws a new box instead
+  const h = e.target.dataset.h || (ui.cropBox.contains(e.target) && !isFull(c) ? 'move' : 'new');
+  cd = { h, rect, kx, ky, X0, Y0, X1, Y1, px, py, ax: px, ay: py };
+  if (h.length === 2) { cd.ax = h.includes('w') ? X1 : X0; cd.ay = h.includes('n') ? Y1 : Y0; }
+  try { ui.cropper.setPointerCapture(e.pointerId); } catch {}
+});
+ui.cropper.addEventListener('pointermove', (e) => {
+  if (!cd) return;
+  const W = S.dw, H = S.dh;
+  const px = clamp((e.clientX - cd.rect.left) * cd.kx, 0, W), py = clamp((e.clientY - cd.rect.top) * cd.ky, 0, H);
+  if (cd.h === 'move') {
+    setCrop((cd.X0 + px - cd.px) / W, (cd.Y0 + py - cd.py) / H, (cd.X1 - cd.X0) / W, (cd.Y1 - cd.Y0) / H);
+  } else if (cd.h === 'new') {
+    if (Math.hypot((px - cd.px) / cd.kx, (py - cd.py) / cd.ky) > 6) cornerTo(cd.ax, cd.ay, px, py);
+  } else if (cd.h.length === 2) {
+    cornerTo(cd.ax, cd.ay, px, py);
+  } else {
+    let { X0, Y0, X1, Y1 } = cd;
+    if (cd.h === 'w') X0 = Math.min(px, X1 - MIN); else if (cd.h === 'e') X1 = Math.max(px, X0 + MIN);
+    else if (cd.h === 'n') Y0 = Math.min(py, Y1 - MIN); else Y1 = Math.max(py, Y0 + MIN);
+    setCrop(X0 / W, Y0 / H, (X1 - X0) / W, (Y1 - Y0) / H);
+  }
+});
+for (const ev of ['pointerup', 'pointercancel']) ui.cropper.addEventListener(ev, () => { cd = null; });
+ui.cropBox.addEventListener('keydown', (e) => {
+  if (!S.cropOn) return;
+  const st = e.shiftKey ? 10 : 1, k = e.key;
+  const dx = k === 'ArrowLeft' ? -st : k === 'ArrowRight' ? st : 0, dy = k === 'ArrowUp' ? -st : k === 'ArrowDown' ? st : 0;
+  if (!dx && !dy) return;
+  e.preventDefault();
+  const c = S.crop;
+  setCrop(c.x + dx / S.dw, c.y + dy / S.dh, c.w, c.h);
+});
+for (const el of [ui.cX, ui.cY, ui.cW, ui.cH]) {
+  el.addEventListener('change', () => {
+    let x = +ui.cX.value, y = +ui.cY.value, w = +ui.cW.value, h = +ui.cH.value;
+    if (![x, y, w, h].every(isFinite)) { layoutCrop(); return; }
+    const r = ratio();
+    if (r) {
+      if (el === ui.cH) w = h * r; else h = w / r;
+      if (w > S.dw) { w = S.dw; h = w / r; }
+      if (h > S.dh) { h = S.dh; w = h * r; }
+    }
+    setCrop(x / S.dw, y / S.dh, w / S.dw, h / S.dh);
+  });
+  el.addEventListener('keydown', (e) => { if (e.key === 'Enter') el.blur(); });
+}
+for (const b of document.querySelectorAll('.rbtn')) b.addEventListener('click', () => setRatio(b.dataset.r));
+ui.cropBtn.addEventListener('click', () => setCropMode(!S.cropOn));
+ui.cropReset.addEventListener('click', () => { setRatio('free'); setCrop(0, 0, 1, 1); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && S.cropOn) setCropMode(false); });
+if (typeof ResizeObserver === 'function') new ResizeObserver(() => layoutCrop()).observe(ui.monitor);
+else window.addEventListener('resize', layoutCrop);
+
 // ----- convert -----
 function setBusy(b) {
   S.busy = b;
   document.body.classList.toggle('busy', b);
   for (const el of document.querySelectorAll('.panel select, .panel input, .preset, #markIn, #markOut, #playSel, #fullRange, #inT, #outT, #file, #hIn, #hOut')) el.disabled = b;
   ui.openBtn.classList.toggle('off', b);
+  if (b) setCropMode(false);
+  for (const el of [ui.cropBtn, ui.cropReset]) el.disabled = b;
   ui.go.hidden = b; ui.prog.hidden = !b;
   if (S.videoOK) ui.video.controls = !b;
 }
@@ -1217,7 +1374,8 @@ async function convert() {
   const p = plan();
   const rot = S.engine === 'wc' ? S.rot : 0;
   const o = { start: S.inT, end: S.outT, fps: p.fps, speed: p.speed, ticks: p.ticks, w: p.w, h: p.h, rot,
-    bw: rot % 180 ? p.h : p.w, bh: rot % 180 ? p.w : p.h, dither: p.dither, shared: p.pal === 'shared', loop: p.loop };
+    bw: rot % 180 ? p.h : p.w, bh: rot % 180 ? p.w : p.h, dither: p.dither, shared: p.pal === 'shared', loop: p.loop,
+    crop: isFull(S.crop) ? null : p.crop, fcrop: isFull(S.crop) ? null : frameCrop(S.crop, rot) };
   ui.alert.hidden = true; ui.result.hidden = true;
   const ctrl = new AbortController();
   S.ctrl = ctrl;
@@ -1272,6 +1430,7 @@ function showResult(blob, o, pipe, secs) {
     ['Dimensions', `${o.w} × ${o.h}`],
     ['Frames', pipe.written === o.ticks ? `${o.ticks.toLocaleString()} at ${o.fps} fps` : `${pipe.written.toLocaleString()} (repeats merged) at ${o.fps} fps`],
     ['Duration', fmtSec((o.end - o.start) / o.speed)],
+    ...(o.crop ? [['Crop', `${o.crop.w} × ${o.crop.h} at ${o.crop.x}, ${o.crop.y}`]] : []),
     ['Palette', o.shared ? 'Shared, 255 colors' : 'Per frame, 255 colors'],
     ['Dither', { fs: 'Floyd–Steinberg', bayer: 'Bayer 8×8', none: 'Off' }[o.dither]],
     ['Encode time', `${secs.toFixed(1)} s · ${((o.end - o.start) / secs).toFixed(1)}× realtime`],
@@ -1351,5 +1510,5 @@ window.addEventListener('drop', (e) => {
   } catch { ui.empty.hidden = false; }
 })();
 
-window.__fp = { S, convert, loadFile, plan };
+window.__fp = { S, convert, loadFile, plan, setCrop, setRatio, setCropMode };
 })();

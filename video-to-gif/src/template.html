@@ -236,6 +236,52 @@ kbd {
 .toast.on { opacity: 1; transform: translate(-50%, 0); }
 body.busy .rail { cursor: default; }
 
+.crop-actions { display: flex; gap: 6px; margin-left: auto; }
+.cropcard .trim-head { justify-content: flex-start; }
+.crop-panel { display: flex; flex-direction: column; gap: 10px; }
+.ratios { display: flex; flex-wrap: wrap; gap: 6px; }
+.rbtn {
+  cursor: pointer; padding: 5px 10px; border-radius: 7px; border: 1px solid var(--line); background: var(--bg);
+  font-family: var(--f-mono); font-size: 0.76rem; font-variant-numeric: tabular-nums;
+}
+.rbtn[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--accent); }
+.cropf { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.cropf label { display: flex; align-items: center; gap: 6px; min-width: 0; font-size: 0.8rem; color: var(--muted); }
+.cropf input {
+  width: 100%; min-width: 0; padding: 5px 6px; border-radius: 6px; border: 1px solid var(--line); background: var(--bg); color: var(--ink);
+  font-family: var(--f-mono); font-size: 0.84rem; font-variant-numeric: tabular-nums;
+}
+
+/* crop overlay: sits exactly over the picture inside the monitor */
+.cropper { position: absolute; z-index: 2; overflow: hidden; pointer-events: none; touch-action: none; }
+.cropper.edit { pointer-events: auto; cursor: crosshair; }
+.crop-box { position: absolute; outline: 1.5px solid #fff; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.45), 0 0 0 200vmax rgba(5, 6, 8, 0.6); }
+.cropper.edit .crop-box { cursor: move; }
+.crop-box:focus { outline: 1.5px solid #fff; }
+.crop-box:focus-visible { outline: 2px solid var(--tc); }
+.third { position: absolute; display: none; background: rgba(255, 255, 255, 0.35); pointer-events: none; }
+.cropper.edit .third { display: block; }
+.third.v1, .third.v2 { top: 0; bottom: 0; width: 1px; }
+.third.v1 { left: 33.333%; } .third.v2 { left: 66.667%; }
+.third.h1, .third.h2 { left: 0; right: 0; height: 1px; }
+.third.h1 { top: 33.333%; } .third.h2 { top: 66.667%; }
+.ch { position: absolute; display: none; filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.85)); }
+.ch::before { content: ""; position: absolute; inset: -11px; }
+.cropper.edit .ch { display: block; }
+.cropper.locked .ch.edge { display: none; }
+/* handles sit just inside the box so they stay grabbable at the picture's edges */
+.ch.corner { width: 20px; height: 20px; border: 0 solid #fff; }
+.ch.nw { left: -1px; top: -1px; border-width: 3px 0 0 3px; cursor: nwse-resize; }
+.ch.ne { right: -1px; top: -1px; border-width: 3px 3px 0 0; cursor: nesw-resize; }
+.ch.sw { left: -1px; bottom: -1px; border-width: 0 0 3px 3px; cursor: nesw-resize; }
+.ch.se { right: -1px; bottom: -1px; border-width: 0 3px 3px 0; cursor: nwse-resize; }
+.ch.edge { background: #fff; border-radius: 2px; }
+.ch.n, .ch.s { left: 50%; width: 28px; height: 4px; margin-left: -14px; cursor: ns-resize; }
+.ch.n { top: 0; } .ch.s { bottom: 0; }
+.ch.w, .ch.e { top: 50%; width: 4px; height: 28px; margin-top: -14px; cursor: ew-resize; }
+.ch.w { left: 0; } .ch.e { right: 0; }
+.tc { z-index: 3; }
+
 @media (max-width: 920px) {
   .grid, .result { grid-template-columns: minmax(0, 1fr); }
   .panel { position: static; }
@@ -274,6 +320,15 @@ body.busy .rail { cursor: default; }
       <div class="monitor" id="monitor">
         <video id="video" playsinline muted controls preload="auto"></video>
         <canvas id="poster" hidden></canvas>
+        <div class="cropper" id="cropper" hidden>
+          <div class="crop-box" id="cropBox" tabindex="-1" role="group" aria-label="Crop area: drag to move, arrow keys nudge it">
+            <i class="third v1"></i><i class="third v2"></i><i class="third h1"></i><i class="third h2"></i>
+            <span class="ch corner nw" data-h="nw"></span><span class="ch corner ne" data-h="ne"></span>
+            <span class="ch corner sw" data-h="sw"></span><span class="ch corner se" data-h="se"></span>
+            <span class="ch edge n" data-h="n"></span><span class="ch edge s" data-h="s"></span>
+            <span class="ch edge w" data-h="w"></span><span class="ch edge e" data-h="e"></span>
+          </div>
+        </div>
         <div class="tc" id="tc" aria-live="off">00:00.00</div>
         <div class="empty" id="empty" hidden>Open a video, or drop one anywhere on this page.</div>
       </div>
@@ -313,6 +368,35 @@ body.busy .rail { cursor: default; }
           <button class="btn sm" id="markOut" type="button">Mark out <kbd>O</kbd></button>
           <button class="btn sm" id="playSel" type="button">Play range</button>
           <button class="btn sm" id="fullRange" type="button">Whole video</button>
+        </div>
+      </div>
+
+      <div class="trim cropcard">
+        <div class="trim-head">
+          <span class="label">Crop</span>
+          <span class="len" id="cropSum">Full frame</span>
+          <div class="crop-actions">
+            <button class="btn sm" id="cropReset" type="button" hidden>Reset</button>
+            <button class="btn sm primary" id="cropBtn" type="button" aria-expanded="false" aria-controls="cropPanel">Crop frame</button>
+          </div>
+        </div>
+        <div class="crop-panel" id="cropPanel" hidden>
+          <div class="ratios" role="group" aria-label="Aspect ratio">
+            <button class="rbtn" type="button" data-r="free" aria-pressed="true">Free</button>
+            <button class="rbtn" type="button" data-r="orig" aria-pressed="false">Original</button>
+            <button class="rbtn" type="button" data-r="1:1" aria-pressed="false">1:1</button>
+            <button class="rbtn" type="button" data-r="4:5" aria-pressed="false">4:5</button>
+            <button class="rbtn" type="button" data-r="9:16" aria-pressed="false">9:16</button>
+            <button class="rbtn" type="button" data-r="16:9" aria-pressed="false">16:9</button>
+            <button class="rbtn" type="button" data-r="4:3" aria-pressed="false">4:3</button>
+          </div>
+          <div class="cropf">
+            <label for="cX">X <input id="cX" type="number" min="0" step="1" inputmode="numeric"></label>
+            <label for="cY">Y <input id="cY" type="number" min="0" step="1" inputmode="numeric"></label>
+            <label for="cW">W <input id="cW" type="number" min="16" step="1" inputmode="numeric"></label>
+            <label for="cH">H <input id="cH" type="number" min="16" step="1" inputmode="numeric"></label>
+          </div>
+          <p class="sub">Drag on the video to draw a box, drag inside it to move it, pull the handles to resize. Values are source pixels. Press Done or Esc when finished.</p>
         </div>
       </div>
     </section>
