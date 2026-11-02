@@ -1,0 +1,76 @@
+<!doctype html><html><head><meta charset="utf-8">
+<style>html,body{margin:0;background:#F6F1E7}</style></head><body>
+<svg id="sv" xmlns="http://www.w3.org/2000/svg"></svg>
+<script src="rig/hand.js"></script><script src="rig/cast.js"></script><script src="rig/quants.js"></script>
+<script src="rig/motion.js"></script><script src="rig/gest.js"></script><script src="rig/gest2.js"></script><script src="kit.js"></script>
+<script>
+// Model sheets for the Desk2Quant cast. sheet.html?s=lineup | turn | faces | gestures  (tools/sheet.mjs renders all four to sheets/)
+const { V, mk, CAST } = Kit, svg = document.getElementById('sv'), Q = new URLSearchParams(location.search), S = Q.get('s') || 'lineup';
+const WHO = ['A', 'B', 'C', 'D', 'E', 'F', 'G'], INK = '#1E1A17', MUTE = '#6E655C', TEAL = '#08A9A2';
+const size = (w, h) => { svg.setAttribute('width', w); svg.setAttribute('height', h); svg.setAttribute('viewBox', `0 0 ${w} ${h}`); document.body.style.width = w + 'px'; };
+const text = (x, y, s, o = {}) => { const e = mk('text', { x, y, 'font-family': o.ff || 'Helvetica, Arial, sans-serif', 'font-size': o.fs || 18, 'font-weight': o.fw || 400, fill: o.fill || INK, 'text-anchor': o.anchor || 'start', 'letter-spacing': o.ls || 0 }, o.p || svg); e.textContent = s; return e; };
+// a posed figure: feet on ground gy at x, facing f; arms from gestures (default rest + rest)
+function figure(parent, who, x, gy, s, o = {}) {
+  const z = Kit.castIn(parent, who), p = Kit.stand(z, x, gy, s, { f: o.f || 0, hf: o.hf ?? (o.f || 0), expr: o.expr || 'neutral', look: o.look || V(0, 1), blink: 1, talkV: o.talkV || 0 });
+  (o.arms || [['rest'], ['rest']]).forEach((am, a) => { if (!am) return; const st = Gest.apply(z, p, a, am[0], am[1]); Gest.put(p, a, Object.assign({ u: 1 }, st)); });
+  if (o.pose) Object.assign(p, o.pose(p));
+  z.pose(p); return { z, p };
+}
+const title = (s, sub) => { text(40, 58, s, { fs: 34, fw: 700 }); if (sub) text(40, 92, sub, { fs: 18, fill: MUTE }); };
+
+if (S === 'lineup') {
+  const CW = 300, W = CW * 7, H = 640; size(W, H); title('Desk2Quant cast: A–G', 'Flat illustrated puppets (front / 3/4 / profile heads and torsos, articulated hands). Voice follows gender.');
+  WHO.forEach((w, i) => { const cx = i * CW + CW / 2, gy = 500;
+    mk('ellipse', { cx, cy: gy + 4, rx: 70, ry: 10, fill: '#000', opacity: .08 }, svg);
+    figure(svg, w, cx, gy, 1.0, { arms: [['rest'], ['rest']] });
+    text(cx, gy + 52, w, { fs: 34, fw: 700, anchor: 'middle' });
+    text(cx, gy + 80, CAST[w].role, { fs: 17, anchor: 'middle' });
+    text(cx, gy + 106, CAST[w].gender + ' · ' + CAST[w].gender + ' voice', { fs: 16, fill: CAST[w].gender === 'female' ? '#B5487A' : '#2F6C9E', anchor: 'middle' }); });
+}
+if (S === 'turn') {
+  const VIEWS = [[0, 'front'], [.55, '3/4 right'], [1, 'profile right'], [-.55, '3/4 left'], [-1, 'profile left']], CW = 270, RH = 470, W = 140 + CW * VIEWS.length, H = 120 + RH * WHO.length; size(W, H);
+  title('Turnarounds', 'Pose field f: 0 front, ±0.55 three-quarter, ±1 profile. Heads and torsos swap drawn views; limbs follow the bones.');
+  VIEWS.forEach(([f, l], j) => text(140 + j * CW + CW / 2, 130, l, { fs: 17, fill: MUTE, anchor: 'middle' }));
+  WHO.forEach((w, i) => { const gy = 140 + (i + 1) * RH - 30; text(40, gy - RH / 2, w, { fs: 40, fw: 700 }); text(40, gy - RH / 2 + 28, CAST[w].gender, { fs: 15, fill: MUTE });
+    VIEWS.forEach(([f], j) => figure(svg, w, 140 + j * CW + CW / 2, gy, 1.0, { f, arms: [['rest'], ['rest']] })); });
+}
+if (S === 'faces') {
+  const EX = ['neutral', 'smile', 'calm', 'focus', 'aha', 'wow', 'stuck'], CW = 190, RH = 210, W = 120 + CW * EX.length, H = 140 + RH * WHO.length; size(W, H);
+  title('Expressions', "Pose field expr (blend two with expr, expr2, exprU). talkV 0..1 opens the mouth; blink 0..1; look V(x, y).");
+  EX.forEach((e, j) => text(120 + j * CW + CW / 2, 128, e, { fs: 17, fill: MUTE, anchor: 'middle' }));
+  const defs = mk('defs', {}, svg);
+  WHO.forEach((w, i) => { const cy = 140 + i * RH; text(40, cy + RH / 2 + 12, w, { fs: 40, fw: 700 });
+    EX.forEach((e, j) => { const cx = 120 + j * CW, id = `c${i}_${j}`;
+      const cp = mk('clipPath', { id }, defs); mk('rect', { x: cx + 6, y: cy + 6, width: CW - 12, height: RH - 12, rx: 14 }, cp);
+      mk('rect', { x: cx + 6, y: cy + 6, width: CW - 12, height: RH - 12, rx: 14, fill: (i + j) % 2 ? '#EFE7DA' : '#F3ECE1' }, svg);
+      const g = mk('g', { 'clip-path': `url(#${id})` }, svg), inner = mk('g', {}, g);
+      const { z } = figure(inner, w, 0, 0, 2.3, { expr: e, arms: [['rest'], ['rest']] });
+      inner.setAttribute('transform', `translate(${(cx + CW / 2 - z.Hc.x).toFixed(1)},${(cy + RH / 2 + 18 - z.Hc.y).toFixed(1)})`); }); });
+}
+if (S === 'gestures') {
+  // targets are given relative to the figure (rel: [dx, dy] in body units); the red dot marks the target
+  const GS = [
+    ['rest + home', [['rest'], ['home']]], ['explain (talking hand)', [['rest'], ['explain']]], ['homeOpen (sincere "you")', [['rest'], ['homeOpen']]],
+    ['pointAt (level target)', [['rest'], ['pointAt', { rel: [150, -175] }]]], ['pointAt (high target, capped)', [['pointAt', { rel: [-90, -340] }], ['home']]],
+    ['presentSide (palm to a display)', [['rest'], ['presentSide', { rel: [125, -260] }]]], ['presentLow', [['presentLow', { rel: [-125, -280] }], ['home']]],
+    ['shrug2 + shrug', [['shrug2'], ['shrug']]], ['one / two / three / four', [['rest'], ['three']]], ['chest ("me" / "owns")', [['rest'], ['chest']]],
+    ['quote (air quotes)', [['quote'], ['quote']]], ['wave', [['rest'], ['wave']]], ['levelHigh + levelMid (ceiling / floor)', [['levelHigh'], ['levelMid']]],
+    ['raiseMid (lifting)', [['rest'], ['raiseMid']]], ['you (palm offered)', [['you'], ['home']]],
+  ];
+  const CW = 340, CH = 520, COLS = 5, W = CW * COLS, H = 120 + CH * Math.ceil(GS.length / COLS) * 2; size(W, H);
+  title('Gesture library (rig/gest.js + rig/gest2.js)', "Gest.track(z, [[t, 'name', dur, opts], ...], arm) blends between these; arm 0 is screen-left, arm 1 screen-right in front view.");
+  ['D', 'C'].forEach((w, wi) => GS.forEach(([label, arms], i) => {
+    const k = wi * GS.length + i, cx = (k % COLS) * CW, cy = 120 + Math.floor(k / COLS) * CH, g = mk('g', {}, svg);
+    mk('rect', { x: cx + 3, y: cy + 3, width: CW - 6, height: CH - 6, rx: 10, fill: k % 2 ? '#F2EBDF' : '#EDE4D6' }, g);
+    const defs = mk('defs', {}, g), id = 'g' + k; mk('rect', { x: cx + 3, y: cy + 3, width: CW - 6, height: CH - 6, rx: 10 }, mk('clipPath', { id }, defs));
+    const inner = mk('g', { 'clip-path': `url(#${id})` }, g), s = 1.45, x = cx + CW / 2, gy = cy + CH + 170;
+    const z = Kit.castIn(inner, w), p = Kit.stand(z, x, gy, s, { f: arms[0][0] === 'pointAt' ? -.2 : arms[1][0] === 'pointAt' || arms[1][0] === 'presentSide' ? .2 : 0, expr: 'neutral', look: V(0, 1), blink: 1 });
+    arms.forEach((am, a) => { let o = am[1];
+      if (o && o.rel) { o = Object.assign({}, o, { target: V(x + o.rel[0], p.y + o.rel[1]) }); delete o.rel; mk('circle', { cx: o.target.x, cy: o.target.y, r: 7, fill: '#E5484D' }, inner); }
+      const st = Gest.apply(z, p, a, am[0], o); Gest.put(p, a, Object.assign({ u: 1 }, st)); });
+    z.pose(p);
+    text(cx + 14, cy + 30, label, { fs: 16, fw: 700, p: g }); text(cx + CW - 14, cy + 30, w, { fs: 16, fill: MUTE, anchor: 'end', p: g });
+  }));
+}
+window.ready = Promise.resolve();
+</script></body></html>

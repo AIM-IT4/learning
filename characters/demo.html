@@ -1,0 +1,48 @@
+<!doctype html><html><head><meta charset="utf-8">
+<style>html,body{margin:0;background:#EFE6D8}svg{display:block}</style></head><body>
+<svg id="sv" width="1080" height="1920" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg"></svg>
+<script src="rig/hand.js"></script><script src="rig/cast.js"></script><script src="rig/quants.js"></script>
+<script src="rig/motion.js"></script><script src="rig/gest.js"></script><script src="rig/gest2.js"></script>
+<script src="sets/env.js"></script><script src="kit.js"></script>
+<script>
+// Minimal working scene (9:16, 6 s): C walks in, D presents a chart (points at its break, palm to it, explains), C waves.
+// Deterministic in t: window.seek(t) draws frame t. Render: PAGE=demo.html node tools/render.mjs 30 0 180 out.mp4 8
+// Motion check: node tools/moaudit.mjs demo.html  (joint jumps at 60 Hz; aim for 0 flags)
+(function () {
+  const { V, mk, E, P, castIn, talker, acting, facing, lookTrack, lerpPose } = Kit, svg = document.getElementById('sv');
+  const GROUND = 1560, S = 1.45;
+  // set: wall, floor, a screen with a chart (the pointing target is a point on it)
+  mk('rect', { x: 0, y: 0, width: 1080, height: GROUND, fill: '#EFE6D8' }, svg);
+  mk('rect', { x: 0, y: GROUND, width: 1080, height: 1920 - GROUND, fill: '#D9C9AF' }, svg);
+  mk('rect', { x: 120, y: 300, width: 840, height: 520, rx: 22, fill: '#16232B' }, svg);
+  const pts = [[180, 700], [300, 640], [420, 660], [540, 560], [610, 590], [680, 470], [760, 740], [880, 760]];
+  mk('path', { d: 'M' + pts.map(q => q.join(',')).join(' L'), fill: 'none', stroke: '#08A9A2', 'stroke-width': 8, 'stroke-linejoin': 'round' }, svg);
+  const BREAK = V(680, 470); mk('circle', { cx: BREAK.x, cy: BREAK.y, r: 12, fill: '#E5484D' }, svg);
+  const cast = mk('g', {}, svg), C = castIn(cast, 'C'), D = castIn(cast, 'D');
+
+  // D: a presenter at x 780. arm 0 (screen-left) works the screen; arm 1 talks
+  const lipD = t => (t > 1.0 && t < 4.8) ? .45 + .35 * Math.abs(Math.sin(t * 17)) * Math.abs(Math.sin(t * 5.3)) : 0;
+  const poseD = talker(D, 780, GROUND, S, {
+    turn: facing([[0, -.25]]), act: acting([[0, 'neutral'], [1.0, 'focus'], [3.6, 'smile']]),
+    g: [Gest.track(D, [[0, 'rest'], [1.1, 'pointAt', .45, { target: BREAK }], [2.6, 'presentSide', .5, { target: V(520, 600) }], [3.4, 'rest', .55]], 0),
+        Gest.track(D, [[0, 'home'], [3.7, 'explain', .5], [5.0, 'home', .5]], 1)],
+    look: lookTrack([[0, V(0, 1)], [1.0, V(-6, -2)], [3.5, V(0, 1)]]), lip: lipD, blinks: [2.2, 4.9] });
+
+  // C: walks in from the left, settles into a stance at x 300, then waves
+  const wk = Motion.walk(C, { t0: .2, x0: -220, x1: 300, ground: GROUND, f: 1, s: S, T: .5, step: 104 });
+  const standC = talker(C, 300, GROUND, S, { turn: facing([[0, .6], [wk.t1 + .2, .15, .5]]), act: acting([[0, 'neutral'], [4.3, 'smile']]),
+    g: [Gest.track(C, [[0, 'rest'], [4.4, 'wave', .46]], 0), Gest.track(C, [[0, 'home']], 1)], look: lookTrack([[0, V(4, 0)], [wk.t1 + .3, V(0, 1)]]), blinks: [3.1] });
+  function poseC(t) {
+    const tw = wk.t1 - .35, W = t => Object.assign(wk(t), { expr: 'neutral', look: V(4, 0), blink: Motion.blink(t, [1.4]) });
+    if (t < tw) return W(t);
+    const u = E.s(P(t, tw, .6)), p = lerpPose(W(tw), standC(t), u);
+    if (u < 1) p.foot = p.foot.map((q, i) => i === 1 ? V(q.x, q.y - 7 * S * Math.sin(Math.PI * u)) : q);      // the far foot steps into the stance
+    return p;
+  }
+
+  window.DUR = 6;
+  window.seek = t => { C.pose(poseC(t)); D.pose(poseD(t)); window.__t = t; };
+  window.__probe = Kit.probe; window.__cast = Kit.CASTS;
+  window.ready = Promise.resolve().then(() => window.seek(0));
+})();
+</script></body></html>
