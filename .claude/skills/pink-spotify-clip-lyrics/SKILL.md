@@ -27,7 +27,8 @@ pacing and type mixing only. Every frame is drawn by our own code.
 3. **Show a contact sheet of stills before the full render**, then wait for the user's go-ahead.
 4. **Ask before overwriting** any existing file in the work or output folder (AskUserQuestion).
 5. Deliver a 1920×1080 master MP4 with the original audio and a 720p copy **under 20 MB** for
-   WhatsApp. Make a 3840×2160 copy **only if the user asks**.
+   WhatsApp. If the user asks for **Instagram Reel size**, also render 1080×1920 (9:16), with its own 720×1280
+   WhatsApp copy (see "Reel layout"). Make a 3840×2160 copy **only if the user asks**.
 
 ## Inputs
 
@@ -194,7 +195,8 @@ reads like Spotify lyrics without the card.
 **5b. Knockout words.** Big **Inter 900** caps (fit to about 85% of the width, one to three words per line)
 with **the clip showing only inside the letters**:
 ```js
-o.drawImage(clipFrame, 0, 0, W, H);                  // offscreen o: graded clip frame (a little brighter here, B≈0.85)
+o.fillStyle = pinkGradient; o.fillRect(0, 0, W, H);   // dark clips vanish inside letters: fill the glyphs pink first,
+o.globalCompositeOperation = "screen"; o.drawImage(clipFrame, 0, 0, W, H);   // then screen the clip in (B≈1.5)
 o.globalCompositeOperation = "destination-in";
 o.fillText(word, x, y);                              // keeps clip pixels only inside the glyphs
 ctx.fillStyle = "#14040e"; ctx.fillRect(0, 0, W, H); // dark plum around the letters
@@ -255,6 +257,8 @@ Each word appears on its sung time: a scale 1.06→1 with α. **End with a camer
 - `scene/render.mjs <from> <to> <out.mp4>` starts the local static server, then renders frames with
   `canvas.toDataURL("image/jpeg", 0.96)` piped to
   `ffmpeg -f image2pipe -c:v mjpeg -i - -c:v libx264 -crf 16 -pix_fmt yuv420p -r 30`.
+  Store each clip section's real frame count in the data and clamp the frame index to it: the slowed source can come up a frame or two short.
+  In bash loops, run ffmpeg with `-nostdin`, or it swallows the loop's input.
   Render 4 parallel chunks and join them with the concat demuxer (`-c copy`). To fix a few seconds,
   **re-render whole chunks**. Never splice a re-rendered piece onto a trimmed stream copy: the timestamps break.
   `--stills t1,t2,… dir` writes PNG stills.
@@ -279,6 +283,22 @@ Tile them with `ffmpeg -i stills/s_%02d.png -vf "scale=480:-1,tile=4x3:padding=8
 Look at the sheet yourself first: is every text readable over its clip (the luma check in Step 2), is it one
 pink world, is the logo undistorted, and is no clip moment reused? Then **show it to the user** with the plan
 table. **Wait for approval.**
+
+## Reel layout (9:16, 1080×1920, when asked)
+
+- Render the same scene with `?w=1080&h=1920`. Every section reads `PORT = H > W` and uses its own layout. **Keep all
+  text inside Instagram's safe zone**: about 230 px clear at the top, 400 px at the bottom (caption) and 150 px on the
+  right (buttons).
+- Extract clip frames per aspect ratio: for 9:16, crop a 608×1080 window around the subject (focus x per clip)
+  from the 16:9 source, then scale it to 1080×1920.
+- Per section:
+  - **card**: larger (scale about 0.8), with less yaw;
+  - **rose**: the rose at the top, its lyric block below;
+  - **Spotify-style lyrics**: lyrics at the bottom-left inside the safe zone, with the gradient from the bottom;
+  - **knockout**: fit each word to 86% of the width;
+  - **letterbox**: a central band about 760 px tall, with the subtitles *below* the band;
+  - **path**: a vertical S-curve;
+  - **split**: top and bottom (the clip on top).
 
 ## Final render and delivery
 

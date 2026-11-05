@@ -29,6 +29,7 @@ Use it for mood and pacing only.
 3. **Show a contact sheet of stills before the full render**, then wait for the user's go-ahead.
 4. **Ask before overwriting** any existing file in the work or output folder (AskUserQuestion).
 5. Deliver a 1920×1080 master MP4 with the original audio and a 720p copy **under 20 MB** for WhatsApp.
+   If the user asks for **Instagram Reel size**, also render 1080×1920 with its own 720×1280 WhatsApp copy (see "Reel layout").
 
 ## Inputs
 
@@ -244,6 +245,16 @@ After the bloom completes, the scene stays as a static painting on the sheet, mu
     Because every frame depends only on `t`, any chunk can be re-rendered on its own.
   - To fix a few seconds, re-render the whole chunk. Never splice onto a trimmed stream copy: the timestamps break.
   - `--stills t1,t2,… dir` writes PNG stills.
+
+## Reel layout (9:16, 1080×1920, when asked)
+
+- Render the same scene with `?w=1080&h=1920`, and **keep the pan constant**.
+- Scenes are 900×600, all at one height (top about 500 px), with **no staggering**. The pan is about 88 px/s, so the spacing rule still holds (check it in the build script).
+- The paper tile scales to the frame height.
+- The frame is too narrow for a block centred on its scene, so it slides off while being sung. Instead, **place each lyric row at the world x where the camera is centred at that row's mid-time**
+  (`x = v·rowMid + W/2`), so it's fully on screen as it's written.
+- Break rows at about 20 characters, cap them at 640 px wide, and **cycle the rows of the whole song through 4 heights** under the scenes, so neighbouring rows never collide.
+- Keep text inside Instagram's safe zone: about 230 px clear at the top and 400 px at the bottom. The title goes at about 30% of the height.
 
 ## Contact sheet: required before the full render
 
