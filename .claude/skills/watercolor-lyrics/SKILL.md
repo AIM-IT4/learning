@@ -282,11 +282,11 @@ Then **show it to the user**, with the scene plan and the chorus timing table. *
 D=<duration>
 ffmpeg -i out/video_noaudio.mp4 -i input/<song> -map 0:v -map 1:a -t $D \
   -af "afade=t=in:d=0.5,afade=t=out:st=$(echo "$D-2"|bc):d=2" -c:v copy -c:a aac -b:a 192k -movflags +faststart out/<slug>_watercolor_1080p.mp4
-VB=$(python3 -c "print(int(19*8*1024*1024/$D/1000 - 96))")k      # WhatsApp: 1280×720, two-pass, 19 MB budget
+VB=$(python3 -c "print(int(18.6*8*1000*1000/$D/1000 - 96))")k      # WhatsApp: 1280×720, two-pass, 18.6 MB budget (decimal; x264 can overshoot ~1%)
 ffmpeg -y -i out/<slug>_watercolor_1080p.mp4 -vf scale=1280:720 -c:v libx264 -preset slow -b:v $VB -pass 1 -an -f null /dev/null
 ffmpeg -i out/<slug>_watercolor_1080p.mp4 -vf scale=1280:720 -c:v libx264 -preset slow -b:v $VB -pass 2 -c:a aac -b:a 96k -movflags +faststart out/<slug>_watercolor_720p_whatsapp.mp4
 ```
-Verify the 720p copy is under 20 MB (`stat`). If it isn't, lower `VB` by 10% and re-encode. Paper texture compresses
+Verify the 720p copy is under 20,000,000 bytes (`stat`; decimal MB, as phones count). If it isn't, lower `VB` by 10% and re-encode. Paper texture compresses
 poorly, so if the 720p copy shows blocking, re-encode with `-tune grain` before dropping the bitrate further.
 Check both files with `ffprobe`: resolution, 30 fps, an audio stream, the duration, and the frame count (`-count_packets`).
 

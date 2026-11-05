@@ -218,7 +218,7 @@ are the Reel safe zones clear, do 16:9 keywords stay off the drawing? Fix, then 
 D=<duration>
 ffmpeg -i out/v_916.mp4 -i analysis/song.wav -map 0:v -map 1:a -t $D \
   -af "afade=t=in:d=0.5,afade=t=out:st=$(echo "$D-1.5"|bc):d=1.5" -c:v copy -c:a aac -b:a 192k -movflags +faststart out/<slug>_inkline_916.mp4
-VB=$(python3 -c "print(int(19*8*1024*1024/$D/1000 - 96))")k      # WhatsApp: two-pass, 19 MB budget, 96k audio
+VB=$(python3 -c "print(int(18.6*8*1000*1000/$D/1000 - 96))")k      # WhatsApp: two-pass, 18.6 MB budget (decimal; x264 can overshoot ~1%), 96k audio
 ffmpeg -y -i out/<slug>_inkline_916.mp4 -vf scale=720:1280 -c:v libx264 -preset slow -b:v $VB -pass 1 -passlogfile wa916 -an -f null /dev/null
 ffmpeg -i out/<slug>_inkline_916.mp4 -vf scale=720:1280 -c:v libx264 -preset slow -b:v $VB -pass 2 -passlogfile wa916 -c:a aac -b:a 96k -movflags +faststart out/<slug>_inkline_916_720p_whatsapp.mp4
 ```

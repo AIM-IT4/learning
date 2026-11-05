@@ -329,13 +329,13 @@ ffmpeg -i out/video_noaudio.mp4 -i input/<song> -map 0:v -map 1:a \
   -af "afade=t=in:d=0.5,afade=t=out:st=$(echo "$D-1.5" | bc):d=1.5" \
   -c:v copy -c:a aac -b:a 192k -shortest -movflags +faststart out/<slug>_night_glow_1080p.mp4
 
-# WhatsApp copy: 720p, < 20 MB. Two-pass with a computed bitrate (19 MB budget, 96k audio)
-VB=$(python3 -c "print(int(19*8*1024*1024/$D/1000 - 96))")k
+# WhatsApp copy: 720p, < 20 MB. Two-pass with a computed bitrate (18.6 MB budget (decimal; x264 can overshoot ~1%), 96k audio)
+VB=$(python3 -c "print(int(18.6*8*1000*1000/$D/1000 - 96))")k
 ffmpeg -y -i out/<slug>_night_glow_1080p.mp4 -vf scale=1280:720 -c:v libx264 -b:v $VB -pass 1 -an -f null /dev/null
 ffmpeg -i out/<slug>_night_glow_1080p.mp4 -vf scale=1280:720 -c:v libx264 -b:v $VB -pass 2 \
   -c:a aac -b:a 96k -movflags +faststart out/<slug>_night_glow_720p_whatsapp.mp4
 ```
-Verify that the 720p file is under 20 MB (`stat`). If it isn't, lower `VB` by 10% and re-encode.
+Verify that the 720p file is under 20,000,000 bytes (`stat`; decimal MB, as phones count). If it isn't, lower `VB` by 10% and re-encode.
 Check both files with `ffprobe`: 1920×1080 or 1280×720, 30 fps, an audio stream, and duration ≈ song.
 
 Before writing into `out/`, check for existing files and **ask before overwriting**.

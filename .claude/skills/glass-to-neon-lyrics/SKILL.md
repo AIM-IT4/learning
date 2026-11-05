@@ -191,7 +191,7 @@ Render with `?w=1080&h=1920` (`PORT = H > W`). **Safe zone:** text ≥ 230 px fr
 - **Testing while frames are still extracting:** `prep_clips.sh` writes `counts.js` as it goes, so the page fails to parse until it ends.
   Point a throwaway `scene/test.html` at a hand-written `counts_test.js` for the aspect ratio that is ready and render stills with
   `render.mjs --page test.html` (delete both afterwards). Never edit a scene file while a render of it is still starting up.
-- The WhatsApp budget (`19*8*1024*1024` bits) lands at ≈ 19.2 MiB ≈ 20.1 million bytes. If the user's limit is a decimal 20 MB, use 18 MiB.
+- The WhatsApp budget is 18.6 decimal MB (`18.6*8*1000*1000` bits), so the copy stays under 20,000,000 bytes even when x264 overshoots by ~1%.
 
 ## Contact sheet: required before the full render
 
@@ -203,7 +203,7 @@ nothing cut off, 9:16 safe zone, letters burning, no clip moment reused. Fix, th
 ## Final render and delivery
 
 Mux each joined video with the song (`-ss START -t D`, `afade` in 0.5 / out 1.5, aac 192k, `+faststart`) →
-`out/<slug>_glassneon_169.mp4` / `_916.mp4`. WhatsApp: `VB = int(19*8*1024*1024/D/1000 - 96)` kbps, two-pass libx264 (unique `-passlogfile`),
+`out/<slug>_glassneon_169.mp4` / `_916.mp4`. WhatsApp: `VB = int(18.6*8*1000*1000/D/1000 - 96)` kbps, two-pass libx264 (unique `-passlogfile`),
 `scale=1280:720` / `720:1280`, aac 96k → `_720p_whatsapp.mp4`, verify < 20 MB. ffprobe every file (resolution, fps, `-count_packets` frames,
 duration, audio). Delete the extracted clip frames afterwards. Ask before overwriting `out/`.
 

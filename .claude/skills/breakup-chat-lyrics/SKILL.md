@@ -268,7 +268,7 @@ Render the same scene with `?w=1080&h=1920`; every part reads `PORT = H > W`. **
 - **Testing while frames are still extracting:** `prep_clips.sh` writes `counts.js` as it goes, so the page fails to parse until it ends.
   Point a throwaway `scene/test.html` at a hand-written `counts_test.js` for the aspect ratio that is ready and render stills with
   `render.mjs --page test.html` (delete both afterwards). Never edit a scene file while a render of it is still starting up.
-- The WhatsApp budget (`19*8*1024*1024` bits) lands at ≈ 19.2 MiB ≈ 20.1 million bytes. If the user's limit is a decimal 20 MB, use 18 MiB.
+- The WhatsApp budget is 18.6 decimal MB (`18.6*8*1000*1000` bits), so the copy stays under 20,000,000 bytes even when x264 overshoots by ~1%.
 
 ## Contact sheet: required before the full render
 
@@ -288,7 +288,7 @@ letters burn (no dead-black letters), is no clip moment reused? Fix, re-check, t
 # per aspect ratio, after joining the chunks into out/v_<ar>.mp4 (D = duration, START = clip start in the song)
 ffmpeg -i out/v_169.mp4 -ss $START -t $D -i analysis/song.wav -map 0:v -map 1:a -t $D \
   -af "afade=t=in:d=0.5,afade=t=out:st=$(echo "$D-1.5"|bc):d=1.5" -c:v copy -c:a aac -b:a 192k -movflags +faststart out/<slug>_breakup_169.mp4
-VB=$(python3 -c "print(int(19*8*1024*1024/$D/1000 - 96))")k        # WhatsApp: two-pass, 19 MB budget, aac 96k
+VB=$(python3 -c "print(int(18.6*8*1000*1000/$D/1000 - 96))")k        # WhatsApp: two-pass, 18.6 MB budget (decimal; x264 can overshoot ~1%), aac 96k
 ffmpeg -y -i out/<slug>_breakup_169.mp4 -vf scale=1280:720 -c:v libx264 -preset slow -b:v $VB -pass 1 -passlogfile wa169 -an -f null /dev/null
 ffmpeg -i out/<slug>_breakup_169.mp4 -vf scale=1280:720 -c:v libx264 -preset slow -b:v $VB -pass 2 -passlogfile wa169 -c:a aac -b:a 96k -movflags +faststart out/<slug>_breakup_169_720p_whatsapp.mp4
 ```

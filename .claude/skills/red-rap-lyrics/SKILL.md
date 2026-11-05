@@ -353,11 +353,11 @@ and is nothing cut off in 9:16? Then **show them to the user** with the section/
 D=<duration>; AUD=analysis/song_clean.wav   # or analysis/song.wav if nothing is masked
 ffmpeg -i out/v_<ar>.mp4 -i $AUD -map 0:v -map 1:a -t $D -af "afade=t=in:d=0.3,afade=t=out:st=$(echo "$D-1.0"|bc):d=1.0" \
   -c:v copy -c:a aac -b:a 192k -movflags +faststart out/<slug>_red_<ar>.mp4
-# WhatsApp: 720p (720×1280 or 1280×720), two-pass to a 19 MB budget with 96k audio
-VB=$(python3 -c "print(int(19*8*1024*1024/$D/1000 - 96))")k
+# WhatsApp: 720p (720×1280 or 1280×720), two-pass to a 18.6 MB budget (decimal; x264 can overshoot ~1%) with 96k audio
+VB=$(python3 -c "print(int(18.6*8*1000*1000/$D/1000 - 96))")k
 ```
 Run the two passes with `-vf scale=720:1280` (9:16) or `scale=1280:720` (16:9) and `-b:v $VB`. Then:
-- Verify each WhatsApp file is under 20 MB (`stat`). If it isn't, lower `VB` by 10% and re-encode.
+- Verify each WhatsApp file is under 20,000,000 bytes (`stat`; decimal MB, as phones count). If it isn't, lower `VB` by 10% and re-encode.
 - Rain and grain are expensive at low bitrates: if the 720p copy looks blocky, re-render the frames for it
   with `grain=0.5` (a scene flag) rather than lowering the bitrate further.
 - Check all 4 files with `ffprobe`: size, 30 fps, an audio stream, and the duration.

@@ -245,7 +245,7 @@ node scene/render.mjs --w 1920 --h 1080 0 $HN out/169_a.mp4 & node scene/render.
 printf "file '169_a.mp4'\nfile '169_b.mp4'\n" > out/169.txt && ffmpeg -nostdin -f concat -safe 0 -i out/169.txt -c copy out/v_169.mp4
 ffmpeg -nostdin -i out/v_169.mp4 -i input/<song>.mp3 -map 0:v -map 1:a -t $D \
   -af "afade=t=in:d=0.5,afade=t=out:st=$(echo "$D-1.5"|bc):d=1.5" -c:v copy -c:a aac -b:a 256k -movflags +faststart out/<slug>_sketch_169.mp4
-VB=$(python3 -c "print(int(19*8*1024*1024/$D/1000 - 96))")k          # WhatsApp: two-pass, 19 MB budget, 96k audio
+VB=$(python3 -c "print(int(18.6*8*1000*1000/$D/1000 - 96))")k          # WhatsApp: two-pass, 18.6 MB budget (decimal; x264 can overshoot ~1%), 96k audio
 ffmpeg -nostdin -y -i out/<slug>_sketch_169.mp4 -vf scale=1280:720 -c:v libx264 -preset slow -b:v $VB -pass 1 -passlogfile out/wa169 -an -f null /dev/null
 ffmpeg -nostdin -i out/<slug>_sketch_169.mp4 -vf scale=1280:720 -c:v libx264 -preset slow -b:v $VB -pass 2 -passlogfile out/wa169 -c:a aac -b:a 96k -movflags +faststart out/<slug>_sketch_169_720p_whatsapp.mp4
 ```
