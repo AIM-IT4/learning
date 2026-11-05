@@ -35,8 +35,8 @@ Collect these, and ask for anything that is missing before starting:
 | Input | Notes |
 |---|---|
 | Song audio | Anything ffmpeg can read (mp3, opus, m4a, wav). A clip of the song is fine, and the video then covers only that clip. |
-| Lyrics | Exactly as sung, **including every repetition**. Expand `(x2)` and chorus shorthand. Roman/Latin script is best for alignment. If the lyrics are in Devanagari or another script, keep it for display and romanize with `uroman` for alignment only. |
-| 2–4 video clips | Emotional, glowing or dreamy couple clips work best. They must be the user's own or ones they have the rights to use. |
+| Lyrics | If the user can't supply them, transcribe the vocal stem with Whisper large-v3 (`faster-whisper`, `language` set, pass a 16 kHz numpy array, not a path). Then re-transcribe any window where the vocal stem is active but no text came back, and show the user the cleaned transcript. Never write lyrics from memory. Otherwise: exactly as sung, **including every repetition**. Expand `(x2)` and chorus shorthand. Roman/Latin script is best for alignment. If the lyrics are in Devanagari or another script, keep it for display and romanize with `uroman` for alignment only. |
+| 2–4 video clips | If the user has none, offer a fully code-drawn version: night-sky scenes built from canvas primitives (moon, stars, clouds, hills, water, lamp, rain of light, lanterns, bokeh, window, road, lotus, backlit couple or single silhouettes). Each "moment" is then a distinct composition, and the "never reuse a moment" rule still applies. Otherwise: emotional, glowing or dreamy couple clips work best. They must be the user's own or ones they have the rights to use. |
 | Title + artists | e.g. `Dooron Dooron — Paresh Pahuja ft. Harleen Sethi`. |
 | (optional) handle / hashtag | For the Instagram-style post. Default: a handle made from the song slug and `#<title-without-spaces>`. |
 
@@ -53,10 +53,16 @@ npm i playwright
 ffmpeg -version   # required
 ```
 
-Fonts must be local so that every render matches. Download them into `scene/fonts/`:
-- `https://github.com/google/fonts/raw/main/ofl/inter/Inter%5Bopsz,wght%5D.ttf` → `Inter.ttf`
-- `https://github.com/google/fonts/raw/main/ofl/instrumentserif/InstrumentSerif-Italic.ttf`
-- `https://github.com/google/fonts/raw/main/ofl/instrumentserif/InstrumentSerif-Regular.ttf`
+Fonts must be local so that every render matches. Download the TTFs into `scene/fonts/` from
+the Google Fonts CSS API (raw GitHub URLs may be blocked by a proxy):
+```bash
+curl -sS -A "Mozilla/4.0" "https://fonts.googleapis.com/css2?family=Inter:wght@300;600&family=Instrument+Serif:ital@0;1" \
+  | grep -o 'https://fonts.gstatic.com[^)]*\.ttf'     # then curl each URL into scene/fonts/
+```
+Check them with `file scene/fonts/*`: each must say "TrueType Font data", not JSON or HTML.
+
+Playwright installed globally is not visible to ESM `import`. In `render.mjs`, load it with
+`createRequire(import.meta.url)` and fall back to the global `node_modules` path.
 
 If torchaudio in the environment no longer provides `torchaudio.pipelines.MMS_FA`, install
 a version that does (e.g. `torchaudio==2.8.*` with the matching torch). Do not switch to
@@ -85,7 +91,7 @@ SR, HOP = bundle.sample_rate, 320                     # 16 kHz, 50 emission fram
 wav, sr = torchaudio.load("sep/htdemucs/song/vocals.wav")
 wav = torchaudio.functional.resample(wav.mean(0, keepdim=True), sr, SR)
 n = wav.size(1)
-model = bundle.get_model(with_star=False).eval()
+model = bundle.get_model(with_star=True).eval()   # star token absorbs hums, alaaps, ad-libs between lines
 
 # Long songs: emit in 30 s windows with 2 s context each side (full-song attention would OOM)
 WIN, CTX, chunks = 30 * SR, 2 * SR, []
@@ -98,7 +104,7 @@ for s in range(0, n, WIN):
 emission = torch.cat(chunks)                           # (T, C) log-probs
 
 lines = [...]          # [{ "display": "...", "words": [{"display": "Mitti", "norm": "mitti"}, ...] }, ...]
-flat = [w["norm"] for L in lines for w in L["words"]]
+flat = ["*"] + [x for L in lines for x in [w["norm"] for w in L["words"]] + ["*"]]   # "*" between lines; skip star spans when reading results
 spans = bundle.get_aligner()(emission, bundle.get_tokenizer()(flat))
 ratio = n / emission.size(0) / SR
 # per word: start = spans[i][0].start*ratio, end = spans[i][-1].end*ratio,
@@ -112,6 +118,9 @@ Then check the alignment:
 - Flag every word with `score < 0.4`, or a word longer than 2.5 s, or a gap that makes no sense.
   Re-align just that line's audio window (slice ±2 s, same code). If it is still bad,
   **show the user the table and ask** whether the lyrics differ from what is sung. Never patch a time by hand.
+- If a line seems missing (vocals active, nothing aligned), test the hypothesis by adding the line, for example a repeated
+  chorus line, and re-aligning: keep it only if it lands in that gap with good scores.
+- Check that the song file does not end with a channel promo or voice-over (transcribe the last 30 s), and end the video before it.
 - Spot-check by listening: cut 3 random lines with `ffmpeg -ss start -to end` and
   confirm the words match.
 
@@ -290,7 +299,7 @@ const ff = spawn("ffmpeg", ["-y", "-f", "image2pipe", "-framerate", "30", "-c:v"
   { stdio: ["pipe", "inherit", "inherit"] });
 for (let f = +from; f < +to; f++) {
   await page.evaluate((t) => window.renderFrame(t), f / 30);
-  const png = await page.screenshot({ type: "png" });
+  const png = await page.screenshot({ type: "png" });   // faster: canvas.toDataURL("image/jpeg", 0.96) piped as mjpeg
   if (!ff.stdin.write(png)) await once(ff.stdin, "drain");
 }
 ff.stdin.end(); await once(ff, "close"); await browser.close();
