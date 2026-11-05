@@ -131,7 +131,7 @@ kick_env = librosa.onset.onset_strength(S=librosa.amplitude_to_db(low[None]), sr
 kicks = librosa.onset.onset_detect(onset_envelope=kick_env, sr=sr, hop_length=256, units="time", backtrack=False)
 ```
 Save `analysis/beats.json` with `tempo`, `beats`, `downbeats`, `kicks`, and `energy` (RMS at 10 Hz).
-Kicks drive the portrait's breathing, small camera shakes and grain pulses.
+Use peak-picking (`librosa.util.peak_pick`, at least 0.2 s apart, above the 80th percentile), or every hi-hat counts as a kick. Kicks drive the portrait's breathing, small camera shakes and grain pulses.
 
 **1e. Split into 4 sections**, one per look:
 card → street → portrait → tower. Cut only at **line boundaries that fall on a downbeat**, and
@@ -262,10 +262,10 @@ Draw the dots as tiny white rects or arcs in batches by size bucket (one `fill()
 **Projection:** a simple pinhole camera in JS. For each word, build its local frame: origin, unit
 x-axis along its face, unit y-axis up. Project the origin, origin+x and origin+y. Then set
 `ctx.setTransform(a, b, c, d, e, f)` from the projected basis (an affine approximation is fine at
-these sizes) and `fillText` at (0,0). Cull words behind the camera, sort by depth, and fade by distance.
+these sizes) and `fillText` at (0,0). Cull words behind the camera, sort by depth, and fade by distance. Also fade out words closer than about 2–4 units: the affine approximation smears near words into huge wedges. In 9:16, use camera distances about 1.45× larger.
 
 **Camera keyframes**, one per sung word:
-- `target` = the word's centre, plus `yaw` (front face about −18°, side face about +55°), `pitch` (±6° seeded),
+- `target` = the word's centre, plus `yaw` (front face about +18°, side face about +55°; keep the camera in the x<0, z>0 quadrant so no word is ever seen mirrored), `pitch` (±6° seeded),
   `roll` (±4° seeded), and `distance` (tighter for small words, wider for big key words).
 - The move to each word starts 0.1 s before the word and takes `min(0.32 s, the gap to the next word)`, with the reel's ease (default easeInOutCubic).
   Interpolate target and distance linearly in eased time and the angles by shortest arc. Hold between moves with a slight drift.
@@ -278,6 +278,7 @@ these sizes) and `fillText` at (0,0). Cull words behind the camera, sort by dept
 - The last aligned word (e.g. `DAMN!`) appears at its start as a **huge white condensed word** (Anton, about 30% of frame height).
 - It scales 2.6→1.0 in 0.12 s (easeOutExpo), with a **shake** (seeded noise, ±24 px decaying over 0.45 s, 2° roll) and
   **red echo trails**: 5 copies behind it, scaled 1.04–1.25, red at 50%→8% α, lagging the slam by 1–5 frames.
+- Dim everything behind it to about 18% within 0.08 s of impact so the slam owns the frame.
 - One red flash frame at impact. Hold, then cut to black on the music's end.
 
 **Swear words** (only the ones the user names; match on the display text or on `norm`):
@@ -318,9 +319,10 @@ out = mix * gain[:, None] + inst[:len(mix)] * (1 - gain[:, None]); sf.write("ana
 - `scene/index.html` loads `data.js` (`window.DATA = {timeline, beats, sections, style, tower, meta}`),
   `dots.bin` and the fonts. It exposes `window.ready` (fonts loaded, checked with `document.fonts.check`, then
   aborts on failure; dots loaded) and `async window.renderFrame(t)`.
+- Lay out anything that measures text (card rows, tower) inside `window.ready`, **after** the fonts load, or the widths will be wrong.
 - `scene/render.mjs <from> <to> <out.mp4> --w W --h H` renders frames with
   `canvas.toDataURL("image/jpeg", 0.96)` piped to `ffmpeg -f image2pipe -c:v mjpeg -i - -c:v libx264 -crf 16 -pix_fmt yuv420p -r 30`.
-  Render 4 parallel chunks and join them with the concat demuxer (`-c copy`). `--stills t1,t2,… dir` writes PNG stills.
+  Render 4 parallel chunks and join them with the concat demuxer (`-c copy`). To fix a few seconds, re-render whole chunks. Don't splice a re-rendered tail onto a trimmed stream copy: the timestamps break. `--stills t1,t2,… dir` writes PNG stills.
 
 ## Contact sheet: required before the full render
 
