@@ -130,7 +130,7 @@ Then check it:
 **2c. Chorus repeats reuse the same timing:**
 - Group lines whose normalized text is identical (or a run of identical lines, i.e. the chorus block).
 - Confirm each repeat is really the same melody: cross-correlate chroma (`librosa.feature.chroma_cqt` on the vocal stem)
-  between the instances. Require a peak correlation of 0.8 or more.
+  between the instances. L2-normalize each chroma column (`librosa.util.normalize(..., norm=2, axis=0)`), so the mean column dot product is a 0–1 similarity, and require 0.8 or more.
 - Pick the **reference instance** with the best mean alignment score. For every other instance, anchor at that
   instance's **own aligned first-word start**, and apply the reference's **relative word offsets**, scaled by the ratio of the
   two instances' aligned line durations. Keep the repeat's own aligned times instead wherever its own
@@ -148,9 +148,9 @@ Normalize each image to a **scene height of about 780 px** (in the 1080 frame), 
 ```python
 import cv2, numpy as np
 from skimage.morphology import skeletonize
-g = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY).astype(np.float32) / 255
-xdog = cv2.GaussianBlur(g, (0, 0), 1.0) - 0.98 * cv2.GaussianBlur(g, (0, 0), 1.6)   # XDoG-style ink edges
-ink = (xdog < -0.012).astype(np.uint8)                                             # tune so the linework reads like pen
+g = cv2.cvtColor(img_fullres, cv2.COLOR_BGR2GRAY).astype(np.float32) / 255           # trace at full resolution, then scale points down
+xdog = cv2.GaussianBlur(g, (0, 0), 1.2) - 0.98 * cv2.GaussianBlur(g, (0, 0), 2.2)   # XDoG-style ink edges
+ink = (xdog < np.percentile(xdog, 4.5)).astype(np.uint8)                          # RELATIVE threshold: a fixed one finds almost nothing on soft images
 ink = cv2.morphologyEx(ink, cv2.MORPH_OPEN, np.ones((2, 2), np.uint8))
 skel = skeletonize(ink > 0)
 # trace the skeleton into polylines (walk 8-connected pixels from endpoints, then from leftovers),
@@ -161,7 +161,7 @@ Save `images/<n>_ink.json` with polylines, the cumulative length per stroke, and
 where the ink mask is wider). Keep about 300–1,500 strokes per image.
 
 **3b. Wash reveal map** (one byte per pixel at ¼ resolution, `images/<n>_reveal.png`):
-- `r = 0.75·dist(subject_centre) + 0.25·fbm_noise` (seeded fractal noise at 2–3 octaves), normalized 0→1.
+- `r = 0.75·dist(subject_centre) + 0.25·fbm_noise` (seeded fractal noise from Gaussian-blurred normal noise at 2–3 sigmas, not cubic-upscaled grids, which look blocky), normalized 0→1.
   The wash blooms **outward from the middle** with organic, wet edges.
 - `subject_centre` is the centre of the face boxes (3c), or the image centre.
 - Multiply in an **edge fade**, so the painting dissolves into the paper (no rectangle). Soft vignette distances near the border are pushed to 1.
@@ -185,6 +185,8 @@ where the ink mask is wider). Keep about 300–1,500 strokes per image.
      largest comfortable `v` (about 40–90 px/s) that satisfies this for all pairs, after shrinking scene widths if needed.
      If two scenes are still too close, merge their lines into one scene (tell the user).
   3. Long instrumental gaps simply leave quiet paper with leaves. That's part of the mood.
+  4. Alternate scenes high and low on the sheet (text below a high scene, above a low one). Then a block can be as wide as `2·(spacing − sceneWidth/2 − 40)` without touching the neighbouring scene.
+  5. Assert in the build script that every scene finishes painting before its first word, and that no block overlaps a face box. Fail loudly.
 - **Opening:** the song title and artist in Amatic SC, written on the paper at the start of the sheet, wiping on, before the first scene.
 - **Ending:** the last scene finishes, the paper keeps sliding for a moment, then everything fades to warm white and black with the music.
 
@@ -202,7 +204,7 @@ plotted. Stroke *i* is drawn up to `k·length_i` as a partial polyline with roun
 **Wash bloom** (the image itself, multiplied onto the paper):
 ```js
 // per frame for a revealing image: threshold its ¼-res reveal map into a mask, then upscale (bilinear = soft edge)
-const k = easeOutSine(washProgress) * 1.08;
+const k = easeOutSine(washProgress);          // end at k = 1.0 so the edge fade survives (k > 1 would fill the corners)
 for (let i = 0; i < map.length; i++) m.data[i*4+3] = 255 * clamp((k - map[i]) / 0.06);   // 0.06 = wet-edge softness
 maskCtx.putImageData(m, 0, 0);
 // compose: image → offscreen; destination-in with the upscaled mask; then
@@ -218,6 +220,7 @@ After the bloom completes, the scene stays as a static painting on the sheet, mu
 
 ## Step 6: Lyrics that write on beside each scene
 
+- **Rows:** break any line over about 26 characters into two balanced rows at a word boundary. Don't rely on commas: they may have been stripped from the aligned words.
 - **Font:** Amatic SC 700 for most text and 400 for secondary rows, ink brown `#3b2a1e`, size 64–96 px. Use 1–3 rows per block,
   with the line broken at natural phrase breaks.
 - **Placement:** the lyric block belongs to its scene and lives on the sheet (it pans with it). Score candidate positions (the
