@@ -155,7 +155,8 @@ txt(g, w.d, x, y, font, { color: "#fff", glows: [["rgba(255,210,210,0.75)", 16, 
   The word layer is mirrored in the floor.
 - **Light rain** (2 layers of pink-white streaks) + floor ripples, and **drops on the glass**: ~34 seeded drops (6–22 px) on the lens; each
   clips a circle and draws a **flipped, shrunk patch of the frame behind it** (a lens), with a dark rim and a specular dot; a third of them slide
-  slowly down with a faint trail. Drops fade in at the start of the part.
+  slowly down with a faint trail. Drops fade in at the start of the part. **Keep the still drops out of the word band**
+  (from 16% H above the floor line, 9% in 9:16, to 3% below it): a drop sitting on a neon word flips its letters and reads as a glitch.
 - **On the last word, hold the frame:** `renderFrame(t)` renders `min(t, lastWord.start + 0.5)` (grain keeps moving), then fades to black from
   the end of the line to the end of the video.
 
@@ -186,6 +187,11 @@ Render with `?w=1080&h=1920` (`PORT = H > W`). **Safe zone:** text ≥ 230 px fr
   `async window.renderFrame(t)` awaits needed frames (`img.decode()`, LRU). `scene/render.mjs --w W --h H <from> <to> out.mp4` pipes JPEG frames to
   libx264 crf 16; `--stills t1,t2,… dir` writes PNGs.
 - At most **2 node render workers** at once; long renders in the background; join chunks with the concat demuxer; `-nostdin` in loops.
+
+- **Testing while frames are still extracting:** `prep_clips.sh` writes `counts.js` as it goes, so the page fails to parse until it ends.
+  Point a throwaway `scene/test.html` at a hand-written `counts_test.js` for the aspect ratio that is ready and render stills with
+  `render.mjs --page test.html` (delete both afterwards). Never edit a scene file while a render of it is still starting up.
+- The WhatsApp budget (`19*8*1024*1024` bits) lands at ≈ 19.2 MiB ≈ 20.1 million bytes. If the user's limit is a decimal 20 MB, use 18 MiB.
 
 ## Contact sheet: required before the full render
 

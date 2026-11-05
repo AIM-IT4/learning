@@ -265,6 +265,11 @@ Render the same scene with `?w=1080&h=1920`; every part reads `PORT = H > W`. **
 - **At most 2 node render workers at once** (shared 4-core machine); run long renders in the background. Join chunks with the concat
   demuxer (`-c copy`); to fix seconds re-render whole chunks. In bash loops call ffmpeg with `-nostdin`.
 
+- **Testing while frames are still extracting:** `prep_clips.sh` writes `counts.js` as it goes, so the page fails to parse until it ends.
+  Point a throwaway `scene/test.html` at a hand-written `counts_test.js` for the aspect ratio that is ready and render stills with
+  `render.mjs --page test.html` (delete both afterwards). Never edit a scene file while a render of it is still starting up.
+- The WhatsApp budget (`19*8*1024*1024` bits) lands at ≈ 19.2 MiB ≈ 20.1 million bytes. If the user's limit is a decimal 20 MB, use 18 MiB.
+
 ## Contact sheet: required before the full render
 
 For each aspect ratio render 12 stills **into an empty folder** (old `s_13.png`… files break `tile`):
