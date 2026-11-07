@@ -207,12 +207,14 @@ def zoompan_expr(move, frames):
     return f"zoompan=z='{z}':x='{x}':y='{y}':d={frames}:s={W}x{H}:fps={FPS}"
 
 
+GRADE = ("eq=contrast=1.12:saturation=1.25:brightness=-0.03,"
+         "colorbalance=rs=0.06:bs=0.06:rm=0.05:bm=-0.04:rh=0.04:bh=-0.06,"
+         "vignette=angle=PI/4.2")
+
+
 def render_shot(img, frames, move, flash, out):
-    grade = ("eq=contrast=1.12:saturation=1.25:brightness=-0.03,"
-             "colorbalance=rs=0.06:bs=0.06:rm=0.05:bm=-0.04:rh=0.04:bh=-0.06,"
-             "vignette=angle=PI/4.2")
     vf = (f"scale={2*W}:{2*H}:force_original_aspect_ratio=increase,crop={2*W}:{2*H},setsar=1,"
-          f"{zoompan_expr(move, frames)},{grade}")
+          f"{zoompan_expr(move, frames)},{GRADE}")
     if flash:
         vf += ",fade=t=in:st=0:d=0.13:color=white"
     vf += ",format=yuv420p"

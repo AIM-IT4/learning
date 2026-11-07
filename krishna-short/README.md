@@ -51,6 +51,47 @@ AI voices read clearly but cannot match a human's rage, pauses and build-up in t
 
 Fonts are downloaded once from Google Fonts into `./fonts` (SIL Open Font License).
 
+## Transition reel for Instagram (`make_reel.py`)
+
+A beat-synced edit: calm intro with a voice hook, then a **drop** where the edit explodes into
+fast cuts on the beat.
+
+```bash
+python fetch_commons_images.py --out reel_images        # public-domain Gita / Kurukshetra paintings + CREDITS.txt
+python make_beat.py --bpm 100 --out beat.wav            # original war-drums track (or use your own song)
+printf "यदा यदा हि धर्मस्य, ग्लानिर्भवति भारत।\n!अभ्युत्थानमधर्मस्य, तदात्मानं सृजाम्यहम्॥\n" > shloka.txt
+python make_voiceover.py --text shloka.txt --lead 1.0 --tail 0.5 --out-audio voice.wav --out-lyrics voice_lyrics.txt
+python make_reel.py --images reel_images --music beat.wav --voice voice.wav --voice-lyrics voice_lyrics.txt \
+    --words "धर्म,कर्म,सत्य,युद्ध" --end-text "धर्मक्षेत्रे कुरुक्षेत्रे" --end-sub "श्रीमद्भगवद्गीता ४.७" \
+    --out reel.mp4
+```
+
+What it does automatically:
+
+* **Finds tempo, beats and the drop** in the music (tested on 85, 100 and 128 BPM: tempo within
+  0.1 BPM, beats within ~10 ms, drop on the right beat). Override with `--bpm` / `--drop`.
+* **Intro** – one shot per bar, soft `hblur` / `dissolve` transitions, voice captions.
+  Keep the voice shorter than the intro so the last word lands on the drop.
+* **Drop** – white flash, big zoom punch, camera shake.
+* **After the drop** – cuts every 2 beats, then every beat (`--cut-every 2,1`), rotating through
+  12 transitions (zoom-in, whip slides, squeeze, circle, radial, pixelize ...), each with a zoom
+  punch, RGB-split glitch and a whoosh sound; big words from `--words` pop on every 2nd cut.
+* **Outro** – the last 3 s (`--outro`) hold on one darkened shot with the end-card text.
+* Landscape paintings sit on a blurred copy of themselves, so nothing important is cropped.
+* Writes `reel.cover.jpg` (a frame just after the drop) to use as the Reel cover.
+
+### Using a real song (e.g. "Kurukshetra Hai")
+
+Commercial songs are copyrighted, so don't bake them into the file. Instead:
+
+1. Get the song audio for **cutting only** (e.g. a clip from your phone) and run
+   `make_reel.py --music song.mp3 --music-start 42 --duration 25 --no-music-in-output ...`
+   – the edit is cut to that song's beats, but the file has only the voice and whooshes.
+2. In Instagram: upload the reel → **Add audio** → search the song → choose the **same start
+   time** (42 s in this example) → lower the original-audio volume if needed.
+
+Instagram licenses its music library, so the song plays legally and the cuts line up.
+
 ## Making your own Short – step by step
 
 1. **Pick 30–60 seconds.** Start on the strongest line so the first 2 seconds hook people
