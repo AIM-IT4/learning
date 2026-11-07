@@ -5,11 +5,37 @@ A small tool that turns **your own images + your own voice/music + lyric timings
 *Krishna Ki Chetavani (Rashmirathi)*.
 
 ```bash
-pip install numpy pillow          # ffmpeg must also be installed
-python make_demo_assets.py        # optional: placeholder images, test beat, sample lyrics in ./demo
-python make_short.py --images demo/images --audio demo/audio.wav --lyrics demo/lyrics.txt \
-    --title "कृष्ण की चेतावनी" --out demo_short.mp4
+pip install numpy pillow piper-tts   # ffmpeg must also be installed
+python make_demo_assets.py           # placeholder images, test beat, sample poem in ./demo
+
+# AI Hindi voiceover + automatic lyric timings
+python make_voiceover.py --text demo/poem.txt --voice rohan \
+    --out-audio demo/voice.wav --out-lyrics demo/voice_lyrics.txt
+
+python make_short.py --images demo/images --audio demo/voice.wav --music demo/audio.wav \
+    --lyrics demo/voice_lyrics.txt --title "कृष्ण की चेतावनी" --out demo_short.mp4
 ```
+
+## Voiceover: two ways
+
+**A. AI voice (quick draft)** – `make_voiceover.py` uses [Piper](https://github.com/OHF-Voice/piper1-gpl),
+a free offline text-to-speech engine with Hindi voices (`rohan`, `pratham` male, `priyamvada` female;
+downloaded once into `./voices`). Write the poem one line per line in `poem.txt`:
+
+```
+हरि ने भीषण हुंकार किया,
+अपना स्वरूप-विस्तार किया,
+
+!हाँ, हाँ दुर्योधन! बाँध मुझे।
+```
+
+A blank line adds a longer pause; `!` marks a dramatic line (slower, louder, pause before it).
+The script speaks every line, adds the "epic" effect (slightly deeper pitch, warmth, compression,
+hall echo), and writes `lyrics.txt` with exact start times, so you do not have to time anything.
+Options: `--speed 0.9` (slower), `--gap`, `--stanza-gap`, `--lead`, `--effect none`.
+
+**B. Your own recitation (best result)** – record yourself, then time the lines by hand (step 5 below).
+AI voices read clearly but cannot match a human's rage, pauses and build-up in this poem.
 
 ## What the script does (the "look")
 

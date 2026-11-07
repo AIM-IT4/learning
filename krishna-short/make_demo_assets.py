@@ -4,8 +4,10 @@ make_demo_assets.py - create placeholder images, a synthetic drum/drone track an
 lyrics file in ./demo so you can test make_short.py before using your own material.
 
   python make_demo_assets.py
-  python make_short.py --images demo/images --audio demo/audio.wav --lyrics demo/lyrics.txt \
-      --title "कृष्ण की चेतावनी" --out demo_short.mp4
+  # with an AI voiceover (needs: pip install piper-tts)
+  python make_voiceover.py --text demo/poem.txt --out-audio demo/voice.wav --out-lyrics demo/voice_lyrics.txt
+  python make_short.py --images demo/images --audio demo/voice.wav --music demo/audio.wav \
+      --lyrics demo/voice_lyrics.txt --title "कृष्ण की चेतावनी" --out demo_short.mp4
 
 Replace the placeholders with your own artwork, your own recitation and your own timings.
 """
@@ -35,6 +37,18 @@ LYRICS = """\
 0:11.0 | भगवान कुपित होकर बोले-
 0:13.5 | 'जंजीर बढ़ा कर साध मुझे,
 0:16.0 | हाँ, हाँ दुर्योधन! बाँध मुझे।
+"""
+
+
+# Untimed version for make_voiceover.py ("!" = dramatic line, blank line = stanza break).
+POEM = """\
+हरि ने भीषण हुंकार किया,
+अपना स्वरूप-विस्तार किया,
+डगमग-डगमग दिग्गज डोले,
+भगवान कुपित होकर बोले-
+
+!जंजीर बढ़ा कर साध मुझे,
+!हाँ, हाँ दुर्योधन! बाँध मुझे।
 """
 
 
@@ -74,7 +88,7 @@ def make_image(i, path):
     img.save(path, quality=92)
 
 
-def make_audio(path, seconds=20):
+def make_audio(path, seconds=60):
     # Low drone (D + A) with a dhol-like hit on every beat at 96 BPM and a stronger hit every bar.
     beat = 60 / 96
     expr = (f"0.22*sin(2*PI*73.4*t)+0.12*sin(2*PI*110*t)+0.06*sin(2*PI*146.8*t)"
@@ -91,6 +105,7 @@ def main():
         make_image(i, OUT / "images" / f"{i + 1:02d}.jpg")
     make_audio(OUT / "audio.wav")
     (OUT / "lyrics.txt").write_text(LYRICS, encoding="utf-8")
+    (OUT / "poem.txt").write_text(POEM, encoding="utf-8")
     print(f"demo assets written to {OUT}")
 
 
