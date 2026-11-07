@@ -86,9 +86,10 @@ def main():
         credits.append(f"{dest.name}: {meta.get('ObjectName') or title[5:]} | {meta.get('Artist', 'Unknown')} | "
                        f"{meta.get('DateTimeOriginal', 'date unknown')} | {licence} | {info['descriptionurl']}")
         print(f"ok   {dest.name}  <- {title[5:70]}")
+        # write after every image so credits survive an interrupted run
+        (out / "CREDITS.txt").write_text(
+            "Public-domain images via Wikimedia Commons\n" + "\n".join(credits) + "\n", encoding="utf-8")
         time.sleep(3)
-    (out / "CREDITS.txt").write_text(
-        "Public-domain images via Wikimedia Commons\n" + "\n".join(credits) + "\n", encoding="utf-8")
     print(f"{len(credits)} images + CREDITS.txt in {out}")
 
 
