@@ -51,6 +51,18 @@ AI voices read clearly but cannot match a human's rage, pauses and build-up in t
 
 Fonts are downloaded once from Google Fonts into `./fonts` (SIL Open Font License).
 
+## Song-style reel: rhyming lyrics on composed music
+
+`make_music.py` composes an original devotional/epic track (tanpura, bansuri melody, strings,
+choir, temple bells, shankh call, bass, dhol/taiko) with intro → verse → conch call → DROP → outro,
+and prints the bar times. `make_voiceover.py --bpm` then puts **one lyric line on each bar**, so
+the recitation rides the music. A line `~` is a bar of rest. Full recipe with original rhyming
+lyrics: `examples/krishna_updesh_song/make_it.sh`.
+
+The AI voice recites rhythmically but cannot *sing* a melody. For a sung version, sing
+`poem.txt` yourself over `music.wav` (record on your phone with headphones on) and pass that
+recording as `--voice`; everything else stays the same.
+
 ## Transition reel for Instagram (`make_reel.py`)
 
 A beat-synced edit: calm intro with a voice hook, then a **drop** where the edit explodes into

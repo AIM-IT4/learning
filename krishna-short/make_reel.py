@@ -17,6 +17,7 @@ Landscape artwork is placed on a blurred copy of itself so nothing important is 
       --end-text "धर्मक्षेत्रे कुरुक्षेत्रे" --out reel.mp4
 
 Images are used in name order (01.jpg, 02.jpg ...), cycling if there are more shots than images.
+Name one image drop.jpg and/or outro.jpg to reserve it for the drop / the final shot.
 Use music you have the rights to, or post the reel without music and add a song in Instagram.
 Needs: ffmpeg (libass), numpy, Pillow.  Shares helpers with make_short.py.
 """
@@ -219,8 +220,8 @@ ScaledBorderAndShadow: yes
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Glow,Tiro Devanagari Hindi,80,&H00007AFF,&H000000FF,&H00007AFF,&H00000000,-1,0,0,0,100,100,0,0,1,10,0,2,70,70,560,1
-Style: Verse,Tiro Devanagari Hindi,80,&H00F2FAFF,&H000000FF,&H00101010,&H00000000,-1,0,0,0,100,100,0,0,1,2,0,2,70,70,560,1
+Style: Glow,Tiro Devanagari Hindi,88,&H00007AFF,&H000000FF,&H00007AFF,&H00000000,-1,0,0,0,100,100,0,0,1,10,0,2,70,70,560,1
+Style: Verse,Tiro Devanagari Hindi,88,&H00F2FAFF,&H000000FF,&H00101010,&H00000000,-1,0,0,0,100,100,0,0,1,2,0,2,70,70,560,1
 Style: WordGlow,Noto Sans Devanagari,190,&H00007AFF,&H000000FF,&H00007AFF,&H00000000,-1,0,0,0,100,100,0,0,1,14,0,5,40,40,0,1
 Style: Word,Noto Sans Devanagari,190,&H00FFFFFF,&H000000FF,&H00202020,&H00000000,-1,0,0,0,100,100,0,0,1,3,0,5,40,40,0,1
 Style: End,Tiro Devanagari Hindi,128,&H004AC9FF,&H000000FF,&H00001A40,&H00000000,-1,0,0,0,100,100,0,0,1,5,0,5,60,60,0,1
@@ -234,8 +235,11 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
     for i, (start, text) in enumerate(voice_lines):
         end = min(voice_lines[i + 1][0] if i + 1 < len(voice_lines) else start + 6, total)
         drop = next((s["start"] for s in shots if s["kind"] == "drop"), None)
+        outro_t = next((s["start"] for s in shots if s["kind"] == "outro"), None)
         if drop and start < drop:
             end = min(end, drop)
+        if outro_t and start < outro_t:          # don't run into the end card
+            end = min(end, outro_t)
         txt = ms.ass_escape(text)
         if len(text) > 24 and ", " in txt:
             txt = txt.replace(", ", ",\\N", 1)
@@ -282,11 +286,15 @@ def main():
     ap.add_argument("--end-text", default="")
     ap.add_argument("--end-sub", default="")
     ap.add_argument("--sfx-volume", type=float, default=0.5)
+    ap.add_argument("--duck", type=float, default=3.0,
+                    help="how hard the music dips under the voice (compressor ratio; 1 = no dip)")
     ap.add_argument("--no-embers", action="store_true")
     ap.add_argument("--out", default="reel.mp4")
     args = ap.parse_args()
 
     images = sorted(p for p in Path(args.images).iterdir() if p.suffix.lower() in ms.IMAGE_EXTS)
+    special = {p.stem.lower(): p for p in images if p.stem.lower() in ("drop", "outro")}
+    images = [p for p in images if p.stem.lower() not in special] or list(special.values())
     if not images:
         raise SystemExit(f"no images in {args.images}")
     total = args.duration or min(ms.media_duration(args.music) - args.music_start, 90.0)
@@ -331,11 +339,16 @@ def main():
     ms.ensure_fonts()
     work = Path(tempfile.mkdtemp(prefix="reel_"))
     moves = ["in", "out", "up", "down"]
+    next_img = 0
     for k, s in enumerate(shots):
         a = S[k] - T[k] // 2
         b = S[k + 1] + T[k + 1] // 2
         s.update(a=a, b=b)
-        img = images[k % len(images)]
+        if s["kind"] in special:                  # drop.jpg / outro.jpg reserved for those moments
+            img = special[s["kind"]]
+        else:
+            img = images[next_img % len(images)]
+            next_img += 1
         print(f"shot {k+1:2d}/{len(shots)} {s['kind']:5s} {S[k]/FPS:6.2f}s  "
               f"{(fx_names[k-1] if k else '-'):11s} {img.name}")
         render_clip(img, b - a, s["kind"], moves[k % 4], T[k] // 2, work / f"c{k:03d}.mp4")
@@ -389,7 +402,7 @@ def main():
         graph.append(f"[{voc_i}:a]aformat=channel_layouts=stereo,asplit=2[vk][vo]")
         if not args.no_music_in_output:
             graph.append(f"[{mus_i}:a]aformat=channel_layouts=stereo[mu];"
-                         f"[mu][vk]sidechaincompress=threshold=0.03:ratio=5:attack=20:release=400[md]")
+                         f"[mu][vk]sidechaincompress=threshold=0.05:ratio={args.duck}:attack=20:release=400[md]")
             a_parts.append("[md]")
         else:
             graph.append("[vk]anullsink")

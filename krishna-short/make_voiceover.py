@@ -6,6 +6,14 @@ and write a timed lyrics file that make_short.py can use directly.
 Input is a plain text file, one line of the poem per line:
   * a blank line   = stanza break (longer pause)
   * a leading "!"  = dramatic line: spoken slower, with a longer pause before it
+  * a line "~"     = in --bpm mode, one bar of rest (no voice)
+
+ON-BEAT MODE (--bpm): every line starts exactly on the downbeat of its own bar (from --start),
+and a line that would spill into the next bar is sped up slightly (max 1.35x) so the
+recitation rides the music like a rap / kavita on beat. Use with make_music.py, which prints the
+bpm and the bar where the verse starts:
+
+  python make_voiceover.py --text poem.txt --bpm 92 --start 2.61 --out-audio voice.wav --out-lyrics lyrics.txt
 
   python make_voiceover.py --text poem.txt --voice rohan --out-audio voice.wav --out-lyrics lyrics.txt
   python make_short.py --images imgs --audio voice.wav --music epic.mp3 --lyrics lyrics.txt --out short.mp4
@@ -53,6 +61,9 @@ def parse_text(path):
         if not line or line.startswith("#"):
             gap = gap or (not line and bool(out))
             continue
+        if line == "~":
+            out.append(("", False, False))   # rest bar (on-beat mode)
+            continue
         if "|" in line and line.split("|", 1)[0].replace(":", "").replace(".", "").strip().isdigit():
             line = line.split("|", 1)[1].strip()  # accept an old timed lyrics file too
         dramatic = line.startswith("!")
@@ -81,6 +92,18 @@ def synth(voice, text, length_scale):
     return pcm, sr
 
 
+def fit(pcm, sr, max_len, limit=1.35):
+    """Speed a line up (pitch unchanged) so it fits in max_len seconds, at most `limit` times."""
+    factor = min(len(pcm) / sr / max_len, limit)
+    if factor <= 1.0:
+        return pcm
+    out = subprocess.run(
+        ["ffmpeg", "-v", "error", "-f", "f32le", "-ar", str(sr), "-ac", "1", "-i", "-",
+         "-af", f"atempo={factor:.4f}", "-f", "f32le", "-"],
+        input=pcm.astype(np.float32).tobytes(), stdout=subprocess.PIPE, check=True).stdout
+    return np.frombuffer(out, dtype=np.float32)
+
+
 def fmt_time(t):
     m, s = divmod(t, 60)
     return f"{int(m)}:{s:05.2f}"
@@ -96,6 +119,10 @@ def main():
     ap.add_argument("--stanza-gap", type=float, default=1.1, help="pause at a blank line (s)")
     ap.add_argument("--tail", type=float, default=1.5, help="silence after the last line (s)")
     ap.add_argument("--effect", default="epic", choices=("epic", "none"))
+    ap.add_argument("--bpm", type=float, help="on-beat mode: place one line per bar at this tempo")
+    ap.add_argument("--start", type=float, default=0.0, help="on-beat mode: time of the first line's bar (s)")
+    ap.add_argument("--bars-per-line", type=int, default=1)
+    ap.add_argument("--fill", type=float, default=0.9, help="on-beat mode: max fraction of the bar a line may use")
     ap.add_argument("--out-audio", default="voice.wav")
     ap.add_argument("--out-lyrics", default="lyrics.txt")
     args = ap.parse_args()
@@ -107,7 +134,23 @@ def main():
 
     base_scale = 1.12 / args.speed          # a little slower than normal speech suits poetry
     chunks, timed, t, sr = [], [], args.lead, None
+    bar = 4 * 60 / args.bpm * args.bars_per_line if args.bpm else None
     for i, (text, dramatic, stanza) in enumerate(lines):
+        if bar:                                   # on-beat: line i sits on its own bar
+            t = args.start + i * bar + 0.02
+            if not text:
+                continue
+            pcm, sr = synth(voice, text, base_scale)
+            pcm = fit(pcm, sr, bar * args.fill)
+            if dramatic:
+                pcm = np.clip(pcm * 1.25, -1, 1)
+            chunks.append((t, pcm))
+            timed.append((t, text))
+            print(f"{fmt_time(t):>7}  bar {i:2d}  {len(pcm)/sr:4.2f}s {'!' if dramatic else ' '} {text}")
+            t += len(pcm) / sr
+            continue
+        if not text:
+            continue
         if i:
             t += args.stanza_gap if stanza else args.gap
         if dramatic:
