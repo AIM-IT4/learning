@@ -235,7 +235,8 @@ def make_sfx(path, shots, total, gain):
 
 
 # ----------------------------------------------------------------------------- captions
-def write_captions(path, shots, voice_lines, words, word_every, end_text, end_sub, total, words_until=None):
+def write_captions(path, shots, voice_lines, words, word_every, end_text, end_sub, total, words_until=None,
+                   words_from=None):
     hdr = f"""[Script Info]
 ScriptType: v4.00+
 PlayResX: {W}
@@ -271,7 +272,8 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         for layer, style, blur in ((0, "Glow", 14), (1, "Verse", 0.6)):
             ev.append(f"Dialogue: {layer},{t(start)},{t(end)},{style},,0,0,0,,{{\\fad(200,150)\\blur{blur}}}{txt}")
     beat_shots = [s for s in shots if s["kind"] in ("drop", "beat")
-                  and (words_until is None or s["start"] < words_until)]
+                  and (words_until is None or s["start"] < words_until)
+                  and (words_from is None or s["start"] >= words_from)]
     if words:
         for n, s in enumerate(beat_shots[::word_every]):
             w = ms.ass_escape(words[n % len(words)])
@@ -315,6 +317,7 @@ def main():
     ap.add_argument("--words", default="", help="comma-separated big words flashed on beat cuts")
     ap.add_argument("--word-every", type=int, default=2)
     ap.add_argument("--words-until", type=float, help="only flash words on cuts before this time (e.g. first sung line)")
+    ap.add_argument("--words-from", type=float, help="only flash words on cuts from this time on")
     ap.add_argument("--end-text", default="")
     ap.add_argument("--end-sub", default="")
     ap.add_argument("--sfx-volume", type=float, default=0.5)
@@ -444,7 +447,7 @@ def main():
     voice_lines = ms.parse_lyrics(args.voice_lyrics) if args.voice_lyrics else []
     words = [w.strip() for w in args.words.split(",") if w.strip()]
     write_captions(work / "cap.ass", shots, voice_lines, words, args.word_every,
-                   args.end_text, args.end_sub, total, args.words_until)
+                   args.end_text, args.end_sub, total, args.words_until, args.words_from)
     for f in ms.FONT_DIR.glob("*.ttf"):
         shutil.copy(f, work / f.name)
     graph.append(f"{last}ass=cap.ass:fontsdir=.:shaping=complex[vout]")
