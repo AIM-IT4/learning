@@ -291,6 +291,8 @@ def main():
     ap.add_argument("--duck", type=float, default=3.0,
                     help="how hard the music dips under the voice (compressor ratio; 1 = no dip)")
     ap.add_argument("--no-embers", action="store_true")
+    ap.add_argument("--parallax", action="store_true",
+                    help="3D camera moves on portrait images using an AI depth map (needs torch + transformers)")
     ap.add_argument("--out", default="reel.mp4")
     args = ap.parse_args()
 
@@ -353,7 +355,13 @@ def main():
             next_img += 1
         print(f"shot {k+1:2d}/{len(shots)} {s['kind']:5s} {S[k]/FPS:6.2f}s  "
               f"{(fx_names[k-1] if k else '-'):11s} {img.name}")
-        render_clip(img, b - a, s["kind"], moves[k % 4], T[k] // 2, work / f"c{k:03d}.mp4")
+        w_img, h_img = Image.open(img).size
+        if args.parallax and w_img / h_img <= 0.75:
+            import parallax
+            parallax.render(img, b - a, s["kind"], moves[k % 4], T[k] // 2, work / f"c{k:03d}.mp4",
+                            W, H, FPS, ms.GRADE)
+        else:
+            render_clip(img, b - a, s["kind"], moves[k % 4], T[k] // 2, work / f"c{k:03d}.mp4")
 
     # ---- video graph: xfade chain -> embers -> glitch on beat cuts -> captions
     inputs, graph = [], []
