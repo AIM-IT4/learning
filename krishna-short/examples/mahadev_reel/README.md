@@ -29,3 +29,17 @@ python make_reel.py --images final --parallax --music mahadev.mp3 --music-start 
 
 Notes: SDXL-Turbo cannot draw a damaru (it makes an hourglass), so damaru shots were dropped.
 The opening shot matters most on Instagram: start on a face, not a landscape.
+
+## Full song video (0 → 178.9 s, 120 shots)
+
+```bash
+python make_art.py generate --shots examples/mahadev_reel/art_shots_verses.tsv --out cand_v
+python make_art.py refine --shots examples/mahadev_reel/art_shots_verses.tsv --cand cand_v --out refined \
+  v01=11 v02=33 v03=33 v04=22 v05=22 v06=33 v07=33 v08=33 v09=33 v10=22 v11=22 v12=11
+python examples/mahadev_reel/build_sequence.py mahadev.mp3 refined seq       # one lyric-matched picture per shot
+python make_reel.py --images seq --parallax --music mahadev.mp3 --duration 178.9 --drop 28.36 --outro 3.99 \
+  --intro-every 8 --sections "28.36:4,74.08:2,95.6:4,124.98:2,142.57:2,168.5:1" --extra-drops 142.57 \
+  --voice-lyrics examples/mahadev_reel/lyrics_full.txt --words "महादेव,महाकाल,शंभो,रुद्र,तांडव,भोले" \
+  --words-from 142.5 --word-every 3 --sfx-volume 0.25 --end-text "॥ हर हर महादेव ॥" \
+  --work work_full --out mahadev_full.mp4          # ~19 min first time; ~5 min when only captions change
+```
