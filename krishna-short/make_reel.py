@@ -37,8 +37,9 @@ import make_short as ms
 W, H, FPS = ms.W, ms.H, ms.FPS
 SR = 44100
 INTRO_FX = ["hblur", "dissolve", "fadeslow", "smoothup"]
-BEAT_FX = ["zoomin", "slideup", "smoothleft", "squeezev", "circleopen", "slidedown",
-           "radial", "smoothright", "pixelize", "hblur", "slideleft", "circleclose"]
+BEAT_FX = ["zoomin", "slideup", "hlwind", "smoothleft", "squeezev", "circleopen", "coverup",
+           "slidedown", "radial", "vuwind", "smoothright", "diagtl", "pixelize", "revealdown",
+           "hblur", "slideleft", "diagbr", "circleclose"]
 
 
 # ----------------------------------------------------------------------------- beat detection
@@ -279,6 +280,9 @@ def main():
     ap.add_argument("--bpm", type=float, help="override detected tempo")
     ap.add_argument("--drop", type=float, help="override detected drop time (seconds into the reel)")
     ap.add_argument("--intro-every", type=int, default=4, help="beats per shot before the drop")
+    ap.add_argument("--intro-fx", default=",".join(INTRO_FX),
+                    help="transitions used before the drop (comma list of ffmpeg xfade names, or 'beat')")
+    ap.add_argument("--no-hits", action="store_true", help="no flash/blur/RGB-split on beat cuts")
     ap.add_argument("--cut-every", default="2,1",
                     help="beats per cut after the drop, per section, e.g. '2,1' = every 2 beats then every beat")
     ap.add_argument("--outro", type=float, default=3.0, help="seconds held on the last shot")
@@ -336,7 +340,8 @@ def main():
         if kind in ("drop", "outro"):
             fx_names.append("fadewhite")
         elif kind == "intro":
-            fx_names.append(INTRO_FX[ii % len(INTRO_FX)]); ii += 1
+            ifx = BEAT_FX if args.intro_fx == "beat" else args.intro_fx.split(",")
+            fx_names.append(ifx[ii % len(ifx)]); ii += 1
         else:
             fx_names.append(BEAT_FX[bi % len(BEAT_FX)]); bi += 1
 
@@ -381,9 +386,14 @@ def main():
         last = "[lit]"
         n_in += 1
     hits = [s["start"] for s in shots if s["kind"] in ("drop", "beat", "outro")]
-    if hits:
+    if hits and not args.no_hits:
+        # impact on every beat cut: RGB split + a 2-frame motion blur + a short exposure flash
         en = "+".join(f"between(t,{h-0.04:.3f},{h+0.09:.3f})" for h in hits)
-        graph.append(f"{last}rgbashift=rh=-16:bh=16:gv=6:enable='{en}'[gl]")
+        blur = "+".join(f"between(t,{h-0.03:.3f},{h+0.04:.3f})" for h in hits)
+        flash = "+".join(f"between(t,{h:.3f},{h+0.06:.3f})" for h in hits)
+        graph.append(f"{last}rgbashift=rh=-16:bh=16:gv=6:enable='{en}',"
+                     f"gblur=sigma=7:steps=2:enable='{blur}',"
+                     f"eq=brightness=0.13:contrast=1.08:enable='{flash}'[gl]")
         last = "[gl]"
 
     voice_lines = ms.parse_lyrics(args.voice_lyrics) if args.voice_lyrics else []
