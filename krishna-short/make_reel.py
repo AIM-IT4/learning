@@ -22,7 +22,9 @@ Use music you have the rights to, or post the reel without music and add a song 
 Needs: ffmpeg (libass), numpy, Pillow.  Shares helpers with make_short.py.
 """
 import argparse
+import hashlib
 import math
+import re
 import shutil
 import subprocess
 import tempfile
@@ -105,8 +107,12 @@ def detect_drop(x, beats, sr=22050, window=4):
 
 
 # ----------------------------------------------------------------------------- shot plan
-def plan(beats, drop_i, total, intro_every, cut_every, outro):
-    """Return a list of shots: dict(start, end, kind) with kind in intro/drop/beat/outro."""
+def plan(beats, drop_i, total, intro_every, cut_every, outro, sections=None, extra_drops=()):
+    """Return a list of shots: dict(start, end, kind) with kind in intro/drop/beat/outro.
+
+    sections: optional [(start_time, beats_per_cut), ...] after the drop, for full songs whose
+    verse / chorus / drop parts need different pacing. extra_drops: times of later drops
+    (they get the flash + shake + punch treatment and restart the cut grid)."""
     cuts = []
     if drop_i is not None:
         k = drop_i - intro_every
@@ -120,7 +126,25 @@ def plan(beats, drop_i, total, intro_every, cut_every, outro):
         first = 0
     outro_at = total - outro if outro > 0 else total
     post = [i for i in range(first, len(beats)) if beats[i] < outro_at - 0.3]
-    if post:
+    drop_beats = {int(np.argmin(np.abs(beats - t))) for t in extra_drops}
+    if post and sections:
+        bounds = sorted(sections) + [(outro_at, None)]
+        for (t0, every), (t1, _) in zip(bounds, bounds[1:]):
+            idx = [i for i in post if t0 - 0.05 <= beats[i] < t1 - 0.05]
+            if not idx:
+                continue
+            anchor = idx[0]
+            for i in idx:
+                if i in drop_beats:
+                    anchor = i
+                if i == first:
+                    continue
+                if i in drop_beats:
+                    cuts.append((beats[i], "drop"))
+                elif (i - anchor) % every == 0:
+                    cuts.append((beats[i], "beat"))
+        cuts.sort()
+    elif post:
         parts = np.array_split(np.array(post), len(cut_every))
         start_i = post[0]
         for part, every in zip(parts, cut_every):
@@ -286,6 +310,8 @@ def main():
     ap.add_argument("--cut-every", default="2,1",
                     help="beats per cut after the drop, per section, e.g. '2,1' = every 2 beats then every beat")
     ap.add_argument("--outro", type=float, default=3.0, help="seconds held on the last shot")
+    ap.add_argument("--sections", help="full songs: 'time:beats_per_cut,...' after the drop, e.g. '28:2,74:1,95:2'")
+    ap.add_argument("--extra-drops", default="", help="comma list of later drop times (flash + shake)")
     ap.add_argument("--words", default="", help="comma-separated big words flashed on beat cuts")
     ap.add_argument("--word-every", type=int, default=2)
     ap.add_argument("--words-until", type=float, help="only flash words on cuts before this time (e.g. first sung line)")
@@ -298,10 +324,12 @@ def main():
     ap.add_argument("--parallax", action="store_true",
                     help="3D camera moves on portrait images using an AI depth map (needs torch + transformers)")
     ap.add_argument("--out", default="reel.mp4")
+    ap.add_argument("--work", help="keep rendered clips here and reuse them on the next run")
     args = ap.parse_args()
 
     images = sorted(p for p in Path(args.images).iterdir() if p.suffix.lower() in ms.IMAGE_EXTS)
-    special = {p.stem.lower(): p for p in images if p.stem.lower() in ("drop", "outro")}
+    special = {p.stem.lower(): p for p in images
+               if p.stem.lower() == "outro" or re.fullmatch(r"drop\d*", p.stem.lower())}
     images = [p for p in images if p.stem.lower() not in special] or list(special.values())
     if not images:
         raise SystemExit(f"no images in {args.images}")
@@ -319,7 +347,10 @@ def main():
     else:
         drop_i = detect_drop(x, beats)
     cut_every = [max(int(v), 1) for v in args.cut_every.split(",")]
-    shots = plan(beats, drop_i, total, args.intro_every, cut_every, args.outro)
+    sections = [(float(a), max(int(b), 1)) for a, b in (x.split(":") for x in args.sections.split(","))] \
+        if args.sections else None
+    extra_drops = [float(t) for t in args.extra_drops.split(",") if t.strip()]
+    shots = plan(beats, drop_i, total, args.intro_every, cut_every, args.outro, sections, extra_drops)
     drop_t = beats[drop_i] if drop_i is not None else None
     print(f"tempo {bpm:.1f} BPM, {len(beats)} beats, drop at "
           f"{'none' if drop_t is None else f'{drop_t:.2f}s'}, {len(shots)} shots")
@@ -346,27 +377,41 @@ def main():
             fx_names.append(BEAT_FX[bi % len(BEAT_FX)]); bi += 1
 
     ms.ensure_fonts()
-    work = Path(tempfile.mkdtemp(prefix="reel_"))
+    work = Path(args.work) if args.work else Path(tempfile.mkdtemp(prefix="reel_"))
+    work.mkdir(parents=True, exist_ok=True)
+    cache = work / "clips"
+    cache.mkdir(exist_ok=True)
     moves = ["in", "out", "up", "down"]
-    next_img = 0
+    next_img = n_drop = 0
     for k, s in enumerate(shots):
         a = S[k] - T[k] // 2
         b = S[k + 1] + T[k + 1] // 2
         s.update(a=a, b=b)
-        if s["kind"] in special:                  # drop.jpg / outro.jpg reserved for those moments
-            img = special[s["kind"]]
+        if s["kind"] == "drop" and special.get(f"drop{n_drop + 1}" if n_drop else "drop"):
+            img = special[f"drop{n_drop + 1}" if n_drop else "drop"]   # drop.jpg, drop2.jpg, ...
+            n_drop += 1
+        elif s["kind"] == "drop" and "drop" in special:
+            img = special["drop"]
+            n_drop += 1
+        elif s["kind"] == "outro" and "outro" in special:
+            img = special["outro"]
         else:
             img = images[next_img % len(images)]
             next_img += 1
         print(f"shot {k+1:2d}/{len(shots)} {s['kind']:5s} {S[k]/FPS:6.2f}s  "
               f"{(fx_names[k-1] if k else '-'):11s} {img.name}")
         w_img, h_img = Image.open(img).size
-        if args.parallax and w_img / h_img <= 0.75:
-            import parallax
-            parallax.render(img, b - a, s["kind"], moves[k % 4], T[k] // 2, work / f"c{k:03d}.mp4",
-                            W, H, FPS, ms.GRADE)
-        else:
-            render_clip(img, b - a, s["kind"], moves[k % 4], T[k] // 2, work / f"c{k:03d}.mp4")
+        use_par = args.parallax and w_img / h_img <= 0.75
+        key = hashlib.sha1(f"{Path(img).resolve()}|{Path(img).stat().st_mtime}|{b - a}|{s['kind']}|"
+                           f"{moves[k % 4]}|{T[k] // 2}|{use_par}".encode()).hexdigest()[:16]
+        cached = cache / f"{key}.mp4"
+        if not cached.exists():               # --work keeps clips, so caption/audio changes re-render fast
+            if use_par:
+                import parallax
+                parallax.render(img, b - a, s["kind"], moves[k % 4], T[k] // 2, cached, W, H, FPS, ms.GRADE)
+            else:
+                render_clip(img, b - a, s["kind"], moves[k % 4], T[k] // 2, cached)
+        shutil.copy(cached, work / f"c{k:03d}.mp4")
 
     # ---- video graph: xfade chain -> embers -> glitch on beat cuts -> captions
     inputs, graph = [], []
@@ -443,7 +488,8 @@ def main():
     cover_t = (drop_t + 0.5) if drop_t is not None else total / 2
     ms.run(["ffmpeg", "-y", "-ss", f"{min(cover_t, total - 0.1):.2f}", "-i", str(out), "-frames:v", "1",
             "-q:v", "2", str(out.with_suffix(".cover.jpg"))])
-    shutil.rmtree(work, ignore_errors=True)
+    if not args.work:
+        shutil.rmtree(work, ignore_errors=True)
     print(f"done -> {out}\ncover -> {out.with_suffix('.cover.jpg')}")
 
 
