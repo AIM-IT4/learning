@@ -3150,32 +3150,40 @@ async function probeFps(el) {     // frames per second, from the player
 }
 // plays the timeline once in real time and records each clip's sound with where its player was; the clips are then
 // lined up by their own playing position (players start a moment late) and crossfaded or mixed as chosen
-async function recordSound(tl, opts, ui) {
-  if (!opts.audio) return { chunks: null, note: "" };
+async function recordSound(tl, opts, ui) { return (await playPass(tl, opts, ui, null, 1, true)).audio; }
+// cap (optional): also copy every frame the players show, merged and at the output size, into a temporary video in
+// memory (hardware encoder, real time). rate < 1 plays slower (used again, without sound, if the phone dropped frames).
+async function playPass(tl, opts, ui, cap, rate, withSound) {
   const fail = { chunks: null, note: " The sound couldn't be recorded on this device." };
-  const ac = audioCtx();
-  if (!ac || typeof AudioData === "undefined" || !ac.createScriptProcessor) return fail;
-  try { await ac.resume(); } catch (e) { /* checked below */ }
-  if (ac.state !== "running") return fail;
-  const enc = await pickAudioEncoder(ac.sampleRate);
-  if (!enc || enc.cfg.sampleRate !== ac.sampleRate) return fail;
-  const sr = ac.sampleRate, seq = !!vidB && comb.mode === "seq", snd = vidB ? comb.sound : "a", cut = tl.st + tl.T / 2;
+  let soundOn = withSound && opts.audio, ac = null, enc = null;
+  if (soundOn) {
+    ac = audioCtx();
+    if (!ac || typeof AudioData === "undefined" || !ac.createScriptProcessor) soundOn = false;
+    else { try { await ac.resume(); } catch (e) { /* checked below */ } if (ac.state !== "running") soundOn = false; }
+    if (soundOn) { enc = await pickAudioEncoder(ac.sampleRate); if (!enc || enc.cfg.sampleRate !== ac.sampleRate) soundOn = false; }
+  }
+  const audioOut = !withSound || !opts.audio ? { chunks: null, note: "" } : fail;
+  if (!soundOn && !cap) return { audio: audioOut };
+  const sr = soundOn ? ac.sampleRate : 48000, seq = !!vidB && comb.mode === "seq", snd = vidB ? comb.sound : "a", cut = tl.st + tl.T / 2;
   const x = t => Math.min(1, Math.max(0, (t - tl.st) / Math.max(0.01, tl.T)));
   const gA = t => !vidB ? 1 : snd === "b" ? 0 : snd === "a" ? (seq && t > cut ? 0 : 1) : seq ? Math.cos(x(t) * Math.PI / 2) : 0.8;
   const gB = t => !vidB ? 0 : snd === "a" ? 0 : snd === "b" ? (seq && t < cut ? 0 : 1) : seq ? Math.sin(x(t) * Math.PI / 2) : 0.8;
   const recs = [vid, vidB].filter(Boolean).map(c => ({ c, parts: [], frames: 0, map: [] }));
-  const merger = ac.createChannelMerger(4), sp = ac.createScriptProcessor(4096, 4, 2), zero = ac.createGain(); zero.gain.value = 0;
+  const merger = soundOn ? ac.createChannelMerger(4) : null, sp = soundOn ? ac.createScriptProcessor(4096, 4, 2) : null, zero = soundOn ? ac.createGain() : null;
+  if (zero) zero.gain.value = 0;
   const undo = [];
-  recs.forEach((r, k) => {
+  if (soundOn) recs.forEach((r, k) => {
     const n = routeEl(r.c.el); n.out.gain.value = 0;                 // quiet on the speaker while recording
     const up = ac.createGain(); up.channelCount = 2; up.channelCountMode = "explicit"; up.channelInterpretation = "speakers";
     const split = ac.createChannelSplitter(2);
     n.src.connect(up); up.connect(split); split.connect(merger, 0, k * 2); split.connect(merger, 1, k * 2 + 1);
     undo.push(() => { try { n.src.disconnect(up); } catch (e) { /* ignore */ } up.disconnect(); split.disconnect(); n.out.gain.value = 1; });
   });
-  merger.connect(sp); sp.connect(zero); zero.connect(ac.destination);
+  if (soundOn) { merger.connect(sp); sp.connect(zero); zero.connect(ac.destination); }
   let recording = false;
-  sp.onaudioprocess = ev => {
+  // the picture: every frame the leading player puts on screen is merged and handed to a hardware encoder
+  const V = cap ? await startCapture(tl, cap) : null;
+  if (soundOn) sp.onaudioprocess = ev => {
     if (!recording) return;
     const ib = ev.inputBuffer, n = ib.length;
     recs.forEach((r, k) => {
@@ -3189,23 +3197,33 @@ async function recordSound(tl, opts, ui) {
   };
   try {
     await seekTimeline(0);
-    recs.forEach(r => { r.c.el.muted = false; r.c.el.volume = 1; });
+    recs.forEach(r => { r.c.el.muted = !soundOn; r.c.el.volume = 1; r.c.el.playbackRate = rate; });
     const start = performance.now(); recording = true;
+    const clock = () => (performance.now() - start) / 1000 * rate;
+    if (V) V.begin(clock);
     driveEls(0, true);
     for (;;) {
       await sleep(40);
       if (cancelExport) throw new Error("cancelled");
-      const t = (performance.now() - start) / 1000;
-      if (t >= tl.dur + 0.6) break;                                  // a little extra so late starters are covered
+      if (V && V.err) throw V.err;
+      const t = clock();
+      if (t >= tl.dur + 0.6 * rate) break;                           // a little extra so late starters are covered
       driveEls(Math.min(t, tl.dur), t < tl.dur);
-      ui(`Recording the sound… ${fmtTime(Math.min(t, tl.dur))} of ${fmtTime(tl.dur)}`, Math.min(1, t / tl.dur));
+      if (V) V.watch();
+      // copying can't keep up on this phone: stop early instead of wasting the whole play-through
+      if (V && t > Math.min(3, tl.dur * 0.3) && V.grabbed < t * cap.fps * 0.8) throw new Error("slowcapture");
+      const what = V ? (soundOn ? "Copying the video and its sound from the player" : "Copying the video from the player") : "Recording the sound";
+      ui(`${what}… ${fmtTime(Math.min(t, tl.dur))} of ${fmtTime(tl.dur)}`, Math.min(1, t / tl.dur));
     }
-  } finally {
+  } catch (e) { if (V) V.abort(); throw e; } finally {
     recording = false;
-    recs.forEach(r => r.c.el.pause());
-    undo.forEach(f => f()); try { merger.disconnect(); sp.disconnect(); zero.disconnect(); } catch (y) { /* ignore */ }
-    sp.onaudioprocess = null;
+    recs.forEach(r => { r.c.el.pause(); r.c.el.playbackRate = 1; });
+    if (V) V.stop();
+    undo.forEach(f => f()); try { if (soundOn) { merger.disconnect(); sp.disconnect(); zero.disconnect(); } } catch (y) { /* ignore */ }
+    if (sp) sp.onaudioprocess = null;
   }
+  const clip = V ? await V.finish() : null;
+  if (!soundOn) return { audio: audioOut, clip };
   // line each clip up by its playing position: one offset per play-through (clip 2 repeats in side by side)
   recs.forEach(r => {
     const all = new Int16Array(r.frames * 2); let o = 0; r.parts.forEach(d => { all.set(d, o); o += d.length; }); r.parts = null; r.pcm = all;
@@ -3214,7 +3232,7 @@ async function recordSound(tl, opts, ui) {
     if (cur.length) segs.push(cur);
     r.offs = segs.map(sg => { const v = sg.map(([si, m]) => si / sr - m).sort((q, w) => q - w); return v[Math.floor(v.length / 2)]; });
   });
-  if (!recs.some(r => r.offs.length)) return fail;
+  if (!recs.some(r => r.offs.length)) return { audio: fail, clip };
   const at = (r, k, m, out) => {
     out[0] = out[1] = 0; if (!r || !r.offs.length) return;
     const pos = (m + r.offs[Math.min(k, r.offs.length - 1)]) * sr, i = Math.floor(pos), w = pos - i;
@@ -3238,8 +3256,80 @@ async function recordSound(tl, opts, ui) {
     while (e.encodeQueueSize > 8) await sleep(1);
   }
   await e.flush().catch(() => {}); try { e.close(); } catch (y) { /* ignore */ }
-  if (encErr || !chunks.length) return fail;
-  return { mixed: true, kind: enc.kind, cfg: dcfg || { codec: enc.cfg.codec, sampleRate: sr, numberOfChannels: 2 }, sampleRate: sr, numberOfChannels: 2, chunks, note: "" };
+  if (encErr || !chunks.length) return { audio: fail, clip };
+  return { audio: { mixed: true, kind: enc.kind, cfg: dcfg || { codec: enc.cfg.codec, sampleRate: sr, numberOfChannels: 2 }, sampleRate: sr, numberOfChannels: 2, chunks, note: "" }, clip };
+}
+// copies the merged picture of every frame the leading player shows (real time) into a temporary video in memory
+async function startCapture(tl, cap) {
+  const { L, ra, rb } = cap, W = L.W, H = L.H, seq = !!vidB && comb.mode === "seq";
+  const da = elDims(vid), db = vidB ? elDims(vidB) : null;
+  const tA = tex(da.w, da.h, true), tB = db ? tex(db.w, db.h, true) : null, capTex = tex(W, H, false), capFb = fbo(capTex);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+  glc.width = W; glc.height = H;
+  const br = Math.round(Math.max(4e6, Math.min(20e6, W * H * 30 * 0.3, 400 * 8e6 / Math.max(1, tl.dur))));
+  const sel = await pickEncoder(W, H, 30, br);
+  if (!sel) throw new Error("This phone can't copy the video from the player.");
+  const samples = [], blobs = []; let part = [], partBytes = 0, size = 0, dcfg = null, err = null;
+  const enc = new VideoEncoder({
+    output: (c, meta) => {
+      if (meta && meta.decoderConfig && !dcfg) dcfg = meta.decoderConfig;
+      const d = new Uint8Array(c.byteLength); c.copyTo(d);
+      samples.push({ offset: size, size: d.length, cts: c.timestamp, duration: c.duration || 33333, is_sync: c.type === "key" });
+      part.push(d); partBytes += d.length; size += d.length;
+      if (partBytes > (32 << 20)) { blobs.push(new Blob(part)); part = []; partBytes = 0; }
+    }, error: e => { err = e; } });
+  enc.configure({ ...sel.cfg, latencyMode: "realtime" });
+  let clock = null, gen = 0, lastT = -1, lastKey = -9, lastGrab = 0, hasB = false, grabbed = 0, alive = true;
+  const C = videoPrograms().comp;
+  const grab = t => {
+    if (t <= lastT + 0.002 || t > tl.dur + 0.05) return;
+    lastT = t;
+    const m = tl.at(Math.min(t, tl.dur));
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false); gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+    if (m.a != null) uploadEl(tA, vid.el);
+    if (vidB && m.b != null) { uploadEl(tB, vidB.el); hasB = true; }
+    mergeDraw(capFb, W, H, tA, hasB ? tB : null, ra, rb, L, m.p);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.viewport(0, 0, W, H);           // onto the canvas, the right way up
+    gl.useProgram(C.p); bindTex(0, capTex); gl.uniform1i(C.u.uT, 0); gl.uniform1i(C.u.uHasF, 0); gl.uniform1i(C.u.uHasB, 0);
+    gl.drawArrays(gl.TRIANGLES, 0, 6);
+    const vf = new VideoFrame(glc, { timestamp: Math.round(t * 1e6) });
+    const key = t - lastKey >= 1; if (key) lastKey = t;
+    enc.encode(vf, { keyFrame: key }); vf.close();
+    grabbed++;
+  };
+  const arm = () => {
+    if (!alive) return;
+    const my = ++gen;
+    const useB = !!vidB && seq && clock() > (vid.duration || 0) - 0.03;      // after clip 1 ends, clip 2 leads
+    const el = useB ? vidB.el : vid.el;
+    el.requestVideoFrameCallback((now, md) => {
+      if (my !== gen || !alive) return;
+      try { grab(useB ? tl.st + md.mediaTime : md.mediaTime); } catch (e) { err = e; }
+      lastGrab = performance.now(); arm();
+    });
+  };
+  return {
+    get err() { return err; },
+    get grabbed() { return grabbed; },
+    abort() { alive = false; try { enc.close(); } catch (e) { /* ignore */ } [tA, tB, capTex].forEach(t => t && gl.deleteTexture(t)); gl.deleteFramebuffer(capFb); },
+    begin(c) { clock = c; try { grab(0); } catch (e) { err = e; } lastGrab = performance.now(); arm(); },   // frame 0 is on screen before playing
+    watch() { if (performance.now() - lastGrab > 250) { lastGrab = performance.now(); arm(); } },
+    stop() { alive = false; },
+    async finish() {
+      alive = false;
+      try { await enc.flush(); } catch (e) { err = err || e; }
+      try { enc.close(); } catch (e) { /* ignore */ }
+      [tA, tB, capTex].forEach(t => t && gl.deleteTexture(t)); gl.deleteFramebuffer(capFb);
+      if (err) throw err;
+      if (!dcfg || samples.length < 2) throw new Error("The video couldn't be copied from the player.");
+      if (part.length) blobs.push(new Blob(part));
+      const durS = Math.max(0.1, tl.dur);
+      return { file: new Blob(blobs, { type: "video/mp4" }), samples, timescale: 1e6, fileRot: 0, cw: W, ch: H, durS,
+        fps: Math.min(120, Math.max(1, Math.round(samples.length / durS * 100) / 100)), audio: null, otherAudio: false,
+        decCfg: { codec: dcfg.codec || sel.cfg.codec, codedWidth: W, codedHeight: H, description: dcfg.description },
+        grabbed, expected: Math.round(tl.dur * cap.fps) };
+    },
+  };
 }
 
 async function exportVideo(opts, ui) {
@@ -3281,7 +3371,7 @@ async function exportVideo(opts, ui) {
   }
   if (!enc) throw new Error("This browser can't create MP4 video on this device.");
   if (Math.max(W, H) < Math.max(L.W, L.H)) L = layoutAt(Math.max(W, H));     // no need to merge at a bigger size than the output
-  const dW = L.W, dH = L.H;
+  let dW = L.W, dH = L.H;
   // body following: the body finder, and the poses of the frames where edits were placed
   let track = needTrack(), trackNote = "";
   if (track) {
@@ -3290,7 +3380,7 @@ async function exportVideo(opts, ui) {
   }
   let audio = null;
   if (!player) { try { audio = await buildAudio(A, B, tl, opts, ui); } catch (e) { if (!isReadErr(e)) throw e; console.warn(e); audio = null; } }
-  if (!audio) audio = await recordSound(tl, opts, ui);
+  if (!audio && !player) audio = await recordSound(tl, opts, ui);
   // GPU resources
   const P2 = videoPrograms();
   freeSet(preview); freeSet(fastSet); preview = null; fastSet = null;   // make room in graphics memory
@@ -3300,6 +3390,34 @@ async function exportVideo(opts, ui) {
   exporting = true;
   glc.style.visibility = "hidden";
   try {
+    if (player) {
+      // 1. the sound: one real-time pass on its own (keeps lip-sync exact)
+      audio = await recordSound(tl, opts, ui);
+      // 2. the picture: play once more and copy every frame the players show (merged, at the output size) into a
+      //    temporary video; again at half speed if the phone skipped frames; frame by frame if it still can't keep up
+      let pass = null;
+      try {
+        const tryPass = async rate => { try { return await playPass(tl, opts, ui, { L, ra, rb, fps }, rate, false); } catch (e) { if (e && e.message === "slowcapture") return null; throw e; } };
+        pass = await tryPass(1);
+        if (!pass || !pass.clip || pass.clip.grabbed < pass.clip.expected * 0.85) {
+          const again = await tryPass(0.5);
+          if (again && again.clip && (!pass || !pass.clip || again.clip.grabbed > pass.clip.grabbed)) pass = again;
+        }
+        if (!pass) throw new Error("copying is too slow on this phone");
+        if (pass.clip && pass.clip.grabbed < pass.clip.expected * 0.85) { console.warn("too many frames skipped while copying", pass.clip.grabbed, pass.clip.expected); pass = null; }
+      } catch (e) {
+        if (e && e.message === "cancelled") throw e;
+        console.warn("copying from the player failed; going frame by frame", e);
+        pass = null;
+      }
+      if (pass && pass.clip) {
+        // 2. edit the copy exactly like a readable file (fast: no more waiting for the players)
+        A = pass.clip; B = null; player = false; ra = 0; rb = 0;
+        L = compLayout({ w: A.cw, h: A.ch }, null, Math.max(A.cw, A.ch)); dW = L.W; dH = L.H;
+        tl = timelineFor(A.durS, null); total = A.samples.length;
+        glc.width = W; glc.height = H;
+      }
+    }
     const rawA = plainTex(true), rawB = B ? plainTex(true) : null, srcTex = tex(dW, dH, true), srcFb = fbo(srcTex);
     res.textures.push(rawA, srcTex); if (rawB) res.textures.push(rawB); res.fbs.push(srcFb);
     let pA = null, pB = null;
