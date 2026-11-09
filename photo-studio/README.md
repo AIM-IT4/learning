@@ -24,3 +24,14 @@ Photos are processed on the viewer's device and never uploaded.
   (falls back to press-and-hold on the shown image).
 
 The embedded sample photo is AI-generated (SDXL-Turbo).
+
+## Stability notes
+
+* The photo pipeline re-runs only when the photo changes; text edits redraw the text layer only.
+* Text layers are cached as bitmaps (glow/shadow blurs are slow on phones) and re-rendered only on style change.
+* Half-resolution preview while a slider or finger moves; full quality 250 ms after it stops.
+* WebGL context loss (phones under memory pressure) is handled: programs, textures and buffers are rebuilt and
+  edits are kept. The person cut-out runs on TF.js's CPU backend so it never opens a second graphics context.
+* Each new gesture clears stale pointers; a global error handler resets gesture state; layout changes are debounced.
+* Tested with 700 random actions in headless Chrome (sliders, text, behind-person, zoom, body tools, undo/redo)
+  plus a forced context loss: no errors, memory stable, 4K export still works.
