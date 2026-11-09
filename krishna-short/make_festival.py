@@ -15,7 +15,7 @@ Built for songs like Chhath geet or bhajans, where a beat-cut glitch reel would 
       --fonts fonts --out chhath_status.mp4
 
 Storyboard (JSON): start (s into the song), duration, bpm, beat0 (first beat, s into the clip), fade_out,
-shots: [{img, bars, fx, move, parallax, kind}], captions: [{t, end, style, text}],
+shots: [{img, bars, fx, move, parallax, kind}], captions: [{t, end, style, text, pos}],
 frame: [[from, to], ...], rays: [[from, to], ...], embers: opacity.
 Use music you have the rights to.  Needs: ffmpeg (libass), numpy, Pillow; torch + transformers for parallax.
 """
@@ -189,6 +189,10 @@ STYLES = {
     "Hook":     ("Yatra One", 132, "&H0059E1FF", "&H00000A6A", 7, 5, 0, 0),
     "End":      ("Yatra One", 146, "&H004DD8FF", "&H00000A6A", 7, 5, 0, 0),
     "EndSub":   ("Tiro Devanagari Hindi", 58, "&H00F2FAFF", "&H00101010", 3, 5, 0, -1),
+    "Pre":      ("Yatra One", 124, "&H004DD8FF", "&H00000A6A", 7, 5, 0, 0),
+    "PreSub":   ("Tiro Devanagari Hindi", 78, "&H00F2FAFF", "&H00101010", 3, 5, 0, -1),
+    "RowDate":  ("Noto Sans Devanagari", 62, "&H004DD8FF", "&H00101010", 2, 4, 0, -1),
+    "RowName":  ("Tiro Devanagari Hindi", 70, "&H00FFFFFF", "&H00101010", 2, 4, 0, -1),
 }
 
 
@@ -223,12 +227,23 @@ def write_ass(path, captions, total):
             lines.append(f"Dialogue: 3,{t(a)},{t(b)},Loc,,0,0,0,,{{{mv}\\bord2}}{{\\fnInter\\1c&H4DD8FF&}}●"
                          f"{{\\fnNoto Sans Devanagari\\1c&HFFFFFF&}} {txt}")
             continue
+        if st == "Row":    # schedule row: gold date, then a gold dot and the name, sliding in from the left
+            y = c["y"]
+            xd, xn = c.get("x", [215, 500])
+            for sty, x, body in (("RowDate", xd, ms.ass_escape(c["date"])),
+                                 ("RowName", xn, f"{{\\1c&H4DD8FF&}}•{{\\1c&HFFFFFF&}}  {txt}")):
+                lines.append(f"Dialogue: 1,{t(a)},{t(b)},{sty},,0,0,0,,{{\\fad(350,500)\\an4"
+                             f"\\move({x - 40},{y},{x},{y},0,400)\\blur0.6}}{body}")
+            continue
         anim = {"Title": "\\fad(500,600)\\fscx70\\fscy70\\t(0,700,\\fscx100\\fscy100)",
                 "Hook": "\\fad(150,500)\\fscx135\\fscy135\\t(0,260,\\fscx100\\fscy100)",
                 "End": f"\\fad(500,500)\\an5\\pos({W // 2},{H // 2 - 40})\\fscx80\\fscy80\\t(0,800,\\fscx100\\fscy100)",
                 "EndSub": f"\\fad(500,500)\\an5\\pos({W // 2},{H // 2 + 110})",
                 }.get(st, "\\fad(450,450)")
-        glow = st in ("Title", "Hook", "End", "Ritual")
+        if "pos" in c:      # explicit centre position; the text drifts up 30 px into place
+            x, y = c["pos"]
+            anim = f"\\fad(400,500)\\an5\\move({x},{y + 30},{x},{y},0,700)"
+        glow = st in ("Title", "Hook", "End", "Ritual", "Pre")
         if glow:
             lines.append(f"Dialogue: 0,{t(a)},{t(b)},{st}Glow,,0,0,0,,{{{anim}\\blur14\\alpha&H60&}}{txt}")
         lines.append(f"Dialogue: 1,{t(a)},{t(b)},{st},,0,0,0,,{{{anim}\\blur0.8}}{txt}")

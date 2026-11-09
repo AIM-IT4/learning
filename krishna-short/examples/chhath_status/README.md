@@ -4,6 +4,11 @@ A calm festival status: Madhubani paintings and photo-real Bihar ghats (Patna, D
 Muzaffarpur, Kosi) cut on the bars of the song, with sun rays, floating embers, a Madhubani
 border, and Hindi greetings and place names.
 
+Opening (0–11.5 s, before the singing starts): the night after Diwali, "दीवाली बीत गई… अब हर
+बिहारी को इंतज़ार है…", then a flash to the Madhubani sun with "छठ महापर्व – लोक आस्था का चार
+दिवसीय महापर्व" and the 2026 dates sliding in one by one (13 नवंबर नहाय-खाय, 14 खरना,
+15 संध्या अर्घ्य, 16 उषा अर्घ्य). Change the `Row` captions in `storyboard.json` for another year.
+
 Song: "Jode Jode Phalwa" (Chhath geet, 124.95 BPM). Only use a song you have permission to use.
 The song is **not** stored in this repo.
 
@@ -48,8 +53,10 @@ ffmpeg -y -i chhath_status.mp4 -c:v libx264 -preset slow -b:v 1800k -pass 2 -c:a
   (`beat` = small zoom punch on the cut, `outro` = darker, softer shot so the end text reads).
   The last shot always runs to the end of the video.
 * `rays` / `frame` – time spans for the sun rays and the Madhubani border.
-* `captions` – `t`, `end`, `style` (Title, TitleSub, Days, Loc, Ritual, Hook, End, EndSub) and
-  `text`; `Banner` draws a soft maroon panel (`box` = x, y, w, h) behind a block of text.
+* `captions` – `t`, `end`, `style` (Pre, PreSub, Title, TitleSub, Days, Loc, Ritual, Hook, End, EndSub) and
+  `text`; `pos` = [x, y] places a caption's centre (it drifts up into place). `Banner` draws a
+  soft maroon panel (`box` = x, y, w, h) behind a block of text; `Row` is a schedule line
+  (`y`, `date`, `text`, optional `x` = [date x, name x]) that slides in from the left.
 
 WhatsApp covers the top ~200 px and bottom ~250 px of a status with its own buttons, so all
 text stays between those.

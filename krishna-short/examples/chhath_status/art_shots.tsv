@@ -1,6 +1,8 @@
 # Chhath Parv WhatsApp status: name<TAB>prompt<TAB>style (styles defined below)
 @md	Madhubani painting, Mithila folk art, fine black ink line work with double outlines, bright red yellow green and indigo colours, decorative fish and lotus border, flat perspective
 @ph	photorealistic photo, cinematic golden hour light, ultra detailed, Bihar India
+@nt	photorealistic photo, cinematic night light, ultra detailed, Bihar India
+diwali_after	the night after Diwali, rows of clay diyas burning low on a colourful rangoli in a village courtyard, some diyas gone out with thin smoke, marigold flowers, warm bokeh, quiet and dark	@nt
 md_surya	the Sun God Surya with a radiant smiling face and flaming rays in the centre, seven horses, lotus flowers and fish around him	@md
 md_arghya	women in red and yellow saris standing in a river offering water arghya to the setting sun, holding bamboo soop baskets full of fruits, fish swimming in the water	@md
 md_kosi	Chhath kosi, sugarcane stalks tied together into a canopy over clay lamps and fruit offerings, women singing around it	@md
