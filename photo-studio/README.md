@@ -1,7 +1,7 @@
 # Roshni Photo Studio
 
-Single-file, in-browser photo editor (WebGL 2). Published as a claude.ai Artifact; this is its source.
-Photos are processed on the viewer's device and never uploaded.
+Single-file, in-browser photo and video editor (WebGL 2 + WebCodecs). Published as a claude.ai Artifact; this
+is its source. Photos and videos are processed on the viewer's device and never uploaded.
 
 * **Enhance** – Auto 4K HDR: measures each photo's noise and sets smoothing to match; colour noise is cleaned
   harder than brightness detail; Lanczos-3 resampling with anti-ringing; contrast-adaptive sharpening plus
@@ -23,6 +23,17 @@ Photos are processed on the viewer's device and never uploaded.
 * **Save** – 4K (3840 px long side), 2K or original, JPEG or PNG, via the Artifact `downloads` capability
   (falls back to press-and-hold on the shown image).
 
+* **Video** – MP4 / MOV (H.264; HEVC where the browser can decode it). The file is opened from the device with an
+  object URL, so a 600 MB clip opens instantly with nothing uploaded. Preview with play/pause and a scrubber; every
+  photo tool works on the frame on screen. **Save video** runs every frame through the same pipeline:
+  mp4box.js (BSD-3) reads only the index, samples are read from the file 4 MB at a time, WebCodecs decodes and
+  re-encodes (H.264 High, VP9/AV1 fallback), the phone's rotation flag is applied, and mp4-muxer (MIT) writes a new
+  MP4 with the original AAC sound copied untouched. Output: 4K, Full HD or original size, High or Standard
+  quality, progress with time left, Stop. The output file is moved into Blobs every 32 MB so long clips don't
+  sit in JavaScript memory. Text behind the person is cut out on every frame; body and dark-circle edits placed
+  on the paused frame follow the person (centre and height from the person finder, smoothed). Film grain moves
+  per frame. "This frame" saves a JPEG of the frame on screen.
+
 The embedded sample photo is AI-generated (SDXL-Turbo).
 
 ## Stability notes
@@ -33,5 +44,7 @@ The embedded sample photo is AI-generated (SDXL-Turbo).
 * WebGL context loss (phones under memory pressure) is handled: programs, textures and buffers are rebuilt and
   edits are kept. The person cut-out runs on TF.js's CPU backend so it never opens a second graphics context.
 * Each new gesture clears stale pointers; a global error handler resets gesture state; layout changes are debounced.
+* During a video export the preview's graphics buffers are freed, the screen is kept awake (Wake Lock where
+  allowed), the canvas is hidden while it is used for frames, and layout changes wait until it finishes.
 * Tested with 700 random actions in headless Chrome (sliders, text, behind-person, zoom, body tools, undo/redo)
   plus a forced context loss: no errors, memory stable, 4K export still works.
