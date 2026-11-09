@@ -33,6 +33,19 @@ is its source. Photos and videos are processed on the viewer's device and never 
   sit in JavaScript memory. Text behind the person is cut out on every frame; body and dark-circle edits placed
   on the paused frame follow the person (centre and height from the person finder, smoothed). Film grain moves
   per frame. "This frame" saves a JPEG of the frame on screen.
+* **Moving people (video)** – MoveNet SinglePose Lightning (Apache-2.0; TF.js weights from @vladmandic/human-models,
+  MIT, re-packed here with 8-bit per-channel weights, ~2.4 MB) finds 17 body points on the device. Natural fit is
+  placed from the shoulders and hips on every frame, so it follows the person as they walk, turn or come closer;
+  the face lock follows the eyes. Other body edits and dark-circle spots are stamped with the frame they were placed
+  on and follow the person through a move/turn/scale transform from that frame's pose (torso for the body, eyes for
+  spots). Poses are smoothed with a One-Euro filter. On photos, Natural fit now finds head and feet by itself.
+* **Combine two videos** – Video tab: rotate either clip in 90° steps, then join them **one after another** with a
+  Smooth blend, Spin (one full turn with motion blur), Zoom or Slide transition (mirrored edges, so no gaps or
+  lines), or merge them **side by side / top and bottom** with an overlapping soft blend and colour matching so no
+  seam line shows. Clip 2 can fill the frame or show whole over a blurred copy of itself. The preview plays both
+  clips on one clock. Export decodes both files on a shared timeline. Sound: the two AAC tracks are joined untouched
+  when their formats match; otherwise they are decoded, crossfaded or mixed and re-encoded (AAC, or Opus where the
+  browser has no AAC encoder).
 
 The embedded sample photo is AI-generated (SDXL-Turbo).
 
@@ -42,7 +55,7 @@ The embedded sample photo is AI-generated (SDXL-Turbo).
 * Text layers are cached as bitmaps (glow/shadow blurs are slow on phones) and re-rendered only on style change.
 * Half-resolution preview while a slider or finger moves; full quality 250 ms after it stops.
 * WebGL context loss (phones under memory pressure) is handled: programs, textures and buffers are rebuilt and
-  edits are kept. The person cut-out runs on TF.js's CPU backend so it never opens a second graphics context.
+  edits are kept. TF.js (person cut-out and body points) runs on the graphics chip when possible and falls back to the processor if that fails.
 * Each new gesture clears stale pointers; a global error handler resets gesture state; layout changes are debounced.
 * During a video export the preview's graphics buffers are freed, the screen is kept awake (Wake Lock where
   allowed), the canvas is hidden while it is used for frames, and layout changes wait until it finishes.
