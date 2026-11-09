@@ -63,9 +63,11 @@ The embedded sample photo is AI-generated (SDXL-Turbo).
   page's private storage (Origin Private File System, or browser-managed Blobs as a fallback) and saves from the
   copy. A read failure during saving triggers one automatic retry from a copy; a file that can't be read at all
   If even a front-to-back copy is refused, the video is made from the player that already has the file open
-  ("player mode"): each output frame is shown on the player (seek + requestVideoFrameCallback) and copied, and the
+  ("player mode"): the player plays forward at half speed and pauses on each output frame (one decode per frame;
+  the frame on screen is checked with VideoFrame timestamps and only skipped frames are jumped to), and the
   sound is recorded while the clips play once in real time through Web Audio, each clip separately together with
   its playing position, then lined up per clip and crossfaded or mixed before encoding.
+* Clips are merged straight at the output size when saving smaller than the source (not at 4K).
 * During a video export the preview's graphics buffers are freed, the screen is kept awake (Wake Lock where
   allowed), the canvas is hidden while it is used for frames, and layout changes wait until it finishes.
 * Tested with 700 random actions in headless Chrome (sliders, text, behind-person, zoom, body tools, undo/redo)
