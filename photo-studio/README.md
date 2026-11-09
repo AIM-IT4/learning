@@ -57,6 +57,12 @@ The embedded sample photo is AI-generated (SDXL-Turbo).
 * WebGL context loss (phones under memory pressure) is handled: programs, textures and buffers are rebuilt and
   edits are kept. TF.js (person cut-out and body points) runs on the graphics chip when possible and falls back to the processor if that fails.
 * Each new gesture clears stale pointers; a global error handler resets gesture state; layout changes are debounced.
+* Phones hand the browser a picked video as a reference into Google Photos, Files or a cloud app; some of these
+  only allow reading front to back, or stop allowing reads later ("the requested file could not be read"). When a
+  clip is opened the app checks it can read the file in pieces; if not, it copies it once, front to back, into the
+  page's private storage (Origin Private File System, or browser-managed Blobs as a fallback) and saves from the
+  copy. A read failure during saving triggers one automatic retry from a copy; a file that can't be read at all
+  gets plain instructions (download it to the phone first).
 * During a video export the preview's graphics buffers are freed, the screen is kept awake (Wake Lock where
   allowed), the canvas is hidden while it is used for frames, and layout changes wait until it finishes.
 * Tested with 700 random actions in headless Chrome (sliders, text, behind-person, zoom, body tools, undo/redo)

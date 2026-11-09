@@ -2428,7 +2428,13 @@ async function loadClipEl(file) {
   }
   return { file, el, url, duration: isFinite(el.duration) ? el.duration : 0, rot: 0 };
 }
-function disposeClip(c) { if (!c) return; try { c.el.pause(); } catch (e) { /* ignore */ } c.el.remove(); c.el.removeAttribute("src"); URL.revokeObjectURL(c.url); }
+function disposeClip(c) {
+  if (!c) return;
+  try { c.el.pause(); } catch (e) { /* ignore */ }
+  c.el.remove(); c.el.removeAttribute("src"); URL.revokeObjectURL(c.url);
+  if (c.copy && c.copy._opfs) { const n = c.copy._opfs; opfsRoot().then(r => r && r.removeEntry(n)).catch(() => {}); }
+  c.copy = null; c.prep = null;
+}
 async function openVideo(file) {
   if (videoBusy) return;
   toast("Opening the video…", 25000);
@@ -2448,6 +2454,7 @@ async function openVideo(file) {
   const mb = file.size / 1048576;
   toast(`Video ready: ${img.w} × ${img.h}, ${fmtTime(vid.duration)}, ${mb >= 10 ? mb.toFixed(0) : mb.toFixed(1)} MB. Opened from your phone, nothing uploaded.`, 4500);
   loadVideoLibs().catch(() => {});
+  prepSource(c);
 }
 async function openSecond(file) {
   if (!vid || videoBusy) return;
@@ -2460,6 +2467,7 @@ async function openSecond(file) {
   await rebuildComposite();
   syncVideoPane();
   toast(comb.mode === "seq" ? "Clip 2 plays after clip 1. Pick a transition, or choose Side by side to merge them." : "Clip 2 added.", 4000);
+  prepSource(c);
 }
 function removeSecond() { if (!vidB) return; stopPlayback(); disposeClip(vidB); vidB = null; lastVideo = null; rebuildComposite(); syncVideoPane(); }
 function freeCompTex() { if (texA) gl.deleteTexture(texA); if (texB) gl.deleteTexture(texB); texA = texB = null; sizeA = sizeB = null; }
@@ -2667,6 +2675,98 @@ function syncVideoPane() {
   document.querySelectorAll("#soundMode button").forEach(b => b.setAttribute("aria-pressed", b.dataset.snd === comb.sound ? "true" : "false"));
 }
 
+/* ---- reading the picked file safely
+   Phones hand the browser a video as a reference into Google Photos, Files or a cloud app. Some of those only allow
+   reading from start to end, or stop allowing reads after a while, which shows up as "the requested file could not
+   be read". The app checks that it can jump around in the file; if not, it copies the video once, front to back,
+   into its own private storage on the phone and works from that copy. */
+const isReadErr = e => !!e && (e.name === "NotReadableError" || e.name === "NotFoundError" || /could not be read|not readable|NotReadable/i.test(String(e.message || e)));
+const READ_HELP = "The phone stopped the browser from reading this video file. This happens with videos opened from Google Photos, Recent or a cloud folder. Download the video to the phone first (Google Photos: ⋮ → Download), open it from the Files app or Gallery, and save again.";
+async function readRange(f, start, end) {
+  let last = null;
+  for (let i = 0; i < 3; i++) {
+    try { return await f.slice(start, end).arrayBuffer(); }
+    catch (e) { last = e; if (!isReadErr(e)) throw e; await sleep(200 * (i + 1)); }
+  }
+  throw last;
+}
+async function canSeek(f) {
+  try {
+    const n = Math.min(f.size, 65536);
+    await readRange(f, 0, n);
+    if (f.size > 3 * n) { const m = Math.floor(f.size / 2); await readRange(f, m, m + n); await readRange(f, f.size - n, f.size); }
+    return true;
+  } catch (e) { console.warn("file can't be read in pieces", e); return false; }
+}
+let copiesCleaned = false;
+async function opfsRoot() { try { return navigator.storage && navigator.storage.getDirectory ? await navigator.storage.getDirectory() : null; } catch (e) { return null; } }
+async function cleanCopies(keep) {
+  const root = await opfsRoot(); if (!root || !root.entries) return;
+  try { for await (const [name] of root.entries()) if (/^clip-/.test(name) && !keep.includes(name)) await root.removeEntry(name).catch(() => {}); } catch (e) { /* ignore */ }
+}
+async function localCopy(f, onProgress) {
+  const reader = f.stream().getReader();
+  let done = 0, lastP = 0;
+  const tick = () => { const p = done / Math.max(1, f.size); if (p - lastP > 0.01 || p >= 1) { lastP = p; onProgress(p); } };
+  const root = await opfsRoot();
+  let room = true;
+  try { const est = await navigator.storage.estimate(); if (est.quota && est.quota - (est.usage || 0) < f.size * 1.05) room = false; } catch (e) { /* unknown: try anyway */ }
+  if (root && room && typeof FileSystemFileHandle !== "undefined" && FileSystemFileHandle.prototype.createWritable) {
+    const name = "clip-" + Date.now() + "-" + Math.floor(Math.random() * 1e6) + ".mp4";
+    const h = await root.getFileHandle(name, { create: true }), w = await h.createWritable();
+    try {
+      for (;;) { const r = await reader.read(); if (r.done) break; await w.write(r.value); done += r.value.byteLength; tick(); if (cancelExport && videoBusy) throw new Error("cancelled"); }
+      await w.close();
+    } catch (e) { try { await w.abort(); } catch (x) { /* ignore */ } await root.removeEntry(name).catch(() => {}); throw e; }
+    const copy = await h.getFile(); copy._opfs = name; return copy;
+  }
+  // no private storage: keep the copy as browser-managed pieces (large ones live on disk, not in memory)
+  const blobs = []; let part = [], partBytes = 0;
+  for (;;) {
+    const r = await reader.read(); if (r.done) break;
+    part.push(r.value); partBytes += r.value.byteLength; done += r.value.byteLength; tick();
+    if (partBytes > (32 << 20)) { blobs.push(new Blob(part)); part = []; partBytes = 0; }
+    if (cancelExport && videoBusy) throw new Error("cancelled");
+  }
+  if (part.length) blobs.push(new Blob(part));
+  return new Blob(blobs, { type: f.type || "video/mp4" });
+}
+// the readable source for a clip: the picked file itself, or the app's copy of it
+async function sourceFor(c, ui, label, mayDetach) {
+  if (c.copy) return c.copy;
+  if (!c.forceCopy && !c.prep && await canSeek(c.file)) return c.file;
+  c.onProg = p => ui(`Preparing ${label} so it can be saved… ${Math.round(p * 100)}%`, null);
+  if (c.prep) c.onProg(0);
+  if (!c.prep) c.prep = (async () => {
+    const prog = p => c.onProg && c.onProg(p);
+    try { return await localCopy(c.file, prog); }
+    catch (e) {
+      if (!mayDetach || (e && e.message === "cancelled")) throw e;
+      // some phones allow only one reader at a time: let go of the preview's hold on the file and try once more
+      const t = c.el.currentTime; c.el.removeAttribute("src"); c.el.load();
+      try { return await localCopy(c.file, prog); }
+      finally {
+        c.el.src = c.url;
+        await new Promise(r => { c.el.onloadeddata = r; setTimeout(r, 8000); });
+        await seekTo(c.el, t);
+      }
+    }
+  })().then(x => { c.copy = x; return x; }, e => { c.prep = null; throw e; });
+  return c.prep;
+}
+// checked as soon as a clip is opened, so a copy (if needed) is usually ready before saving
+async function prepSource(c) {
+  if (!copiesCleaned) { copiesCleaned = true; await cleanCopies([]); }
+  if (await canSeek(c.file)) return;
+  if (c !== vid && c !== vidB) return;
+  c.forceCopy = true;
+  let lastT = 0;
+  const label = c === vid ? "the video" : "clip 2";
+  sourceFor(c, msg => { const now = performance.now(); if (!videoBusy && now - lastT > 800) { lastT = now; toast(msg, 1500); } }, label, false)
+    .then(() => { if (!videoBusy && (c === vid || c === vidB)) toast(`${label[0].toUpperCase() + label.slice(1)} is ready to save.`, 2000); })
+    .catch(e => console.warn(e));
+}
+
 /* ---- export: reading the files */
 function videoDescription(trak) {
   for (const entry of trak.mdia.minf.stbl.stsd.entries) {
@@ -2694,7 +2794,7 @@ async function readIndex(file, who) {
   mp4.onReady = i => { info = i; };
   for (let guard = 0; !info && !demuxErr && next < file.size && guard < 4000; guard++) {
     if (cancelExport) throw new Error("cancelled");
-    const buf = await file.slice(next, Math.min(file.size, next + (4 << 20))).arrayBuffer();
+    const buf = await readRange(file, next, Math.min(file.size, next + (4 << 20)));
     buf.fileStart = next;
     const want = mp4.appendBuffer(buf);
     next = typeof want === "number" && want > next ? want : next + buf.byteLength;
@@ -2737,7 +2837,7 @@ function clipReader(c) {
     if (!(buf && s.offset >= bStart && s.offset + s.size <= bEnd)) {
       let end = s.offset + s.size;
       for (let j = i + 1; j < S.length; j++) { const e = S[j].offset + S[j].size; if (S[j].offset < s.offset || e - s.offset > (4 << 20)) break; end = Math.max(end, e); }
-      buf = new Uint8Array(await c.file.slice(s.offset, end).arrayBuffer()); bStart = s.offset; bEnd = end;
+      buf = new Uint8Array(await readRange(c.file, s.offset, end)); bStart = s.offset; bEnd = end;
     }
     return buf.subarray(s.offset - bStart, s.offset - bStart + s.size);
   }
@@ -2772,7 +2872,7 @@ async function readPackets(c) {          // all of a clip's AAC sound packets (s
   while (i < S.length) {
     const s0 = S[i]; let j = i, end = s0.offset + s0.size;
     while (j + 1 < S.length && S[j + 1].offset === end && end - s0.offset < (2 << 20)) { j++; end += S[j].size; }
-    const buf = new Uint8Array(await c.file.slice(s0.offset, end).arrayBuffer());
+    const buf = new Uint8Array(await readRange(c.file, s0.offset, end));
     for (let k = i; k <= j; k++) { const s = S[k]; out.push({ ts: s.cts / c.audio.timescale, dur: s.duration / c.audio.timescale, data: buf.slice(s.offset - s0.offset, s.offset - s0.offset + s.size) }); }
     i = j + 1;
     if (cancelExport) throw new Error("cancelled");
@@ -2990,7 +3090,7 @@ async function exportVideo(opts, ui) {
   ui("Preparing…", 0);
   await loadVideoLibs();
   stopPlayback();
-  const A = await readIndex(vid.file, ""), B = vidB ? await readIndex(vidB.file, "Clip 2: ") : null;
+  const A = await readIndex(await sourceFor(vid, ui, vidB ? "clip 1" : "the video", true), ""), B = vidB ? await readIndex(await sourceFor(vidB, ui, "clip 2", true), "Clip 2: ") : null;
   const ra = (A.fileRot + vid.rot) % 360, rb = B ? (B.fileRot + vidB.rot) % 360 : 0;
   const L = compLayout(rotDims({ w: A.cw, h: A.ch }, ra), B ? rotDims({ w: B.cw, h: B.ch }, rb) : null, Math.min(MAXTEX, 4096));
   const dW = L.W, dH = L.H, tl = timelineFor(A.durS, B ? B.durS : null), fps = A.fps;
@@ -3199,12 +3299,19 @@ async function runVideoExport(choice) {
     let lock = null; try { if (navigator.wakeLock) lock = await navigator.wakeLock.request("screen"); } catch (e) { /* the screen may sleep */ }
     const ui = (msg, p) => { st.textContent = msg + " Keep this screen open."; if (p != null) prog.value = p; };
     try {
-      const out = await exportVideo({ size: choice, quality: q, audio }, ui);
+      let out;
+      try { out = await exportVideo({ size: choice, quality: q, audio }, ui); }
+      catch (e) {
+        // the phone refused a read part-way: copy the clips into the app's storage and try once more
+        if (!isReadErr(e) || cancelExport || [vid, vidB].some(c => c && c.copy)) throw e;
+        [vid, vidB].forEach(c => { if (c) c.forceCopy = true; });
+        out = await exportVideo({ size: choice, quality: q, audio }, ui);
+      }
       r = lastVideo = { key, ...out };
     } catch (err) {
       console.warn(err);
       st.className = "status err";
-      st.textContent = err && err.message === "cancelled" ? "Stopped. Nothing was saved." : (err && err.message || "Making the video failed. Try Full HD.");
+      st.textContent = err && err.message === "cancelled" ? "Stopped. Nothing was saved." : isReadErr(err) ? READ_HELP : (err && err.message || "Making the video failed. Try Full HD.");
     } finally {
       try { lock && lock.release(); } catch (e) { /* ignore */ }
       videoBusy = false; sheet.classList.remove("busy"); $("#expGo").disabled = false; $("#expCancel").textContent = "Cancel";
