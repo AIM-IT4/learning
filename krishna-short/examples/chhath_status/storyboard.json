@@ -1,0 +1,264 @@
+{
+ "song": "Jode Jode Phalwa (T-Series), used with the user's permission; 17.98 s to 77.98 s",
+ "start": 17.98,
+ "duration": 60.0,
+ "bpm": 124.95,
+ "beat0": 0.0,
+ "fade_out": 2.5,
+ "embers": 0.7,
+ "rays": [
+  [
+   0,
+   11.4
+  ],
+  [
+   15.4,
+   19.2
+  ],
+  [
+   51.9,
+   60
+  ]
+ ],
+ "frame": [
+  [
+   0,
+   11.3
+  ],
+  [
+   55.7,
+   60
+  ]
+ ],
+ "shots": [
+  {
+   "img": "md_surya.png",
+   "bars": 3,
+   "move": "in"
+  },
+  {
+   "img": "sun_river.png",
+   "bars": 3,
+   "fx": "dissolve",
+   "move": "up",
+   "parallax": true
+  },
+  {
+   "img": "patna_ghat.png",
+   "bars": 2,
+   "fx": "circleopen",
+   "move": "in",
+   "parallax": true
+  },
+  {
+   "img": "patna_sil.png",
+   "bars": 2,
+   "fx": "dissolve",
+   "move": "out",
+   "parallax": true
+  },
+  {
+   "img": "soop_close.png",
+   "bars": 2,
+   "fx": "fadewhite",
+   "move": "in",
+   "parallax": true,
+   "kind": "beat"
+  },
+  {
+   "img": "md_offering.png",
+   "bars": 2,
+   "fx": "smoothup",
+   "move": "down"
+  },
+  {
+   "img": "darbhanga_wall.png",
+   "bars": 2,
+   "fx": "dissolve",
+   "move": "in",
+   "parallax": true
+  },
+  {
+   "img": "darbhanga_pond.png",
+   "bars": 2,
+   "fx": "circleopen",
+   "move": "out",
+   "parallax": true
+  },
+  {
+   "img": "md_arghya.png",
+   "bars": 2,
+   "fx": "smoothleft",
+   "move": "up"
+  },
+  {
+   "img": "muz_litchi.png",
+   "bars": 2,
+   "fx": "dissolve",
+   "move": "in",
+   "parallax": true
+  },
+  {
+   "img": "muz_ghat.png",
+   "bars": 2,
+   "fx": "radial",
+   "move": "down",
+   "parallax": true
+  },
+  {
+   "img": "kosi_night.png",
+   "bars": 1,
+   "fx": "fade",
+   "move": "in",
+   "parallax": true
+  },
+  {
+   "img": "patna_night.png",
+   "bars": 1,
+   "fx": "smoothup",
+   "move": "out",
+   "parallax": true
+  },
+  {
+   "img": "diyas_water.png",
+   "bars": 1,
+   "fx": "dissolve",
+   "move": "in",
+   "parallax": true
+  },
+  {
+   "img": "sunrise_arghya.png",
+   "bars": 2,
+   "fx": "fadewhite",
+   "move": "up",
+   "parallax": true
+  },
+  {
+   "img": "md_ghat.png",
+   "bars": 3,
+   "fx": "fadeslow",
+   "move": "in",
+   "kind": "outro"
+  }
+ ],
+ "captions": [
+  {
+   "t": 0.4,
+   "end": 10.9,
+   "style": "Banner",
+   "box": [
+    90,
+    255,
+    900,
+    420
+   ]
+  },
+  {
+   "t": 0.6,
+   "end": 10.9,
+   "style": "Title",
+   "text": "छठ महापर्व"
+  },
+  {
+   "t": 1.3,
+   "end": 10.9,
+   "style": "TitleSub",
+   "text": "की हार्दिक शुभकामनाएँ"
+  },
+  {
+   "t": 3.2,
+   "end": 10.9,
+   "style": "Days",
+   "text": "नहाय-खाय • खरना • संध्या अर्घ्य • उषा अर्घ्य"
+  },
+  {
+   "t": 12.0,
+   "end": 15.2,
+   "style": "Loc",
+   "text": "पटना • गंगा घाट"
+  },
+  {
+   "t": 15.8,
+   "end": 19.0,
+   "style": "Ritual",
+   "text": "संध्या अर्घ्य"
+  },
+  {
+   "t": 19.6,
+   "end": 23.0,
+   "style": "Hook",
+   "text": "जोड़े जोड़े फलवा"
+  },
+  {
+   "t": 23.4,
+   "end": 26.7,
+   "style": "Loc",
+   "text": "मिथिला की मधुबनी कला"
+  },
+  {
+   "t": 27.3,
+   "end": 30.6,
+   "style": "Loc",
+   "text": "दरभंगा • मिथिला"
+  },
+  {
+   "t": 31.1,
+   "end": 34.4,
+   "style": "Loc",
+   "text": "दरभंगा • पोखर घाट"
+  },
+  {
+   "t": 38.8,
+   "end": 42.1,
+   "style": "Loc",
+   "text": "मुज़फ़्फ़रपुर • लीची के बाग़"
+  },
+  {
+   "t": 42.6,
+   "end": 45.9,
+   "style": "Loc",
+   "text": "मुज़फ़्फ़रपुर • बूढ़ी गंडक घाट"
+  },
+  {
+   "t": 46.3,
+   "end": 47.9,
+   "style": "Ritual",
+   "text": "कोसी भराई"
+  },
+  {
+   "t": 48.2,
+   "end": 49.8,
+   "style": "Loc",
+   "text": "पटना • दीपों से जगमग घाट"
+  },
+  {
+   "t": 52.3,
+   "end": 55.5,
+   "style": "Ritual",
+   "text": "उषा अर्घ्य"
+  },
+  {
+   "t": 55.9,
+   "end": 60.0,
+   "style": "Banner",
+   "box": [
+    70,
+    760,
+    940,
+    400
+   ]
+  },
+  {
+   "t": 56.1,
+   "end": 60.0,
+   "style": "End",
+   "text": "जय छठी मईया"
+  },
+  {
+   "t": 56.8,
+   "end": 60.0,
+   "style": "EndSub",
+   "text": "छठ पूजा की हार्दिक शुभकामनाएँ"
+  }
+ ]
+}
