@@ -62,7 +62,10 @@ The embedded sample photo is AI-generated (SDXL-Turbo).
   clip is opened the app checks it can read the file in pieces; if not, it copies it once, front to back, into the
   page's private storage (Origin Private File System, or browser-managed Blobs as a fallback) and saves from the
   copy. A read failure during saving triggers one automatic retry from a copy; a file that can't be read at all
-  gets plain instructions (download it to the phone first).
+  If even a front-to-back copy is refused, the video is made from the player that already has the file open
+  ("player mode"): each output frame is shown on the player (seek + requestVideoFrameCallback) and copied, and the
+  sound is recorded while the clips play once in real time through Web Audio, each clip separately together with
+  its playing position, then lined up per clip and crossfaded or mixed before encoding.
 * During a video export the preview's graphics buffers are freed, the screen is kept awake (Wake Lock where
   allowed), the canvas is hidden while it is used for frames, and layout changes wait until it finishes.
 * Tested with 700 random actions in headless Chrome (sliders, text, behind-person, zoom, body tools, undo/redo)

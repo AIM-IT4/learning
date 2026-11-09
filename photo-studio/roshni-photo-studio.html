@@ -2433,7 +2433,7 @@ function disposeClip(c) {
   try { c.el.pause(); } catch (e) { /* ignore */ }
   c.el.remove(); c.el.removeAttribute("src"); URL.revokeObjectURL(c.url);
   if (c.copy && c.copy._opfs) { const n = c.copy._opfs; opfsRoot().then(r => r && r.removeEntry(n)).catch(() => {}); }
-  c.copy = null; c.prep = null;
+  c.copy = null; c.prep = null; aNodes.delete(c.el);
 }
 async function openVideo(file) {
   if (videoBusy) return;
@@ -2593,6 +2593,7 @@ async function startPlayback() {
   if (req !== playReq || vid !== v) return;
   const clips = [vid, vidB].filter(Boolean);
   clips.forEach(c => { c.el.muted = false; });
+  if (actx && actx.state !== "running") actx.resume().catch(() => {});
   // start every player inside the tap (phones only allow sound that way); the clock pauses the ones not needed yet
   const ok = await Promise.all(clips.map(c => c.el.play().then(() => true, () => { c.el.muted = true; return c.el.play().then(() => true, () => false); })));
   if (req !== playReq || vid !== v) { clips.forEach(c => c.el.pause()); return; }
@@ -2680,7 +2681,7 @@ function syncVideoPane() {
    reading from start to end, or stop allowing reads after a while, which shows up as "the requested file could not
    be read". The app checks that it can jump around in the file; if not, it copies the video once, front to back,
    into its own private storage on the phone and works from that copy. */
-const isReadErr = e => !!e && (e.name === "NotReadableError" || e.name === "NotFoundError" || /could not be read|not readable|NotReadable/i.test(String(e.message || e)));
+const isReadErr = e => !!e && (e.name === "NotReadableError" || e.name === "NotFoundError" || /could not be read|not readable|NotReadable|network error/i.test(String(e.message || e)));
 const READ_HELP = "The phone stopped the browser from reading this video file. This happens with videos opened from Google Photos, Recent or a cloud folder. Download the video to the phone first (Google Photos: ⋮ → Download), open it from the Files app or Gallery, and save again.";
 async function readRange(f, start, end) {
   let last = null;
@@ -2732,26 +2733,17 @@ async function localCopy(f, onProgress) {
   return new Blob(blobs, { type: f.type || "video/mp4" });
 }
 // the readable source for a clip: the picked file itself, or the app's copy of it
-async function sourceFor(c, ui, label, mayDetach) {
+async function sourceFor(c, ui, label) {
   if (c.copy) return c.copy;
+  if (c.unreadable) return null;
   if (!c.forceCopy && !c.prep && await canSeek(c.file)) return c.file;
   c.onProg = p => ui(`Preparing ${label} so it can be saved… ${Math.round(p * 100)}%`, null);
   if (c.prep) c.onProg(0);
-  if (!c.prep) c.prep = (async () => {
-    const prog = p => c.onProg && c.onProg(p);
-    try { return await localCopy(c.file, prog); }
-    catch (e) {
-      if (!mayDetach || (e && e.message === "cancelled")) throw e;
-      // some phones allow only one reader at a time: let go of the preview's hold on the file and try once more
-      const t = c.el.currentTime; c.el.removeAttribute("src"); c.el.load();
-      try { return await localCopy(c.file, prog); }
-      finally {
-        c.el.src = c.url;
-        await new Promise(r => { c.el.onloadeddata = r; setTimeout(r, 8000); });
-        await seekTo(c.el, t);
-      }
-    }
-  })().then(x => { c.copy = x; return x; }, e => { c.prep = null; throw e; });
+  if (!c.prep) c.prep = localCopy(c.file, p => c.onProg && c.onProg(p)).then(x => { c.copy = x; return x; }, e => {
+    c.prep = null;
+    if (e && e.message === "cancelled") throw e;
+    console.warn("the phone refused to copy the file", e); c.unreadable = true; return null;
+  });
   return c.prep;
 }
 // checked as soon as a clip is opened, so a copy (if needed) is usually ready before saving
@@ -2762,8 +2754,8 @@ async function prepSource(c) {
   c.forceCopy = true;
   let lastT = 0;
   const label = c === vid ? "the video" : "clip 2";
-  sourceFor(c, msg => { const now = performance.now(); if (!videoBusy && now - lastT > 800) { lastT = now; toast(msg, 1500); } }, label, false)
-    .then(() => { if (!videoBusy && (c === vid || c === vidB)) toast(`${label[0].toUpperCase() + label.slice(1)} is ready to save.`, 2000); })
+  sourceFor(c, msg => { const now = performance.now(); if (!videoBusy && now - lastT > 800) { lastT = now; toast(msg, 1500); } }, label)
+    .then(x => { if (x && !videoBusy && (c === vid || c === vidB)) toast(`${label[0].toUpperCase() + label.slice(1)} is ready to save.`, 2000); })
     .catch(e => console.warn(e));
 }
 
@@ -3084,17 +3076,165 @@ async function ensureRefPoses(ui) {
   await seekTimeline(back);
 }
 
+/* ---- player mode
+   When the phone refuses every new read of the file, the video is made from the player that already has it open:
+   each frame is shown on the player and copied, and the sound is recorded while the clips play once in real time. */
+let actx = null; const aNodes = new Map();
+function audioCtx() {
+  if (!actx) { const AC = window.AudioContext || window.webkitAudioContext; if (AC) { try { actx = new AC({ sampleRate: 48000 }); } catch (e) { actx = new AC(); } } }
+  return actx;
+}
+function routeEl(el) {            // the player's sound through Web Audio (once per player; it keeps playing to the speaker)
+  const ac = audioCtx(); if (!ac) return null;
+  let n = aNodes.get(el);
+  if (!n) { const src = ac.createMediaElementSource(el), out = ac.createGain(); src.connect(out); out.connect(ac.destination); n = { src, out }; aNodes.set(el, n); }
+  return n;
+}
+function elFrame(el, t) {         // show the frame at time t on a player
+  t = Math.max(0, Math.min(t + 0.001, (el.duration || t + 1) - 0.002));
+  return new Promise(res => {
+    let fin = false;
+    const done = () => { if (fin) return; fin = true; el.removeEventListener("seeked", onS); res(); };
+    const onS = () => { if (el.requestVideoFrameCallback) { el.requestVideoFrameCallback(() => done()); setTimeout(done, 300); } else done(); };
+    el.addEventListener("seeked", onS); el.currentTime = t; setTimeout(done, 4000);
+  });
+}
+async function probeFps(el) {     // frames per second, from the player
+  if (!el.requestVideoFrameCallback) return 30;
+  const times = [], wasMuted = el.muted; el.muted = true;
+  await seekTo(el, 0);
+  await new Promise(res => {
+    const cb = (now, md) => { times.push(md.mediaTime); if (times.length < 14) el.requestVideoFrameCallback(cb); else res(); };
+    el.requestVideoFrameCallback(cb); el.play().catch(res); setTimeout(res, 3000);
+  });
+  el.pause(); el.muted = wasMuted;
+  const d = []; for (let i = 1; i < times.length; i++) { const x = times[i] - times[i - 1]; if (x > 0.004 && x < 0.2) d.push(x); }
+  if (d.length < 3) return 30;
+  d.sort((x, y) => x - y);
+  const f = 1 / d[Math.floor(d.length / 2)];
+  return [24, 25, 30, 48, 50, 60].reduce((x, y) => Math.abs(y - f) < Math.abs(x - f) ? y : x);
+}
+// plays the timeline once in real time and records each clip's sound with where its player was; the clips are then
+// lined up by their own playing position (players start a moment late) and crossfaded or mixed as chosen
+async function recordSound(tl, opts, ui) {
+  if (!opts.audio) return { chunks: null, note: "" };
+  const fail = { chunks: null, note: " The sound couldn't be recorded on this device." };
+  const ac = audioCtx();
+  if (!ac || typeof AudioData === "undefined" || !ac.createScriptProcessor) return fail;
+  try { await ac.resume(); } catch (e) { /* checked below */ }
+  if (ac.state !== "running") return fail;
+  const enc = await pickAudioEncoder(ac.sampleRate);
+  if (!enc || enc.cfg.sampleRate !== ac.sampleRate) return fail;
+  const sr = ac.sampleRate, seq = !!vidB && comb.mode === "seq", snd = vidB ? comb.sound : "a", cut = tl.st + tl.T / 2;
+  const x = t => Math.min(1, Math.max(0, (t - tl.st) / Math.max(0.01, tl.T)));
+  const gA = t => !vidB ? 1 : snd === "b" ? 0 : snd === "a" ? (seq && t > cut ? 0 : 1) : seq ? Math.cos(x(t) * Math.PI / 2) : 0.8;
+  const gB = t => !vidB ? 0 : snd === "a" ? 0 : snd === "b" ? (seq && t < cut ? 0 : 1) : seq ? Math.sin(x(t) * Math.PI / 2) : 0.8;
+  const recs = [vid, vidB].filter(Boolean).map(c => ({ c, parts: [], frames: 0, map: [] }));
+  const merger = ac.createChannelMerger(4), sp = ac.createScriptProcessor(4096, 4, 2), zero = ac.createGain(); zero.gain.value = 0;
+  const undo = [];
+  recs.forEach((r, k) => {
+    const n = routeEl(r.c.el); n.out.gain.value = 0;                 // quiet on the speaker while recording
+    const up = ac.createGain(); up.channelCount = 2; up.channelCountMode = "explicit"; up.channelInterpretation = "speakers";
+    const split = ac.createChannelSplitter(2);
+    n.src.connect(up); up.connect(split); split.connect(merger, 0, k * 2); split.connect(merger, 1, k * 2 + 1);
+    undo.push(() => { try { n.src.disconnect(up); } catch (e) { /* ignore */ } up.disconnect(); split.disconnect(); n.out.gain.value = 1; });
+  });
+  merger.connect(sp); sp.connect(zero); zero.connect(ac.destination);
+  let recording = false;
+  sp.onaudioprocess = ev => {
+    if (!recording) return;
+    const ib = ev.inputBuffer, n = ib.length;
+    recs.forEach((r, k) => {
+      const c0 = ib.getChannelData(k * 2), c1 = ib.getChannelData(k * 2 + 1), d = new Int16Array(n * 2);
+      for (let i = 0; i < n; i++) { d[2 * i] = Math.max(-32768, Math.min(32767, c0[i] * 32767)); d[2 * i + 1] = Math.max(-32768, Math.min(32767, c1[i] * 32767)); }
+      r.parts.push(d);
+      const el = r.c.el;
+      if (!el.paused && el.readyState > 2) r.map.push([r.frames + n, el.currentTime - n / sr]);   // where this player was
+      r.frames += n;
+    });
+  };
+  try {
+    await seekTimeline(0);
+    recs.forEach(r => { r.c.el.muted = false; r.c.el.volume = 1; });
+    const start = performance.now(); recording = true;
+    driveEls(0, true);
+    for (;;) {
+      await sleep(40);
+      if (cancelExport) throw new Error("cancelled");
+      const t = (performance.now() - start) / 1000;
+      if (t >= tl.dur + 0.6) break;                                  // a little extra so late starters are covered
+      driveEls(Math.min(t, tl.dur), t < tl.dur);
+      ui(`Recording the sound… ${fmtTime(Math.min(t, tl.dur))} of ${fmtTime(tl.dur)}`, Math.min(1, t / tl.dur));
+    }
+  } finally {
+    recording = false;
+    recs.forEach(r => r.c.el.pause());
+    undo.forEach(f => f()); try { merger.disconnect(); sp.disconnect(); zero.disconnect(); } catch (y) { /* ignore */ }
+    sp.onaudioprocess = null;
+  }
+  // line each clip up by its playing position: one offset per play-through (clip 2 repeats in side by side)
+  recs.forEach(r => {
+    const all = new Int16Array(r.frames * 2); let o = 0; r.parts.forEach(d => { all.set(d, o); o += d.length; }); r.parts = null; r.pcm = all;
+    const segs = []; let cur = [];
+    for (const pt of r.map) { if (cur.length && pt[1] < cur[cur.length - 1][1] - 0.5) { segs.push(cur); cur = []; } cur.push(pt); }
+    if (cur.length) segs.push(cur);
+    r.offs = segs.map(sg => { const v = sg.map(([si, m]) => si / sr - m).sort((q, w) => q - w); return v[Math.floor(v.length / 2)]; });
+  });
+  if (!recs.some(r => r.offs.length)) return fail;
+  const at = (r, k, m, out) => {
+    out[0] = out[1] = 0; if (!r || !r.offs.length) return;
+    const pos = (m + r.offs[Math.min(k, r.offs.length - 1)]) * sr, i = Math.floor(pos), w = pos - i;
+    if (i < 0 || i + 1 >= r.frames) return;
+    const P = r.pcm; out[0] = (P[2 * i] * (1 - w) + P[2 * i + 2] * w) / 32768; out[1] = (P[2 * i + 1] * (1 - w) + P[2 * i + 3] * w) / 32768;
+  };
+  const chunks = []; let dcfg = null, encErr = null;
+  const e = new AudioEncoder({ output: (c, meta) => { const d = new Uint8Array(c.byteLength); c.copyTo(d); chunks.push({ data: d, ts: c.timestamp / 1e6, dur: (c.duration || 0) / 1e6 }); if (meta && meta.decoderConfig && !dcfg) dcfg = meta.decoderConfig; }, error: y => { encErr = y; } });
+  e.configure(enc.cfg);
+  const rA = recs[0], rB = recs[1] || null, dB = vidB ? vidB.duration || 0 : 0, BL = 4096, N = Math.ceil(tl.dur * sr), ta = [0, 0], tb = [0, 0];
+  for (let f0 = 0; f0 < N && !encErr; f0 += BL) {
+    const n = Math.min(BL, N - f0), data = new Float32Array(n * 2);
+    for (let i = 0; i < n; i++) {
+      const t = (f0 + i) / sr, ga = gA(t), gb = gB(t);
+      if (ga > 1e-4) at(rA, 0, t, ta); else ta[0] = ta[1] = 0;
+      if (rB && gb > 1e-4) { if (seq) at(rB, 0, t - tl.st, tb); else { const k = dB ? Math.floor(t / dB) : 0; at(rB, k, t - k * dB, tb); } } else tb[0] = tb[1] = 0;
+      data[i] = Math.max(-1, Math.min(1, ta[0] * ga + tb[0] * gb)); data[n + i] = Math.max(-1, Math.min(1, ta[1] * ga + tb[1] * gb));
+    }
+    const ad = new AudioData({ format: "f32-planar", sampleRate: sr, numberOfFrames: n, numberOfChannels: 2, timestamp: Math.round(f0 / sr * 1e6), data });
+    try { e.encode(ad); } catch (y) { encErr = y; } ad.close();
+    while (e.encodeQueueSize > 8) await sleep(1);
+  }
+  await e.flush().catch(() => {}); try { e.close(); } catch (y) { /* ignore */ }
+  if (encErr || !chunks.length) return fail;
+  return { mixed: true, kind: enc.kind, cfg: dcfg || { codec: enc.cfg.codec, sampleRate: sr, numberOfChannels: 2 }, sampleRate: sr, numberOfChannels: 2, chunks, note: "" };
+}
+
 async function exportVideo(opts, ui) {
   if (typeof VideoEncoder === "undefined" || typeof VideoDecoder === "undefined" || typeof VideoFrame === "undefined")
     throw new Error("This browser can't make videos. Use the latest Chrome on Android, or Safari 16.4 or newer on iPhone.");
   ui("Preparing…", 0);
   await loadVideoLibs();
   stopPlayback();
-  const A = await readIndex(await sourceFor(vid, ui, vidB ? "clip 1" : "the video", true), ""), B = vidB ? await readIndex(await sourceFor(vidB, ui, "clip 2", true), "Clip 2: ") : null;
-  const ra = (A.fileRot + vid.rot) % 360, rb = B ? (B.fileRot + vidB.rot) % 360 : 0;
-  const L = compLayout(rotDims({ w: A.cw, h: A.ch }, ra), B ? rotDims({ w: B.cw, h: B.ch }, rb) : null, Math.min(MAXTEX, 4096));
-  const dW = L.W, dH = L.H, tl = timelineFor(A.durS, B ? B.durS : null), fps = A.fps;
-  const total = B ? Math.max(1, Math.round(tl.dur * fps)) : A.samples.length;
+  const savedV = vtime;
+  let player = false, A = null, B = null;
+  try {
+    const sa = await sourceFor(vid, ui, vidB ? "clip 1" : "the video"), sb = vidB ? await sourceFor(vidB, ui, "clip 2") : null;
+    if (!sa || (vidB && !sb)) player = true;
+    else { A = await readIndex(sa, ""); B = vidB ? await readIndex(sb, "Clip 2: ") : null; }
+  } catch (e) { if (!isReadErr(e)) throw e; console.warn(e); player = true; }
+  let ra, rb, L, tl, fps, total;
+  if (!player) {
+    ra = (A.fileRot + vid.rot) % 360; rb = B ? (B.fileRot + vidB.rot) % 360 : 0;
+    L = compLayout(rotDims({ w: A.cw, h: A.ch }, ra), B ? rotDims({ w: B.cw, h: B.ch }, rb) : null, Math.min(MAXTEX, 4096));
+    tl = timelineFor(A.durS, B ? B.durS : null); fps = A.fps;
+    total = B ? Math.max(1, Math.round(tl.dur * fps)) : A.samples.length;
+  } else {
+    ui("This phone won't let the page read the video file again, so the video is made from the player…", 0);
+    ra = vid.rot; rb = vidB ? vidB.rot : 0;
+    L = compLayout(rotDims(elDims(vid), ra), vidB ? rotDims(elDims(vidB), rb) : null, Math.min(MAXTEX, 4096));
+    tl = timeline(); fps = await probeFps(vid.el);
+    total = Math.max(1, Math.round(tl.dur * fps));
+  }
+  const dW = L.W, dH = L.H;
   // output size + encoder
   let { W, H } = videoOutSize(dW, dH, opts.size);
   let enc = await pickEncoder(W, H, fps, videoBitrate(W, H, fps, opts.quality));
@@ -3110,7 +3250,9 @@ async function exportVideo(opts, ui) {
     ui("Loading the body finder…", 0);
     try { await loadPose(); await ensureRefPoses(ui); } catch (e) { console.warn(e); track = false; trackNote = " The body finder couldn't start, so body edits stay where they were placed."; }
   }
-  const audio = await buildAudio(A, B, tl, opts, ui);
+  let audio = null;
+  if (!player) { try { audio = await buildAudio(A, B, tl, opts, ui); } catch (e) { if (!isReadErr(e)) throw e; console.warn(e); audio = null; } }
+  if (!audio) audio = await recordSound(tl, opts, ui);
   // GPU resources
   const P2 = videoPrograms();
   freeSet(preview); freeSet(fastSet); preview = null; fastSet = null;   // make room in graphics memory
@@ -3122,6 +3264,8 @@ async function exportVideo(opts, ui) {
   try {
     const rawA = plainTex(true), rawB = B ? plainTex(true) : null, srcTex = tex(dW, dH, true), srcFb = fbo(srcTex);
     res.textures.push(rawA, srcTex); if (rawB) res.textures.push(rawB); res.fbs.push(srcFb);
+    let pA = null, pB = null;
+    if (player) { const da = elDims(vid); pA = tex(da.w, da.h, true); res.textures.push(pA); if (vidB) { const db = elDims(vidB); pB = tex(db.w, db.h, true); res.textures.push(pB); } }
     const set = res.set = makeSet(W, H);
     if (!set) throw new Error("Not enough graphics memory for this size. Choose Full HD.");
     glc.width = W; glc.height = H;
@@ -3198,18 +3342,24 @@ async function exportVideo(opts, ui) {
         ai++;
       }
     };
-    const rdA = clipReader(A), rdB = B ? clipReader(B) : null; readers.push(rdA); if (rdB) readers.push(rdB);
+    const rdA = player ? null : clipReader(A), rdB = B ? clipReader(B) : null; if (rdA) readers.push(rdA); if (rdB) readers.push(rdB);
     const filt = makePoseFilter();
-    let rawPose = null, fPose = null, haveMask = false, lastFa = null, lastFb = null, lastB = -1, aDone = false, done = 0, lastUi = 0;
+    let rawPose = null, fPose = null, haveMask = false, lastFa = null, lastFb = null, lastB = -1, aDone = false, done = 0, lastUi = 0, pHasB = false;
     const t0 = performance.now();
-    while (B ? done < total : true) {
+    while (B || player ? done < total : true) {
       if (cancelExport) throw new Error("cancelled");
       if (encErr) throw new Error("The video couldn't be encoded (" + String(encErr.message || encErr).slice(0, 120) + "). Try Full HD.");
       if (muxErr) throw new Error("The video file couldn't be assembled (" + String(muxErr.message || muxErr).slice(0, 120) + ").");
       if (glLost || gl.isContextLost()) throw new Error("The phone reset the graphics during the export. Try Full HD.");
       // 1. the source picture for this output frame
       let ts, dur, p = 0;
-      if (!B) {
+      if (player) {
+        const t = done / fps, m = tl.at(t);
+        ts = Math.round(t * 1e6); dur = Math.round(1e6 / fps); p = m.p;
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false); gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+        if (m.a != null) { await elFrame(vid.el, m.a); uploadEl(pA, vid.el); }
+        if (vidB && m.b != null) { await elFrame(vidB.el, m.b); uploadEl(pB, vidB.el); pHasB = true; }
+      } else if (!B) {
         const f = await rdA.next();
         if (!f) break;
         ts = f.timestamp; dur = f.duration || Math.round(1e6 / fps);
@@ -3225,7 +3375,8 @@ async function exportVideo(opts, ui) {
           const fb = await rdB.frameAt(m.b); if (fb && fb !== lastFb) { await uploadFrame(rawB, fb); lastFb = fb; }
         }
       }
-      mergeDraw(srcFb, dW, dH, rawA, rawB && lastFb ? rawB : null, ra, rb, L, p);
+      if (player) mergeDraw(srcFb, dW, dH, pA, pHasB ? pB : null, ra, rb, L, p);
+      else mergeDraw(srcFb, dW, dH, rawA, rawB && lastFb ? rawB : null, ra, rb, L, p);
       gl.bindTexture(gl.TEXTURE_2D, srcTex); gl.generateMipmap(gl.TEXTURE_2D);
       // 2. person cut-out and body pose
       if (tf && done % segEvery === 0) { await segFrom(srcTex, dW, dH); haveMask = true; }
@@ -3273,6 +3424,7 @@ async function exportVideo(opts, ui) {
       frames: done, total, person: tfOk, tracked: track };
   } finally {
     exporting = false; img = savedImg; grainSeed = 17;
+    if (player) setTimeout(() => seekTimeline(savedV), 0);
     readers.forEach(r => r.close());
     try { encoder && encoder.state !== "closed" && encoder.close(); } catch (e) { /* ignore */ }
     res.textures.forEach(t => gl.deleteTexture(t)); res.fbs.forEach(f => gl.deleteFramebuffer(f)); freeSet(res.set);
@@ -3288,6 +3440,8 @@ function videoKey(choice, q, audio) {
   return [snap(), choice, q, audio, f(vid), f(vidB), JSON.stringify(comb)].join("|");
 }
 async function runVideoExport(choice) {
+  // start the sound engine inside the Save tap: phones only allow recording sound from a tap (used if the file can't be read)
+  try { const ac = audioCtx(); if (ac && ac.state !== "running") ac.resume().catch(() => {}); } catch (e) { /* not needed for normal saves */ }
   const st = $("#expStatus"), prog = $("#expProg"), sheet = $("#exportSheet");
   const q = document.querySelector('input[name="vq"]:checked').value, audio = $("#vAudio").checked;
   const key = videoKey(choice, q, audio);
