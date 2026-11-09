@@ -67,7 +67,9 @@ button { cursor: pointer; }
 @media (min-width: 561px) { .hold .short { display: none; } }
 
 /* stage */
-.stage { position: relative; min-height: 0; border-radius: 14px; background: var(--surface); overflow: hidden; touch-action: none; }
+.stage { position: relative; min-height: 0; border-radius: 14px; background: var(--surface); overflow: hidden; touch-action: none;
+  -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; overscroll-behavior: contain; }
+#ov { touch-action: none; }
 .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .badge {
   position: absolute; left: 10px; bottom: 10px; max-width: calc(100% - 20px);
@@ -135,7 +137,7 @@ input[type="range"]::-moz-range-thumb { width: 22px; height: 22px; border-radius
 .confirm .ok { color: var(--accent); }
 
 /* text tab */
-textarea { width: 100%; min-height: 54px; resize: vertical; background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; font-size: 16px; }
+textarea { box-sizing: border-box; width: 100%; min-height: 54px; resize: vertical; background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; font-size: 16px; }
 .font-grid { display: grid; grid-auto-flow: column; grid-template-rows: repeat(2, 46px); grid-auto-columns: 112px; gap: 6px; overflow-x: auto; padding-bottom: 4px; }
 .font-btn { border: 1px solid var(--line); background: var(--surface-2); border-radius: 10px; font-size: 19px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; padding: 0 6px; }
 .font-btn[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
@@ -299,6 +301,7 @@ input[type="color"] { width: 32px; height: 32px; border: 1px solid var(--line); 
         </div>
         <div id="textEdit" class="pane">
           <textarea id="tContent" aria-label="Text"></textarea>
+          <p class="note">Drag the text on the photo to move it, or use Left ↔ right and Up ↕ down below.</p>
           <p class="section-label">Style</p>
           <div class="chips" id="tPresets"></div>
           <p class="section-label">Font</p>
@@ -319,6 +322,7 @@ input[type="color"] { width: 32px; height: 32px; border: 1px solid var(--line); 
             <div class="seg" role="group" aria-label="Text position">
               <button id="tFront" aria-pressed="true">In front</button><button id="tBehind" aria-pressed="false">Behind person</button>
             </div>
+            <button class="btn" id="findPerson" hidden>Find person again</button>
             <span class="note" id="behindNote"></span>
           </div>
           <div id="tSliders" class="pane"></div>
@@ -1001,7 +1005,7 @@ async function loadSource(source, isSample) {
   freeSet(baseSet); baseSet = null;
   const texo = uploadSrc(srcCanvas, w, h);
   img = { w, h, tex: texo, src: srcCanvas, mean: sum / (px.length / 4), noise, stats, id: Date.now() + Math.random(), sample: !!isSample };
-  maskCanvas = null; maskKey = ""; maskState = "idle";
+  maskCanvas = null; maskKey = ""; maskState = "idle"; maskHint = null;
   baseSet = makeBaseSet();
   state = freshState();
   if (isSample) {
@@ -1372,17 +1376,58 @@ function guidedFilter(I, p, w, h, r, eps) {
   for (let i = 0; i < N; i++) q[i] = ma[i] * I[i] + mb[i];
   return q;
 }
+let maskErr = "", maskHint = null;   // maskHint: where the user tapped the person, if automatic finding failed
 function maskMessage() {
-  return maskState === "busy" ? "Finding the person…" : maskState === "failed" ? "Couldn't find a person in this photo, so this text stays in front." :
-    maskState === "ready" ? "The text sits behind the person." : "";
+  if (maskState === "busy") return "Finding the person…";
+  if (maskState === "failed") return maskErr || "Couldn't find a person. Tap on the person in the photo to help.";
+  if (maskState === "ready") return "Person found. Drag the text over them and it goes behind.";
+  return "";
 }
-async function ensureMask() {
-  if (!needMask()) return;
-  const key = maskSignature();
-  if (key === maskKey || maskState === "busy") return;
-  maskState = "busy"; syncBehindNote();
+// the photo as it looks now (committed body edits included), as RGBA pixels with row 0 at the top
+function warpToPixels(MW, MH) {
+  const t = tex(MW, MH, false), f = fbo(t);
+  const ops = bodyOps(false), pr = state.protect;
+  const A = new Float32Array(96), B = new Float32Array(96);
+  ops.forEach((op, i) => { A.set(op.a, i * 4); B.set(op.b, i * 4); });
+  gl.bindVertexArray(vao); gl.useProgram(P.warp.p); const uw = P.warp.u;
+  bindTex(0, img.tex); gl.uniform1i(uw.uSrc, 0);
+  gl.uniform2f(uw.uSrcSize, img.w, img.h); gl.uniform1f(uw.uAspect, img.w / img.h);
+  gl.uniform1i(uw.uN, ops.length); gl.uniform4fv(uw.uA, A); gl.uniform4fv(uw.uB, B);
+  gl.uniform4f(uw.uProt, pr.x, pr.y, pr.r, pr.on ? 1 : 0);
+  gl.uniform4f(uw.uRegion, 0, 0, 1, 1); gl.uniform1f(uw.uLod, Math.max(0, Math.log2(img.w / MW)));
+  draw(f, MW, MH);
+  const px = new Uint8Array(MW * MH * 4);
+  gl.readPixels(0, 0, MW, MH, gl.RGBA, gl.UNSIGNED_BYTE, px);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.deleteFramebuffer(f); gl.deleteTexture(t);
+  requestRender();
+  return px;
+}
+// run the model on the square [cx0, cy0, side] of src (may extend past the edges); returns 256x256 probabilities
+async function runSelfie(tf, src, cx0, cy0, side) {
+  const sq = document.createElement("canvas"); sq.width = sq.height = 256;
+  const k = 256 / side, sc = sq.getContext("2d");
+  sc.fillStyle = "#000"; sc.fillRect(0, 0, 256, 256);
+  sc.drawImage(src, -cx0 * k, -cy0 * k, src.width * k, src.height * k);
+  const input = tf.tidy(() => tf.browser.fromPixels(sq).toFloat().div(255).expandDims(0));
+  const out = selfie.execute(input);
+  const m = await out.data(); input.dispose(); out.dispose();
+  return m;
+}
+function sampleSq(m, k, cx0, cy0, x, y) {   // probability at src pixel (x, y); -1 outside the square
+  const fx = (x + 0.5 - cx0) * k - 0.5, fy = (y + 0.5 - cy0) * k - 0.5;
+  if (fx < 0 || fy < 0 || fx > 255 || fy > 255) return -1;
+  const x0 = Math.min(254, Math.floor(fx)), y0 = Math.min(254, Math.floor(fy)), tx = fx - x0, ty = fy - y0;
+  return m[y0 * 256 + x0] * (1 - tx) * (1 - ty) + m[y0 * 256 + x0 + 1] * tx * (1 - ty) + m[(y0 + 1) * 256 + x0] * (1 - tx) * ty + m[(y0 + 1) * 256 + x0 + 1] * tx * ty;
+}
+async function ensureMask(force) {
+  if (!needMask() || !img) return;
+  const key = maskSignature() + (maskHint ? "@" + maskHint.u.toFixed(3) + "," + maskHint.v.toFixed(3) : "");
+  if ((!force && key === maskKey) || maskState === "busy") return;
+  maskState = "busy"; maskErr = ""; syncBehindNote();
+  await new Promise(r => setTimeout(r, 30));          // let the message paint before the heavy work
   try {
-    const tf = await loadTf();
+    let tf;
+    try { tf = await loadTf(); } catch (e) { tfLoad = null; throw new Error("The person-finder couldn't download. Check the internet connection, then tap Find person again."); }
     if (!tfCpu) { try { await tf.setBackend("cpu"); } catch (e) { /* keep default */ } tfCpu = true; }
     await tf.ready();
     if (!selfie) {
@@ -1391,48 +1436,61 @@ async function ensureMask() {
         modelTopology: SELFIE_JSON.modelTopology, format: SELFIE_JSON.format, generatedBy: SELFIE_JSON.generatedBy, convertedBy: SELFIE_JSON.convertedBy,
         weightSpecs: SELFIE_JSON.weightsManifest.flatMap(g => g.weights), weightData: bytes.buffer }));
     }
-    // the photo as it looks now (body edits included), at the 512 px whole-photo size
-    runPipeline(preview, region, { pending: false });
-    const bs = baseSet, sw = bs.sw, sh = bs.sh, px = new Uint8Array(sw * sh * 4);
-    gl.bindFramebuffer(gl.FRAMEBUFFER, bs.fS); gl.readPixels(0, 0, sw, sh, gl.RGBA, gl.UNSIGNED_BYTE, px); gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    requestRender();
-    const src = document.createElement("canvas"); src.width = sw; src.height = sh;
-    src.getContext("2d").putImageData(new ImageData(new Uint8ClampedArray(px.buffer), sw, sh), 0, 0);
-    const k = 256 / Math.max(sw, sh), ox = (256 - sw * k) / 2, oy = (256 - sh * k) / 2;
-    const sq = document.createElement("canvas"); sq.width = sq.height = 256;
-    const sc = sq.getContext("2d"); sc.fillStyle = "#000"; sc.fillRect(0, 0, 256, 256); sc.drawImage(src, ox, oy, sw * k, sh * k);
-    const input = tf.tidy(() => tf.browser.fromPixels(sq).toFloat().div(255).expandDims(0));
-    const outT = selfie.execute(input);
-    const m = await outT.data(); input.dispose(); outT.dispose();
-    // back to photo coordinates, then snap the edge to the photo's real edges
-    const N = sw * sh, p = new Float32Array(N), I = new Float32Array(N);
-    for (let y = 0; y < sh; y++) for (let x = 0; x < sw; x++) {
-      const fx = Math.min(254.999, Math.max(0, ox + (x + 0.5) * k - 0.5)), fy = Math.min(254.999, Math.max(0, oy + (y + 0.5) * k - 0.5));
-      const x0 = Math.floor(fx), y0 = Math.floor(fy), tx = fx - x0, ty = fy - y0;
-      const v = m[y0 * 256 + x0] * (1 - tx) * (1 - ty) + m[y0 * 256 + x0 + 1] * tx * (1 - ty) + m[(y0 + 1) * 256 + x0] * (1 - tx) * ty + m[(y0 + 1) * 256 + x0 + 1] * tx * ty;
-      const i = y * sw + x, t = Math.min(1, Math.max(0, (v - 0.3) / 0.4));
-      p[i] = t * t * (3 - 2 * t);
+    const ar = img.w / img.h;
+    const MW = ar >= 1 ? 1024 : Math.max(64, Math.round(1024 * ar)), MH = ar >= 1 ? Math.max(64, Math.round(1024 / ar)) : 1024;
+    const px = warpToPixels(MW, MH);
+    const src = document.createElement("canvas"); src.width = MW; src.height = MH;
+    src.getContext("2d").putImageData(new ImageData(new Uint8ClampedArray(px.buffer), MW, MH), 0, 0);
+    const N = MW * MH, p = new Float32Array(N);
+    // pass 1: the whole photo, or a crop around the spot the user tapped
+    let side, cx0, cy0;
+    if (maskHint) { side = Math.min(Math.max(MW, MH), MH * 0.8); cx0 = maskHint.u * MW - side / 2; cy0 = maskHint.v * MH - side / 2; }
+    else { side = Math.max(MW, MH); cx0 = (MW - side) / 2; cy0 = (MH - side) / 2; }
+    const m1 = await runSelfie(tf, src, cx0, cy0, side), k1 = 256 / side;
+    let minX = MW, minY = MH, maxX = -1, maxY = -1, cnt = 0;
+    for (let y = 0; y < MH; y++) for (let x = 0; x < MW; x++) {
+      const v = Math.max(0, sampleSq(m1, k1, cx0, cy0, x, y)); p[y * MW + x] = v;
+      if (v > 0.5) { cnt++; if (x < minX) minX = x; if (x > maxX) maxX = x; if (y < minY) minY = y; if (y > maxY) maxY = y; }
+    }
+    if (cnt < N * 0.002) throw new Error(maskHint ? "No person found where you tapped. Tap the middle of the person." : "Couldn't find a person automatically. Tap on the person in the photo to help.");
+    // pass 2: zoom in on the person for a sharper outline (helps a lot when they are small in the photo)
+    const s2 = Math.max(maxX - minX + 1, maxY - minY + 1) * 1.3;
+    if (s2 < side * 0.8) {
+      const c0 = (minX + maxX) / 2 - s2 / 2, c1 = (minY + maxY) / 2 - s2 / 2, k2 = 256 / s2;
+      const m2 = await runSelfie(tf, src, c0, c1, s2);
+      for (let y = 0; y < MH; y++) for (let x = 0; x < MW; x++) { const v = sampleSq(m2, k2, c0, c1, x, y); if (v >= 0) p[y * MW + x] = v; }
+    }
+    // soften the threshold, then snap the edge to the photo's real edges
+    const I = new Float32Array(N);
+    for (let i = 0; i < N; i++) {
+      const t = Math.min(1, Math.max(0, (p[i] - 0.3) / 0.4)); p[i] = t * t * (3 - 2 * t);
       I[i] = (0.299 * px[i * 4] + 0.587 * px[i * 4 + 1] + 0.114 * px[i * 4 + 2]) / 255;
     }
-    const q = guidedFilter(I, p, sw, sh, 5, 0.002);
-    const mc = document.createElement("canvas"); mc.width = sw; mc.height = sh;
-    const md = new ImageData(sw, sh);
-    for (let i = 0; i < N; i++) { md.data[i * 4 + 3] = Math.round(Math.min(1, Math.max(0, (q[i] - 0.1) / 0.8)) * 255); }
+    const q = guidedFilter(I, p, MW, MH, 8, 0.002);
+    const mc = document.createElement("canvas"); mc.width = MW; mc.height = MH;
+    const md = new ImageData(MW, MH);
+    for (let i = 0; i < N; i++) md.data[i * 4 + 3] = Math.round(Math.min(1, Math.max(0, (q[i] - 0.1) / 0.8)) * 255);
     mc.getContext("2d").putImageData(md, 0, 0);
     maskCanvas = mc; maskKey = key; maskState = "ready";
   } catch (err) {
     console.warn(err); maskCanvas = null; maskKey = key; maskState = "failed";
+    maskErr = err && err.message && !/^[A-Z][a-z]+Error/.test(err.message) && err.message.length < 160 ? err.message
+      : "The person-finder hit a problem (" + String(err && err.message || err).slice(0, 80) + "). Tap Find person again.";
   }
   syncBehindNote(); requestOverlay();
-  if (needMask() && maskSignature() !== maskKey) scheduleMask();
+  if (needMask() && maskSignature() !== maskKey.split("@")[0]) scheduleMask();
 }
-function syncBehindNote() { const L = curText(); $("#behindNote").textContent = L && L.behind ? maskMessage() : ""; }
+function syncBehindNote() {
+  const L = curText(), on = !!(L && L.behind);
+  $("#behindNote").textContent = on ? maskMessage() : "";
+  $("#findPerson").hidden = !on || maskState === "busy";
+}
 
 let behindCanvas = null;
 function drawAllText(ctx, ox, oy, W, H, cw, ch, scale, cached) {
   const behind = state.texts.filter(t => t.behind), front = state.texts.filter(t => !t.behind);
   if (behind.length) {
-    if (maskCanvas && maskState === "ready" && maskKey === maskSignature()) {
+    if (maskCanvas && maskState === "ready" && maskKey.split("@")[0] === maskSignature()) {
       if (!behindCanvas) behindCanvas = document.createElement("canvas");
       if (behindCanvas.width !== cw || behindCanvas.height !== ch) { behindCanvas.width = cw; behindCanvas.height = ch; }
       const b = behindCanvas.getContext("2d");
@@ -1456,6 +1514,7 @@ function newText(v) {
     shadow: 0, spacing: 0, lineH: 115, align: "center", box: 0, boxColor: "#000000", behind: false }, v);
 }
 const TSLIDERS = [
+  { k: "x", name: "Left ↔ right", min: -10, max: 110, step: 1, pct: true }, { k: "y", name: "Up ↕ down", min: -10, max: 110, step: 1, pct: true },
   { k: "size", name: "Size", min: 1, max: 30, step: 0.5 }, { k: "rot", name: "Rotate", min: -180, max: 180, step: 1 },
   { k: "opacity", name: "Opacity", min: 5, max: 100, step: 1 }, { k: "stroke", name: "Outline", min: 0, max: 100, step: 1 },
   { k: "glow", name: "Glow", min: 0, max: 100, step: 1 }, { k: "shadow", name: "Shadow", min: 0, max: 100, step: 1 },
@@ -1469,7 +1528,7 @@ const TSLIDERS = [
     row.innerHTML = `<label for="ts-${s.k}">${s.name}</label><input type="range" id="ts-${s.k}" min="${s.min}" max="${s.max}" step="${s.step}"><output for="ts-${s.k}" id="tsv-${s.k}"></output><span></span>`;
     wrap.appendChild(row);
     const inp = row.querySelector("input");
-    inp.addEventListener("input", () => { const L = curText(); if (!L) return; L[s.k] = +inp.value; $("#tsv-" + s.k).textContent = inp.value; requestOverlay(); });
+    inp.addEventListener("input", () => { const L = curText(); if (!L) return; L[s.k] = s.pct ? +inp.value / 100 : +inp.value; $("#tsv-" + s.k).textContent = inp.value; requestOverlay(); });
     inp.addEventListener("change", commit);
   });
   const fg = $("#fontGrid");
@@ -1507,6 +1566,7 @@ const TSLIDERS = [
 function curText() { return state.texts.find(t => t.id === selText) || null; }
 $("#tContent").addEventListener("input", (ev) => { const L = curText(); if (!L) return; L.text = ev.target.value; ensureFont(L); requestOverlay(); syncLayers(); });
 $("#tContent").addEventListener("change", commit);
+$("#findPerson").onclick = () => { maskHint = null; ensureMask(true); };
 $("#tFront").onclick = () => { const L = curText(); if (L) { L.behind = false; commit(); syncText(); requestOverlay(); } };
 $("#tBehind").onclick = () => { const L = curText(); if (L) { L.behind = true; commit(); syncText(); scheduleMask(); requestOverlay(); } };
 $("#tSolid").onclick = () => { const L = curText(); if (L) { L.grad = false; commit(); syncText(); requestOverlay(); } };
@@ -1536,7 +1596,7 @@ function syncText() {
   $("#textEdit").hidden = !L; $("#textEmpty").hidden = !!L;
   if (!L) return;
   if (document.activeElement !== $("#tContent")) $("#tContent").value = L.text;
-  TSLIDERS.forEach(s => { $("#ts-" + s.k).value = L[s.k]; $("#tsv-" + s.k).textContent = L[s.k]; });
+  TSLIDERS.forEach(s => { const v = s.pct ? Math.round(L[s.k] * 100) : L[s.k]; $("#ts-" + s.k).value = v; $("#tsv-" + s.k).textContent = v; });
   $("#fontGrid").querySelectorAll(".font-btn").forEach(b => b.setAttribute("aria-pressed", b.dataset.font === L.font ? "true" : "false"));
   $("#tSwatches").querySelectorAll(".sw").forEach(b => b.setAttribute("aria-pressed", b.dataset.c === L.color ? "true" : "false"));
   $("#tColor").value = L.color; $("#tColor2").value = L.color2; $("#tStrokeColor").value = L.strokeColor; $("#tGlowColor").value = L.glowColor; $("#tBoxColor").value = L.boxColor;
@@ -1707,12 +1767,12 @@ let drag = null, pinch = null, downAt = null, lastTap = { t: 0, x: 0, y: 0 };
 const pts = new Map();
 function stageXY(ev) { const r = stage.getBoundingClientRect(); return { x: ev.clientX - r.left, y: ev.clientY - r.top }; }
 function toImg(ev) { const s = stageXY(ev); return { u: (s.x - view.x) / view.w, v: (s.y - view.y) / view.h }; }
-function hitText(u, v) {
+function hitText(u, v, pad = 10) {
   for (let i = state.texts.length - 1; i >= 0; i--) {
     const L = state.texts[i]; if (!L._bw) continue;
     const dx = (u - L.x) * view.w, dy = (v - L.y) * view.h, a = -L.rot * Math.PI / 180;
     const lx = dx * Math.cos(a) - dy * Math.sin(a), ly = dx * Math.sin(a) + dy * Math.cos(a);
-    if (Math.abs(lx) <= L._bw * view.w / 2 + 10 && Math.abs(ly) <= L._bh * view.h / 2 + 10) return L;
+    if (Math.abs(lx) <= L._bw * view.w / 2 + pad && Math.abs(ly) <= L._bh * view.h / 2 + pad) return L;
   }
   return null;
 }
@@ -1762,12 +1822,13 @@ ov.addEventListener("pointerdown", (ev) => {
     } else { state.protect.x = p.u; state.protect.y = p.v; state.protect.placed = true; drag = { kind: "face" }; }
     syncRet();
   } else {
-    const L = hitText(p.u, p.v);
+    const L = hitText(p.u, p.v, ev.pointerType === "touch" ? 28 : 12);
     if (L) {
       if (tab !== "text") switchTab("text");
       selText = L.id; syncText(); drag = { kind: "text", L, du: L.x - p.u, dv: L.y - p.v, moved: false };
     } else {
-      if (tab === "text" && selText) { selText = null; syncText(); }
+      const cur = curText();
+      if (tab === "text" && cur && cur.behind && maskState === "failed") { maskHint = { u: p.u, v: p.v }; toast("Looking for the person here…"); ensureMask(true); }
       if (zoom > 1.001) startPan(ev);
     }
   }
@@ -1829,6 +1890,9 @@ function endPointer(ev) {
 }
 ov.addEventListener("pointerup", endPointer); ov.addEventListener("pointercancel", endPointer);
 ov.addEventListener("lostpointercapture", endPointer);
+// iPhone ignores CSS touch-action, and app viewers can claim swipes: tell the browser these touches belong to the editor
+["touchstart", "touchmove"].forEach(t => ov.addEventListener(t, (e) => { if (e.cancelable) e.preventDefault(); }, { passive: false }));
+["gesturestart", "gesturechange", "gestureend"].forEach(t => stage.addEventListener(t, (e) => e.preventDefault()));
 // safety net: an unexpected error must never leave a gesture half-finished and the tools unresponsive
 let errWarned = false;
 function recoverInteraction() { drag = null; pinch = null; pts.clear(); requestRender(); }
@@ -1897,7 +1961,7 @@ $("#expGo").onclick = async () => {
     const cx = c.getContext("2d");
     cx.putImageData(new ImageData(new Uint8ClampedArray(px.buffer), W, H), 0, 0);
     await Promise.all(state.texts.map(L => document.fonts.load(fontSpec(L, 40), L.text || "Aa").catch(() => {})));
-    if (needMask() && maskKey !== maskSignature()) { st.textContent = "Finding the person for text behind them…"; await ensureMask(); }
+    if (needMask() && maskKey.split("@")[0] !== maskSignature()) { st.textContent = "Finding the person for text behind them…"; await ensureMask(); }
     drawAllText(cx, 0, 0, W, H, W, H, 1, false);
     if (behindCanvas) { behindCanvas.width = behindCanvas.height = 1; }
     blob = await new Promise(r => c.toBlob(r, fmt === "png" ? "image/png" : "image/jpeg", 0.97));
