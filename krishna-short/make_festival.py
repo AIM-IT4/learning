@@ -4,7 +4,8 @@ make_festival.py - calm, music-aligned FESTIVAL / DEVOTIONAL status video (Whats
 
 Built for songs like Chhath geet or bhajans, where a beat-cut glitch reel would feel wrong:
   * shots last whole bars of the song (tempo given in the storyboard), so cuts land on the music
-  * photos get a gentle 3D camera move from an AI depth map (parallax.py); paintings a slow Ken Burns
+  * photos get a gentle 3D camera move from an AI depth map (parallax.py); paintings a slow Ken Burns;
+    real video clips play as they are (trimmed, graded, optionally slowed)
   * soft transitions (dissolve, fade, light flash, circle reveal ...), each centred on its cut
   * floating diya sparks, slowly turning sun rays (baked with a fade envelope) and a hand-drawn
     Madhubani-style border that fades in and out where the storyboard asks for it
@@ -15,7 +16,10 @@ Built for songs like Chhath geet or bhajans, where a beat-cut glitch reel would 
       --fonts fonts --out chhath_status.mp4
 
 Storyboard (JSON): start (s into the song), duration, bpm, beat0 (first beat, s into the clip), fade_out,
-shots: [{img, bars, fx, move, parallax, kind}], captions: [{t, end, style, text, pos}],
+shots: [{img | video, bars, fx, move, parallax, kind, fit, focus, ss, speed}], captions: [{t, end, style, text, pos}],
+  img: a photo or painting; video: a real video clip, played from `ss` seconds at `speed`.
+  fit: "auto" (portrait fills the frame, wide pictures sit on a blurred copy of themselves), "cover" (always
+  fill the frame, cropped around `focus` = 0 left .. 1 right) or "blur".
 frame: [[from, to], ...], rays: [[from, to], ...], embers: opacity.
 Use music you have the rights to.  Needs: ffmpeg (libass), numpy, Pillow; torch + transformers for parallax.
 """
@@ -250,6 +254,54 @@ def write_ass(path, captions, total):
     Path(path).write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
+# ----------------------------------------------------------------------------- real footage
+def probe_size(path):
+    r = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=width,height",
+                        "-of", "csv=p=0", str(path)], capture_output=True, text=True, check=True)
+    w, h = r.stdout.strip().split("\n")[0].split(",")[:2]
+    return int(w), int(h)
+
+
+def frame_filter(w, h, fit, focus, scale=1):
+    """ffmpeg filter that turns a w x h picture into W x H: fill (cropped around focus) or fit on a blurred copy."""
+    ow, oh = W * scale, H * scale
+    if fit == "cover" or (fit == "auto" and w / h <= 0.75):
+        return (f"scale={ow}:{oh}:force_original_aspect_ratio=increase,"
+                f"crop={ow}:{oh}:(iw-{ow})*{focus}:(ih-{oh})/2")
+    fg_w = int(ow * 1.0) // 2 * 2
+    return (f"split[a][b];[a]scale={ow}:{oh}:force_original_aspect_ratio=increase,crop={ow}:{oh},"
+            f"gblur=sigma={30 * scale},eq=brightness=-0.18:saturation=0.9[bg];"
+            f"[b]scale={fg_w}:-2[fg];[bg][fg]overlay=(W-w)/2:(H-h)/2")
+
+
+def render_video(src, ss, frames, out, speed=1.0, fit="auto", focus=0.5, zoom=0.04):
+    """`frames` frames of a real video from `ss` s; speed < 1 slows it down (frame blending), a slow push-in on top."""
+    w, h = probe_size(src)
+    need = frames / FPS * speed + 1.0
+    n = max(frames - 1, 1)
+    slow = f"setpts=PTS/{speed},minterpolate=fps={FPS}:mi_mode=blend," if speed < 0.999 else f"fps={FPS},"
+    vf = (f"setpts=PTS-STARTPTS,{slow}{frame_filter(w, h, fit, focus)},setsar=1,"
+          f"scale=w='trunc({W}*(1+{zoom}*n/{n})/2)*2':h=-2:eval=frame,crop={W}:{H},"
+          f"{ms.GRADE},format=yuv420p")
+    ms.run(["ffmpeg", "-y", "-ss", f"{ss:.3f}", "-t", f"{need:.3f}", "-i", str(src), "-filter_complex", vf,
+            "-frames:v", str(frames), "-an", "-r", str(FPS), "-c:v", "libx264", "-preset", "veryfast", "-crf", "16",
+            str(out)])
+
+
+def framed_image(img, fit, focus, cache):
+    """A 9:16 crop of a wide photo around `focus` (for fit "cover"), so the 3D move works on the right part."""
+    w, h = Image.open(img).size
+    if fit != "cover" or w / h <= 9 / 16 + 0.01:
+        return img
+    out = cache / f"{img.stem}_crop{int(focus * 100)}.png"
+    if not out.exists():
+        im = Image.open(img).convert("RGB")
+        cw = int(h * 9 / 16)
+        x0 = int((w - cw) * focus)
+        im.crop((x0, 0, x0 + cw, h)).save(out)
+    return out
+
+
 # ----------------------------------------------------------------------------- main
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -285,18 +337,30 @@ def main():
     for k, s in enumerate(shots):
         a, b = S[k] - T[k] // 2, S[k + 1] + T[k + 1] // 2
         s["a"] = a
-        img = Path(args.images) / s["img"]
         kind, move = s.get("kind", "intro"), s.get("move", "in")
         par = s.get("parallax", False)
-        key = f"{img.stem}_{b - a}_{kind}_{move}_{T[k] // 2}_{int(par)}"
-        out = cache / f"{key}.mp4"
-        print(f"shot {k + 1:2d}/{len(shots)} {S[k] / FPS:6.2f}s {s.get('fx', '-'):10s} {s['img']}", flush=True)
-        if not out.exists():
-            if par:
-                import parallax
-                parallax.render(img, b - a, kind, move, T[k] // 2, out, W, H, FPS, ms.GRADE)
-            else:
-                mr.render_clip(img, b - a, kind, move, T[k] // 2, out)
+        fit, focus = s.get("fit", "auto"), float(s.get("focus", 0.5))
+        name = s.get("video") or s["img"]
+        print(f"shot {k + 1:2d}/{len(shots)} {S[k] / FPS:6.2f}s {s.get('fx', '-'):10s} {name}", flush=True)
+        if "video" in s:
+            src = Path(args.images) / s["video"]
+            ss, speed = float(s.get("ss", 0)), float(s.get("speed", 1))
+            out = cache / f"{src.stem}_{b - a}_{ss:.2f}_{speed:.2f}_{fit}_{int(focus * 100)}.mp4"
+            if not out.exists():
+                render_video(src, ss, b - a, out, speed, fit, focus)
+        else:
+            img = framed_image(Path(args.images) / s["img"], fit, focus, cache)
+            w0, h0 = Image.open(img).size
+            if par and fit == "auto" and w0 / h0 > 0.75:
+                par = False                     # wide photo on a blurred copy: Ken Burns instead of 3D
+            key = f"{img.stem}_{b - a}_{kind}_{move}_{T[k] // 2}_{int(par)}"
+            out = cache / f"{key}.mp4"
+            if not out.exists():
+                if par:
+                    import parallax
+                    parallax.render(img, b - a, kind, move, T[k] // 2, out, W, H, FPS, ms.GRADE)
+                else:
+                    mr.render_clip(img, b - a, kind, move, T[k] // 2, out)
         shutil.copy(out, work / f"c{k:03d}.mp4")
 
     # overlays
