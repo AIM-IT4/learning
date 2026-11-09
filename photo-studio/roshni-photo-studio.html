@@ -2899,11 +2899,13 @@ function clipReader(c) {
   start();
   return { next, frameAt, restart: start, close() { closeFrames(); try { if (dec && dec.state !== "closed") dec.close(); } catch (e) { /* ignore */ } } };
 }
-async function readPackets(c) {          // all of a clip's AAC sound packets (small: about 1 MB a minute)
-  const S = c.audio.samples, out = []; let i = 0;
+async function readPackets(c, ui, label) {          // all of a clip's AAC sound packets (small: about 1 MB a minute)
+  const S = c.audio.samples, out = []; let i = 0, lastUi = 0;
   while (i < S.length) {
     const s0 = S[i]; let j = i, end = s0.offset + s0.size;
-    while (j + 1 < S.length && S[j + 1].offset === end && end - s0.offset < (2 << 20)) { j++; end += S[j].size; }
+    while (j + 1 < S.length && S[j + 1].offset >= end && S[j + 1].offset - end < (64 << 10) && S[j + 1].offset + S[j + 1].size - s0.offset < (2 << 20)) { j++; end = S[j].offset + S[j].size; }
+    const now = performance.now();
+    if (ui && now - lastUi > 300) { lastUi = now; ui(`Preparing the sound${label || ""}… ${Math.round(i / S.length * 100)}%`, null); }
     const buf = new Uint8Array(await readRange(c.file, s0.offset, end));
     for (let k = i; k <= j; k++) { const s = S[k]; out.push({ ts: s.cts / c.audio.timescale, dur: s.duration / c.audio.timescale, data: buf.slice(s.offset - s0.offset, s.offset - s0.offset + s.size) }); }
     i = j + 1;
@@ -3016,10 +3018,10 @@ async function buildAudio(A, B, tl, opts, ui) {
   const noAac = "The sound isn't AAC, so it couldn't be copied.";
   if (!B) {
     if (!A.audio) return { chunks: null, note: A.otherAudio ? noAac : "" };
-    return { kind: "aac", cfg: A.audio.cfg, sampleRate: A.audio.cfg.sampleRate, numberOfChannels: A.audio.cfg.numberOfChannels, chunks: await readPackets(A), note: "" };
+    return { kind: "aac", cfg: A.audio.cfg, sampleRate: A.audio.cfg.sampleRate, numberOfChannels: A.audio.cfg.numberOfChannels, chunks: await readPackets(A, ui, ""), note: "" };
   }
   ui("Preparing the sound…", 0);
-  const pa = A.audio ? await readPackets(A) : null, pb = B.audio ? await readPackets(B) : null;
+  const pa = A.audio ? await readPackets(A, ui, " (clip 1)") : null, pb = B.audio ? await readPackets(B, ui, " (clip 2)") : null;
   const pass = (c, list) => ({ kind: "aac", cfg: c.audio.cfg, sampleRate: c.audio.cfg.sampleRate, numberOfChannels: c.audio.cfg.numberOfChannels, chunks: list, note: "" });
   const seq = comb.mode === "seq", snd = comb.sound;
   if (snd === "a" || (snd === "both" && !pb)) return pa ? pass(A, passList(pa, 0, seq ? tl.st + tl.T / 2 : tl.dur, 0)) : { chunks: null, note: "Clip 1 has no sound to copy." };
@@ -3518,7 +3520,7 @@ async function exportVideo(opts, ui) {
     const hasAudio = !!(audio.chunks && audio.chunks.length);
     const muxer = new Mp4Muxer.Muxer({
       target: new Mp4Muxer.StreamTarget({ onData: (d, p) => out.write(d, p) }),
-      video: { codec: enc.kind, width: W, height: H, frameRate: fps },
+      video: { codec: enc.kind, width: W, height: H, frameRate: Math.max(1, Math.round(fps)) },
       audio: hasAudio ? { codec: audio.kind, numberOfChannels: audio.numberOfChannels, sampleRate: audio.sampleRate } : undefined,
       fastStart: false, firstTimestampBehavior: "offset",
     });
