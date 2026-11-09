@@ -55,7 +55,7 @@ ffmpeg -y -i chhath_status.mp4 -c:v libx264 -preset slow -b:v 1800k -pass 2 -c:a
 * `rays` / `frame` – time spans for the sun rays and the Madhubani border.
 * `captions` – `t`, `end`, `style` (Pre, PreSub, Title, TitleSub, Days, Loc, Ritual, Hook, End, EndSub) and
   `text`; `pos` = [x, y] places a caption's centre (it drifts up into place). `Banner` draws a
-  soft maroon panel (`box` = x, y, w, h) behind a block of text; `Row` is a schedule line
+  soft maroon panel (`box` = x, y, w, h; `alpha` 00 solid … FF clear, default 38) behind a block of text; `Row` is a schedule line
   (`y`, `date`, `text`, optional `x` = [date x, name x]) that slides in from the left.
 
 WhatsApp covers the top ~200 px and bottom ~250 px of a status with its own buttons, so all

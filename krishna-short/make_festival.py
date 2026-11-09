@@ -212,13 +212,13 @@ def write_ass(path, captions, total):
     for c in captions:
         st, a, b = c["style"], c["t"], min(c.get("end", c["t"] + 3), total)
         txt = ms.ass_escape(c.get("text", ""))
-        if st == "Banner":  # soft maroon panel behind a block of text: box = [x, y, w, h]
+        if st == "Banner":  # soft maroon panel behind a block of text: box = [x, y, w, h], alpha 00 (solid) - FF
             x, y, w, h = c["box"]
             r = 36
             shape = (f"m {r} 0 l {w - r} 0 b {w} 0 {w} 0 {w} {r} l {w} {h - r} b {w} {h} {w} {h} {w - r} {h} "
                     f"l {r} {h} b 0 {h} 0 {h} 0 {h - r} l 0 {r} b 0 0 0 0 {r} 0")
             lines.append(f"Dialogue: 0,{t(a)},{t(b)},Loc,,0,0,0,,{{\\fad(500,600)\\an7\\pos({x},{y})\\bord0\\shad0"
-                         f"\\blur18\\1c&H14104A&\\1a&H38&\\p1}}{shape}{{\\p0}}")
+                         f"\\blur18\\1c&H14104A&\\1a&H{c.get('alpha', '38')}&\\p1}}{shape}{{\\p0}}")
             continue
         if st == "Loc":    # location tag: gold dot + name on a soft dark halo, sliding in from the left
             mv = f"\\fad(300,300)\\move(20,{H - 300},70,{H - 300},0,350)\\an1"
