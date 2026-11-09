@@ -68,6 +68,10 @@ The embedded sample photo is AI-generated (SDXL-Turbo).
   sound is recorded while the clips play once in real time through Web Audio, each clip separately together with
   its playing position, then lined up per clip and crossfaded or mixed before encoding.
 * Clips are merged straight at the output size when saving smaller than the source (not at 4K).
+* In player mode the players move to the next frame while the current one is being edited (switched off
+  automatically if the phone can't keep up). Body points are found ~10 times a second and the person cut-out
+  ~15 times a second, smoothed in between. The warp skips its 36-tap filter when the frame is already at the
+  output size. The progress line shows where the time goes per frame (reading or player, person, edits).
 * During a video export the preview's graphics buffers are freed, the screen is kept awake (Wake Lock where
   allowed), the canvas is hidden while it is used for frames, and layout changes wait until it finishes.
 * Tested with 700 random actions in headless Chrome (sliders, text, behind-person, zoom, body tools, undo/redo)

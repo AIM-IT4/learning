@@ -432,6 +432,7 @@ progress { width: 100%; height: 8px; accent-color: var(--accent); }
       </div>
       <label class="check"><input type="checkbox" id="vAudio" checked> <span id="vAudioLabel">Keep the original sound</span></label>
       <p class="note">Every frame gets your enhance, colour, body, retouch and text edits. Natural fit finds the body on every frame; other body and spot edits follow the person too. The video is made on this phone; nothing is uploaded.</p>
+      <p class="status err" id="slowNote" hidden></p>
     </div>
     <progress id="expProg" max="1" value="0" hidden></progress>
     <p class="status" id="expStatus"></p>
@@ -625,7 +626,7 @@ float luma(vec3 c){ return dot(c, vec3(0.2126,0.7152,0.0722)); }
 `;
 // 1. body warp + resampling. Lanczos-3 with anti-ringing when enlarging or at 1:1, trilinear mip when shrinking.
 const FS_WARP = `
-uniform sampler2D uSrc; uniform vec2 uSrcSize; uniform float uAspect; uniform int uN; uniform float uLod;
+uniform sampler2D uSrc; uniform vec2 uSrcSize; uniform float uAspect; uniform int uN; uniform float uLod; uniform int uFast;
 uniform vec4 uA[24]; uniform vec4 uB[24]; uniform vec4 uProt; uniform vec4 uRegion;
 float protect(vec2 q){ if(uProt.w < 0.5) return 1.0; vec2 d=(q-uProt.xy)*vec2(uAspect,1.0); return smoothstep(0.9, 1.45, length(d)/uProt.z); }
 float sinc(float x){ x *= 3.14159265; return abs(x) < 1e-4 ? 1.0 : sin(x)/x; }
@@ -671,7 +672,7 @@ void main(){
     q = a.xy + d/vec2(uAspect, 1.0);
   }
   q = clamp(q, 0.0, 1.0);
-  vec3 c = uLod > 0.6 ? textureLod(uSrc, q, uLod).rgb : lanczos(q);
+  vec3 c = uFast == 1 ? texture(uSrc, q).rgb : uLod > 0.6 ? textureLod(uSrc, q, uLod).rgb : lanczos(q);
   o = vec4(c, 1.0);
 }`;
 // 2. noise reduction: edge-preserving; colour noise is cleaned much harder than brightness detail.
@@ -880,7 +881,7 @@ function activeProtect(includePending) {
   return state.protect;
 }
 
-let grainSeed = 17;          // changes every frame in videos so film grain moves like real grain
+let grainSeed = 17, warpFast = false;          // changes every frame in videos so film grain moves like real grain
 function runPipeline(set, region, opts = {}) {
   const R = region || { u: 0, v: 0, du: 1, dv: 1 };
   const { W, H } = set;
@@ -890,7 +891,7 @@ function runPipeline(set, region, opts = {}) {
   ops.forEach((op, i) => { A.set(op.a, i * 4); B.set(op.b, i * 4); });
   const e = state.enh, c = state.col;
   gl.bindVertexArray(vao);
-  gl.useProgram(P.warp.p); const uw = P.warp.u;
+  gl.useProgram(P.warp.p); const uw = P.warp.u; gl.uniform1i(uw.uFast, 0);
   bindTex(0, img.tex); gl.uniform1i(uw.uSrc, 0);
   gl.uniform2f(uw.uSrcSize, img.w, img.h); gl.uniform1f(uw.uAspect, img.w / img.h);
   gl.uniform1i(uw.uN, ops.length); gl.uniform4fv(uw.uA, A); gl.uniform4fv(uw.uB, B);
@@ -912,6 +913,7 @@ function runPipeline(set, region, opts = {}) {
   gl.useProgram(P.warp.p);
   bindTex(0, img.tex);
   gl.uniform4f(uw.uRegion, R.u, R.v, R.du, R.dv); gl.uniform1f(uw.uLod, Math.max(0, -Math.log2(Math.min(pxx, pxy))));
+  gl.uniform1i(uw.uFast, warpFast && Math.abs(pxx - 1) < 0.02 && Math.abs(pxy - 1) < 0.02 ? 1 : 0);
   draw(set.fA, W, H);
   gl.useProgram(P.bilat.p); const ub = P.bilat.u;
   bindTex(0, set.A); gl.uniform1i(ub.uT, 0);
@@ -1476,7 +1478,7 @@ function warpToPixels(MW, MH) {
   const ops = bodyOps(false), pr = state.protect;
   const A = new Float32Array(96), B = new Float32Array(96);
   ops.forEach((op, i) => { A.set(op.a, i * 4); B.set(op.b, i * 4); });
-  gl.bindVertexArray(vao); gl.useProgram(P.warp.p); const uw = P.warp.u;
+  gl.bindVertexArray(vao); gl.useProgram(P.warp.p); const uw = P.warp.u; gl.uniform1i(uw.uFast, 0);
   bindTex(0, img.tex); gl.uniform1i(uw.uSrc, 0);
   gl.uniform2f(uw.uSrcSize, img.w, img.h); gl.uniform1f(uw.uAspect, img.w / img.h);
   gl.uniform1i(uw.uN, ops.length); gl.uniform4fv(uw.uA, A); gl.uniform4fv(uw.uB, B);
@@ -2086,9 +2088,9 @@ async function detectPose(t, tw, th, prev) {
   }
   const R = { u: (cx - side / 2) / tw, v: (cy - side / 2) / th, du: side / tw, dv: side / th };
   if (!poseFb || poseGl !== P) { poseTex = tex(PS, PS, false); poseFb = fbo(poseTex); poseGl = P; }
-  gl.bindVertexArray(vao); gl.useProgram(P.warp.p); const uw = P.warp.u;
+  gl.bindVertexArray(vao); gl.useProgram(P.warp.p); const uw = P.warp.u; gl.uniform1i(uw.uFast, 0);
   bindTex(0, t); gl.uniform1i(uw.uSrc, 0); gl.uniform2f(uw.uSrcSize, tw, th); gl.uniform1f(uw.uAspect, tw / th);
-  gl.uniform1i(uw.uN, 0); gl.uniform4f(uw.uProt, 0, 0, 1, 0); gl.uniform4f(uw.uRegion, R.u, R.v, R.du, R.dv);
+  gl.uniform1i(uw.uN, 0); gl.uniform4f(uw.uProt, 0, 0, 1, 0); gl.uniform4f(uw.uRegion, R.u, R.v, R.du, R.dv); gl.uniform1i(uw.uFast, 0);
   gl.uniform1f(uw.uLod, Math.max(0, Math.log2(side / PS)));
   draw(poseFb, PS, PS);
   gl.readPixels(0, 0, PS, PS, gl.RGBA, gl.UNSIGNED_BYTE, posePx);
@@ -2742,9 +2744,14 @@ async function sourceFor(c, ui, label) {
   if (!c.prep) c.prep = localCopy(c.file, p => c.onProg && c.onProg(p)).then(x => { c.copy = x; return x; }, e => {
     c.prep = null;
     if (e && e.message === "cancelled") throw e;
-    console.warn("the phone refused to copy the file", e); c.unreadable = true; return null;
+    console.warn("the phone refused to copy the file", e); c.unreadable = true; slowNotice(); return null;
   });
   return c.prep;
+}
+const SLOW_HELP = "Your phone only lets the browser play this video, not read the file, so saving has to go frame by frame from the player and is slow. For fast saving: in Google Photos tap ⋮ → Download, then tap Open here and pick the video from the Files app (Downloads or Movies).";
+function slowNotice() {
+  const n = $("#slowNote"); if (n) n.hidden = ![vid, vidB].some(c => c && c.unreadable);
+  if (!videoBusy) toast("Saving this video will be slow: your phone blocks reading the file. See Save for the fast way.", 5000);
 }
 // checked as soon as a clip is opened, so a copy (if needed) is usually ready before saving
 async function prepSource(c) {
@@ -3093,7 +3100,7 @@ function routeEl(el) {            // the player's sound through Web Audio (once 
 function seekEl(el, t) {         // jump a player to time t (used only when going back or far ahead)
   return new Promise(res => { let ok = false; const done = () => { if (ok) return; ok = true; el.removeEventListener("seeked", done); res(); }; el.addEventListener("seeked", done); el.currentTime = t; setTimeout(done, 3000); });
 }
-let stepSlow = 0;
+let stepSlow = 0, stepJumps = 0;
 function shownTime(el) {          // time of the frame the player is really showing
   try { const vf = new VideoFrame(el); const t = vf.timestamp / 1e6; vf.close(); return t; } catch (e) { return el.currentTime; }
 }
@@ -3122,6 +3129,7 @@ async function stepEl(el, m, fd) {
     cur = shownTime(el);
     if (near(cur)) return;
   }
+  stepJumps++;
   await seekEl(el, m + 0.001);
   for (let i = 0; i < 8; i++) { if (near(shownTime(el))) return; await new Promise(r => requestAnimationFrame(r)); }
 }
@@ -3335,7 +3343,7 @@ async function exportVideo(opts, ui) {
       maskImg = new ImageData(SW, SH);
     }
     async function segFrom(t, tw, th) {
-      gl.bindVertexArray(vao); gl.useProgram(P.warp.p); const uw = P.warp.u;
+      gl.bindVertexArray(vao); gl.useProgram(P.warp.p); const uw = P.warp.u; gl.uniform1i(uw.uFast, 0);
       bindTex(0, t); gl.uniform1i(uw.uSrc, 0); gl.uniform2f(uw.uSrcSize, tw, th); gl.uniform1f(uw.uAspect, tw / th);
       gl.uniform1i(uw.uN, 0); gl.uniform4f(uw.uProt, 0, 0, 1, 0); gl.uniform4f(uw.uRegion, 0, 0, 1, 1); gl.uniform1f(uw.uLod, Math.max(0, Math.log2(tw / SW)));
       draw(segFb, SW, SH);
@@ -3352,8 +3360,8 @@ async function exportVideo(opts, ui) {
       }
       upload(maskTex, maskImg);
     }
-    const segEvery = Math.max(1, Math.round(fps / 30)), keyEvery = Math.max(1, Math.round(fps * 2));
-    let poseEvery = Math.max(1, Math.round(fps / 15));
+    const segEvery = Math.max(1, Math.round(fps / 15)), keyEvery = Math.max(1, Math.round(fps * 2));
+    let poseEvery = Math.max(1, Math.round(fps / 10));
     // muxer and encoder
     const out = makeCollector();
     const hasAudio = !!(audio.chunks && audio.chunks.length);
@@ -3379,6 +3387,9 @@ async function exportVideo(opts, ui) {
     const rdA = player ? null : clipReader(A), rdB = B ? clipReader(B) : null; if (rdA) readers.push(rdA); if (rdB) readers.push(rdB);
     const filt = makePoseFilter();
     let rawPose = null, fPose = null, haveMask = false, lastFa = null, lastFb = null, lastB = -1, aDone = false, done = 0, lastUi = 0, pHasB = false;
+    let nextStep = null, overlap = true; stepJumps = 0;
+    const tm = { src: null, find: null, edit: null }; let tC = 0;
+    const stepBoth = m => Promise.all([m.a != null ? stepEl(vid.el, m.a, 1 / fps) : null, vidB && m.b != null ? stepEl(vidB.el, m.b, 1 / fps) : null]);
     const t0 = performance.now();
     while (B || player ? done < total : true) {
       if (cancelExport) throw new Error("cancelled");
@@ -3386,14 +3397,18 @@ async function exportVideo(opts, ui) {
       if (muxErr) throw new Error("The video file couldn't be assembled (" + String(muxErr.message || muxErr).slice(0, 120) + ").");
       if (glLost || gl.isContextLost()) throw new Error("The phone reset the graphics during the export. Try Full HD.");
       // 1. the source picture for this output frame
+      const tA = performance.now();
       let ts, dur, p = 0;
       if (player) {
         const t = done / fps, m = tl.at(t);
         ts = Math.round(t * 1e6); dur = Math.round(1e6 / fps); p = m.p;
         gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false); gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
-        await Promise.all([m.a != null ? stepEl(vid.el, m.a, 1 / fps) : null, vidB && m.b != null ? stepEl(vidB.el, m.b, 1 / fps) : null]);
+        await (nextStep || stepBoth(m));
         if (m.a != null) uploadEl(pA, vid.el);
         if (vidB && m.b != null) { uploadEl(pB, vidB.el); pHasB = true; }
+        // start bringing the players to the next frame now, so they move while this frame is being edited
+        if (overlap && done > 30 && stepJumps > Math.max(8, done * 0.12)) overlap = false;    // this phone can't keep up: one thing at a time
+        nextStep = overlap && done + 1 < total ? stepBoth(tl.at((done + 1) / fps)) : null;
       } else if (!B) {
         const f = await rdA.next();
         if (!f) break;
@@ -3414,6 +3429,7 @@ async function exportVideo(opts, ui) {
       else mergeDraw(srcFb, dW, dH, rawA, rawB && lastFb ? rawB : null, ra, rb, L, p);
       gl.bindTexture(gl.TEXTURE_2D, srcTex); gl.generateMipmap(gl.TEXTURE_2D);
       // 2. person cut-out and body pose
+      const tB = performance.now();
       if (tf && done % segEvery === 0) { await segFrom(srcTex, dW, dH); haveMask = true; }
       img = { ...savedImg, w: dW, h: dH, tex: srcTex };
       try {
@@ -3422,10 +3438,12 @@ async function exportVideo(opts, ui) {
           fPose = filt(rawPose, ts / 1e6);
           if (done === 8 * poseEvery && poseMs > 120) poseEvery = Math.max(poseEvery, Math.round(fps / 4));
         }
+        tC = performance.now();
         // 3. the photo pipeline, with the edits placed where the person is on this frame
         const E = track && fPose ? videoEdits(fPose) : null;
         grainSeed = 17 + (done % 997) * 0.618;
-        withEdits(E, () => runPipeline(set, null, { pending: false }));
+        warpFast = true;
+        try { withEdits(E, () => runPipeline(set, null, { pending: false })); } finally { warpFast = false; }
       } finally { img = savedImg; grainSeed = 17; }
       // 4. text, then encode
       gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.viewport(0, 0, W, H);
@@ -3442,10 +3460,13 @@ async function exportVideo(opts, ui) {
       done++;
       while (encoder.encodeQueueSize > 4 && !encErr) await sleep(1);
       const now = performance.now();
+      const ema = (o, v) => o == null ? v : o * 0.9 + v * 0.1;
+      tm.src = ema(tm.src, tB - tA); tm.find = ema(tm.find, tC - tB); tm.edit = ema(tm.edit, now - tC);
       if (now - lastUi > 400 || done === total) {
         lastUi = now;
         const el = (now - t0) / 1000, rate = done / Math.max(el, 0.001), left = (total - done) / Math.max(rate, 0.01);
-        ui(`Frame ${done} of ${total} · ${rate.toFixed(1)} frames a second · about ${fmtTime(left)} left${player ? " (made from the player)" : ""}.`, done / total);
+        const sx = v => (v / 1000).toFixed(2) + " s";
+        ui(`Frame ${done} of ${total} · ${rate.toFixed(1)} frames a second · about ${fmtTime(left)} left${player ? " (made from the player)" : ""}. Per frame: ${player ? "player" : "reading"} ${sx(tm.src)}, person ${sx(tm.find)}, edits ${sx(tm.edit)}.`, done / total);
         await sleep(0);
       }
     }
@@ -3536,6 +3557,7 @@ function syncExportSheet() {
   const isV = !!vid, fmt = (document.querySelector('input[name="fmt"]:checked') || {}).value;
   const asVideo = isV && fmt === "mp4";
   $("#vidOpts").hidden = !asVideo;
+  $("#slowNote").textContent = SLOW_HELP; $("#slowNote").hidden = !asVideo || ![vid, vidB].some(c => c && c.unreadable);
   if (asVideo) {
     [["3840", "3840"], ["1920", "mid"], ["orig", "orig"]].forEach(([k, id]) => { const s = videoOutSize(img.w, img.h, k); $("#sz" + id).textContent = `${s.W} × ${s.H}`; });
     const choice = document.querySelector('input[name="size"]:checked').value, s = videoOutSize(img.w, img.h, choice), d = timeline().dur || 0;
