@@ -75,10 +75,17 @@ button { cursor: pointer; }
   padding: 5px 10px; border-radius: 999px; font-size: 12px; color: var(--muted); pointer-events: none;
 }
 .toast {
-  position: absolute; left: 50%; top: 10px; transform: translateX(-50%); max-width: calc(100% - 20px);
+  position: absolute; left: 50%; top: 56px; transform: translateX(-50%); max-width: calc(100% - 20px);
   background: var(--fg); color: var(--bg); padding: 7px 14px; border-radius: 999px; font-size: 13px; font-weight: 600;
   pointer-events: none; text-align: center;
 }
+.zoom { position: absolute; right: 10px; top: 10px; display: flex; gap: 6px; align-items: center; }
+.zoom button {
+  height: 36px; min-width: 36px; border-radius: 999px; border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--bg) 80%, transparent); font-size: 18px; padding: 0 10px; line-height: 1;
+}
+.zoom .pct { font-family: var(--font-mono); font-size: 12px; }
+.zoom button:disabled { opacity: 0.4; }
 .nogl { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; text-align: center; color: var(--muted); }
 
 /* panel */
@@ -178,6 +185,11 @@ input[type="color"] { width: 32px; height: 32px; border: 1px solid var(--line); 
     <canvas id="ov"></canvas>
     <div class="badge" id="badge">Sample photo (AI-generated). Open your own photo to edit it.</div>
     <div class="toast" id="toast" hidden></div>
+    <div class="zoom" aria-label="Zoom">
+      <button id="zOut" aria-label="Zoom out" disabled>−</button>
+      <button class="pct" id="zPct" title="Fit the photo to the screen">Fit</button>
+      <button id="zIn" aria-label="Zoom in">+</button>
+    </div>
   </main>
 
   <section class="panel" aria-label="Editing tools">
@@ -187,7 +199,7 @@ input[type="color"] { width: 32px; height: 32px; border: 1px solid var(--line); 
         <div class="lead">
           <button class="btn primary" id="auto">✦ Auto 4K HDR</button>
           <button class="btn" id="enhReset">Reset</button>
-          <p class="note">Cleans noise, recovers detail and relights shadows. It processes your real pixels and never redraws faces.</p>
+          <p class="note">Measures this photo's noise, then cleans it, sharpens real detail and relights shadows. It never redraws faces. Pinch or double-tap the photo to zoom in and check.</p>
         </div>
         <div class="chips" id="enhChips"></div>
         <div class="slider-row">
@@ -202,6 +214,12 @@ input[type="color"] { width: 32px; height: 32px; border: 1px solid var(--line); 
       <div class="pane" id="pane-body" role="tabpanel" hidden>
         <div class="chips" id="bodyChips"></div>
         <div id="bodyEdit" class="pane" hidden>
+          <div id="fitBox" class="pane" hidden>
+            <p class="note" id="fitHint"></p>
+            <div class="seg" id="fitType" role="group" aria-label="Body type">
+              <button data-fit="lean" aria-pressed="false">Lean</button><button data-fit="fit" aria-pressed="true">Fit</button><button data-fit="athletic" aria-pressed="false">Athletic</button>
+            </div>
+          </div>
           <div class="slider-row">
             <label for="bStrength" id="bStrengthLabel">Strength</label>
             <input type="range" id="bStrength" min="-100" max="100" value="0">
@@ -228,7 +246,7 @@ input[type="color"] { width: 32px; height: 32px; border: 1px solid var(--line); 
           </div>
         </div>
         <div id="bodyIdle" class="pane">
-          <p class="note" id="bodyHelp">Pick a body part, then tap or drag it on the photo. Face lock keeps the face untouched by every body edit.</p>
+          <p class="note" id="bodyHelp">Natural fit reshapes the whole body in one step: slimmer waist and belly, slightly broader shoulders, a little more leg. Or pick one part and tap it on the photo. Face lock keeps the face untouched by every body edit.</p>
           <div class="row-wrap">
             <button class="btn" id="bodyReset">Reset body edits</button>
             <span class="note" id="opCount"></span>
@@ -389,6 +407,8 @@ const PRESETS = [
   { id: "bw", name: "Black & white", c: "#d9d9d9", v: { mono: 100, contrast: 25, grain: 15 } },
 ];
 const BODY = [
+  { id: "fit", name: "Natural fit", kind: "fit",
+    icon: '<path d="M12 2l1.2 2.6L16 5l-2 2 .5 2.8L12 8.5 9.5 9.8 10 7 8 5l2.8-.4z"/><path d="M9 12c-1 2-1 5 0 7M15 12c1 2 1 5 0 7M10 21h4"/>' },
   { id: "head", name: "Head", kind: "scale", rx: 0.075, ry: 0.095, k: -0.22, minus: "Smaller", plus: "Bigger",
     icon: '<circle cx="12" cy="12" r="6"/><path d="M4 4l3 3M20 4l-3 3M4 20l3-3M20 20l-3-3"/>' },
   { id: "all", name: "All body", kind: "slim", rx: 0.2, ry: 0.44, k: 0.2, angle: true, minus: "Wider", plus: "Slimmer",
@@ -483,20 +503,30 @@ precision highp float; precision highp int;
 in vec2 vUv; out vec4 o;
 float luma(vec3 c){ return dot(c, vec3(0.2126,0.7152,0.0722)); }
 `;
+// 1. body warp + resampling. Lanczos-3 with anti-ringing when enlarging or at 1:1, trilinear mip when shrinking.
 const FS_WARP = `
 uniform sampler2D uSrc; uniform vec2 uSrcSize; uniform float uAspect; uniform int uN; uniform float uLod;
-uniform vec4 uA[24]; uniform vec4 uB[24]; uniform vec4 uProt;
+uniform vec4 uA[24]; uniform vec4 uB[24]; uniform vec4 uProt; uniform vec4 uRegion;
 float protect(vec2 q){ if(uProt.w < 0.5) return 1.0; vec2 d=(q-uProt.xy)*vec2(uAspect,1.0); return smoothstep(0.9, 1.45, length(d)/uProt.z); }
-vec4 cw(float t){ float t2=t*t, t3=t2*t; return vec4(-0.5*t3+t2-0.5*t, 1.5*t3-2.5*t2+1.0, -1.5*t3+2.0*t2+0.5*t, 0.5*t3-0.5*t2); }
-vec3 tf(ivec2 c, ivec2 mx){ return texelFetch(uSrc, clamp(c, ivec2(0), mx), 0).rgb; }
-vec3 rowS(ivec2 b, int j, vec4 w, ivec2 mx){ return tf(b+ivec2(-1,j),mx)*w.x + tf(b+ivec2(0,j),mx)*w.y + tf(b+ivec2(1,j),mx)*w.z + tf(b+ivec2(2,j),mx)*w.w; }
-vec3 bicubic(vec2 uv){
+float sinc(float x){ x *= 3.14159265; return abs(x) < 1e-4 ? 1.0 : sin(x)/x; }
+float lz(float x){ x = abs(x); return x < 3.0 ? sinc(x)*sinc(x/3.0) : 0.0; }
+vec3 lanczos(vec2 uv){
   vec2 p = uv*uSrcSize - 0.5; vec2 f = fract(p); ivec2 b = ivec2(floor(p)); ivec2 mx = ivec2(uSrcSize) - 1;
-  vec4 wx = cw(f.x), wy = cw(f.y);
-  return clamp(rowS(b,-1,wx,mx)*wy.x + rowS(b,0,wx,mx)*wy.y + rowS(b,1,wx,mx)*wy.z + rowS(b,2,wx,mx)*wy.w, 0.0, 1.0);
+  vec3 acc = vec3(0.0); float ws = 0.0; vec3 lo = vec3(1.0), hi = vec3(0.0);
+  for (int j = -2; j <= 3; j++) {
+    float wy = lz(float(j) - f.y);
+    for (int i = -2; i <= 3; i++) {
+      float w = lz(float(i) - f.x)*wy;
+      vec3 c = texelFetch(uSrc, clamp(b + ivec2(i, j), ivec2(0), mx), 0).rgb;
+      acc += c*w; ws += w;
+      if (i >= 0 && i <= 1 && j >= 0 && j <= 1) { lo = min(lo, c); hi = max(hi, c); }
+    }
+  }
+  vec3 r = acc/ws;
+  return clamp(mix(r, clamp(r, lo, hi), 0.55), 0.0, 1.0);
 }
 void main(){
-  vec2 q = vUv;
+  vec2 q = uRegion.xy + vUv*uRegion.zw;
   for (int i = 23; i >= 0; i--) {
     if (i >= uN) continue;
     vec4 a = uA[i]; vec4 b = uB[i]; int t = int(b.x + 0.5);
@@ -521,22 +551,27 @@ void main(){
     q = a.xy + d/vec2(uAspect, 1.0);
   }
   q = clamp(q, 0.0, 1.0);
-  vec3 c = uLod > 0.5 ? textureLod(uSrc, q, uLod).rgb : bicubic(q);
+  vec3 c = uLod > 0.6 ? textureLod(uSrc, q, uLod).rgb : lanczos(q);
   o = vec4(c, 1.0);
 }`;
+// 2. noise reduction: edge-preserving; colour noise is cleaned much harder than brightness detail.
 const FS_BILAT = `
-uniform sampler2D uT; uniform vec2 uTexel; uniform float uStep, uSigR, uAmt;
+uniform sampler2D uT; uniform vec2 uTexel; uniform float uSigR, uAmt;
 void main(){
   vec3 c0 = texture(uT, vUv).rgb;
   if (uAmt < 0.001) { o = vec4(c0, 1.0); return; }
   vec3 acc = vec3(0.0); float ws = 0.0;
   for (int j = -2; j <= 2; j++) for (int i = -2; i <= 2; i++) {
     vec2 off = vec2(float(i), float(j));
-    vec3 c = texture(uT, vUv + off*uTexel*uStep).rgb; vec3 dc = c - c0;
+    vec3 c = texture(uT, vUv + off*uTexel).rgb; vec3 dc = c - c0;
     float w = exp(-dot(off, off)/4.5 - dot(dc, dc)/(2.0*uSigR*uSigR));
     acc += c*w; ws += w;
   }
-  o = vec4(mix(c0, acc/ws, uAmt), 1.0);
+  vec3 f = acc/ws;
+  float l0 = luma(c0), lf = luma(f);
+  float l = mix(l0, lf, uAmt*0.6);
+  vec3 ch = mix(c0 - l0, f - lf, min(1.0, uAmt*1.8));
+  o = vec4(clamp(ch + l, 0.0, 1.0), 1.0);
 }`;
 const FS_BLUR = `
 uniform sampler2D uT; uniform vec2 uDir;
@@ -547,23 +582,35 @@ void main(){
   o = vec4(s, 1.0);
 }`;
 const FS_DOWN = `uniform sampler2D uT; uniform float uLod; void main(){ o = vec4(textureLod(uT, vUv, uLod).rgb, 1.0); }`;
+// 3. detail (contrast-adaptive sharpening + fine texture), local HDR tone mapping, colour grading.
 const FS_FINAL = `
-uniform sampler2D uB, uC, uBase; uniform vec2 uRes; uniform float uAspect, uSeed;
-uniform float uSharp, uClar, uHDR, uExpo, uCon, uHigh, uShad, uWhites, uBlacks, uTemp, uTint, uVib, uSat, uFade, uVig, uGrain, uMono;
+uniform sampler2D uB, uC, uBase; uniform vec2 uImg, uCas; uniform vec4 uRegion; uniform float uAspect, uSeed;
+uniform float uCasAmt, uDetail, uClar, uHDR, uExpo, uCon, uHigh, uShad, uWhites, uBlacks, uTemp, uTint, uVib, uSat, uFade, uVig, uGrain, uMono;
 uniform vec4 uSplit; // shHue, shAmt, hiHue, hiAmt
 vec3 hue(float h){ vec3 p = abs(fract(vec3(h) + vec3(1.0, 2.0/3.0, 1.0/3.0))*6.0 - 3.0); return clamp(p - 1.0, 0.0, 1.0); }
 float hash(vec2 p){ p = fract(p*vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x*p.y); }
+vec3 tb(vec2 off){ return texture(uB, vUv + off*uCas).rgb; }
 void main(){
-  vec3 b = texture(uB, vUv).rgb, c = texture(uC, vUv).rgb, base = texture(uBase, vUv).rgb;
-  vec3 det = b - c;
-  float m = smoothstep(0.003, 0.03, abs(luma(det)));
-  vec3 col = b + det*uSharp*2.2*m;
+  vec2 fu = uRegion.xy + vUv*uRegion.zw;            // position in the whole photo
+  vec3 e0 = texture(uB, vUv).rgb, e = e0;
+  if (uCasAmt > 0.001) {
+    vec3 a = tb(vec2(-1.0,-1.0)), b = tb(vec2(0.0,-1.0)), c = tb(vec2(1.0,-1.0)), d = tb(vec2(-1.0,0.0));
+    vec3 f = tb(vec2(1.0,0.0)), g = tb(vec2(-1.0,1.0)), h = tb(vec2(0.0,1.0)), i = tb(vec2(1.0,1.0));
+    vec3 mn = min(min(min(d, e0), min(f, b)), h); mn += min(mn, min(min(a, c), min(g, i)));
+    vec3 mx = max(max(max(d, e0), max(f, b)), h); mx += max(mx, max(max(a, c), max(g, i)));
+    vec3 amp = sqrt(clamp(min(mn, 2.0 - mx)/max(mx, vec3(1e-4)), 0.0, 1.0));
+    vec3 w = amp*(-1.0/mix(8.0, 4.6, uCasAmt));
+    e = clamp(((b + d + f + h)*w + e0)/(1.0 + 4.0*w), 0.0, 1.0);
+  }
+  float dl = clamp(luma(e0 - texture(uC, vUv).rgb), -0.05, 0.05);
+  vec3 col = e + vec3(dl*uDetail*1.5*smoothstep(0.002, 0.02, abs(dl)));
+  vec3 base = texture(uBase, fu).rgb;
   float L = luma(col), Lb = luma(base);
   col += (L - Lb)*uClar*0.7*(1.0 - abs(2.0*L - 1.0));
   vec3 lin = pow(clamp(col, 0.0, 1.0), vec3(2.2));
   float lbl = pow(max(Lb, 1e-4), 2.2);
-  float g = clamp(pow((lbl + 0.02)/0.2, -0.42*uHDR), 0.55, 3.2);
-  lin *= g*exp2(uExpo);
+  float gn = clamp(pow((lbl + 0.02)/0.2, -0.42*uHDR), 0.55, 3.2);
+  lin *= gn*exp2(uExpo);
   lin *= vec3(1.0 + uTemp*0.12, 1.0 - uTint*0.07, 1.0 - uTemp*0.12);
   lin = mix(lin, lin/(1.0 + max(lin - 0.8, 0.0)*1.2), step(0.8, lin));   // soft highlight roll-off
   vec3 s = pow(max(lin, 0.0), vec3(1.0/2.2));
@@ -571,8 +618,7 @@ void main(){
   s += s*uShad*0.6*(1.0 - smoothstep(0.0, 0.55, l));
   s *= 1.0 + uHigh*0.35*smoothstep(0.45, 1.0, l);
   float bp = -uBlacks*0.06, wp = 1.0 - uWhites*0.08;
-  s = (s - bp)/(wp - bp);
-  s = clamp(s, 0.0, 1.0);
+  s = clamp((s - bp)/(wp - bp), 0.0, 1.0);
   if (uCon >= 0.0) s = mix(s, s*s*(3.0 - 2.0*s), uCon*0.7); else s = mix(s, vec3(0.5), -uCon*0.3);
   float l2 = luma(s); float sat = max(max(s.r, s.g), s.b) - min(min(s.r, s.g), s.b);
   s = mix(vec3(l2), s, 1.0 + uVib*(1.0 - sat)*0.9);
@@ -581,13 +627,14 @@ void main(){
   s += (hue(uSplit.z) - 0.5)*uSplit.w*0.22*l2;
   s = mix(s, vec3(luma(s)), uMono);
   s = uFade*0.09 + s*(1.0 - uFade*0.14);
-  vec2 q = (vUv - 0.5)*vec2(uAspect, 1.0);
+  vec2 q = (fu - 0.5)*vec2(uAspect, 1.0);
   float v = 1.0 - smoothstep(0.25, 0.95, length(q)/max(uAspect*0.5, 0.5)*0.8);
   s = uVig >= 0.0 ? s*mix(1.0, v, uVig*0.75) : mix(s, vec3(1.0), (1.0 - v)*(-uVig)*0.5);
-  s += (hash(vUv*uRes + uSeed) - 0.5)*uGrain*0.09;
+  s += (hash(fu*uImg + uSeed) - 0.5)*uGrain*0.09;
   o = vec4(clamp(s, 0.0, 1.0), 1.0);
 }`;
-const FS_SHOW = `uniform sampler2D uT; void main(){ o = vec4(texture(uT, vec2(vUv.x, 1.0 - vUv.y)).rgb, 1.0); }`;
+const FS_SHOW = `uniform sampler2D uT; uniform vec4 uRegion;
+void main(){ vec2 uv = vec2(vUv.x, 1.0 - vUv.y); o = vec4(texture(uT, uRegion.xy + uv*uRegion.zw).rgb, 1.0); }`;
 
 function compile(type, src) {
   const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s);
@@ -634,114 +681,189 @@ function fbo(t) {
   return f;
 }
 function makeSet(W, H) {
-  const bw = Math.max(2, Math.ceil(W / 16)), bh = Math.max(2, Math.ceil(H / 16));
-  const s = { W, H, bw, bh, A: tex(W, H), B: tex(W, H, true), T: tex(W, H), C: tex(W, H), b0: tex(bw, bh), b1: tex(bw, bh) };
-  s.fA = fbo(s.A); s.fB = fbo(s.B); s.fT = fbo(s.T); s.fC = fbo(s.C); s.f0 = fbo(s.b0); s.f1 = fbo(s.b1);
-  const ok = gl.checkFramebufferStatus(gl.FRAMEBUFFER) === gl.FRAMEBUFFER_COMPLETE;
+  const s = { W, H, A: tex(W, H), B: tex(W, H), T: tex(W, H), C: tex(W, H) };
+  s.fA = fbo(s.A); s.fB = fbo(s.B); s.fT = fbo(s.T); s.fC = fbo(s.C);
+  const ok = gl.checkFramebufferStatus(gl.FRAMEBUFFER) === gl.FRAMEBUFFER_COMPLETE && !gl.getError();
   gl.bindFramebuffer(gl.FRAMEBUFFER, null);
   if (!ok) { freeSet(s); return null; }
   return s;
 }
 function freeSet(s) {
   if (!s) return;
-  ["A", "B", "T", "C", "b0", "b1"].forEach(k => s[k] && gl.deleteTexture(s[k]));
-  ["fA", "fB", "fT", "fC", "f0", "f1"].forEach(k => s[k] && gl.deleteFramebuffer(s[k]));
+  ["A", "B", "T", "C", "S", "b0", "b1"].forEach(k => s[k] && gl.deleteTexture(s[k]));
+  ["fA", "fB", "fT", "fC", "fS", "f0", "f1"].forEach(k => s[k] && gl.deleteFramebuffer(s[k]));
+}
+// whole-photo brightness map (fixed 128 px grid) so HDR looks identical in the preview, when zoomed and in the 4K file
+function makeBaseSet() {
+  const ar = img.w / img.h;
+  const sw = ar >= 1 ? 512 : Math.max(16, Math.round(512 * ar)), sh = ar >= 1 ? Math.max(16, Math.round(512 / ar)) : 512;
+  const s = { sw, sh, bw: Math.max(4, Math.round(sw / 4)), bh: Math.max(4, Math.round(sh / 4)) };
+  s.S = tex(sw, sh, true); s.fS = fbo(s.S);
+  s.b0 = tex(s.bw, s.bh); s.f0 = fbo(s.b0); s.b1 = tex(s.bw, s.bh); s.f1 = fbo(s.b1);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+  return s;
 }
 
 function bindTex(unit, t) { gl.activeTexture(gl.TEXTURE0 + unit); gl.bindTexture(gl.TEXTURE_2D, t); }
 function draw(fb, w, h) { gl.bindFramebuffer(gl.FRAMEBUFFER, fb); gl.viewport(0, 0, w, h); gl.drawArrays(gl.TRIANGLES, 0, 6); }
 
 function bodyOps(includePending) {
-  const list = state.ops.slice();
-  if (includePending && pending) { const op = pendingToOp(pending); if (op) list.push(op); }
+  const fitEditing = includePending && pending && pending.tool === "fit";
+  let list = state.ops.filter(o => !(fitEditing && o.tool === "fit"));
+  if (includePending && pending) list = list.concat(pending.tool === "fit" ? fitOps(pending) : [pendingToOp(pending)].filter(Boolean));
   return list.slice(-24);
 }
+function activeProtect(includePending) {
+  if (includePending && pending && pending.tool === "fit" && pending.H && pending.F) return fitProtect(pending);
+  return state.protect;
+}
 
-function runPipeline(set, opts = {}) {
+function runPipeline(set, region, opts = {}) {
+  const R = region || { u: 0, v: 0, du: 1, dv: 1 };
   const { W, H } = set;
-  const ops = bodyOps(opts.pending !== false);
+  const inc = opts.pending !== false;
+  const ops = bodyOps(inc), pr = activeProtect(inc);
   const A = new Float32Array(96), B = new Float32Array(96);
   ops.forEach((op, i) => { A.set(op.a, i * 4); B.set(op.b, i * 4); });
-  const up = Math.max(1, W / img.w);            // >1 when upscaling (e.g. 4K from a small photo)
-  const lod = Math.max(0, Math.log2(img.w / W));
   const e = state.enh, c = state.col;
   gl.bindVertexArray(vao);
-  // 1. body warp + high-quality resample
   gl.useProgram(P.warp.p); const uw = P.warp.u;
   bindTex(0, img.tex); gl.uniform1i(uw.uSrc, 0);
   gl.uniform2f(uw.uSrcSize, img.w, img.h); gl.uniform1f(uw.uAspect, img.w / img.h);
-  gl.uniform1i(uw.uN, ops.length); gl.uniform1f(uw.uLod, lod > 0.6 ? lod : 0);
-  gl.uniform4fv(uw.uA, A); gl.uniform4fv(uw.uB, B);
-  const pr = state.protect; gl.uniform4f(uw.uProt, pr.x, pr.y, pr.r, pr.on ? 1 : 0);
+  gl.uniform1i(uw.uN, ops.length); gl.uniform4fv(uw.uA, A); gl.uniform4fv(uw.uB, B);
+  gl.uniform4f(uw.uProt, pr.x, pr.y, pr.r, pr.on ? 1 : 0);
+  // a. whole-photo brightness map (body edits included)
+  const bs = baseSet;
+  gl.uniform4f(uw.uRegion, 0, 0, 1, 1); gl.uniform1f(uw.uLod, Math.max(0, Math.log2(img.w / bs.sw)));
+  draw(bs.fS, bs.sw, bs.sh);
+  gl.bindTexture(gl.TEXTURE_2D, bs.S); gl.generateMipmap(gl.TEXTURE_2D);
+  gl.useProgram(P.down.p); bindTex(0, bs.S); gl.uniform1i(P.down.u.uT, 0); gl.uniform1f(P.down.u.uLod, 2); draw(bs.f0, bs.bw, bs.bh);
+  gl.useProgram(P.blur.p); const ul = P.blur.u; gl.uniform1i(ul.uT, 0);
+  for (let i = 0; i < 2; i++) {
+    bindTex(0, bs.b0); gl.uniform2f(ul.uDir, 1.3 / bs.bw, 0); draw(bs.f1, bs.bw, bs.bh);
+    bindTex(0, bs.b1); gl.uniform2f(ul.uDir, 0, 1.3 / bs.bh); draw(bs.f0, bs.bw, bs.bh);
+  }
+  // b. the visible region (or the whole photo for export) at full detail
+  const pxx = (W / R.du) / img.w, pxy = (H / R.dv) / img.h;       // output pixels per photo pixel
+  const upx = Math.max(1, pxx), upy = Math.max(1, pxy);
+  gl.useProgram(P.warp.p);
+  bindTex(0, img.tex);
+  gl.uniform4f(uw.uRegion, R.u, R.v, R.du, R.dv); gl.uniform1f(uw.uLod, Math.max(0, -Math.log2(Math.min(pxx, pxy))));
   draw(set.fA, W, H);
-  // 2. edge-preserving noise reduction
   gl.useProgram(P.bilat.p); const ub = P.bilat.u;
   bindTex(0, set.A); gl.uniform1i(ub.uT, 0);
-  gl.uniform2f(ub.uTexel, 1 / W, 1 / H); gl.uniform1f(ub.uStep, up);
-  gl.uniform1f(ub.uSigR, 0.025 + 0.09 * e.smooth / 100); gl.uniform1f(ub.uAmt, e.smooth / 100 * 0.9);
+  gl.uniform2f(ub.uTexel, upx / W, upy / H);
+  gl.uniform1f(ub.uSigR, 0.02 + 0.08 * e.smooth / 100); gl.uniform1f(ub.uAmt, e.smooth / 100);
   draw(set.fB, W, H);
-  gl.bindTexture(gl.TEXTURE_2D, set.B); gl.generateMipmap(gl.TEXTURE_2D);
-  // 3. fine blur for detail recovery
-  gl.useProgram(P.blur.p); const ul = P.blur.u;
-  bindTex(0, set.B); gl.uniform1i(ul.uT, 0); gl.uniform2f(ul.uDir, 0.75 * up / W, 0); draw(set.fT, W, H);
-  bindTex(0, set.T); gl.uniform2f(ul.uDir, 0, 0.75 * up / H); draw(set.fC, W, H);
-  // 4. local brightness map for HDR and clarity
-  gl.useProgram(P.down.p); bindTex(0, set.B); gl.uniform1i(P.down.u.uT, 0); gl.uniform1f(P.down.u.uLod, 4); draw(set.f0, set.bw, set.bh);
   gl.useProgram(P.blur.p);
-  for (let i = 0; i < 2; i++) {
-    bindTex(0, set.b0); gl.uniform2f(ul.uDir, 1.3 / set.bw, 0); draw(set.f1, set.bw, set.bh);
-    bindTex(0, set.b1); gl.uniform2f(ul.uDir, 0, 1.3 / set.bh); draw(set.f0, set.bw, set.bh);
-  }
-  // 5. tone + colour
+  bindTex(0, set.B); gl.uniform2f(ul.uDir, 0.8 * upx / W, 0); draw(set.fT, W, H);
+  bindTex(0, set.T); gl.uniform2f(ul.uDir, 0, 0.8 * upy / H); draw(set.fC, W, H);
   gl.useProgram(P.fin.p); const uf = P.fin.u;
-  bindTex(0, set.B); gl.uniform1i(uf.uB, 0); bindTex(1, set.C); gl.uniform1i(uf.uC, 1); bindTex(2, set.b0); gl.uniform1i(uf.uBase, 2);
-  gl.uniform2f(uf.uRes, W, H); gl.uniform1f(uf.uAspect, W / H); gl.uniform1f(uf.uSeed, 17.0);
-  gl.uniform1f(uf.uSharp, e.clear / 100 * 1.6); gl.uniform1f(uf.uClar, e.clarity / 100); gl.uniform1f(uf.uHDR, e.hdr / 100);
+  bindTex(0, set.B); gl.uniform1i(uf.uB, 0); bindTex(1, set.C); gl.uniform1i(uf.uC, 1); bindTex(2, bs.b0); gl.uniform1i(uf.uBase, 2);
+  gl.uniform2f(uf.uImg, img.w, img.h); gl.uniform2f(uf.uCas, upx / W, upy / H);
+  gl.uniform4f(uf.uRegion, R.u, R.v, R.du, R.dv);
+  gl.uniform1f(uf.uAspect, img.w / img.h); gl.uniform1f(uf.uSeed, 17.0);
+  gl.uniform1f(uf.uCasAmt, e.clear / 100); gl.uniform1f(uf.uDetail, e.clear / 100);
+  gl.uniform1f(uf.uClar, e.clarity / 100); gl.uniform1f(uf.uHDR, e.hdr / 100);
   gl.uniform1f(uf.uExpo, c.exposure / 100 * 2); gl.uniform1f(uf.uCon, c.contrast / 100);
   gl.uniform1f(uf.uHigh, c.highlights / 100); gl.uniform1f(uf.uShad, c.shadows / 100);
   gl.uniform1f(uf.uWhites, c.whites / 100); gl.uniform1f(uf.uBlacks, c.blacks / 100);
   gl.uniform1f(uf.uTemp, c.temp / 100); gl.uniform1f(uf.uTint, c.tint / 100);
   gl.uniform1f(uf.uVib, c.vibrance / 100); gl.uniform1f(uf.uSat, c.saturation / 100);
   gl.uniform1f(uf.uFade, c.fade / 100); gl.uniform1f(uf.uVig, c.vignette / 100);
-  gl.uniform1f(uf.uGrain, c.grain / 100 * (W > 2000 ? 1 : 0.8)); gl.uniform1f(uf.uMono, c.mono / 100);
+  gl.uniform1f(uf.uGrain, c.grain / 100); gl.uniform1f(uf.uMono, c.mono / 100);
   gl.uniform4f(uf.uSplit, c.shHue / 360, c.shAmt / 100, c.hiHue / 360, c.hiAmt / 100);
   draw(set.fT, W, H);
   gl.activeTexture(gl.TEXTURE0);
 }
 
-/* ------------------------------------------------------------------ view + render loop */
-let view = { x: 0, y: 0, w: 1, h: 1, dpr: 1 }, preview = null, dirty = false;
+/* ------------------------------------------------------------------ view, zoom + render loop */
+let fitR = { x: 0, y: 0, w: 1, h: 1 }, zoom = 1, panX = 0, panY = 0;
+let view = { x: 0, y: 0, w: 1, h: 1, dpr: 1 }, vis = { x: 0, y: 0, w: 1, h: 1 }, region = { u: 0, v: 0, du: 1, dv: 1 };
+let preview = null, baseSet = null, dirty = false;
 function layout() {
-  const dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+  const dpr = Math.min(window.devicePixelRatio || 1, 3);
   const sw = stage.clientWidth, sh = stage.clientHeight;
   glc.width = ov.width = Math.max(1, Math.round(sw * dpr)); glc.height = ov.height = Math.max(1, Math.round(sh * dpr));
+  view.dpr = dpr;
   if (!img) return;
   const m = 10, ar = img.w / img.h;
   let w = sw - 2 * m, h = w / ar;
   if (h > sh - 2 * m) { h = sh - 2 * m; w = h * ar; }
-  view = { x: (sw - w) / 2, y: (sh - h) / 2, w, h, dpr };
-  let PW = Math.round(w * dpr), PH = Math.round(h * dpr);
-  const cap = 1800 / Math.max(PW, PH); if (cap < 1) { PW = Math.round(PW * cap); PH = Math.round(PH * cap); }
+  fitR = { x: (sw - w) / 2, y: (sh - h) / 2, w, h };
+  let PW = Math.round(sw * dpr), PH = Math.round(sh * dpr);
+  const cap = 2400 / Math.max(PW, PH); if (cap < 1) { PW = Math.round(PW * cap); PH = Math.round(PH * cap); }
   PW = Math.max(2, PW); PH = Math.max(2, PH);
   if (!preview || preview.W !== PW || preview.H !== PH) { freeSet(preview); preview = makeSet(PW, PH); }
+  updateView();
+}
+function maxZoom() { return Math.max(1, 4 * img.w / (fitR.w * view.dpr)); }   // up to 4 screen pixels per photo pixel
+function updateView() {
+  if (!img) return;
+  const sw = stage.clientWidth, sh = stage.clientHeight;
+  zoom = Math.min(maxZoom(), Math.max(1, zoom));
+  const w = fitR.w * zoom, h = fitR.h * zoom;
+  const cx = fitR.x + (fitR.w - w) / 2, cy = fitR.y + (fitR.h - h) / 2;
+  let x = cx + panX, y = cy + panY;
+  x = w <= sw ? (sw - w) / 2 : Math.min(10, Math.max(sw - w - 10, x));
+  y = h <= sh ? (sh - h) / 2 : Math.min(10, Math.max(sh - h - 10, y));
+  panX = x - cx; panY = y - cy;
+  view = { x, y, w, h, dpr: view.dpr };
+  const x0 = Math.max(x, 0), y0 = Math.max(y, 0), x1 = Math.min(x + w, sw), y1 = Math.min(y + h, sh);
+  vis = { x: x0, y: y0, w: Math.max(1, x1 - x0), h: Math.max(1, y1 - y0) };
+  region = { u: (x0 - x) / w, v: (y0 - y) / h, du: vis.w / w, dv: vis.h / h };
+  const pct = Math.round(view.w * view.dpr / img.w * 100);
+  $("#zPct").textContent = zoom <= 1.001 ? "Fit" : pct + "%";
+  $("#zOut").disabled = zoom <= 1.001; $("#zIn").disabled = zoom >= maxZoom() - 0.001;
+}
+function zoomAt(z, sx, sy) {
+  if (!img) return;
+  const u = (sx - view.x) / view.w, v = (sy - view.y) / view.h;
+  zoom = Math.min(maxZoom(), Math.max(1, z));
+  const w = fitR.w * zoom, h = fitR.h * zoom;
+  panX = sx - u * w - (fitR.x + (fitR.w - w) / 2); panY = sy - v * h - (fitR.y + (fitR.h - h) / 2);
+  updateView(); requestRender();
 }
 function requestRender() { if (!dirty) { dirty = true; requestAnimationFrame(frame); } }
 function frame() {
   dirty = false;
-  if (!img || !preview) return;
-  if (!showBefore) runPipeline(preview);
+  if (!img || !preview || !baseSet) return;
+  if (!showBefore) runPipeline(preview, region);
   gl.bindFramebuffer(gl.FRAMEBUFFER, null);
   gl.viewport(0, 0, glc.width, glc.height);
   gl.clearColor(0.11, 0.098, 0.118, 1); gl.clear(gl.COLOR_BUFFER_BIT);
   const d = view.dpr;
-  gl.viewport(Math.round(view.x * d), Math.round(glc.height - (view.y + view.h) * d), Math.round(view.w * d), Math.round(view.h * d));
+  gl.viewport(Math.round(vis.x * d), Math.round(glc.height - (vis.y + vis.h) * d), Math.round(vis.w * d), Math.round(vis.h * d));
   gl.useProgram(P.show.p); bindTex(0, showBefore ? img.tex : preview.T); gl.uniform1i(P.show.u.uT, 0);
+  if (showBefore) gl.uniform4f(P.show.u.uRegion, region.u, region.v, region.du, region.dv); else gl.uniform4f(P.show.u.uRegion, 0, 0, 1, 1);
   gl.drawArrays(gl.TRIANGLES, 0, 6);
   drawOverlay();
 }
 new ResizeObserver(() => { layout(); requestRender(); }).observe(stage);
+$("#zIn").onclick = () => zoomAt(zoom * 1.7, stage.clientWidth / 2, stage.clientHeight / 2);
+$("#zOut").onclick = () => zoomAt(zoom / 1.7, stage.clientWidth / 2, stage.clientHeight / 2);
+$("#zPct").onclick = () => { zoom = 1; panX = panY = 0; updateView(); requestRender(); };
+stage.addEventListener("wheel", (ev) => {
+  if (!img) return; ev.preventDefault();
+  const r = stage.getBoundingClientRect(); zoomAt(zoom * Math.exp(-ev.deltaY * 0.0015), ev.clientX - r.left, ev.clientY - r.top);
+}, { passive: false });
 
 /* ------------------------------------------------------------------ loading photos */
+function estimateNoise(src, w, h) {
+  // centre crop at full resolution; median of the high-pass residual is a robust noise estimate (0-255 scale)
+  const cw = Math.min(w, 512), ch = Math.min(h, 512);
+  const c = document.createElement("canvas"); c.width = cw; c.height = ch;
+  const cx = c.getContext("2d", { willReadFrequently: true });
+  cx.drawImage(src, Math.floor((w - cw) / 2), Math.floor((h - ch) / 2), cw, ch, 0, 0, cw, ch);
+  const d = cx.getImageData(0, 0, cw, ch).data, L = new Float32Array(cw * ch);
+  for (let i = 0; i < L.length; i++) L[i] = 0.299 * d[i * 4] + 0.587 * d[i * 4 + 1] + 0.114 * d[i * 4 + 2];
+  const r = [];
+  for (let y = 1; y < ch - 1; y += 2) for (let x = 1; x < cw - 1; x += 2) {
+    const k = y * cw + x; r.push(Math.abs(L[k] - (L[k - 1] + L[k + 1] + L[k - cw] + L[k + cw]) / 4));
+  }
+  r.sort((a, b) => a - b);
+  return (r[r.length >> 1] || 0) * 1.4826 / 1.118;
+}
 async function loadSource(source, isSample) {
   let bmp;
   try {
@@ -759,17 +881,20 @@ async function loadSource(source, isSample) {
     const c = document.createElement("canvas"); c.width = w; c.height = h;
     c.getContext("2d").drawImage(bmp, 0, 0, w, h); srcCanvas = c;
   }
-  // mean brightness for Auto exposure
   const t = document.createElement("canvas"); t.width = 48; t.height = 48;
   const tc = t.getContext("2d"); tc.drawImage(srcCanvas, 0, 0, 48, 48);
   const px = tc.getImageData(0, 0, 48, 48).data; let sum = 0;
   for (let i = 0; i < px.length; i += 4) sum += (0.2126 * px[i] + 0.7152 * px[i + 1] + 0.0722 * px[i + 2]) / 255;
+  let noise = 2;
+  try { noise = estimateNoise(srcCanvas, w, h); } catch (e) { /* keep default */ }
   if (img && img.tex) gl.deleteTexture(img.tex);
+  freeSet(baseSet); baseSet = null;
   const texo = tex(w, h, true);
   gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false); gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
   gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, srcCanvas);
   gl.generateMipmap(gl.TEXTURE_2D);
-  img = { w, h, tex: texo, mean: sum / (px.length / 4), sample: !!isSample };
+  img = { w, h, tex: texo, mean: sum / (px.length / 4), noise, sample: !!isSample };
+  baseSet = makeBaseSet();
   state = freshState();
   if (isSample) {
     state.protect = { on: true, x: 0.61, y: 0.115, r: 0.06 };
@@ -777,6 +902,7 @@ async function loadSource(source, isSample) {
     state.texts.push(newText({ text: "शुभ दीपावली", y: 0.08, x: 0.5, size: 7.5, ...TEXT_PRESETS[0].v }));
   }
   pending = null; bodyTool = null; selText = state.texts[0] ? state.texts[0].id : null;
+  zoom = 1; panX = panY = 0;
   hist = []; hi = -1; commit();
   $("#badge").hidden = !isSample;
   layout(); refreshAll();
@@ -789,11 +915,12 @@ window.addEventListener("paste", (ev) => { const it = [...(ev.clipboardData?.ite
 
 /* ------------------------------------------------------------------ enhance */
 function autoEnhance(withCommit = true) {
-  state.enh = { hdr: 55, smooth: 40, clear: 45, clarity: 18 };
+  const smooth = Math.round(Math.min(50, Math.max(4, (img.noise - 0.8) * 9)));   // only as much as this photo's noise needs
+  state.enh = { hdr: 50, smooth, clear: 62, clarity: 16 };
   const linMean = Math.pow(Math.max(img.mean, 0.02), 2.2), target = Math.pow(0.45, 2.2);
   const stops = Math.max(-0.8, Math.min(1.6, Math.log2(target / linMean) * 0.5));
   Object.assign(state.col, { exposure: Math.round(stops / 2 * 100), shadows: 22, highlights: -25, whites: 8, blacks: -6, vibrance: 18 });
-  if (withCommit) { commit(); refreshAll(); toast("Auto 4K HDR applied"); }
+  if (withCommit) { commit(); refreshAll(); toast("Auto 4K HDR applied. Pinch or double-tap the photo to check detail."); }
 }
 $("#auto").onclick = () => autoEnhance(true);
 $("#enhReset").onclick = () => { state.enh = { hdr: 0, smooth: 0, clear: 0, clarity: 0 }; commit(); refreshAll(); };
@@ -860,6 +987,38 @@ function pendingToOp(p) {
   if (t.kind === "band") { if (Math.abs(v) < 0.001) return null; return { a: [0.5, Math.min(p.y0, p.y1), 0, Math.max(p.y0, p.y1)], b: [2, v * t.k, 0, 0], tool: t.id }; }
   return null;
 }
+
+/* Natural fit: from two taps (top of head, between the feet) place every body part using standard adult
+   proportions, then apply gentle edits: slimmer waist and belly, slightly broader shoulders, a touch longer legs.
+   Strengths are deliberately small so the result stays a natural, healthy build. */
+const FIT_TYPES = {
+  lean:     { name: "Lean",     waist: 0.26, belly: 0.28, hips: 0.20, neck: 0.16, sh: 0.03, chest: 0.00, legs: 0.045 },
+  fit:      { name: "Fit",      waist: 0.22, belly: 0.25, hips: 0.12, neck: 0.12, sh: 0.10, chest: 0.05, legs: 0.035 },
+  athletic: { name: "Athletic", waist: 0.20, belly: 0.22, hips: 0.06, neck: 0.00, sh: 0.17, chest: 0.10, legs: 0.030 },
+};
+function fitGeom(p) {
+  const ar = img.w / img.h;
+  const Hx = p.H.u * ar, Hy = p.H.v, dx = p.F.u * ar - Hx, dy = p.F.v - Hy;
+  return { h: Math.hypot(dx, dy), ang: -Math.atan2(dx, dy), at: t => ({ u: (Hx + dx * t) / ar, v: Hy + dy * t }) };
+}
+function fitOps(p) {
+  if (!p.H || !p.F) return [];
+  const g = fitGeom(p); if (g.h < 0.12) return [];
+  const T = FIT_TYPES[p.type], a = p.amt / 100, h = g.h, out = [];
+  const slim = (t, rx, ry, s) => { if (Math.abs(s) < 1e-4) return; const c = g.at(t); out.push({ a: [c.u, c.v, rx * h, ry * h], b: [0, s, g.ang, 0], tool: "fit" }); };
+  const grow = (t, rx, ry, s) => { if (Math.abs(s) < 1e-4) return; const c = g.at(t); out.push({ a: [c.u, c.v, rx * h, ry * h], b: [1, s, 0, 0], tool: "fit" }); };
+  slim(0.155, 0.06, 0.035, T.neck * a);       // neck
+  slim(0.205, 0.20, 0.055, -T.sh * a);        // shoulders (negative = broader)
+  grow(0.28, 0.12, 0.07, -T.chest * a);       // chest (negative = fuller)
+  slim(0.40, 0.14, 0.075, T.waist * a);       // waist
+  slim(0.465, 0.13, 0.07, T.belly * a);       // belly
+  slim(0.535, 0.16, 0.07, T.hips * a);        // hips
+  const y0 = g.at(0.545).v, y1 = Math.min(0.995, Math.max(p.H.v, p.F.v));
+  if (T.legs * a > 1e-4 && y1 > y0 + 0.05) out.push({ a: [0.5, y0, 0, y1], b: [2, T.legs * a, 0, 0], tool: "fit" });
+  return out;
+}
+function fitProtect(p) { const g = fitGeom(p); const c = g.at(0.07); return { on: true, x: c.u, y: c.v, r: Math.max(0.03, 0.075 * g.h) }; }
+
 function buildBodyChips() {
   const el = $("#bodyChips"); el.innerHTML = "";
   BODY.forEach(t => {
@@ -873,13 +1032,16 @@ buildBodyChips();
 function selectBodyTool(id) {
   const t = toolById(id);
   bodyTool = id;
-  if (t.kind === "face") {
+  if (t.kind === "face" || t.kind === "free") {
     pending = null;
-  } else if (t.kind === "free") {
-    pending = null;
+  } else if (t.kind === "fit") {
+    if (!(pending && pending.tool === "fit")) {
+      const s = img && img.sample;
+      pending = { tool: "fit", type: "fit", amt: 100, H: s ? { u: 0.64, v: 0.045 } : null, F: s ? { u: 0.62, v: 0.985 } : null };
+    }
   } else {
     const prev = pending && pending.tool === id ? pending : null;
-    pending = prev || { tool: id, x: 0.5, y: t.kind === "scale" && id === "head" ? 0.18 : 0.5, size: 100, angle: 0, v: 0, y0: t.y0, y1: t.y1 };
+    pending = prev || { tool: id, x: 0.5, y: id === "head" ? 0.18 : 0.5, size: 100, angle: 0, v: 0, y0: t.y0, y1: t.y1 };
   }
   syncBody(); requestRender();
 }
@@ -887,27 +1049,36 @@ function syncBody() {
   $("#bodyChips").querySelectorAll(".chip").forEach(b => {
     b.setAttribute("aria-pressed", b.dataset.id === bodyTool ? "true" : "false");
     const n = state.ops.filter(o => o.tool === b.dataset.id).length;
-    const v = b.querySelector(".v"); v.textContent = b.dataset.id === "face" ? (state.protect.on ? "on" : "off") : (n ? "✓" + (n > 1 ? n : "") : "");
+    const v = b.querySelector(".v");
+    v.textContent = b.dataset.id === "face" ? (state.protect.on ? "on" : "off") : b.dataset.id === "fit" ? (n ? "✓" : "") : (n ? "✓" + (n > 1 ? n : "") : "");
   });
   const t = bodyTool && toolById(bodyTool);
-  const editing = !!t;
-  $("#bodyEdit").hidden = !editing; $("#bodyIdle").hidden = editing;
-  $("#opCount").textContent = state.ops.length ? `${state.ops.length} body edit${state.ops.length > 1 ? "s" : ""} applied` : "";
+  $("#bodyEdit").hidden = !t; $("#bodyIdle").hidden = !!t;
+  const edits = new Set(state.ops.map(o => o.tool === "fit" ? "fit" : o)).size;
+  $("#opCount").textContent = edits ? `${edits} body edit${edits > 1 ? "s" : ""} applied` : "";
   if (!t) return;
   $("#bodyTitle").textContent = t.name;
   const sR = $("#bStrength"), sz = $("#bSize"), an = $("#bAngle");
+  $("#fitBox").hidden = t.kind !== "fit";
   $("#bAngleRow").hidden = !t.angle;
-  $("#bSizeRow").hidden = t.kind === "band";
+  $("#bSizeRow").hidden = t.kind === "band" || t.kind === "fit" || t.kind === "free";
+  if (t.kind === "fit") {
+    $("#bStrengthLabel").textContent = "Amount"; sR.min = 0; sR.max = 150; sR.value = pending.amt; $("#bStrengthVal").textContent = pending.amt + "%";
+    $("#bMinus").textContent = "← Subtle"; $("#bPlus").textContent = "Stronger →";
+    $("#fitHint").textContent = !pending.H ? "Tap the top of the head." : !pending.F ? "Now tap between the feet." :
+      "Body mapped. Drag the two dots to adjust, choose a body type, then tap ✓. The face is locked automatically.";
+    $("#fitType").querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", b.dataset.fit === pending.type ? "true" : "false"));
+    return;
+  }
   if (t.kind === "face") {
     $("#bStrengthLabel").textContent = "Face lock"; sR.min = 0; sR.max = 1; sR.value = state.protect.on ? 1 : 0; $("#bStrengthVal").textContent = state.protect.on ? "On" : "Off";
     $("#bMinus").textContent = "Off"; $("#bPlus").textContent = "On";
     sz.value = Math.round(state.protect.r / 0.08 * 100); $("#bSizeVal").textContent = sz.value + "%";
-    $("#bodyApply").hidden = false;
     return;
   }
   if (t.kind === "free") {
     $("#bStrengthLabel").textContent = "Brush size"; sR.min = 20; sR.max = 250; sR.value = Math.round(brushSize / 0.08 * 100); $("#bStrengthVal").textContent = sR.value + "%";
-    $("#bMinus").textContent = "Small"; $("#bPlus").textContent = "Large"; $("#bSizeRow").hidden = true;
+    $("#bMinus").textContent = "Small"; $("#bPlus").textContent = "Large";
     return;
   }
   $("#bStrengthLabel").textContent = "Strength"; sR.min = -100; sR.max = 100; sR.value = pending.v; $("#bStrengthVal").textContent = pending.v;
@@ -915,14 +1086,20 @@ function syncBody() {
   sz.value = pending.size; $("#bSizeVal").textContent = pending.size + "%";
   an.value = pending.angle; $("#bAngleVal").textContent = pending.angle + "°";
 }
+$("#fitType").querySelectorAll("button").forEach(b => b.onclick = () => { if (pending && pending.tool === "fit") { pending.type = b.dataset.fit; syncBody(); requestRender(); } });
 $("#bStrength").addEventListener("input", (ev) => {
   const t = toolById(bodyTool); const v = +ev.target.value;
   if (t.kind === "face") { state.protect.on = v > 0.5; $("#bStrengthVal").textContent = state.protect.on ? "On" : "Off"; }
   else if (t.kind === "free") { brushSize = v / 100 * 0.08; $("#bStrengthVal").textContent = v + "%"; }
+  else if (t.kind === "fit") { pending.amt = v; $("#bStrengthVal").textContent = v + "%"; }
   else { pending.v = v; $("#bStrengthVal").textContent = v; }
   requestRender();
 });
-$("#bStrengthZero").onclick = () => { const t = toolById(bodyTool); if (t && pending && t.kind !== "face" && t.kind !== "free") { pending.v = 0; syncBody(); requestRender(); } };
+$("#bStrengthZero").onclick = () => {
+  const t = toolById(bodyTool); if (!t || !pending) return;
+  if (t.kind === "fit") pending.amt = 100; else if (t.kind !== "face" && t.kind !== "free") pending.v = 0;
+  syncBody(); requestRender();
+};
 $("#bSize").addEventListener("input", (ev) => {
   const t = toolById(bodyTool); const v = +ev.target.value; $("#bSizeVal").textContent = v + "%";
   if (t.kind === "face") state.protect.r = 0.08 * v / 100; else if (pending) pending.size = v;
@@ -932,7 +1109,14 @@ $("#bAngle").addEventListener("input", (ev) => { if (pending) { pending.angle = 
 $("#bAngleZero").onclick = () => { if (pending) { pending.angle = 0; syncBody(); requestRender(); } };
 $("#bodyApply").onclick = () => {
   const t = toolById(bodyTool);
-  if (t && t.kind !== "face" && t.kind !== "free" && pending) {
+  if (t && t.kind === "fit" && pending) {
+    const ops = fitOps(pending);
+    if (!ops.length) { toast("Tap the top of the head, then between the feet first."); return; }
+    const rest = state.ops.filter(o => o.tool !== "fit");
+    if (rest.length + ops.length > 24) { toast("Too many body edits. Reset or undo some first."); return; }
+    state.ops = rest.concat(ops); state.protect = fitProtect(pending);
+    toast("Natural fit applied");
+  } else if (t && t.kind !== "face" && t.kind !== "free" && pending) {
     const op = pendingToOp(pending);
     if (op) {
       if (state.ops.length >= 24) toast("You've reached 24 body edits. Reset or undo some first.");
@@ -1097,28 +1281,44 @@ function drawOverlay() {
   if (showBefore) return;
   const sx = u => view.x + u * view.w, sy = v => view.y + v * view.h;
   const acc = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim() || "#f2a33a";
+  const ellipse = (op, style, dash) => {
+    octx.save(); octx.setLineDash(dash); octx.strokeStyle = style;
+    octx.translate(sx(op.a[0]), sy(op.a[1])); octx.rotate(op.b[0] === 0 ? op.b[2] : 0);
+    octx.beginPath(); octx.ellipse(0, 0, op.a[2] * view.h, op.a[3] * view.h, 0, 0, Math.PI * 2); octx.stroke(); octx.restore();
+  };
   octx.lineWidth = 1.5;
   if (tab === "body") {
-    state.ops.forEach(op => {
-      if (op.b[0] === 2) return;
-      octx.save(); octx.setLineDash([4, 4]); octx.strokeStyle = "rgba(255,255,255,0.35)";
-      octx.translate(sx(op.a[0]), sy(op.a[1])); octx.rotate(op.b[0] === 0 ? op.b[2] : 0);
-      octx.beginPath(); octx.ellipse(0, 0, op.a[2] * view.h, op.a[3] * view.h, 0, 0, Math.PI * 2); octx.stroke(); octx.restore();
-    });
-    const pr = state.protect;
+    const fitEditing = pending && pending.tool === "fit";
+    state.ops.forEach(op => { if (op.b[0] !== 2 && !(fitEditing && op.tool === "fit")) ellipse(op, "rgba(255,255,255,0.35)", [4, 4]); });
+    const pr = activeProtect(true);
     if (pr.on) {
-      octx.save(); octx.strokeStyle = bodyTool === "face" ? acc : "rgba(255,255,255,0.55)"; octx.setLineDash(bodyTool === "face" ? [] : [2, 4]);
+      octx.save(); octx.strokeStyle = bodyTool === "face" ? acc : "rgba(255,255,255,0.6)"; octx.setLineDash(bodyTool === "face" ? [] : [2, 4]);
       octx.beginPath(); octx.arc(sx(pr.x), sy(pr.y), pr.r * view.h, 0, Math.PI * 2); octx.stroke();
       octx.fillStyle = octx.strokeStyle; octx.font = "600 11px Figtree, sans-serif"; octx.textAlign = "center";
       octx.fillText("Face lock", sx(pr.x), sy(pr.y) - pr.r * view.h - 6); octx.restore();
     }
     const t = bodyTool && toolById(bodyTool);
-    if (pending && t) {
+    if (fitEditing) {
+      octx.save(); octx.strokeStyle = acc; octx.fillStyle = acc; octx.font = "600 11px Figtree, sans-serif";
+      if (pending.H && pending.F) {
+        octx.setLineDash([3, 5]); octx.beginPath(); octx.moveTo(sx(pending.H.u), sy(pending.H.v)); octx.lineTo(sx(pending.F.u), sy(pending.F.v)); octx.stroke(); octx.setLineDash([]);
+        fitOps(pending).forEach(op => {
+          if (op.b[0] === 2) { octx.beginPath(); octx.moveTo(view.x, sy(op.a[1])); octx.lineTo(view.x + view.w, sy(op.a[1])); octx.stroke(); octx.fillText("Legs", view.x + 6, sy(op.a[1]) - 5); }
+          else ellipse(op, acc, []);
+        });
+      }
+      [["Head", pending.H], ["Feet", pending.F]].forEach(([lab, pt]) => {
+        if (!pt) return;
+        octx.beginPath(); octx.arc(sx(pt.u), sy(pt.v), 7, 0, Math.PI * 2); octx.fill();
+        octx.fillText(lab, sx(pt.u) + 11, sy(pt.v) + 4);
+      });
+      octx.restore();
+    } else if (pending && t) {
       octx.save(); octx.strokeStyle = acc; octx.fillStyle = acc;
       if (t.kind === "band") {
         [["Start", pending.y0], ["End", pending.y1]].forEach(([lab, yy]) => {
           octx.beginPath(); octx.moveTo(view.x, sy(yy)); octx.lineTo(view.x + view.w, sy(yy)); octx.stroke();
-          octx.font = "600 11px Figtree, sans-serif"; octx.fillText(lab + " · drag", view.x + 6, sy(yy) - 5);
+          octx.font = "600 11px Figtree, sans-serif"; octx.fillText(lab + " · drag", Math.max(6, view.x + 6), sy(yy) - 5);
         });
       } else {
         const sz = pending.size / 100;
@@ -1145,9 +1345,11 @@ function drawOverlay() {
   }
 }
 
-/* ------------------------------------------------------------------ pointer */
-let drag = null;
-function toImg(ev) { const r = stage.getBoundingClientRect(); return { u: (ev.clientX - r.left - view.x) / view.w, v: (ev.clientY - r.top - view.y) / view.h }; }
+/* ------------------------------------------------------------------ pointer: tools, pan, pinch zoom, double-tap */
+let drag = null, pinch = null, downAt = null, lastTap = { t: 0, x: 0, y: 0 };
+const pts = new Map();
+function stageXY(ev) { const r = stage.getBoundingClientRect(); return { x: ev.clientX - r.left, y: ev.clientY - r.top }; }
+function toImg(ev) { const s = stageXY(ev); return { u: (s.x - view.x) / view.w, v: (s.y - view.y) / view.h }; }
 function hitText(u, v) {
   for (let i = state.texts.length - 1; i >= 0; i--) {
     const L = state.texts[i]; if (!L._bw) continue;
@@ -1157,53 +1359,105 @@ function hitText(u, v) {
   }
   return null;
 }
+function startPan(ev) { const s = stageXY(ev); drag = { kind: "pan", x0: s.x, y0: s.y, px: panX, py: panY }; }
 ov.addEventListener("pointerdown", (ev) => {
   if (!img) return;
+  pts.set(ev.pointerId, stageXY(ev));
+  ov.setPointerCapture(ev.pointerId);
+  if (pts.size === 2) {
+    if (drag && drag.kind === "push") drag = null;
+    if (drag && drag.kind !== "pan") commit();
+    drag = null;
+    const [a, b] = [...pts.values()];
+    const mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+    pinch = { d0: Math.hypot(a.x - b.x, a.y - b.y) || 1, z0: zoom, u: (mid.x - view.x) / view.w, v: (mid.y - view.y) / view.h };
+    requestRender(); return;
+  }
+  if (pts.size > 2) return;
+  downAt = { ...stageXY(ev), t: performance.now() };
   const p = toImg(ev);
-  if (tab === "text" || tab === "enhance" || tab === "color") {
-    const L = hitText(p.u, p.v);
-    if (L) {
-      if (tab !== "text") switchTab("text");
-      selText = L.id; syncText(); drag = { kind: "text", L, du: L.x - p.u, dv: L.y - p.v, moved: false };
-    } else if (tab === "text") { selText = null; syncText(); requestRender(); return; }
-    else return;
-  } else if (tab === "body") {
+  if (tab === "body") {
     const t = bodyTool && toolById(bodyTool);
-    if (!t) { toast("Pick a body part below first"); return; }
+    if (!t) { if (zoom > 1.001) startPan(ev); else toast("Pick a body part below first"); requestRender(); return; }
     if (t.kind === "face") { state.protect.x = p.u; state.protect.y = p.v; drag = { kind: "face" }; }
     else if (t.kind === "free") { drag = { kind: "push", u0: p.u, v0: p.v, u: p.u, v: p.v }; }
+    else if (t.kind === "fit") {
+      const near = pt => pt && Math.hypot((pt.u - p.u) * view.w, (pt.v - p.v) * view.h) < 30;
+      if (near(pending.H)) drag = { kind: "fitpt", which: "H" };
+      else if (near(pending.F)) drag = { kind: "fitpt", which: "F" };
+      else if (!pending.H || pending.F) { pending.H = p; pending.F = null; drag = { kind: "fitpt", which: "H" }; }
+      else { pending.F = p; drag = { kind: "fitpt", which: "F" }; }
+      syncBody();
+    }
     else if (t.kind === "band") {
       const which = Math.abs(p.v - pending.y0) < Math.abs(p.v - pending.y1) ? "y0" : "y1";
       pending[which] = Math.min(1, Math.max(0, p.v)); drag = { kind: "band", which };
     } else { pending.x = p.u; pending.y = p.v; drag = { kind: "move" }; }
+  } else {
+    const L = hitText(p.u, p.v);
+    if (L) {
+      if (tab !== "text") switchTab("text");
+      selText = L.id; syncText(); drag = { kind: "text", L, du: L.x - p.u, dv: L.y - p.v, moved: false };
+    } else {
+      if (tab === "text" && selText) { selText = null; syncText(); }
+      if (zoom > 1.001) startPan(ev);
+    }
   }
-  ov.setPointerCapture(ev.pointerId); requestRender();
+  requestRender();
 });
 ov.addEventListener("pointermove", (ev) => {
+  if (!pts.has(ev.pointerId)) return;
+  pts.set(ev.pointerId, stageXY(ev));
+  if (pinch && pts.size >= 2) {
+    const [a, b] = [...pts.values()];
+    const mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+    zoom = Math.min(maxZoom(), Math.max(1, pinch.z0 * Math.hypot(a.x - b.x, a.y - b.y) / pinch.d0));
+    const w = fitR.w * zoom, h = fitR.h * zoom;
+    panX = mid.x - pinch.u * w - (fitR.x + (fitR.w - w) / 2); panY = mid.y - pinch.v * h - (fitR.y + (fitR.h - h) / 2);
+    updateView(); requestRender(); return;
+  }
   if (!drag) return;
   const p = toImg(ev);
-  if (drag.kind === "text") { drag.L.x = Math.min(1.2, Math.max(-0.2, p.u + drag.du)); drag.L.y = Math.min(1.2, Math.max(-0.2, p.v + drag.dv)); drag.moved = true; }
+  if (drag.kind === "pan") { const s = stageXY(ev); panX = drag.px + s.x - drag.x0; panY = drag.py + s.y - drag.y0; updateView(); }
+  else if (drag.kind === "text") { drag.L.x = Math.min(1.2, Math.max(-0.2, p.u + drag.du)); drag.L.y = Math.min(1.2, Math.max(-0.2, p.v + drag.dv)); drag.moved = true; }
   else if (drag.kind === "face") { state.protect.x = p.u; state.protect.y = p.v; }
   else if (drag.kind === "push") { drag.u = p.u; drag.v = p.v; }
+  else if (drag.kind === "fitpt") { pending[drag.which] = { u: Math.min(1, Math.max(0, p.u)), v: Math.min(1, Math.max(0, p.v)) }; }
   else if (drag.kind === "band") { pending[drag.which] = Math.min(1, Math.max(0, p.v)); }
   else if (drag.kind === "move") { pending.x = p.u; pending.y = p.v; }
   requestRender();
 });
-function endDrag() {
-  if (!drag) return;
-  if (drag.kind === "push") {
-    const ar = img.w / img.h;
-    let vx = (drag.u - drag.u0) * ar, vy = drag.v - drag.v0;
-    const mag = Math.hypot(vx, vy), cap = brushSize * 0.6;
-    if (mag > cap) { vx *= cap / mag; vy *= cap / mag; }
-    if (mag > 0.002) {
-      if (state.ops.length >= 24) toast("You've reached 24 body edits. Reset or undo some first.");
-      else { state.ops.push({ a: [drag.u0, drag.v0, brushSize, brushSize], b: [3, 0, vx, vy], tool: "push" }); commit(); }
-    }
-  } else if (drag.kind === "face" || (drag.kind === "text" && drag.moved)) commit();
-  drag = null; syncBody(); requestRender();
+function endPointer(ev) {
+  if (!pts.has(ev.pointerId)) return;
+  const end = stageXY(ev);
+  pts.delete(ev.pointerId);
+  if (pinch) { if (pts.size < 2) { pinch = null; drag = null; } return; }
+  const wasTap = downAt && Math.hypot(end.x - downAt.x, end.y - downAt.y) < 8 && performance.now() - downAt.t < 350;
+  if (drag) {
+    if (drag.kind === "push") {
+      const ar = img.w / img.h;
+      let vx = (drag.u - drag.u0) * ar, vy = drag.v - drag.v0;
+      const mag = Math.hypot(vx, vy), cap = brushSize * 0.6;
+      if (mag > cap) { vx *= cap / mag; vy *= cap / mag; }
+      if (mag > 0.002) {
+        if (state.ops.length >= 24) toast("You've reached 24 body edits. Reset or undo some first.");
+        else { state.ops.push({ a: [drag.u0, drag.v0, brushSize, brushSize], b: [3, 0, vx, vy], tool: "push" }); commit(); }
+      }
+    } else if (drag.kind === "face" || (drag.kind === "text" && drag.moved)) commit();
+    drag = null;
+  }
+  // double-tap on the photo (outside body tools and text) toggles fit / 100% zoom
+  if (wasTap && (tab === "enhance" || tab === "color" || (tab === "body" && !bodyTool)) && !hitText(...Object.values(toImg(ev)))) {
+    const now = performance.now();
+    if (now - lastTap.t < 320 && Math.hypot(end.x - lastTap.x, end.y - lastTap.y) < 30) {
+      if (zoom > 1.05) { zoom = 1; panX = panY = 0; updateView(); requestRender(); }
+      else zoomAt(Math.max(2, img.w / (fitR.w * view.dpr)), end.x, end.y);
+      lastTap.t = 0;
+    } else lastTap = { t: now, x: end.x, y: end.y };
+  }
+  syncBody(); requestRender();
 }
-ov.addEventListener("pointerup", endDrag); ov.addEventListener("pointercancel", endDrag);
+ov.addEventListener("pointerup", endPointer); ov.addEventListener("pointercancel", endPointer);
 
 /* ------------------------------------------------------------------ before/after */
 const bef = $("#before");
@@ -1255,7 +1509,7 @@ $("#expGo").onclick = async () => {
   if (!set) { st.className = "status err"; st.textContent = "This device ran out of graphics memory. Try 2K or Original size."; $("#expGo").disabled = false; return; }
   let blob;
   try {
-    runPipeline(set, { pending: false });
+    runPipeline(set, null, { pending: false });
     gl.bindFramebuffer(gl.FRAMEBUFFER, set.fT);
     const px = new Uint8Array(W * H * 4);
     gl.readPixels(0, 0, W, H, gl.RGBA, gl.UNSIGNED_BYTE, px);
@@ -1266,7 +1520,7 @@ $("#expGo").onclick = async () => {
     cx.putImageData(new ImageData(new Uint8ClampedArray(px.buffer), W, H), 0, 0);
     await Promise.all(state.texts.map(L => document.fonts.load(fontSpec(L, 40), L.text || "Aa").catch(() => {})));
     state.texts.forEach(L => drawText(cx, L, 0, 0, W, H));
-    blob = await new Promise(r => c.toBlob(r, fmt === "png" ? "image/png" : "image/jpeg", 0.95));
+    blob = await new Promise(r => c.toBlob(r, fmt === "png" ? "image/png" : "image/jpeg", 0.97));
     c.width = c.height = 1;
   } catch (err) {
     freeSet(set);
