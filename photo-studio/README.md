@@ -57,6 +57,9 @@ The embedded sample photo is AI-generated (SDXL-Turbo).
 * WebGL context loss (phones under memory pressure) is handled: programs, textures and buffers are rebuilt and
   edits are kept. TF.js (person cut-out and body points) runs on the graphics chip when possible and falls back to the processor if that fails.
 * Each new gesture clears stale pointers; a global error handler resets gesture state; layout changes are debounced.
+* Open and Add second video use no type filter, so Android shows its normal file picker (Files) rather than the
+  photo picker, whose videos the browser may only be able to play, not read. If a clip still can't be read, the
+  save sheet and Video tab offer "Pick from Files": the same video is swapped in with every edit kept.
 * Phones hand the browser a picked video as a reference into Google Photos, Files or a cloud app; some of these
   only allow reading front to back, or stop allowing reads later ("the requested file could not be read"). When a
   clip is opened the app checks it can read the file in pieces; if not, it copies it once, front to back, into the

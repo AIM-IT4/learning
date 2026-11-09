@@ -190,7 +190,7 @@ progress { width: 100%; height: 8px; accent-color: var(--accent); }
     <div class="brand"><span class="logo" aria-hidden="true">रोशनी</span><span class="name">Roshni Photo Studio</span></div>
     <div class="actions">
       <label class="btn" for="file" tabindex="0" id="openLabel" title="Open a photo or a video">Open</label>
-      <input id="file" type="file" accept="image/*,video/*" hidden>
+      <input id="file" type="file" hidden>
       <button class="btn icon" id="undo" aria-label="Undo" title="Undo" disabled>↶</button>
       <button class="btn icon" id="redo" aria-label="Redo" title="Redo" disabled>↷</button>
       <button class="btn hold" id="before" title="Press and hold to see the original"><span class="long">Hold: before</span><span class="short">Before</span></button>
@@ -362,14 +362,15 @@ progress { width: 100%; height: 8px; accent-color: var(--accent); }
       <!-- VIDEO -->
       <div class="pane" id="pane-video" role="tabpanel" hidden>
         <p class="section-label">Clip 1</p>
-        <div class="clip-row"><span class="note" id="clipAInfo"></span><button class="btn" id="rotA" title="Turn clip 1 by 90°">↻ Rotate</button></div>
+        <div class="clip-row"><span class="note" id="clipAInfo"></span><button class="btn" id="rotA" title="Turn clip 1 by 90°">↻ Rotate</button><label class="btn" for="fileAnyA" tabindex="0" id="relinkA" title="Pick the same video again from the Files app; your edits are kept">Pick from Files</label></div>
+        <input id="fileAnyA" type="file" hidden><input id="fileAnyB" type="file" hidden>
         <p class="section-label">Combine two videos</p>
         <div class="clip-row">
           <label class="btn primary" for="file2" tabindex="0" id="addB">+ Add second video</label>
-          <input id="file2" type="file" accept="video/*" hidden>
+          <input id="file2" type="file" hidden>
         </div>
         <div id="combBox" class="pane" hidden>
-          <div class="clip-row"><span class="note" id="clipBInfo"></span><button class="btn" id="rotB" title="Turn clip 2 by 90°">↻ Rotate</button><button class="btn" id="swapAB">⇄ Swap sides</button><button class="btn" id="removeB">Remove</button></div>
+          <div class="clip-row"><span class="note" id="clipBInfo"></span><button class="btn" id="rotB" title="Turn clip 2 by 90°">↻ Rotate</button><button class="btn" id="swapAB">⇄ Swap sides</button><button class="btn" id="removeB">Remove</button><label class="btn" for="fileAnyB" tabindex="0" id="relinkB" title="Pick the same video again from the Files app; your edits are kept">Pick from Files</label></div>
           <p class="section-label">Layout</p>
           <div class="chips" id="combLayout"></div>
           <div id="seqBox" class="pane">
@@ -433,6 +434,7 @@ progress { width: 100%; height: 8px; accent-color: var(--accent); }
       <label class="check"><input type="checkbox" id="vAudio" checked> <span id="vAudioLabel">Keep the original sound</span></label>
       <p class="note">Every frame gets your enhance, colour, body, retouch and text edits. Natural fit finds the body on every frame; other body and spot edits follow the person too. The video is made on this phone; nothing is uploaded.</p>
       <p class="status err" id="slowNote" hidden></p>
+      <div class="row-wrap" id="slowFix" hidden><label class="btn primary" for="fileAnyA" tabindex="0" id="slowFixA">Pick clip 1 from Files</label><label class="btn primary" for="fileAnyB" tabindex="0" id="slowFixB">Pick clip 2 from Files</label></div>
     </div>
     <progress id="expProg" max="1" value="0" hidden></progress>
     <p class="status" id="expStatus"></p>
@@ -2448,7 +2450,7 @@ async function openVideo(file) {
   freeCompTex(); compOn = false; compL = null;
   Object.assign(comb, { mode: "seq", trans: "blend", tdur: 0.8, seam: 22, fill: "fill", swap: false, sound: "both" });
   vid = c; vtime = 0; poseCache.clear(); curPose = null; lastVideo = null;
-  c.el.onended = () => { if (!compOn) { stopPlayback(); updateVideoFrame(); scheduleMask(); } };
+  c.el.onended = onEndA;
   await loadSource(c.el, false);
   if (!img || img.src !== c.el) return;
   $("#vbar").hidden = false; $("#save").textContent = "Save";
@@ -2458,6 +2460,36 @@ async function openVideo(file) {
   loadVideoLibs().catch(() => {});
   prepSource(c);
 }
+function syncSlowFix(show) {
+  const a = !!(vid && vid.unreadable), b = !!(vidB && vidB.unreadable);
+  const vis = show === undefined ? !$("#vidOpts").hidden : show;
+  $("#slowFix").hidden = !vis || !(a || b); $("#slowFixA").hidden = !a; $("#slowFixB").hidden = !b;
+  if (!$("#slowNote").hidden && !(a || b)) $("#slowNote").hidden = true;
+}
+const onEndA = () => { if (!compOn) { stopPlayback(); updateVideoFrame(); scheduleMask(); } };
+async function relinkClip(which, file) {
+  const old = which === "a" ? vid : vidB;
+  if (!old || videoBusy || !isVideoFile(file)) return;
+  toast("Opening the video from Files…", 25000);
+  const c = await loadClipEl(file);
+  if (!c) return;
+  stopPlayback();
+  c.rot = old.rot;
+  if (which === "a") c.el.onended = onEndA; else c.el.loop = old.el.loop;
+  disposeClip(old);
+  if (which === "a") { vid = c; img.src = c.el; } else vidB = c;
+  lastVideo = null;
+  await rebuildComposite();
+  await seekTimeline(vtime);
+  syncVideoPane(); syncSlowFix();
+  if (Math.abs((c.duration || 0) - (old.duration || 0)) > 0.5) toast("This video is a different length from the one it replaces; check your edits.", 5000);
+  if (await canSeek(c.file)) toast("Opened from Files. The app can read this video directly, so saving will be fast.", 4500);
+  else prepSource(c);
+  syncSlowFix(); if (!$("#exportSheet").hidden) syncExportSheet();
+}
+$("#fileAnyA").addEventListener("change", ev => { const f = ev.target.files && ev.target.files[0]; if (f) relinkClip("a", f); ev.target.value = ""; });
+$("#fileAnyB").addEventListener("change", ev => { const f = ev.target.files && ev.target.files[0]; if (f) relinkClip("b", f); ev.target.value = ""; });
+["relinkA", "relinkB", "slowFixA", "slowFixB"].forEach(id => $("#" + id).addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); $("#" + (id.endsWith("A") ? "fileAnyA" : "fileAnyB")).click(); } }));
 async function openSecond(file) {
   if (!vid || videoBusy) return;
   toast("Adding the second video…", 25000);
@@ -2654,7 +2686,7 @@ $("#rotA").onclick = () => { if (!vid || videoBusy) return; stopPlayback(); vid.
 $("#rotB").onclick = () => { if (!vidB || videoBusy) return; stopPlayback(); vidB.rot = (vidB.rot + 90) % 360; lastVideo = null; rebuildComposite(); syncVideoPane(); };
 $("#swapAB").onclick = () => { if (!vidB || videoBusy) return; stopPlayback(); comb.swap = !comb.swap; lastVideo = null; rebuildComposite(); syncVideoPane(); };
 $("#removeB").onclick = () => { if (!videoBusy) removeSecond(); };
-$("#file2").addEventListener("change", ev => { const f = ev.target.files && ev.target.files[0]; if (f && isVideoFile(f)) openSecond(f); ev.target.value = ""; });
+$("#file2").addEventListener("change", ev => { const f = ev.target.files && ev.target.files[0]; if (f) { if (isVideoFile(f)) openSecond(f); else toast("Pick a video (MP4 or MOV) for clip 2.", 3000); } ev.target.value = ""; });
 $("#addB").addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); $("#file2").click(); } });
 const BODY_HELP_PHOTO = $("#bodyHelp").textContent;
 const BODY_HELP_VIDEO = "Natural fit finds the body on every frame of the video, so the fit follows the person as they walk, turn or move closer. Other body edits and dark-circle spots also follow the person. Face lock keeps the face untouched.";
@@ -2748,10 +2780,11 @@ async function sourceFor(c, ui, label) {
   });
   return c.prep;
 }
-const SLOW_HELP = "Your phone only lets the browser play this video, not read the file, so saving has to go frame by frame from the player and is slow. For fast saving: in Google Photos tap ⋮ → Download, then tap Open here and pick the video from the Files app (Downloads or Movies).";
+const SLOW_HELP = "The app this video was picked from only lets the browser play it, not read the file, so saving is slow. For the fastest save, tap Pick from Files below and choose the same video in Files → Internal storage → DCIM → Camera (or Videos). Your edits are kept.";
 function slowNotice() {
   const n = $("#slowNote"); if (n) n.hidden = ![vid, vidB].some(c => c && c.unreadable);
-  if (!videoBusy) toast("Saving this video will be slow: your phone blocks reading the file. See Save for the fast way.", 5000);
+  syncSlowFix();
+  if (!videoBusy) toast("Saving will be slow: the app this video came from blocks reading it. In the Video tab, tap Pick from Files and choose the same video for a fast save.", 6000);
 }
 // checked as soon as a clip is opened, so a copy (if needed) is usually ready before saving
 async function prepSource(c) {
@@ -3676,6 +3709,7 @@ function syncExportSheet() {
   const asVideo = isV && fmt === "mp4";
   $("#vidOpts").hidden = !asVideo;
   $("#slowNote").textContent = SLOW_HELP; $("#slowNote").hidden = !asVideo || ![vid, vidB].some(c => c && c.unreadable);
+  syncSlowFix(asVideo);
   if (asVideo) {
     [["3840", "3840"], ["1920", "mid"], ["orig", "orig"]].forEach(([k, id]) => { const s = videoOutSize(img.w, img.h, k); $("#sz" + id).textContent = `${s.W} × ${s.H}`; });
     const choice = document.querySelector('input[name="size"]:checked').value, s = videoOutSize(img.w, img.h, choice), d = timeline().dur || 0;
