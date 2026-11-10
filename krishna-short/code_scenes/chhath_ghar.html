@@ -1,0 +1,575 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Chhath homecoming</title>
+<style>
+@font-face { font-family: 'Yatra One'; src: url('fonts/YatraOne.ttf'); }
+@font-face { font-family: 'Tiro'; src: url('fonts/TiroDevanagariHindi-0.ttf'); }
+@font-face { font-family: 'NotoDeva'; src: url('fonts/NotoSansDevanagari-0.ttf'); }
+@font-face { font-family: 'Rozha'; src: url('fonts/RozhaOne.ttf'); }
+html,body{margin:0;background:#000}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="mithila.js"></script>
+<script src="film_kit.js"></script>
+<script>
+// "छठ — घर बुलाता है": a Bihari working in Mumbai goes home for Chhath. Part 1 (the journey: Mumbai, Maa's call,
+// packing, flights and the Chhath special train, station boards, the auto to the village, Maa at the door) runs on
+// the song's instrumental intro; part 2 (the four days with the family, the daura, kosi and fireworks, thekua) on its
+// vocals. Shot times, subtitles and word cues come from voice/make_timing_ghar.py through window.setTiming().
+const DEF = {
+  shots: [['mumbai', 0, 5.29], ['phone', 5.29, 11.45], ['pack', 11.45, 15.87], ['flight', 15.87, 18.53], ['train', 18.53, 22.73], ['stations', 22.73, 29.94],
+    ['auto', 29.94, 37.42], ['door', 37.42, 42.7], ['family', 42.7, 50.629], ['day1', 50.629, 56.391], ['day2', 56.391, 62.154], ['day3', 62.154, 71.757],
+    ['kosi', 71.757, 77.52], ['day4', 77.52, 82.322], ['end', 82.322, 89.044]],
+  subs: [], cues: {}, total: 89.044, fast: ['day1', 'day2', 'day3', 'kosi', 'day4', 'end'],
+};
+const SC = {}, OVER = {};
+// the family
+const SON = { kind: 'man', outfit: 'shirt', shirt: '#2f6fb0', pants: '#2a2a38', bangles: false, alta: false, seed: 1 };
+const SON_HOME = { ...SON, outfit: 'kurta', kurta: C.yellow, pants: C.white, border: C.red, shoe: 'sandal' };
+const MAA = { kind: 'woman', ghunghat: true, sari: C.red, sari2: C.yellow, border: C.gold, blouse: C.yellow, seed: 2 };
+const PAPA = { kind: 'man', outfit: 'kurta', kurta: C.cream, pants: C.white, border: C.maroon, mustache: true, hairCol: '#9a9a9a', glasses: true, shoe: 'sandal', seed: 3 };
+const BHABHI = { kind: 'woman', ghunghat: true, sari: C.pink, sari2: C.gold, border: C.red, blouse: C.green, seed: 4 };
+const GIRL = { kind: 'woman', child: true, sindoor: false, sari: C.orange, sari2: C.yellow, border: C.red, blouse: C.green, seed: 5, bangles: false, alta: false };
+const BOY = { kind: 'man', outfit: 'shirt', child: true, shirt: C.red, pants: '#2a4a8a', seed: 6 };
+
+// ------------------------------------------------------------------ small helpers
+function rr(x, y, w, h, r) { g.roundRect(x, y, w, h, r); }
+function palm(x, y, s, t) { // taad (palmyra) tree
+  g.save(); g.translate(x, y); g.scale(s, s);
+  shape(() => { g.moveTo(-0.22, 0); g.quadraticCurveTo(0.2, -4, 0.05, -8.2); g.lineTo(0.3, -8.2); g.quadraticCurveTo(0.45, -4, 0.22, 0); g.closePath(); }, '#5a3a22', { w: 0.06, pattern: () => { for (let yy = -0.5; yy > -8.2; yy -= 0.5) { g.strokeStyle = 'rgba(0,0,0,0.35)'; g.lineWidth = 0.05; g.beginPath(); g.moveTo(-0.5, yy); g.lineTo(0.8, yy - 0.1); g.stroke(); } } });
+  for (let i = 0; i < 11; i++) { const a = -Math.PI + i / 10 * Math.PI + Math.sin(t * 1.3 + i) * 0.04, L = 2.1 + (i % 2) * 0.4;
+    shape(() => { g.moveTo(0.17, -8.2); g.quadraticCurveTo(0.17 + Math.cos(a - 0.15) * L * 0.6, -8.2 + Math.sin(a - 0.15) * L * 0.6, 0.17 + Math.cos(a) * L, -8.2 + Math.sin(a) * L * 0.8 + 0.3); g.quadraticCurveTo(0.17 + Math.cos(a + 0.15) * L * 0.6, -8.2 + Math.sin(a + 0.15) * L * 0.6, 0.17, -8.2); }, i % 2 ? C.green : C.leaf, { w: 0.05 }); }
+  g.restore();
+}
+function hut(x, y, s, col = '#c98a52', lit = 0) {
+  g.save(); g.translate(x, y); g.scale(s, s);
+  shape(() => g.rect(-2, -2.2, 4, 2.2), col, { w: 0.07, pattern: () => zigzagBand(-2, 2, -1.9, 0.18, C.red, 0.4) });
+  shape(() => { g.moveTo(-2.5, -2.1); g.lineTo(0, -4.0); g.lineTo(2.5, -2.1); g.closePath(); }, '#b0904a', { w: 0.07, pattern: () => patLines('rgba(90,60,20,0.5)', 0.22, 0.05, 1.2, 6) });
+  shape(() => g.rect(-0.45, -1.5, 0.9, 1.5), lit ? '#ffcf70' : '#2a1a0a', { w: 0.06 });
+  if (lit) glow(0, -0.75, 2.6, `rgba(255,190,90,${0.5 * lit})`);
+  g.restore();
+}
+function mug(x, y, t) { shape(() => rr(x - 20, y - 26, 40, 50, 6), C.cream, { w: 3, pattern: () => zigzagBand(x - 20, x + 20, y - 4, 6, C.red, 10) }); g.beginPath(); g.arc(x + 22, y, 12, -1.2, 1.2); inkStroke(5, C.cream); g.beginPath(); g.arc(x + 22, y, 12, -1.2, 1.2); inkStroke(2); steam(x, y - 30, 0.35, t, 2); }
+function aripanFloor(cx, cy, r) {
+  g.save(); g.translate(cx, cy); g.scale(1, 0.4); g.strokeStyle = 'rgba(252,246,232,0.95)'; g.fillStyle = 'rgba(252,246,232,0.95)'; g.globalAlpha = REVEAL.f;
+  for (let k = 0; k < 3; k++) { g.lineWidth = 6; g.beginPath(); g.arc(0, 0, r * (0.35 + k * 0.3), 0, TAU); g.stroke(); for (let i = 0; i < 8 + k * 4; i++) { const a = i / (8 + k * 4) * TAU; g.beginPath(); g.arc(Math.cos(a) * r * (0.5 + k * 0.3), Math.sin(a) * r * (0.5 + k * 0.3), 7, 0, TAU); g.fill(); } }
+  g.beginPath(); g.arc(0, 0, r * 0.12, 0, TAU); g.fillStyle = C.red; g.fill(); g.restore();
+}
+function bag(x, y, w, col = C.maroon) { // a travel bag hanging from (x, y)
+  g.beginPath(); g.arc(x, y + 6, w * 0.16, Math.PI, 0); inkStroke(5, '#3a2418');
+  shape(() => rr(x - w / 2, y + 6, w, w * 0.62, 12), col, { w: 4, pattern: () => { zigzagBand(x - w / 2, x + w / 2, y + w * 0.32, 8, C.gold, 16); } });
+}
+function dustPuff(x, y, t, n = 6) { for (let i = 0; i < n; i++) { const p = (t * 1.4 + i / n) % 1; g.fillStyle = `rgba(222,190,140,${0.45 * (1 - p)})`; g.beginPath(); g.arc(x - p * 120 - i * 6, y - p * 40, 14 + p * 30, 0, TAU); g.fill(); } }
+// fireworks: a burst `age` seconds after it pops; rgb 'r,g,b'
+function burst(cx, cy, age, seed, rgb, n = 54, rad = 230) {
+  if (age < 0 || age > 2.4) return;
+  const r = R(seed), k = easeOut(age / 1.0), fade = 1 - clamp((age - 0.7) / 1.7);
+  g.save(); g.globalCompositeOperation = 'lighter';
+  if (age < 0.35) glow(cx, cy, 300 * (1 - age / 0.35) + 60, `rgba(255,240,200,${0.6 * (1 - age / 0.35)})`);
+  for (let i = 0; i < n; i++) {
+    const a = i / n * TAU + r() * 0.12, sp = rad * (0.7 + r() * 0.4), dy = 70 * age * age;
+    const x = cx + Math.cos(a) * sp * k, y = cy + Math.sin(a) * sp * k + dy, x0 = cx + Math.cos(a) * sp * k * 0.72, y0 = cy + Math.sin(a) * sp * k * 0.72 + dy * 0.85;
+    g.strokeStyle = `rgba(${rgb},${0.45 * fade})`; g.lineWidth = 3; g.beginPath(); g.moveTo(x0, y0); g.lineTo(x, y); g.stroke();
+    const tw = 0.55 + 0.45 * Math.sin(age * 28 + i * 1.7);
+    g.fillStyle = `rgba(${rgb},${fade * tw})`; g.beginPath(); g.arc(x, y, 5, 0, TAU); g.fill();
+    if (i % 3 === 0) { g.fillStyle = `rgba(255,255,255,${fade * tw * 0.85})`; g.beginPath(); g.arc(x, y, 2.2, 0, TAU); g.fill(); }
+  }
+  g.restore();
+}
+function rocketTrail(x, y0, y1, p) { if (p <= 0 || p >= 1) return; const y = lerp(y0, y1, easeOut(p)); g.save(); g.globalCompositeOperation = 'lighter'; for (let i = 0; i < 12; i++) { g.fillStyle = `rgba(255,210,140,${0.6 * (1 - i / 12)})`; g.beginPath(); g.arc(x + Math.sin(i) * 2, y + i * 9, 3.5 - i * 0.2, 0, TAU); g.fill(); } g.restore(); }
+function anar(x, y, t, h = 300) { // ground fountain firework
+  g.save(); g.globalCompositeOperation = 'lighter'; const r = R(99);
+  for (let i = 0; i < 110; i++) { const ph = (t * 1.7 + r()) % 1, a = -Math.PI / 2 + (r() - 0.5) * 0.75, v = h * (0.7 + r() * 0.5);
+    const px = x + Math.cos(a) * v * ph, py = y - 30 + Math.sin(a) * v * ph + 320 * ph * ph;
+    g.fillStyle = `rgba(255,${190 + Math.floor(r() * 60)},${80 + Math.floor(r() * 90)},${(1 - ph) * 0.9})`; g.beginPath(); g.arc(px, py, 2.4 + (1 - ph) * 2.2, 0, TAU); g.fill(); }
+  g.restore(); glow(x, y - 40, 150, 'rgba(255,200,90,0.45)');
+  shape(() => { g.moveTo(x - 24, y + 6); g.lineTo(x - 12, y - 34); g.lineTo(x + 12, y - 34); g.lineTo(x + 24, y + 6); g.closePath(); }, C.red, { w: 3, pattern: () => patDots(C.yellow, 12, 2, x - 30, y - 40, x + 30, y + 10) });
+}
+// a local ink-wipe between two painters inside one shot (p 0..1)
+function wipeBetween(p, a, b, seed, cx = 540, cy = 1000) {
+  if (p <= 0) return a(); if (p >= 1) return b();
+  a(); g.save(); inkWipe(p, seed, cx, cy); g.clip(); b(); g.restore();
+  g.save(); inkWipe(p, seed, cx, cy); g.strokeStyle = `rgba(40,15,5,${0.5 * (1 - p)})`; g.lineWidth = 14; g.stroke(); g.restore();
+}
+
+// ------------------------------------------------------------------ 1 Mumbai: alone on a high-rise balcony at night
+function skyline(seed, base, hmin, hmax, wmin, wmax, col, lit, t, ant) {
+  const r = R(seed); let x = -240;
+  while (x < 1320) { const w = wmin + r() * (wmax - wmin), h = hmin + r() * (hmax - hmin); tower(x, base, w, h, t, { col, lit, seed: Math.floor(r() * 1e6), antenna: ant && r() < 0.4, cw: w > 110 ? 22 : 17, chh: 26 }); x += w + 8 + r() * 24; }
+}
+function seaLink(x, y, s, t) { // cable-stayed bridge across the bay
+  g.save(); g.translate(x, y); g.strokeStyle = 'rgba(205,215,255,0.55)'; g.lineWidth = 1.6;
+  for (const px of [0, 300 * s]) {
+    for (let k = 1; k <= 8; k++) { g.beginPath(); g.moveTo(px, -170 * s); g.lineTo(px - k * 24 * s, 0); g.moveTo(px, -170 * s); g.lineTo(px + k * 24 * s, 0); g.stroke(); }
+    shape(() => { g.moveTo(px - 14 * s, 4); g.lineTo(px - 3 * s, -186 * s); g.lineTo(px + 3 * s, -186 * s); g.lineTo(px + 14 * s, 4); g.closePath(); }, '#3a3f7a', { w: 2 });
+  }
+  shape(() => g.rect(-320 * s, -3, 980 * s, 8), '#2a2f66', { w: 2 });
+  for (let i = 0; i < 48; i++) { g.fillStyle = `rgba(255,220,150,${0.55 + 0.45 * Math.sin(t * 2 + i)})`; g.fillRect(-310 * s + i * 20 * s, -7, 3, 3); }
+  g.restore();
+}
+function necklace(t) { // the curve of streetlights along the sea front
+  const P = u => [lerp(-140, 1220, u), (1 - u) * (1 - u) * 1395 + 2 * (1 - u) * u * 1500 + u * u * 1345];
+  g.beginPath(); for (let i = 0; i <= 40; i++) { const [x, y] = P(i / 40); i ? g.lineTo(x, y) : g.moveTo(x, y); } g.strokeStyle = '#1a1730'; g.lineWidth = 30; g.stroke();
+  for (let i = 0; i < 18; i++) { const uu = (t * 0.045 + i / 18) % 1, [x, y] = P(uu); g.fillStyle = i % 2 ? 'rgba(255,90,70,0.95)' : 'rgba(255,248,220,0.95)'; g.fillRect(x - 7, y - 4 + (i % 2) * 7, 14, 3.5); }
+  for (let i = 0; i <= 50; i++) { const [x, y] = P(i / 50); glow(x, y - 18, 30, 'rgba(255,190,90,0.5)'); g.fillStyle = '#ffe0a0'; g.beginPath(); g.arc(x, y - 18, 4.2, 0, TAU); g.fill(); }
+}
+SC.mumbai = (u, T) => {
+  camPath(u / T, [520, 900, 1.0], [600, 980, 1.1]);
+  layer(0.1, () => { skyGrad([[0, '#05081f'], [0.4, '#121845'], [0.54, '#2a2357'], [0.62, '#55305e']]); paperOver(0.2); stars(70, 9, 700, u); moon(860, 300, 52, '#0a0f30'); });
+  layer(0.25, () => { skyline(21, 1130, 220, 520, 50, 110, '#262b66', 0.26, u, false); });
+  layer(0.42, () => {
+    skyline(5, 1170, 380, 780, 90, 175, '#151944', 0.5, u, true);
+    shape(() => g.rect(-300, 1165, 1680, 420), '#0b1238', { ink: false });
+    seaLink(130, 1210, 0.85, u);
+    g.save(); g.globalCompositeOperation = 'lighter'; const r = R(8);
+    for (let i = 0; i < 70; i++) { const x = r() * 1240 - 80, y = 1225 + r() * 170, w = 6 + r() * 28; g.fillStyle = `rgba(255,${190 + (r() * 50 | 0)},120,${0.1 + 0.16 * (0.5 + 0.5 * Math.sin(u * 2 + i))})`; g.fillRect(x + Math.sin(u * 1.5 + i) * 6, y, w, 3); }
+    g.restore();
+    necklace(u);
+  });
+  layer(0.95, () => {
+    shape(() => g.rect(-300, 1640, 1680, 600), '#33263a', { w: 4, pattern: () => { patLines('rgba(255,220,160,0.1)', 96, 3, 0, 2600); patLines('rgba(255,220,160,0.1)', 96, 3, 1.57, 2600); } });
+    shape(() => g.rect(-300, 1462, 1680, 22), '#2a2238', { w: 4, inkCol: '#c99a40' });
+    for (let x = -280; x < 1380; x += 64) shape(() => g.rect(x, 1484, 9, 160), '#2a2238', { w: 2, inkCol: '#c99a40' });
+    shape(() => g.rect(-300, 1630, 1680, 16), '#2a2238', { w: 3, inkCol: '#c99a40' });
+    glow(-60, 1560, 760, 'rgba(255,170,80,0.26)');
+    tulsi(930, 1700, 34, u);
+    const f = figure(300, 1830, 84, { ...SON, pose: 'hold' }, u);
+    mug(f.hand[0] + 10, f.hand[1] + 4, u);
+  });
+};
+OVER.mumbai = (u, T) => place(u, T, 'मुंबई', 'घर से बहुत दूर…', 150);
+
+// ------------------------------------------------------------------ 2 Maa calls
+function bokeh(t, seed = 3) { const r = R(seed); g.save(); g.globalCompositeOperation = 'lighter'; for (let i = 0; i < 34; i++) { const x = r() * 1180 - 50, y = r() * 1900, rad = 30 + r() * 80, warm = r() < 0.6, a = 0.07 + r() * 0.14 + 0.04 * Math.sin(t * 1.2 + i); g.fillStyle = warm ? `rgba(255,180,90,${a})` : `rgba(120,160,255,${a})`; g.beginPath(); g.arc(x + Math.sin(t * 0.3 + i) * 8, y, rad, 0, TAU); g.fill(); } g.restore(); }
+function handset(x, y, s, rot, col) { g.save(); g.translate(x, y); g.rotate(rot); g.scale(s, s); g.beginPath(); g.moveTo(-0.85, -0.3); g.quadraticCurveTo(0, 0.5, 0.85, -0.3); g.lineWidth = 0.36; g.strokeStyle = col; g.lineCap = 'round'; g.stroke(); g.restore(); }
+function portrait(cx, cy, r, who, t) {
+  g.save(); g.beginPath(); g.arc(cx, cy, r, 0, TAU); g.clip(); g.fillStyle = C.turmeric; g.fillRect(cx - r, cy - r, 2 * r, 2 * r); patDots(C.orange, 26, 3, cx - r, cy - r, cx + r, cy + r);
+  const k = r * 0.8; g.translate(cx - 0.2 * k, cy + 6.45 * k); g.scale(k, k);
+  shape(() => g.ellipse(0.15, -5.0, 1.15, 0.8, 0, 0, TAU), who.sari, { w: 0.04, pattern: () => patDots(who.sari2, 0.3, 0.05, -1.2, -6, 1.4, -4.2) });
+  shape(() => { g.moveTo(0.1, -6.18); g.lineTo(0.42, -6.12); g.lineTo(0.42, -5.72); g.lineTo(0.0, -5.74); g.closePath(); }, C.skin, { w: 0.03 });
+  head({ ...who, skin: C.skin, t });
+  g.restore(); g.beginPath(); g.arc(cx, cy, r, 0, TAU); g.lineWidth = 6; g.strokeStyle = C.gold; g.stroke();
+}
+SC.phone = (u, T) => {
+  camPath(u / T, [540, 990, 1.07], [540, 930, 1.0]);
+  const pick = cue('babua', 3.9) - 0.6, on = ease((u - pick) / 0.3);
+  layer(0.2, () => { skyGrad([[0, '#0b0d2e'], [0.6, '#22163e'], [1, '#3a1a3a']]); paperOver(0.25); bokeh(u); });
+  layer(0.85, () => {
+    const px = 300, py = 440, pw = 480, ph = 980, cx = 540;
+    shape(() => { g.moveTo(10, 2100); g.lineTo(230, 1500); g.lineTo(560, 1590); g.lineTo(430, 2100); g.closePath(); }, SON.shirt, { w: 6, pattern: () => { patLines('rgba(0,0,0,0.13)', 26, 4, 0, 3000); patLines('rgba(0,0,0,0.1)', 26, 4, 1.57, 3000); } });
+    shape(() => { g.moveTo(250, 1560); g.quadraticCurveTo(270, 1330, 420, 1270); g.lineTo(770, 1250); g.quadraticCurveTo(850, 1420, 720, 1580); g.quadraticCurveTo(500, 1660, 250, 1560); g.closePath(); }, C.skin, { w: 6 });
+    shape(() => rr(px, py, pw, ph, 64), '#16131d', { w: 7, inkCol: '#d9a520' });
+    g.save(); g.beginPath(); rr(px + 20, py + 20, pw - 40, ph - 40, 48); g.clip();
+    const gr = g.createLinearGradient(0, py, 0, py + ph); gr.addColorStop(0, '#5a1420'); gr.addColorStop(1, '#1e1440'); g.fillStyle = gr; g.fillRect(px, py, pw, ph);
+    patDots('rgba(255,210,120,0.08)', 30, 3, px, py, px + pw, py + ph);
+    const cy = py + 340;
+    if (on < 1) tx('कॉल आ रहा है…', cx, py + 125, '36px NotoDeva', '#f2d48a', { a: 1 - on });
+    if (on > 0) tx('00:0' + Math.min(9, Math.max(0, Math.floor(u - pick))), cx, py + 125, '36px NotoDeva', '#9be59b', { a: on });
+    if (on < 1) for (let k = 0; k < 3; k++) { const p = (u * 0.8 + k / 3) % 1; g.beginPath(); g.arc(cx, cy, 150 + p * 110, 0, TAU); g.strokeStyle = `rgba(255,210,120,${0.55 * (1 - p) * (1 - on)})`; g.lineWidth = 4; g.stroke(); }
+    portrait(cx, cy, 150, MAA, u);
+    tx('माँ', cx, py + 650, '124px "Yatra One"', '#ffd34d', { stroke: '#3a0a06', sw: 10 });
+    tx('मधुबनी, बिहार', cx, py + 712, '32px NotoDeva', '#f2d48a');
+    const by = py + ph - 165;
+    if (on < 1) { g.save(); g.globalAlpha = 1 - on; shape(() => g.arc(cx - 120, by, 58, 0, TAU), '#d8382a', { w: 4 }); handset(cx - 120, by + 6, 34, Math.PI, '#fff');
+      const pul = 1 + 0.08 * Math.sin(u * 9); shape(() => g.arc(cx + 120, by, 58 * pul, 0, TAU), '#2fae5a', { w: 4 }); handset(cx + 120, by - 6, 34, 0, '#fff'); g.restore(); }
+    if (on > 0) { g.save(); g.globalAlpha = on; shape(() => g.arc(cx, by, 58, 0, TAU), '#d8382a', { w: 4 }); handset(cx, by + 6, 34, Math.PI, '#fff'); g.restore(); }
+    g.restore();
+    for (let i = 0; i < 4; i++) shape(() => rr(px + pw - 36, py + 560 + i * 102, 92, 86, 40), C.skin, { w: 5 });
+    shape(() => g.ellipse(px + 14, py + 720, 48, 120, -0.2, 0, TAU), C.skin, { w: 5 });
+  });
+  const bub = ease((u - cue('babua', 3.9) + 0.15) / 0.35);
+  if (bub > 0) { g.save(); const s2 = 0.85 + 0.15 * easeOut(bub); g.translate(540, 290); g.scale(s2, s2); g.globalAlpha = bub;
+    shape(() => { g.moveTo(-40, 80); g.lineTo(10, 175); g.lineTo(50, 80); g.closePath(); }, '#fff4dc', { w: 6 });
+    shape(() => rr(-460, -110, 920, 196, 56), '#fff4dc', { w: 6 });
+    g.fillStyle = '#fff4dc'; g.fillRect(-36, 70, 82, 22);
+    tx('“बबुआ, छठ में आ रहे हो ना?”', 0, 22, '62px Tiro', '#5a0a06'); g.restore(); }
+};
+
+// ------------------------------------------------------------------ 3 packing: the calendar, a waiting-list ticket, gifts for home
+function calendar(x, y, w, u) {
+  const h = w * 1.28; g.save(); g.translate(x, y);
+  g.beginPath(); g.moveTo(w / 2, -44); g.lineTo(w * 0.3, 0); g.moveTo(w / 2, -44); g.lineTo(w * 0.7, 0); inkStroke(3); g.beginPath(); g.arc(w / 2, -46, 7, 0, TAU); fillA(C.ink);
+  shape(() => g.rect(0, 0, w, h), '#fffaf0', { w: 4 });
+  shape(() => g.rect(0, 0, w, h * 0.15), C.red, { w: 4, pattern: () => zigzagBand(0, w, h * 0.135, 8, C.yellow, 18) });
+  tx('नवंबर 2026', w / 2, h * 0.1, `${Math.round(w * 0.11)}px Tiro`, '#fff4dc');
+  const days = ['रवि', 'सोम', 'मंगल', 'बुध', 'गुरु', 'शुक्र', 'शनि'], cw = w / 7, top = h * 0.17, ch = (h * 0.72) / 6;
+  days.forEach((d, i) => tx(d, cw * (i + 0.5), top + ch * 0.62, `${Math.round(w * 0.042)}px NotoDeva`, i === 0 ? C.red : '#3a2a1a'));
+  for (let d = 1; d <= 30; d++) {
+    const i = (d - 1) % 7, j = Math.floor((d - 1) / 7) + 1, cx = cw * (i + 0.5), cy = top + ch * (j + 0.62);
+    tx(String(d), cx, cy, `${Math.round(w * 0.058)}px NotoDeva`, i === 0 ? C.red : '#2a1a10');
+    if (d >= 13 && d <= 16) { const k = clamp((u - 0.25 - (d - 13) * 0.16) / 0.3); if (k > 0) { g.beginPath(); g.arc(cx, cy - w * 0.018, w * 0.052, -Math.PI / 2, -Math.PI / 2 + TAU * k); g.lineWidth = 5; g.strokeStyle = C.red; g.stroke(); } }
+  }
+  const kk = ease((u - 0.9) / 0.4); if (kk > 0) tx('छठ पूजा ☀', w / 2, h * 0.965, `${Math.round(w * 0.075)}px "Yatra One"`, C.red, { a: kk });
+  g.restore();
+}
+function ticket(x, y, w, rot, stamp) {
+  const h = w * 0.56; g.save(); g.translate(x, y); g.rotate(rot);
+  shape(() => g.rect(-w / 2, -h / 2, w, h), '#fff7e6', { w: 4, pattern: () => patDots('rgba(38,53,122,0.06)', 18, 2, -w, -h, w, h) });
+  shape(() => g.rect(-w / 2, -h / 2, w, h * 0.22), C.indigo, { w: 4 });
+  tx('यात्रा टिकट', 0, -h / 2 + h * 0.155, `${Math.round(h * 0.12)}px NotoDeva`, '#fff4dc');
+  tx('मुंबई  ➜  दरभंगा', 0, -h * 0.02, `${Math.round(h * 0.15)}px Tiro`, '#1b120e');
+  tx('छठ स्पेशल • स्लीपर', 0, h * 0.16, `${Math.round(h * 0.09)}px NotoDeva`, '#5a3a2a');
+  g.setLineDash([10, 8]); g.beginPath(); g.moveTo(-w / 2 + 14, h * 0.24); g.lineTo(w / 2 - 14, h * 0.24); g.strokeStyle = 'rgba(90,60,40,0.5)'; g.lineWidth = 2; g.stroke(); g.setLineDash([]);
+  if (stamp > 0) { g.save(); g.translate(w * 0.2, h * 0.36); g.rotate(-0.16); const sc = 1.35 - 0.35 * stamp; g.scale(sc, sc); g.globalAlpha = stamp;
+    g.strokeStyle = C.red; g.lineWidth = 5; g.strokeRect(-w * 0.21, -h * 0.1, w * 0.42, h * 0.19); tx('वेटिंग • WL 87', 0, h * 0.04, `${Math.round(h * 0.1)}px NotoDeva`, C.red); g.restore(); }
+  g.restore();
+}
+function suitcase(x, y, w, open, inside) {  // bottom centre (x, y); open: 1 lid up .. 0 shut
+  const h = w * 0.4; g.save(); g.translate(x, y);
+  if (open > 0.02) {
+    shape(() => g.rect(-w / 2, -h - h * 1.05 * open, w, h * 1.05 * open), '#6a1a1a', { w: 5, pattern: () => patDots(C.gold, 28, 3, -w, -h * 3, w, 0) });
+    shape(() => g.rect(-w / 2 + 22, -h - h * 1.05 * open + 20, w - 44, Math.max(0, h * 1.05 * open - 24)), '#ecd0a8', { w: 3, pattern: () => patLines('rgba(120,60,20,0.18)', 16, 2, 0.8, 2000) });
+  }
+  if (open > 0.3) inside();
+  shape(() => g.rect(-w / 2, -h, w, h), C.maroon, { w: 6, pattern: () => { zigzagBand(-w / 2, w / 2, -h * 0.5, 12, C.gold, 26); patDots('rgba(242,183,5,0.4)', 30, 3, -w / 2, -h, w / 2, 0); } });
+  for (const sx of [-0.3, 0.3]) shape(() => g.rect(sx * w - 16, -h - 4, 32, h + 4), '#4a1010', { w: 3 });
+  if (open < 0.5) { const k = 1 - open * 2; g.save(); g.globalAlpha *= k; g.beginPath(); g.arc(0, -h - 6, 46, Math.PI, 0); inkStroke(14, '#3a2418');
+    g.beginPath(); g.moveTo(60, -h - 30); g.lineTo(110, -h + 50); inkStroke(3); shape(() => rr(80, -h + 40, 90, 54, 8), C.cream, { w: 3 }); tx('घर', 125, -h + 80, '34px "Yatra One"', C.red); g.restore(); }
+  g.restore();
+}
+SC.pack = (u, T) => {
+  camPath(u / T, [540, 980, 1.05], [540, 960, 1.0]);
+  const shut = ease((u - cue('jana', 3.2) + 0.25) / 0.45), stamp = ease((u - cue('ticket', 0.35) - 0.45) / 0.3) * (1 + 0.15 * Math.sin(clamp(u - cue('nahi', 1.7), 0, 1) * 12) * (1 - clamp(u - cue('nahi', 1.7))));
+  layer(0.25, () => { skyGrad([[0, '#f2d0a0'], [1, '#e2ae78']]); paperOver(0.5); g.save(); g.globalAlpha = 0.18; patFlowers(C.red, 120, 9, 1, -200, -200, 1300, 1400); g.restore();
+    shape(() => g.rect(-200, 1340, 1480, 700), '#7a3a2a', { w: 5, pattern: () => { patScales('rgba(255,210,140,0.35)', 60, 3, -200, 1340, 1300, 2100); } });
+    glow(180, 300, 520, 'rgba(255,200,120,0.35)');
+    calendar(610, 250, 360, u);
+    // a Mithila painting of the sun on the wall: home
+    shape(() => g.rect(90, 230, 300, 300), '#f3e4c2', { w: 6, inkCol: C.maroon });
+    g.save(); g.beginPath(); g.rect(90, 230, 300, 300); g.clip(); sun(240, 380, 70, u); waterBand(450, 530, u, C.blue, { a: 0.6, gap: 22, lw: 3 }); g.restore();
+  });
+  layer(0.8, () => {
+    suitcase(540, 1640, 760, 1 - shut, () => {
+      const drop = (t0, fn, rest) => { const k = clamp((u - t0) / 0.5); if (k <= 0) return; const b = 1 - Math.pow(1 - k, 3) + Math.sin(k * Math.PI) * 0.04; g.save(); g.translate(0, lerp(-1500, rest, b)); fn(); g.restore(); };
+      drop(0.15, () => shape(() => rr(-300, -60, 330, 82, 10), C.red, { w: 4, pattern: () => { g.fillStyle = C.gold; g.fillRect(-300, -60, 330, 14); g.fillRect(-300, 8, 330, 14); patDots(C.yellow, 22, 3, -300, -60, 30, 22); } }), -300);
+      drop(0.55, () => { shape(() => rr(60, -86, 230, 104, 10), C.pink, { w: 4, pattern: () => patDots('rgba(255,255,255,0.5)', 20, 3, 60, -86, 290, 20) }); g.beginPath(); g.moveTo(175, -86); g.lineTo(175, 18); inkStroke(8, C.red); tx('मिठाई', 175, -22, '40px "Yatra One"', C.maroon); }, -300);
+      drop(0.95, () => shape(() => rr(-250, -40, 300, 60, 10), C.cream, { w: 4, pattern: () => { g.fillStyle = C.maroon; g.fillRect(-250, -40, 300, 10); g.fillRect(-250, 10, 300, 10); } }), -330);
+      drop(1.3, () => plane(140, -70, 26, -0.15, u), -330);
+    });
+    ticket(270, 900, 420, -0.07 + Math.sin(u * 1.4) * 0.01, stamp);
+  });
+};
+
+// ------------------------------------------------------------------ 4 flights from everywhere to Patna and Darbhanga
+function fields(y0, t) {
+  const r = R(31), cols = ['#8fbf4a', '#c9d65a', '#6fa83a', '#e2c35a', '#a8c860'];
+  for (let j = 0; j < 7; j++) for (let i = 0; i < 6; i++) { const x = -200 + i * 260 + (j % 2) * 120, y = y0 + j * 110, c = cols[Math.floor(r() * cols.length)], ang = r() < 0.5 ? 0.5 : -0.5;
+    shape(() => g.rect(x, y, 250, 104), c, { w: 3, pattern: () => patLines('rgba(60,90,20,0.35)', 16, 3, ang, 600) }); }
+  waterBand(y0 + 300, y0 + 380, t, C.blue, { a: 0.7, gap: 26, lw: 3 });
+  shape(() => g.rect(-200, y0 + 380, 1480, 30), '#d8c08a', { w: 3 });
+}
+const ROUTES = [['लंदन', 40, 380], ['दुबई', 40, 700], ['अमेरिका', 880, 170], ['सिंगापुर', 1000, 520], ['दिल्ली', 400, 140], ['बेंगलुरु', 960, 880], ['मुंबई', 80, 1000]];
+SC.flight = (u, T) => {
+  camPath(u / T, [540, 900, 1.0], [540, 990, 1.12]);
+  const dx = 560, dy = 1300;
+  layer(0.1, () => { skyGrad([[0, '#3d84cc'], [0.45, '#8cc6ea'], [0.62, '#fde0b0'], [1, '#f6c27a']]); paperOver(0.4); sun(900, 250, 64, u, { face: false }); });
+  layer(0.3, () => fields(1180, u));
+  layer(0.45, () => { cloud(180 - u * 30, 520, 62); cloud(820 - u * 26, 820, 54); cloud(330 - u * 20, 1040, 46); });
+  layer(0.6, () => {
+    g.save(); g.setLineDash([16, 16]); g.lineDashOffset = -u * 70; g.lineWidth = 5;
+    ROUTES.forEach(([nm, ox, oy], i) => { const k = ease((u - 0.1 - i * 0.08) / 0.7); if (k <= 0) return; g.globalAlpha = k; g.strokeStyle = 'rgba(200,35,29,0.85)';
+      g.beginPath(); g.moveTo(ox, oy); g.quadraticCurveTo((ox + dx) / 2, Math.min(oy, dy) - 260, dx, dy); g.stroke(); });
+    g.restore();
+    ROUTES.forEach(([nm, ox, oy], i) => { const k = ease((u - 0.1 - i * 0.08) / 0.5); if (k <= 0) return;
+      g.save(); g.globalAlpha = k; shape(() => g.arc(ox, oy, 12, 0, TAU), C.red, { w: 3 }); g.restore();
+      tx(nm, clamp(ox, 90, 990), oy - 26, '40px NotoDeva', '#1b120e', { a: k, stroke: 'rgba(255,248,230,0.9)', sw: 8 }); });
+    const p = 0.75 + 0.25 * Math.sin(u * 6); glow(dx, dy, 160 * p, 'rgba(255,200,80,0.6)'); g.save(); g.translate(dx, dy); sunMark(26); g.restore();
+    tx('बिहार', dx, dy + 92, '64px "Yatra One"', C.red, { stroke: '#fff4dc', sw: 10 });
+  });
+  layer(0.85, () => { plane(lerp(140, 690, u / T), lerp(560, 760, u / T), 94, 0.1, u); bird(lerp(-60, 420, u / T), 430, 30, u, C.green); bird(lerp(-140, 330, u / T), 470, 24, u + 1, C.orange); cloud(980 - u * 60, 1000, 70); });
+};
+OVER.flight = (u, T) => { const c = cue('patna1', 1.0) - 0.9; place(u - c, T - c, 'पटना • दरभंगा', 'हवाई अड्डे', 150); };
+
+// ------------------------------------------------------------------ 5 the Chhath special train, people standing at the doors all night
+function doorPeople(cx, by, h, t, k) {
+  const s = h * 0.094, sets = [[{ ...SON, shirt: C.orange, pants: '#3a3a4a' }, { ...SON, shirt: C.green, pants: '#2a2a38', seed: 7 }], [{ ...MAA, sari: C.yellow, sari2: C.red, seed: 9 }, { ...SON, shirt: C.pink, seed: 8 }]][k % 2];
+  figure(cx - s * 0.9, by, s, { ...sets[0], pose: 'hold', lean: -0.06 }, t);
+  figure(cx + s * 0.5, by, s, { ...sets[1], pose: 'hold', dir: -1, lean: 0.05 }, t + 1);
+}
+function pole(x, y, t) { shape(() => g.rect(x - 7, y - 560, 14, 560), '#2a2018', { w: 3 }); shape(() => g.rect(x - 60, y - 540, 120, 12), '#2a2018', { w: 3 }); }
+SC.train = (u, T) => {
+  camPath(u / T, [540, 960, 1.05], [580, 960, 1.0]);
+  layer(0.1, () => { skyGrad([[0, '#060a26'], [0.5, '#141c4a'], [0.6, '#24245a'], [1, '#1a1a3a']]); paperOver(0.22); stars(110, 4, 900, u); moon(830, 330, 72, '#0e1438'); });
+  layer(0.3, () => { shape(() => g.rect(-300, 1040, 1680, 300), '#121830', { ink: false }); const off = -((u * 45) % 330);
+    for (let i = -1; i < 5; i++) { palm(off + i * 330 + 80, 1060, 15, u); hut(off + i * 330 + 230, 1060, 18, '#3a3048', i % 2 ? 0.8 : 0); } });
+  layer(0.6, () => {
+    shape(() => { g.moveTo(-300, 1192); g.lineTo(1380, 1192); g.lineTo(1380, 1340); g.lineTo(-300, 1340); g.closePath(); }, '#3a2c2c', { w: 3, pattern: () => patDots('rgba(200,180,160,0.25)', 14, 2.5, -300, 1192, 1380, 1340) });
+    g.beginPath(); g.moveTo(-300, 1190); g.lineTo(1380, 1190); inkStroke(6, '#9a9aa8');
+    const x0 = -110 + u * 70;
+    for (let i = -1; i < 2; i++) coach(x0 + i * 1262, 800, 1245, u, { lit: true, faces: 0.95, seed: 4 + i, plate: i === 0 ? 'छठ स्पेशल' : null, door: (cx, by, h) => doorPeople(cx, by, h, u, i + 1) });
+  });
+  layer(1.25, () => { for (let i = 0; i < 2; i++) pole(1500 - ((u * 950 + i * 1050) % 2100), 1700, u);
+    shape(() => g.rect(-300, 1640, 1680, 600), '#0d1226', { w: 3, pattern: () => patLines('rgba(120,140,200,0.12)', 22, 3, 0.4, 2600) }); });
+};
+OVER.train = (u, T) => place(u, T, 'छठ स्पेशल', 'खड़े-खड़े, रात भर का सफ़र', 150);
+
+// ------------------------------------------------------------------ 6 station boards: Patna, Muzaffarpur, Darbhanga, Madhubani (painted walls)
+function stationBoard(x, y, w, hi, en, flip) {
+  const h = w * 0.34; g.save(); g.translate(x, y);
+  for (const px of [-w * 0.32, w * 0.32]) shape(() => g.rect(px - 9, -10, 18, 560), '#2a2a2a', { w: 3, pattern: () => { for (let yy = 0; yy < 560; yy += 60) { g.fillStyle = yy % 120 ? C.yellow : '#2a2a2a'; g.fillRect(px - 9, yy, 18, 60); } } });
+  g.translate(0, -h / 2); g.scale(1, Math.max(0.02, flip)); g.translate(0, h / 2);
+  shape(() => g.rect(-w / 2, -h, w, h), '#f6c845', { w: 7 });
+  g.strokeStyle = C.ink; g.lineWidth = 4; g.strokeRect(-w / 2 + 12, -h + 12, w - 24, h - 24);
+  g.save(); g.font = `${Math.round(h * 0.38)}px NotoDeva`; const s1 = Math.min(1, (w - 70) / g.measureText(hi).width); g.restore();
+  g.save(); g.translate(0, -h * 0.47); g.scale(s1, 1); tx(hi, 0, 0, `${Math.round(h * 0.38)}px NotoDeva`, C.ink); g.restore();
+  g.save(); g.font = `700 ${Math.round(h * 0.22)}px Inter, "DejaVu Sans", sans-serif`; const s2 = Math.min(1, (w - 70) / g.measureText(en).width); g.restore();
+  g.save(); g.translate(0, -h * 0.13); g.scale(s2, 1); tx(en, 0, 0, `700 ${Math.round(h * 0.22)}px Inter, "DejaVu Sans", sans-serif`, C.ink); g.restore();
+  g.restore();
+}
+const BOARDS = [['पटना जंक्शन', 'PATNA JN.'], ['मुज़फ़्फ़रपुर जंक्शन', 'MUZAFFARPUR JN.'], ['दरभंगा जंक्शन', 'DARBHANGA JN.'], ['मधुबनी', 'MADHUBANI']];
+SC.stations = (u, T) => {
+  camPath(u / T, [540, 960, 1.07], [540, 930, 1.0]);
+  const cs = [cue('st1', 0.35), cue('st2', 1.25), cue('st3', 2.25), cue('st4', 3.0)];
+  let k = 0; cs.forEach((c, i) => { if (u >= c - 0.12) k = i; });
+  const flip = Math.min(...cs.slice(1).map(c => clamp(Math.abs(u - (c - 0.12)) / 0.12)));
+  const mural = clamp((u - cs[3] - 0.1) / 1.8), gone = ease((u - cs[3] + 0.5) / 0.7);
+  layer(0.15, () => { skyGrad([[0, '#f7c890'], [0.5, '#fde6bc'], [1, '#f4c084']]); paperOver(0.45); sun(860, 330, 70, u, { face: false }); });
+  layer(0.4, () => {
+    shape(() => g.rect(-300, 430, 1680, 860), '#f0dfc0', { w: 5, pattern: () => patDots('rgba(150,100,50,0.12)', 30, 3, -300, 430, 1400, 1300) });
+    shape(() => g.rect(-300, 430, 1680, 50), C.maroon, { w: 4 });
+    if (mural > 0) { const sd = REVEAL.d, sf = REVEAL.f; REVEAL.d = ease(mural / 0.6); REVEAL.f = ease((mural - 0.25) / 0.6);
+      shape(() => g.rect(-300, 480, 1680, 44), C.yellow, { w: 4, pattern: () => zigzagBand(-300, 1400, 510, 16, C.red, 34) });
+      sun(150, 650, 92, u); mFish(860, 600, 46, 0.25, C.green, C.yellow, u); mFish(860, 760, 46, Math.PI - 0.25, C.orange, C.red, u);
+      bird(500, 600, 70, u, C.blue, false); lotus(330, 1180, 46); lotus(760, 1180, 46); tree(-30, 1250, 70, u, { seed: 8 }); tree(1110, 1250, 70, u, { seed: 9 });
+      for (let i = 0; i < 4; i++) figure(150 + i * 250, 1250, 26, { ...MAA, sari: [C.yellow, C.red, C.pink, C.orange][i], pose: 'carry', seed: i }, u + i);
+      REVEAL.d = sd; REVEAL.f = sf; }
+  });
+  layer(0.6, () => { if (gone >= 1) return; const x0 = 1150 - u * 2100;
+    for (let i = 0; i < 4; i++) coach(x0 + i * 760, 830, 745, u * 3, { faces: 0.7, seed: 12 + i });
+    g.save(); g.globalAlpha = 0.5 * (1 - gone); g.strokeStyle = '#fff6e0'; g.lineWidth = 4; for (let i = 0; i < 16; i++) { const y = 860 + i * 22, x = (1200 - ((u * 2600 + i * 230) % 1600)); g.beginPath(); g.moveTo(x, y); g.lineTo(x + 260, y); g.stroke(); } g.restore(); });
+  layer(0.9, () => {
+    shape(() => g.rect(-300, 1290, 1680, 900), '#a8a29a', { w: 5, pattern: () => { patLines('rgba(60,50,40,0.25)', 80, 3, 0, 3000); patLines('rgba(60,50,40,0.25)', 80, 3, 1.57, 3000); } });
+    shape(() => g.rect(-300, 1290, 1680, 26), C.yellow, { w: 4 });
+    shape(() => { g.moveTo(-300, 0); g.lineTo(1380, 0); g.lineTo(1380, 250); g.lineTo(-300, 320); g.closePath(); }, '#7a2a2a', { w: 5, pattern: () => patLines('rgba(255,220,180,0.3)', 26, 4, 1.4, 3000) });
+    for (const px of [70, 1010]) shape(() => g.rect(px - 18, 260, 36, 1040), '#5a7a3a', { w: 4, pattern: () => { g.fillStyle = C.cream; g.fillRect(px - 18, 1180, 36, 30); } });
+    stationBoard(540, 1010, 820, BOARDS[k][0], BOARDS[k][1], flip);
+    const wk = clamp((u - cs[3] - 0.3) / (T - cs[3] - 0.3)); if (wk > 0) {
+      const x = lerp(1180, 760, wk); const f = figure(x, 1820, 66, { ...SON, backpack: C.maroon, pose: 'stand', dir: -1, walk: u * 6.5 }, u); bag(f.hand[0], f.hand[1], 120); }
+  });
+};
+
+// ------------------------------------------------------------------ 7 the auto through the sugarcane, home in the distance
+SC.auto = (u, T) => {
+  camPath(u / T, [470, 980, 1.06], [640, 960, 1.12]);
+  const homeGlow = ease((u - cue('ghar', 5.5) + 0.3) / 0.8);
+  layer(0.1, () => { skyGrad([[0, '#f0a070'], [0.3, '#fbd39a'], [0.5, '#f9c486'], [0.56, '#ee9a6a']]); paperOver(0.42); sun(250, 930, 96, u);
+    for (let i = 0; i < 5; i++) bird(620 + i * 70 - u * 20, 420 + Math.abs(i - 2) * 40, 18, u + i, C.ink, true); });
+  layer(0.3, () => {
+    shape(() => g.rect(-300, 1000, 1680, 380), '#9ab85a', { ink: false });
+    palm(560, 1010, 13, u); palm(1040, 1012, 15, u); hut(660, 1010, 20); temple(930, 1000, 10, u);
+    hut(800, 1012, 24, '#d08a50', homeGlow); if (homeGlow > 0) { glow(800, 960, 220, `rgba(255,200,110,${0.45 * homeGlow})`); }
+    for (let i = 0; i < 9; i++) shape(() => g.rect(-250 + i * 190, 1060 + (i % 3) * 40, 180, 60), ['#b8c860', '#8fb04a', '#d6c25a'][i % 3], { w: 2, pattern: () => patLines('rgba(60,80,20,0.3)', 12, 2, 0.4, 800) });
+  });
+  layer(0.55, () => { for (let i = 0; i < 26; i++) ganna(-200 + i * 26 + (i % 3) * 7, 1340 + (i % 2) * 8, 34 + (i % 4) * 2, u, { col: i % 2 ? '#7a8f2a' : '#8a7a2a' }); });
+  layer(0.7, () => {
+    shape(() => g.rect(-300, 1330, 1680, 150), '#d8b47a', { w: 4, pattern: () => { patLines('rgba(120,80,40,0.3)', 34, 3, 0.05, 3000); } });
+    const x = lerp(-120, 820, u / T);
+    dustPuff(x - 170, 1455, u);
+    autoRickshaw(x, 1465, 62, u, { riders: () => {
+      figure(-1.15, -0.45, 0.48, { ...SON, backpack: null, pose: 'stand' }, u);
+      figure(0.85, -0.5, 0.45, { kind: 'man', outfit: 'shirt', shirt: C.cream, pants: '#3a3a4a', mustache: true, pose: 'hold', seed: 12 }, u); } });
+  });
+  layer(1.25, () => { for (let i = 0; i < 9; i++) ganna(-160 + i * 34, 1990, 62 + (i % 3) * 6, u, { col: '#6a7f20' }); for (let i = 0; i < 9; i++) ganna(1000 + i * 36, 1990, 62 + (i % 2) * 8, u, { col: '#7a8a26' }); });
+};
+OVER.auto = (u, T) => place(u, T, 'अपना गाँव', 'मधुबनी, बिहार', 150);
+
+// ------------------------------------------------------------------ 8 Maa at the door
+function mudHouse(t) {
+  shape(() => { g.moveTo(-300, 600); g.lineTo(540, 300); g.lineTo(1380, 600); g.closePath(); }, '#b0904a', { w: 6, pattern: () => patLines('rgba(90,60,20,0.45)', 14, 3, 1.1, 2000) });
+  shape(() => g.rect(-300, 590, 1680, 920), '#c98a52', { w: 6, pattern: () => patDots('rgba(90,40,10,0.18)', 34, 4, -300, 590, 1400, 1520) });
+  shape(() => g.rect(-300, 590, 1680, 56), C.red, { w: 4, pattern: () => zigzagBand(-300, 1400, 626, 16, C.yellow, 34) });
+  shape(() => g.rect(-300, 1440, 1680, 70), C.yellow, { w: 4, pattern: () => zigzagBand(-300, 1400, 1480, 16, C.red, 34) });
+  shape(() => { g.moveTo(600, 1500); g.lineTo(600, 940); g.quadraticCurveTo(730, 800, 860, 940); g.lineTo(860, 1500); g.closePath(); }, '#2a1508', { w: 8, inkCol: C.gold });
+  glow(730, 1220, 300, 'rgba(255,180,80,0.35)');
+  mFish(330, 820, 40, 0.3, C.yellow, C.red, t); mFish(330, 1000, 40, Math.PI - 0.3, C.green, C.yellow, t); lotus(150, 1300, 44); lotus(400, 1300, 40);
+  sun(1000, 800, 70, t); bird(1010, 1080, 50, t, C.green, false);
+  garland(590, 900, 870, 900, 70, 16, t);
+}
+SC.door = (u, T) => {
+  const zoom = ease((u - cue('aankhen', 2.5) + 0.8) / 1.6);
+  camPath(u / T, [520, 1000, 1.0], [600, 1000, 1.08]); CAM.z += 0.12 * zoom; CAM.x = lerp(CAM.x, 700, zoom * 0.5); CAM.y = lerp(CAM.y, 1050, zoom * 0.5);
+  const walk = clamp(u / 1.3), bow = ease((u - 1.35) / 0.6), bless = ease((u - 1.7) / 0.5), tear = ease((u - cue('aankhen', 2.5)) / 0.6);
+  layer(0.15, () => { skyGrad([[0, '#c86a7a'], [0.4, '#f6b886'], [1, '#f0a070']]); paperOver(0.4); });
+  layer(0.5, () => { mudHouse(u); bananaPlant(-20, 1500, 66, u); bananaPlant(1110, 1500, 62, u); });
+  layer(0.8, () => {
+    shape(() => g.rect(-300, 1500, 1680, 700), '#b8875a', { w: 5, pattern: () => patDots('rgba(80,40,10,0.25)', 30, 4, -300, 1500, 1400, 2200) });
+    aripanFloor(730, 1610, 230);
+    figure(735, 1600, 70, { ...MAA, dir: -1, pose: bless > 0.5 ? 'bless' : 'stand', tear }, u);
+    const sx = lerp(-80, 425, easeOut(walk));
+    if (bow > 0.5) bag(230, 1530, 130);
+    const f = figure(sx, 1620, 70, { ...SON, backpack: bow > 0.5 ? null : C.maroon, pose: bow > 0.2 ? 'namaste' : 'stand', bend: 0.95 * bow, walk: walk < 1 ? u * 7 : null }, u);
+    if (bow <= 0.5) bag(f.hand[0], f.hand[1], 120);
+    const kid = ease((u - 2.0) / 1.2);
+    if (kid > 0) { figure(lerp(1200, 940, kid), 1640, 44, { ...GIRL, dir: -1, pose: 'namaste' }, u); figure(lerp(1300, 1040, kid), 1650, 42, { ...BOY, dir: -1, pose: 'hold', walk: kid < 1 ? u * 9 : null }, u); }
+  });
+};
+
+// ------------------------------------------------------------------ 9 the whole family together (end of part 1)
+function courtyard(t, dusk = 1) {
+  skyGrad([[0, lerp3('#f4a878', '#2a2050', dusk * 0.7)], [0.35, lerp3('#f8c890', '#6a3a5a', dusk * 0.7)], [1, '#d07a50']]); paperOver(0.45);
+  shape(() => g.rect(-300, 520, 1680, 900), '#c98a52', { w: 6, pattern: () => patDots('rgba(90,40,10,0.18)', 34, 4, -300, 520, 1400, 1420) });
+  shape(() => g.rect(-300, 520, 1680, 50), C.maroon, { w: 4, pattern: () => zigzagBand(-300, 1400, 550, 14, C.yellow, 30) });
+  shape(() => { g.moveTo(-300, 530); g.lineTo(540, 380); g.lineTo(1380, 530); g.closePath(); }, '#b0904a', { w: 6, pattern: () => patLines('rgba(90,60,20,0.45)', 14, 3, 1.1, 2000) });
+  for (const [x, c1, c2] of [[200, C.yellow, C.red], [880, C.green, C.yellow]]) { mFish(x, 760, 36, 0.3, c1, c2, t); mFish(x, 900, 36, Math.PI - 0.3, c2, c1, t); }
+  sun(540, 760, 80, t);
+  garland(-40, 600, 560, 640, 90, 22, t); garland(520, 640, 1120, 600, 90, 22, t);
+  shape(() => g.rect(-300, 1180, 1680, 30), '#7a4a2a', { w: 4 });
+  for (let i = 0; i < 10; i++) diya(40 + i * 112, 1178, 42, t, i, 1);
+  shape(() => g.rect(-300, 1420, 1680, 800), '#b8875a', { w: 5, pattern: () => patDots('rgba(80,40,10,0.25)', 30, 4, -300, 1420, 1400, 2200) });
+}
+SC.family = (u, T) => {
+  camPath(u / T, [540, 1040, 1.1], [540, 1000, 1.0]);
+  layer(0.4, () => courtyard(u, 0.6));
+  layer(0.8, () => {
+    aripanFloor(540, 1700, 260); tulsi(540, 1640, 48, u);
+    figure(150, 1680, 64, { ...PAPA, pose: 'namaste' }, u); figure(330, 1690, 62, { ...MAA, pose: 'namaste' }, u);
+    figure(760, 1690, 64, { ...SON_HOME, dir: -1, pose: 'namaste' }, u); figure(940, 1680, 60, { ...BHABHI, dir: -1, pose: 'namaste' }, u);
+    figure(400, 1800, 42, { ...GIRL, pose: 'namaste' }, u); figure(690, 1810, 40, { ...BOY, dir: -1, pose: 'namaste' }, u);
+  });
+};
+OVER.family = (u, T) => {
+  const a = ease((u - 0.5) / 0.7) * (1 - ease((u - T + 0.3) / 0.3)); if (a <= 0) return;
+  topScrim(a, 720);
+  tx('चार दिन • पूरा परिवार', 540, 230, '44px NotoDeva', '#f2d48a', { a, stroke: 'rgba(20,8,6,0.6)', sw: 6 }); rule(540, 262, 320 * ease((u - 0.5) / 0.8), a);
+  const b = ease((u - 1.2) / 0.6);
+  g.save(); g.translate(540, 420); const pop = 0.85 + 0.15 * easeOut((u - 1.2) / 0.5); g.scale(pop, pop);
+  tx('छठ महापर्व', 0, 0, '140px "Yatra One"', '#ffd34d', { a: a * b, stroke: '#4a0a06', sw: 16, glow: 'rgba(255,170,60,0.9)', blur: 36 }); g.restore();
+  tx('13 • 14 • 15 • 16 नवंबर', 540, 520, '60px Tiro', '#fff4dc', { a: a * ease((u - 1.8) / 0.6), stroke: 'rgba(20,8,6,0.85)', sw: 9 });
+};
+
+// ------------------------------------------------------------------ part 2: the four days
+SC.day1 = (u, T) => {  // नहाय-खाय: Maa's holy dip, then kaddu-bhaat on a banana leaf
+  camPath(u / T, [540, 960, 1.06], [540, 1000, 1.0]);
+  layer(0.2, () => { skyGrad([[0, '#9ad0ee'], [0.55, '#fde7b8'], [1, '#f6c27a']]); paperOver(0.5); sun(820, 620, 95, u); });
+  layer(0.7, () => { const dip = Math.sin(clamp((u - 0.6) / 2.2) * Math.PI); waterBand(1120, H, u, C.blue, { a: 0.7 });
+    inWater(() => { figure(560, 1420 + dip * 240, 64, { ...MAA, pose: 'namaste' }, u); figure(250, 1440, 56, { ...SON_HOME, pose: 'pour', kurta: null, outfit: null, dhoti: C.yellow, border: C.red }, u); }, 1200, u, C.blue);
+    ripplesAt(560, 1205, 150, u); if (dip > 0.2) sparkles(400, 900, 320, 300, u, 18, 2); });
+  layer(1.0, () => { const a = ease((u - 3.0) / 0.8); if (a <= 0) return; g.save(); g.globalAlpha = a; g.translate(540, 1580); g.scale(0.9 + 0.1 * a, 0.9 + 0.1 * a);
+    shape(() => g.ellipse(0, 0, 420, 170, 0, 0, TAU), '#3f8a35', { w: 5, pattern: () => { g.strokeStyle = 'rgba(0,0,0,0.3)'; g.lineWidth = 3; g.beginPath(); g.moveTo(-420, 0); g.lineTo(420, 0); g.stroke(); for (let x = -380; x < 400; x += 50) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x + 40, -160); g.moveTo(x, 0); g.lineTo(x + 40, 160); g.stroke(); } } });
+    shape(() => { g.moveTo(-260, 40); g.quadraticCurveTo(-150, -110, -40, 40); g.closePath(); }, C.white, { w: 4, pattern: () => patDots('rgba(0,0,0,0.25)', 14, 2, -270, -110, -30, 50) });
+    shape(() => g.ellipse(60, 10, 95, 55, 0, 0, TAU), C.turmeric, { w: 4, pattern: () => patDots('rgba(160,90,0,0.6)', 16, 4, -40, -50, 160, 70) });
+    shape(() => g.ellipse(250, 20, 100, 58, 0, 0, TAU), '#a8c060', { w: 4, pattern: () => { for (let i = 0; i < 9; i++) { g.fillStyle = '#e8f0b0'; g.fillRect(190 + (i % 3) * 38, -10 + Math.floor(i / 3) * 22, 20, 14); } } });
+    steam(-150, -40, 0.8, u); steam(60, -30, 0.7, u); g.restore(); });
+};
+SC.day2 = (u, T) => {  // खरना: gur ki kheer and roti on the clay chulha; the children get prasad
+  camPath(u / T, [540, 980, 1.08], [540, 960, 1.0]);
+  layer(0.2, () => { skyGrad([[0, '#111a44'], [0.6, '#2a2a66'], [1, '#4a2a50']]); paperOver(0.3); stars(90, 7, 900, u); moon(820, 420, 70, '#151d48'); });
+  layer(0.7, () => {
+    shape(() => g.rect(-200, 1250, 1480, 900), '#b8875a', { w: 5, pattern: () => patDots('rgba(80,40,10,0.3)', 30, 4, -200, 1250, 1300, 2200) });
+    shape(() => g.rect(-200, 820, 1480, 440), '#d8a870', { w: 5, pattern: () => { patFlowers('rgba(200,35,29,0.5)', 120, 9, 1, -200, 860, 1300, 1260); } });
+    chulha(250, 1390, 110, u); lota(250, 1230, 150, 0); steam(250, 1120, 1, u, 3);
+    const f = figure(720, 1520, 54, { ...MAA, dir: -1, pose: 'hold' }, u);
+    shape(() => g.ellipse(f.mid[0] - 10, f.mid[1] + 4, 56, 16, 0, 0, TAU), '#c9a060', { w: 3 }); thekua(f.mid[0] - 22, f.mid[1] - 6, 18); thekua(f.mid[0] + 6, f.mid[1] - 8, 16, 0.4);
+    const k = ease((u - 1.2) / 0.8); figure(lerp(380, 470, k), 1560, 36, { ...GIRL, pose: 'hold' }, u); figure(lerp(300, 380, k), 1570, 34, { ...BOY, pose: 'hold' }, u);
+    diya(560, 1600, 50, u, 3, 1);
+  });
+  layer(1.0, () => { g.save(); g.translate(560, 1760);
+    shape(() => g.ellipse(0, 0, 360, 120, 0, 0, TAU), '#3f8a35', { w: 5, pattern: () => { g.strokeStyle = 'rgba(0,0,0,0.3)'; g.lineWidth = 3; g.beginPath(); g.moveTo(-360, 0); g.lineTo(360, 0); g.stroke(); } });
+    for (let i = 0; i < 3; i++) shape(() => g.ellipse(-180 + i * 70, -8 - i * 6, 80, 34, 0, 0, TAU), '#e6b878', { w: 4, pattern: () => patDots('rgba(120,60,10,0.5)', 14, 3, -280, -60, 0, 40) });
+    shape(() => g.ellipse(180, -10, 110, 52, 0, 0, TAU), '#f2e0b8', { w: 4, pattern: () => patDots('rgba(150,80,20,0.55)', 16, 3, 60, -60, 300, 50) });
+    steam(180, -40, 0.7, u); g.restore(); });
+};
+function walkToGhat(u, T) {
+  camPath(u / T, [480, 980, 1.08], [600, 980, 1.0]);
+  layer(0.15, () => { skyGrad([[0, '#7a2a6a'], [0.4, '#e86a5a'], [0.62, '#f8b060'], [1, '#e88050']]); paperOver(0.4); sun(860, 900, 120, u); });
+  layer(0.35, () => { waterBand(1040, 1300, u, '#3a3a8a', { a: 0.5 }); for (let i = 0; i < 7; i++) { const x = 120 + i * 150; g.beginPath(); g.moveTo(x, 1040); g.lineTo(x, 900); inkStroke(3); shape(() => { g.moveTo(x, 900); g.lineTo(x + 50, 915); g.lineTo(x, 930); g.closePath(); }, [C.saffron, C.red, C.yellow][i % 3], { w: 2 }); } });
+  layer(0.7, () => {
+    shape(() => { g.moveTo(-300, 1300); g.quadraticCurveTo(540, 1240, 1380, 1320); g.lineTo(1380, 2200); g.lineTo(-300, 2200); g.closePath(); }, '#c99a5a', { w: 5, pattern: () => patDots('rgba(90,50,20,0.35)', 26, 4, -300, 1240, 1400, 2200) });
+    for (let i = 0; i < 10; i++) diya(60 + i * 110, 1340 + (i % 2) * 24, 26, u, i, 1);
+    const x = lerp(260, 760, u / T), ph = u * 6.2;
+    // kids with sugarcane, Papa, Maa with the lota, then the son carrying the daura on his head
+    const kg = figure(x - 560, 1820, 40, { ...GIRL, pose: 'hold' }, u); ganna(kg.hand[0], kg.hand[1] + 30, 30, u, { h: 9, lean: 0.35 });
+    figure(x - 430, 1830, 40, { ...BOY, pose: 'hold', walk: ph + 1 }, u);
+    figure(x - 300, 1800, 64, { ...PAPA, pose: 'stand', walk: ph + 2 }, u);
+    const fm = figure(x - 150, 1810, 64, { ...MAA, pose: 'hold' }, u); lota(fm.hand[0] + 4, fm.hand[1] + 6, 46, 0);
+    const fs = figure(x + 40, 1820, 72, { ...SON_HOME, pose: 'carry', walk: ph }, u);
+    daura(fs.hand[0] - 22, 1820 - 7.55 * 72 - 0.32 * 190, 190, u);
+  });
+}
+function ghatArghya(u, T) {
+  camPath(u / T, [540, 960, 1.04], [540, 940, 1.1]);
+  layer(0.2, () => { skyGrad([[0, '#6a2a6a'], [0.45, '#e05a5a'], [0.65, '#f8a850'], [1, '#e07040']]); paperOver(0.4); sun(540, 960, 140, u); lightBeams(540, 960, u, 0.12, 9, 1.2, 1200); });
+  layer(0.55, () => { waterBand(1080, H, u, '#3a3a8a', { a: 0.55 }); for (let i = 0; i < 4; i++) { const x = 120 + i * 280; inWater(() => { const f = figure(x, 1300, 30, { ...MAA, sari: [C.yellow, C.pink, C.orange, C.green][i], pose: 'arghya', seed: i + 5 }, u); soop(f.mid[0], f.mid[1] - 6, 74, u, { seed: i }); }, 1180, u, '#3a3a8a'); } });
+  layer(0.85, () => {
+    inWater(() => {
+      const fm = figure(430, 1640, 76, { ...MAA, pose: 'arghya' }, u); soop(fm.mid[0], fm.mid[1] - 12, 190, u, { seed: 2 });
+      const fs = figure(720, 1650, 74, { ...SON_HOME, dir: -1, pose: 'pour' }, u); lota(fs.hand[0] - 14, fs.hand[1] - 8, 54, 1.2);
+      stream(fs.hand[0] - 36, fs.hand[1] - 22, fm.mid[0] + 60, 1420, u, 30, '255,252,240');
+    }, 1400, u, '#3a3a8a');
+    sparkles(250, 700, 600, 500, u, 26, 5);
+  });
+}
+SC.day3 = (u, T) => {  // संध्या अर्घ्य: the son carries the daura (his father used to), then arghya to the setting sun
+  const sw = cue('t4_end', 5.0) + 0.1;
+  wipeBetween(clamp((u - sw) / 0.8), () => walkToGhat(u, T), () => ghatArghya(u - sw, T - sw), 41, 700, 1100);
+};
+SC.kosi = (u, T) => {  // कोसी की रात: kosi with diyas, fireworks over the ghat
+  camPath(u / T, [540, 1000, 1.08], [540, 960, 1.0]);
+  layer(0.1, () => { skyGrad([[0, '#05071c'], [0.5, '#121640'], [1, '#2a1a3a']]); paperOver(0.2); stars(120, 12, 1000, u);
+    const B = [[0.2, 300, 420, '255,200,90'], [0.75, 780, 330, '255,90,70'], [1.3, 520, 560, '120,255,150'], [1.9, 220, 640, '255,130,210'], [2.45, 860, 520, '255,250,230'],
+      [3.0, 450, 300, '140,190,255'], [3.55, 760, 640, '255,200,90'], [4.1, 260, 380, '255,90,70'], [4.65, 640, 450, '255,130,210'], [5.2, 360, 560, '120,255,150']];
+    B.forEach(([t0, x, y, c], i) => { rocketTrail(x, 1250, y, (u - t0 + 0.55) / 0.55); burst(x, y, u - t0, i * 7 + 3, c, 50 + (i % 3) * 8, 190 + (i % 4) * 30); }); });
+  layer(0.4, () => { waterBand(1180, 1500, u, '#1a2050', { a: 0.4, line: 'rgba(255,210,140,0.4)' }); for (let i = 0; i < 9; i++) diya(60 + i * 120 + Math.sin(u + i) * 10, 1260 + (i % 3) * 60, 30, u, i + 20, 1); });
+  layer(0.8, () => {
+    shape(() => g.rect(-300, 1480, 1680, 800), '#3a2a2a', { w: 5, pattern: () => patDots('rgba(255,200,140,0.12)', 30, 4, -300, 1480, 1400, 2300) });
+    aripanFloor(540, 1700, 300);
+    kosi(540, 1690, 40, u);
+    figure(160, 1760, 60, { ...MAA, pose: 'namaste' }, u); figure(930, 1760, 62, { ...SON_HOME, dir: -1, pose: 'namaste' }, u);
+    figure(310, 1840, 38, { ...GIRL, pose: 'namaste' }, u);
+    anar(830, 1840, u, 340);
+  });
+};
+SC.day4 = (u, T) => {  // उषा अर्घ्य: sunrise, the whole family in the water
+  camPath(u / T, [540, 1000, 1.0], [540, 950, 1.1]);
+  layer(0.2, () => { skyGrad([[0, '#6a8ad0'], [0.45, '#f4b4a0'], [0.66, '#ffd090'], [1, '#f0a070']]); paperOver(0.45); sun(540, lerp(1120, 860, easeOut(u / 4)), 140, u); });
+  layer(0.6, () => { waterBand(1100, H, u, C.blue, { a: 0.6 });
+    inWater(() => {
+      const fm = figure(330, 1470, 60, { ...MAA, pose: 'arghya' }, u); soop(fm.mid[0], fm.mid[1] - 10, 150, u, { seed: 4 });
+      const fs = figure(620, 1480, 58, { ...SON_HOME, pose: 'pour' }, u); lota(fs.hand[0] + 6, fs.hand[1] - 4, 40, -1.2); stream(fs.hand[0] + 26, fs.hand[1] - 14, fs.hand[0] + 100, 1290, u, 24);
+      const fp = figure(860, 1470, 58, { ...PAPA, dir: -1, pose: 'pour' }, u); lota(fp.hand[0] - 6, fp.hand[1] - 4, 40, 1.2); stream(fp.hand[0] - 26, fp.hand[1] - 14, fp.hand[0] - 100, 1290, u + 0.4, 24);
+    }, 1300, u, C.blue);
+  });
+  layer(1.0, () => { shape(() => { g.moveTo(-300, 1760); g.quadraticCurveTo(300, 1700, 700, 1780); g.lineTo(700, 2200); g.lineTo(-300, 2200); g.closePath(); }, '#c99a5a', { w: 5, pattern: () => patDots('rgba(90,50,20,0.35)', 26, 4, -300, 1700, 800, 2200) });
+    figure(140, 1900, 44, { ...GIRL, pose: 'namaste' }, u); figure(290, 1910, 42, { ...BHABHI, pose: 'namaste', child: false }, u); });
+};
+SC.end = (u, T) => {  // thekua from Maa's hands, a family photo, Jai Chhathi Maiya
+  const ph = cue('t5_end', 1.7) + 0.2;   // photo flash
+  camPath(u / T, [540, 1000, 1.08], [540, 980, 1.0]);
+  layer(0.2, () => { skyGrad([[0, '#7a9ad8'], [0.45, '#f8c4a0'], [0.7, '#ffd890'], [1, '#f0a070']]); paperOver(0.45); sun(540, 760, 120, u); });
+  layer(0.6, () => {
+    waterBand(1240, 1500, u, C.blue, { a: 0.5 });
+    shape(() => g.rect(-300, 1480, 1680, 800), '#c99a5a', { w: 5, pattern: () => patDots('rgba(90,50,20,0.35)', 26, 4, -300, 1480, 1400, 2300) });
+    if (u < ph + 0.1) {
+      const fm = figure(690, 1700, 84, { ...MAA, dir: -1, pose: 'hold' }, u);
+      shape(() => g.ellipse(fm.mid[0] + 10, fm.mid[1] + 10, 110, 30, 0, 0, TAU), '#e2b25a', { w: 4, pattern: () => patLines('rgba(140,90,20,0.5)', 10, 2, 0.6, 400) });
+      [[-50, -14, 0], [10, -18, 0.5], [60, -10, -0.3], [-10, -36, 0.2], [40, -40, -0.4]].forEach(([dx, dy, r]) => thekua(fm.mid[0] + 10 + dx, fm.mid[1] + 10 + dy, 26, r));
+      const fs = figure(330, 1710, 82, { ...SON_HOME, pose: 'hold', lean: 0.08 }, u);
+      const k = ease((u - 0.8) / 0.6); if (k > 0) thekua(lerp(fm.mid[0] - 30, fs.hand[0] + 30, k), lerp(fm.mid[1] - 20, fs.hand[1] - 10, k), 28, 0.3);
+      glow(fm.mid[0], fm.mid[1], 200, 'rgba(255,210,120,0.3)');
+    } else {
+      // the family photo: everyone at the ghat in the morning sun
+      const k = ease((u - ph) / 0.6); g.save(); g.translate(540, 1150); g.rotate(-0.03 * k); g.scale(0.92 + 0.08 * k, 0.92 + 0.08 * k);
+      shape(() => g.rect(-430, -330, 860, 760), '#fffaf0', { w: 6 });
+      g.save(); g.beginPath(); g.rect(-400, -300, 800, 600); g.clip();
+      skyGrad([[0, '#f8c4a0'], [0.6, '#ffd890'], [1, '#f0a070']], -300, 300); sun(0, -120, 80, u); waterBand(40, 400, u, C.blue, { a: 0.6 });
+      figure(-320, 290, 44, { ...PAPA, pose: 'stand' }, u); figure(-190, 295, 43, { ...MAA, pose: 'hold' }, u); figure(-40, 300, 44, { ...SON_HOME, pose: 'stand' }, u);
+      figure(110, 295, 42, { ...BHABHI, pose: 'stand' }, u); figure(240, 300, 30, { ...GIRL, pose: 'namaste' }, u); figure(330, 300, 29, { ...BOY, pose: 'namaste' }, u);
+      g.restore(); tx('छठ 2026 • अपना घर', 0, 400, '40px "Yatra One"', C.maroon); g.restore();
+    }
+  });
+  const fl = 1 - clamp(Math.abs(u - ph) / 0.25); if (fl > 0) { g.save(); g.fillStyle = `rgba(255,255,255,${0.9 * fl})`; g.fillRect(0, 0, W, H); g.restore(); }
+};
+
+OVER.day1 = (u, T) => dayCard(u, T, 'पहला दिन', 'नहाय-खाय', '13 नवंबर', 'गंगा स्नान • कद्दू-भात का प्रसाद');
+OVER.day2 = (u, T) => dayCard(u, T, 'दूसरा दिन', 'खरना', '14 नवंबर', 'गुड़ की खीर, रोटी • बच्चों को प्रसाद');
+OVER.day3 = (u, T) => dayCard(u, T, 'तीसरा दिन', 'संध्या अर्घ्य', '15 नवंबर', null);
+OVER.kosi = (u, T) => { chapter(u, T, 'संध्या अर्घ्य की रात', 'कोसी • दीये • पटाखे'); };
+OVER.day4 = (u, T) => dayCard(u, T, 'चौथा दिन', 'उषा अर्घ्य', '16 नवंबर', null);
+OVER.end = (u, T) => {
+  const t0 = cue('t5_end', 1.7) + 0.5, a = ease((u - t0) / 0.6); if (a <= 0) return;
+  topScrim(a, 700);
+  tx('जय छठी मइया', 540, 300, '128px "Yatra One"', '#ffd34d', { a, stroke: '#4a0a06', sw: 14, glow: 'rgba(255,170,60,0.9)', blur: 40 });
+  tx('छठ पूजा की हार्दिक शुभकामनाएँ', 540, 400, '54px Tiro', '#fff4dc', { a: ease((u - t0 - 0.5) / 0.6), stroke: 'rgba(20,8,6,0.85)', sw: 8 });
+};
+
+startFilm(document.getElementById('c'), DEF);
+</script></body></html>

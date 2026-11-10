@@ -28,3 +28,24 @@ narrator… never rushed"), four male candidates (Charon, Iapetus, Rasalgethi, S
 
 `omni_tts.py` drives OmniVoice (k2-fsa, the engine inside VoiceStudio; Hindi; voice cloning; target duration instead
 of time-stretching). It needs the VoiceStudio source on PYTHONPATH and permission to run that code; weights are CC-BY-NC.
+
+# Narration for the homecoming film (`chhath_ghar.html`, "छठ — घर बुलाता है")
+A Bihari working in Mumbai goes home for Chhath: Maa's call, a waiting-list ticket, flights and the Chhath special
+train, the station boards (Patna, Muzaffarpur, Darbhanga, Madhubani), the auto through the sugarcane, Maa at the door,
+then the four days with the family (the daura on his head, kosi and fireworks, thekua). 89 s; part 1 (journey) 50.6 s
+on the song's instrumental intro, part 2 (the four days) on its vocals.
+
+1. Voice: Gemini 2.5 Pro TTS, Charon, whole directed takes (direction and script in `lines_ghar.json`: soft, intimate,
+   slightly hushed). Five takes: T1-T3 back to back for part 1, T4 (daura) and T5 (ending) placed inside part 2.
+   Two candidates each, picked on the speech check.
+2. Speech check: `python3 check_takes.py lines_ghar.json takes` (faster-whisper medium + large-v3-turbo; letter error
+   rate, missed key words, length, longest pause). Takes used: T1 9.6 %, T2 4.7 %, T3 7.1 %, T4 2.9 %, T5 2.5 % (turbo);
+   the misses are the recognisers writing छठ as "छट".
+3. Timing: `python3 make_timing_ghar.py takes tm` (letter-level alignment; shot cuts 0.35 s before each new-shot
+   sentence; part 2 starts on the song's vocal entry, bar-aligned: 50.629 s; shots in bars; writes narration.wav,
+   timing.json, words.json).
+4. Render: `node render_scenes.cjs chhath_ghar.html x --timeline ghar:89.044 --serve --timing tm/timing.json --out render`
+5. Mix: `python3 mix_ghar.py song.wav tm/narration.wav tm/timing.json mix.wav` (song intro, then the intro again
+   from its first bar into the vocals; music 9 LU under the voice, swells between lines, full in part 2 and ducked under
+   T4/T5; quiet synthesised phone ring, train horn, station chime, fireworks; two-pass loudnorm -14 LUFS).
+6. WhatsApp: split at part 1's end (50.6 s): two clips under 60 s and 16 MB each.
