@@ -1,8 +1,8 @@
 # Narration for the Chhath documentary (`chhath_doc.html`)
 
 The narration is spoken by a consented, saved voice from the private studio repo
-(`d2q-private-uploads/studio/voices`, model Edge0 Audio8-TTS-Realistic-Air) and every post
-carries "Voiceover generated with AI." (shown on screen during the narration). No audio is kept here.
+(`d2q-private-uploads/studio/voices`, model Edge0 Audio8-TTS-Realistic-Air). An on-screen voice label can be
+switched on with `"disclose": [from, to]` in timing.json (off in the delivered version). No audio is kept here.
 
 1. Speak the passages (`lines_v2.json`; four passages under 25 s, a few words respelled for the
    voice model: रिग्वेद/रिचाओं, अर्घ, सूर्य के पुत्र कर्ण, छठी मैया, "छठ पूजा" at the end):

@@ -24,7 +24,7 @@ const DEF = {
   ],
   subs: [], // [start, end, text]
   cues: {},  // absolute times of spoken key words: draupadi, shashthi, alive, today1..today4
-  disclose: [0.6, 60.0], // show "Voiceover generated with AI." over the narrated part
+  disclose: null, // optional on-screen voice label: [from, to] seconds
   total: 90.841,
 };
 let TM = DEF, SHOT_T0 = 0;
