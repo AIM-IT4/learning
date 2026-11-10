@@ -17,3 +17,14 @@ switched on with `"disclose": [from, to]` in timing.json (off in the delivered v
 4. Render: `node render_scenes.cjs chhath_doc.html x --timeline doc:90.841 --serve --timing timing.json --out render`
 5. Mix (voice ~12 dB over the ducked song intro, song section after 60.11 s, two-pass loudnorm to -14 LUFS)
    and mux with ffmpeg.
+
+## Human-sounding narration (current version): Gemini 2.5 Pro TTS
+Following the studio playbook: whole directed takes, not line by line. Three takes (`lines_gemini.json`: T1 Diwali +
+Rigveda, T2 Sita + Karna, T3 Purana + ending), each under 30 s, direction line first ("warm, unhurried documentary
+narrator… never rushed"), four male candidates (Charon, Iapetus, Rasalgethi, Sadaltager), speech-checked; Charon used
+(CER 1.5-7.5 %, no direction read aloud). No time-stretching: the documentary half of the music bed is two bars longer
+(63.95 s) so the natural pace fits, and the WhatsApp split moves to 57.9 s.
+`python3 make_timing.py takes final --lines lines_gemini.json --map '{"T1": ["p0", "p1"], "T2": ["p2"], "T3": ["p3", "p4"]}' --part1 63.951 --total 94.682`
+
+`omni_tts.py` drives OmniVoice (k2-fsa, the engine inside VoiceStudio; Hindi; voice cloning; target duration instead
+of time-stretching). It needs the VoiceStudio source on PYTHONPATH and permission to run that code; weights are CC-BY-NC.

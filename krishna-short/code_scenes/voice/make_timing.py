@@ -14,6 +14,7 @@ from faster_whisper import WhisperModel
 ap = argparse.ArgumentParser()
 ap.add_argument("take_dir"); ap.add_argument("out_dir")
 ap.add_argument("--lines", default=str(Path(__file__).with_name("lines_v3.json")), help="spoken script, [name, text] pairs")
+ap.add_argument("--map", default=None, help='JSON: which passages each take holds, e.g. {"T1": ["p0", "p1"], ...} (default: one take per passage)')
 ap.add_argument("--start", type=float, default=1.0); ap.add_argument("--gap", type=float, default=0.45)
 ap.add_argument("--part1", type=float, default=60.11); ap.add_argument("--total", type=float, default=90.841)
 a = ap.parse_args()
@@ -24,7 +25,7 @@ DISPLAY = {
     "p0": [["दीवाली बीत गई… अब हर बिहारी को इंतज़ार है…", "लोक आस्था के महापर्व, छठ पूजा का।"]],
     "p1": [["पर यह परंपरा शुरू कहाँ से हुई?"], ["हज़ारों साल पहले, ऋग्वेद की ऋचाओं में सूर्य की स्तुति हुई…", "और नदी में खड़े होकर अर्घ्य देने की परंपरा बनी।"]],
     "p2": [["मान्यता है कि माता सीता ने मुंगेर में गंगा तट पर छठ का व्रत किया था।"],
-           ["महाभारत में सूर्य के पुत्र कर्ण रोज़ कमर भर पानी में खड़े होकर अर्घ्य देते थे…", "और द्रौपदी ने भी यही व्रत रखा।"]],
+           ["महाभारत में सूर्यपुत्र कर्ण रोज़ कमर भर पानी में खड़े होकर अर्घ्य देते थे…", "और द्रौपदी ने भी यही व्रत रखा।"]],
     "p3": [["पुराणों में कथा है — राजा प्रियव्रत के पुत्र को षष्ठी देवी ने जीवनदान दिया।"], ["तभी से छठी मैया की पूजा होने लगी।"],
            ["देव के सूर्य मंदिर से गंगा के घाटों तक…", "बिहार ने यह परंपरा पीढ़ी दर पीढ़ी संजोकर रखी।"]],
     "p4": [["न कोई पुरोहित… न कोई मूर्ति…", "बस सूरज, जल और अटूट आस्था।"], ["चार दिन का महापर्व — छठ पूजा।"]],
@@ -59,10 +60,16 @@ model = WhisperModel("mobiuslabsgmbh/faster-whisper-large-v3-turbo", device="cpu
 def norm(s): return re.sub(r"[^ऀ-ॿ]", "", s.replace("़", ""))
 
 SPOKEN = dict(json.load(open(a.lines, encoding="utf-8")))
+TAKES = json.loads(a.map) if a.map else {p: [p] for p in ["p0", "p1", "p2", "p3", "p4"] if p in SPOKEN}
+for tk, ps in TAKES.items():   # a take that holds several passages: concatenate their display chunks and anchors
+    if tk not in DISPLAY:
+        DISPLAY[tk] = [sent for p in ps for sent in DISPLAY[p]]; ANCHORS[tk] = [sent for p in ps for sent in ANCHORS[p]]
+        BIGS = [p in BIG_TYPE for p in ps for _ in DISPLAY[p]]
+        DISPLAY[tk + "_big"] = BIGS
 def n2(s): return re.sub(r"[^\u0900-\u097F]", "", s.replace("़", "").replace("ँ", "ं").replace("ॉ", "ो"))
 track = np.zeros(int(a.total * SR), np.float32)
 t, sentences, chunks, words, cue_t = a.start, [], [], [], {}
-for name in [p for p in ["p0", "p1", "p2", "p3", "p4"] if p in SPOKEN]:
+for name in TAKES:
     y = load(take / f"{name}.wav")
     idx = np.where(np.abs(y) > 0.01 * np.abs(y).max())[0]; lead = max(idx[0] - int(0.04 * SR), 0); y = y[lead: idx[-1] + int(0.12 * SR)]
     track[int(t * SR): int(t * SR) + len(y)] += y[: len(track) - int(t * SR)]
@@ -94,7 +101,8 @@ for name in [p for p in ["p0", "p1", "p2", "p3", "p4"] if p in SPOKEN]:
         for j, ph in enumerate(sent):
             c0, c1 = bounds[k], bounds[k + 1]
             ta, tb = at(c0), at(c1, end=True)
-            chunks.append([round(ta - 0.08, 2), round(tb + 0.3, 2), DISPLAY[name][si][j], name])
+            big = DISPLAY[name + "_big"][si] if name + "_big" in DISPLAY else name in BIG_TYPE
+            chunks.append([round(ta - 0.08, 2), round(tb + 0.3, 2), DISPLAY[name][si][j], "big" if big else name])
             if j == 0: sentences.append([round(ta, 2), round(tb, 2)])
             k += 1
     for key, ph, nth in [("diwali1", "दीवाली", 1), ("diwali2", "अब हर", 1), ("chhath0", "लोक आस्था", 1), ("draupadi", "द्रौपदी", 1), ("shashthi", "षष्ठी", 1), ("alive", "जीवनदान", 1), ("today2", "न कोई मूर्ति", 1), ("today3", "बस सूरज", 1)]:
@@ -116,7 +124,7 @@ shots = [["diwali", 0, cut(cue_t["chhath0"])], ["surya", cut(cue_t["chhath0"]), 
 bar = 4 * 0.48017
 shots += [[f"day{i + 1}", round(a.part1 + i * 4 * bar, 3), round(a.part1 + (i + 1) * 4 * bar, 3)] for i in range(4)]
 shots = [[n, round(x, 3), round(y, 3)] for n, x, y in shots]
-timing = {"shots": shots, "subs": [c[:3] for c in chunks if c[3] not in BIG_TYPE], "cues": {k: (round(v, 2) if v is not None else None) for k, v in cues.items()},
+timing = {"shots": shots, "subs": [c[:3] for c in chunks if c[3] != "big" and c[3] not in BIG_TYPE], "cues": {k: (round(v, 2) if v is not None else None) for k, v in cues.items()},
           "disclose": None, "total": a.total}
 json.dump(timing, open(out / "timing.json", "w"), ensure_ascii=False, indent=1)
 subprocess.run(["ffmpeg", "-y", "-v", "error", "-f", "f32le", "-ar", str(SR), "-ac", "1", "-i", "-", str(out / "narration.wav")], input=track.tobytes(), check=True)
