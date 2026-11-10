@@ -1,6 +1,6 @@
 """Mix the homecoming film: the Chhath song under the whole film, the narration on top, a few quiet sound effects.
 
-  python3 mix_ghar.py song.wav narration.wav timing.json out.wav [--under 14] [--swell 6] [--song-level 3] [--no-sfx]
+  python3 mix_ghar.py song.wav narration.wav timing.json out.wav [--under 20] [--swell 10] [--song-level 6] [--no-sfx]
 
 Music bed: the song's instrumental intro, then the intro again from its first bar straight into the vocals, so the
 song's vocal section starts exactly at timing["part1"] (part 2, the four days) and runs to the end (2.2 s fade).
@@ -16,9 +16,9 @@ import numpy as np
 
 ap = argparse.ArgumentParser()
 ap.add_argument("song"); ap.add_argument("narration"); ap.add_argument("timing"); ap.add_argument("out")
-ap.add_argument("--under", type=float, default=14.0, help="music while the narration speaks, LU below the narration")
-ap.add_argument("--swell", type=float, default=6.0, help="part-1 music between and after lines, LU below the narration")
-ap.add_argument("--song-level", dest="song_lu", type=float, default=3.0, help="part-2 song without narration, LU below the narration")
+ap.add_argument("--under", type=float, default=20.0, help="music while the narration speaks, LU below the narration")
+ap.add_argument("--swell", type=float, default=10.0, help="part-1 music between and after lines, LU below the narration")
+ap.add_argument("--song-level", dest="song_lu", type=float, default=6.0, help="part-2 song without narration, LU below the narration")
 ap.add_argument("--no-sfx", action="store_true")
 a = ap.parse_args()
 SR = 48000

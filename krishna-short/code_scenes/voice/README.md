@@ -46,6 +46,7 @@ on the song's instrumental intro, part 2 (the four days) on its vocals.
    timing.json, words.json).
 4. Render: `node render_scenes.cjs chhath_ghar.html x --timeline ghar:89.044 --serve --timing tm/timing.json --out render`
 5. Mix: `python3 mix_ghar.py song.wav tm/narration.wav tm/timing.json mix.wav` (song intro, then the intro again
-   from its first bar into the vocals; music 9 LU under the voice, swells between lines, full in part 2 and ducked under
-   T4/T5; quiet synthesised phone ring, train horn, station chime, fireworks; two-pass loudnorm -14 LUFS).
+   from its first bar into the vocals; the voice always leads: music 20 LU under the voice while it speaks, 10 LU
+   below it between lines, the part-2 song 6 LU below it; quiet synthesised phone ring, train horn, station chime,
+   fireworks; two-pass loudnorm -14 LUFS).
 6. WhatsApp: split at part 1's end (50.6 s): two clips under 60 s and 16 MB each.
