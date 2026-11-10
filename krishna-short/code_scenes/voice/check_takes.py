@@ -42,7 +42,7 @@ def pauses(y, sr=16000, thr_db=-38):
 
 M = {m: WhisperModel(NAMES[m], device="cpu", compute_type="int8", cpu_threads=4) for m in a.models.split(",")}
 out = {}
-for f in sorted(Path(a.take_dir).glob("T*_*.wav")):
+for f in sorted(Path(a.take_dir).glob("*_*.wav")):
     name = f.stem.split("_")[0]
     if name not in TAKES: continue
     y = load16(f); row = {"dur": round(len(y) / 16000, 2)}; row["max_pause"], row["speech"] = pauses(y)

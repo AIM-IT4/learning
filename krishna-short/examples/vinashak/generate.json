@@ -1,0 +1,140 @@
+{
+ "project": "Vinashak",
+ "scenes": [
+  {
+   "prompt": "Planet Earth seen from orbit at night: glowing webs of city lights spread like veins across the dark continents, a thin blue line of atmosphere on the curved horizon, stars behind. Slow push-in toward the lights. Photoreal cinematic nature documentary, vertical 9:16 composition. Deep blues with warm amber city lights. Sound: a soft low space ambience hum only; no music, no voices.",
+   "type": "video",
+   "model": "Veo 3.1 - Lite",
+   "aspect_ratio": "9:16",
+   "max_credits": 12,
+   "download_quality": "original",
+   "retries": 1
+  },
+  {
+   "prompt": "Prehistoric night: a small group of early humans in animal skins crouch at a rocky cave mouth; one strikes two stones together and a first flame catches in a nest of dry grass, firelight blooming across their faces. Medium shot, slow push-in toward the new fire. Photoreal cinematic nature documentary, vertical 9:16 composition. Warm flickering firelight against deep blue night. Sound: crackling fire, wind, quiet breathing; no music, no speech.",
+   "type": "video",
+   "model": "Veo 3.1 - Lite",
+   "aspect_ratio": "9:16",
+   "max_credits": 12,
+   "download_quality": "original",
+   "retries": 1
+  },
+  {
+   "prompt": "Tall industrial chimneys pour thick grey-black smoke into an orange evening sky above a sprawling factory, the smoke rolling and spreading across the sky. Low-angle wide shot, slow tilt up along the chimneys. Photoreal cinematic nature documentary, vertical 9:16 composition. Hazy, polluted light. Sound: deep industrial rumble and hissing steam; no music.",
+   "type": "video",
+   "model": "Veo 3.1 - Lite",
+   "aspect_ratio": "9:16",
+   "max_credits": 12,
+   "download_quality": "original",
+   "retries": 1
+  },
+  {
+   "prompt": "A giant old rainforest tree, already cut through at its base, slowly tilts and crashes down through the canopy, leaves and dust bursting upward; beside it lies a wide strip of bare, muddy cleared land. Wide aerial shot, slow drone pull-back revealing the cleared land. Photoreal cinematic nature documentary, vertical 9:16 composition. Humid morning light, rich greens against brown mud. Sound: cracking wood, a heavy crash, frightened birds, a distant chainsaw; no music.",
+   "type": "video",
+   "model": "Veo 3.1 - Lite",
+   "aspect_ratio": "9:16",
+   "max_credits": 12,
+   "download_quality": "original",
+   "retries": 1
+  },
+  {
+   "prompt": "Underwater: a sea turtle swims slowly through a drifting cloud of plastic bags, bottles and tangled fishing net in open blue ocean water, sun rays falling from the surface. Medium shot, the camera glides alongside the turtle. Photoreal cinematic nature documentary, vertical 9:16 composition. Clear blue water, soft sun shafts. Sound: muffled underwater ambience and soft bubbles; no music.",
+   "type": "video",
+   "model": "Veo 3.1 - Lite",
+   "aspect_ratio": "9:16",
+   "max_credits": 12,
+   "download_quality": "original",
+   "retries": 1
+  },
+  {
+   "prompt": "Microscope view of human blood: round red blood cells drift slowly across the frame, and among them tiny jagged blue and white plastic fragments float and turn. Very slow push-in. Photoreal cinematic nature documentary, vertical 9:16 composition. Scientific microscopy look, glowing backlight, shallow depth of field. Sound: near silence with a faint low pulse; no music.",
+   "type": "video",
+   "model": "Veo 3.1 - Lite",
+   "aspect_ratio": "9:16",
+   "max_credits": 12,
+   "download_quality": "original",
+   "retries": 1
+  },
+  {
+   "prompt": "A crowded city street choked with thick brown smog, the sun only a pale disc in the haze; people in face masks walk past while traffic crawls with headlights glowing in the murk. Medium-wide shot, slow push-in down the street. Photoreal cinematic nature documentary, vertical 9:16 composition. Muted brown-grey palette. Sound: traffic hum, distant horns, footsteps; no music, no speech.",
+   "type": "video",
+   "model": "Veo 3.1 - Lite",
+   "aspect_ratio": "9:16",
+   "max_credits": 12,
+   "download_quality": "original",
+   "retries": 1
+  },
+  {
+   "prompt": "Vast cracked, parched earth under a white-hot sun, heat haze shimmering above the dry ground, a single dead tree far away on the horizon. Low wide shot, very slow push-in across the cracks. Photoreal cinematic nature documentary, vertical 9:16 composition. Harsh, bleached midday light. Sound: hot dry wind and cicadas; no music.",
+   "type": "video",
+   "model": "Veo 3.1 - Lite",
+   "aspect_ratio": "9:16",
+   "max_credits": 12,
+   "download_quality": "original",
+   "retries": 1
+  },
+  {
+   "prompt": "Night: a wildfire races across a forested hillside, walls of orange flame and showers of sparks rising into black smoke. Wide shot, slow sideways tracking move. Photoreal cinematic nature documentary, vertical 9:16 composition. Orange fire against a black sky. Sound: roaring flames, crackling wood, rushing wind; no music.",
+   "type": "video",
+   "model": "Veo 3.1 - Lite",
+   "aspect_ratio": "9:16",
+   "max_credits": 12,
+   "download_quality": "original",
+   "retries": 1
+  },
+  {
+   "prompt": "A lone adult elephant stands still in a stretch of bare, cleared forest land full of fresh tree stumps, dust drifting around it, the last standing trees far behind. Wide shot, slow push-in toward the elephant. Photoreal cinematic nature documentary, vertical 9:16 composition. Dusty golden afternoon light. Sound: dry wind and a single low elephant rumble; no music.",
+   "type": "video",
+   "model": "Veo 3.1 - Lite",
+   "aspect_ratio": "9:16",
+   "max_credits": 12,
+   "download_quality": "original",
+   "retries": 1
+  },
+  {
+   "prompt": "Inside a vast weapons factory: long rows of identical grey missiles rest on assembly cradles under cold fluorescent light, a welder's sparks flying in the background. Symmetrical wide shot, slow dolly forward down the central aisle. Photoreal cinematic nature documentary, vertical 9:16 composition. Cold steel-blue light. Sound: industrial clanks and a ventilation hum; no music.",
+   "type": "video",
+   "model": "Veo 3.1 - Lite",
+   "aspect_ratio": "9:16",
+   "max_credits": 12,
+   "download_quality": "original",
+   "retries": 1
+  },
+  {
+   "prompt": "Night: the heavy concrete doors of an underground missile silo slowly slide open in a bleak, empty field, steam venting out, red warning lights blinking. Wide shot, very slow push-in. Photoreal cinematic nature documentary, vertical 9:16 composition. Ominous darkness lit by red lights. Sound: deep mechanical grinding, a low hum, wind; no music.",
+   "type": "video",
+   "model": "Veo 3.1 - Lite",
+   "aspect_ratio": "9:16",
+   "max_credits": 12,
+   "download_quality": "original",
+   "retries": 1
+  },
+  {
+   "prompt": "Extreme close-up of an unblinking human eye; a burning forest is reflected in the iris, its flames flickering. Static macro shot with a barely perceptible push-in. Photoreal cinematic nature documentary, vertical 9:16 composition. Shallow depth of field, warm fire reflections against cool skin tones. Sound: faint crackling fire and a slow heartbeat; no music.",
+   "type": "video",
+   "model": "Veo 3.1 - Lite",
+   "aspect_ratio": "9:16",
+   "max_credits": 12,
+   "download_quality": "original",
+   "retries": 1
+  },
+  {
+   "prompt": "Close-up at ground level: a child's small hands and an adult's hands press dark soil around a tiny green sapling just planted, then the adult hand gently pats the soil once. Static close shot. Photoreal cinematic nature documentary, vertical 9:16 composition. Soft golden morning light, fresh green leaves. Sound: birdsong and soft soil sounds; no music.",
+   "type": "video",
+   "model": "Veo 3.1 - Lite",
+   "aspect_ratio": "9:16",
+   "max_credits": 12,
+   "download_quality": "original",
+   "retries": 1
+  },
+  {
+   "prompt": "From orbit, sunrise breaks over the curve of planet Earth: a thin line of golden light spreads across blue oceans and white clouds as the sun flares on the horizon. Slow push-in toward the rising sun. Photoreal cinematic nature documentary, vertical 9:16 composition. Warm gold against deep blue space. Sound: a soft low space ambience; no music.",
+   "type": "video",
+   "model": "Veo 3.1 - Lite",
+   "aspect_ratio": "9:16",
+   "max_credits": 12,
+   "download_quality": "original",
+   "retries": 1
+  }
+ ]
+}
