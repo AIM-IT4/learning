@@ -19,8 +19,12 @@ Gemini 2.5 Pro TTS, voice Charon. No clips, audio or video are kept in this repo
    near 60 s), Hindi subtitles, sourced fact labels, title and end card (libass; keep letter spacing at 0 for
    Devanagari or the vowel signs break off), the clips' own sound levelled to -24 LUFS and kept 18 dB under
    the voice, loudnorm -14 LUFS. Prints the WhatsApp split point.
-4. Export: `bash export.sh <out> <split>` (HQ copy + two WhatsApp parts under 60 s / 16 MB; if the two-pass
-   encode of part 2 fails with "Incomplete MB-tree stats file", encode it single-pass with -crf 22 -maxrate 1900k).
+   Background music (optional 6th argument): Erik Satie's Gymnopédie No. 1, recording by Kevin MacLeod
+   (incompetech.com, "Gymnopedie No 1", CC BY 4.0; not kept here). It plays 22 dB under the narration while it
+   speaks, 12 dB under in the pauses and 10 dB under over the end card; with music the clips' own sound drops
+   2 dB in the pauses. CC BY needs the credit, and WhatsApp status has no caption, so it is on the end card.
+4. Export: `bash export.sh <out> <split>` (HQ copy + two WhatsApp parts under 60 s / 16 MB; part 2 is encoded
+   single-pass, because the two-pass run of a seeked input failed with "Incomplete MB-tree stats file").
 
 ## Sources of the on-screen facts
 FAO Global Forest Resources Assessment 2020 (deforestation ~10 million ha a year, 2015-2020); Leslie et al.,

@@ -10,7 +10,7 @@ cd "$OUT"
 D1=$SPLIT; D2=$(python3 -c "print(round($TOTAL - $SPLIT, 3))")
 ffmpeg -y -v error -t $D1 -i "$F" -vf "fade=t=out:st=$(python3 -c "print($D1-0.5)"):d=0.5" $X -pass 1 -passlogfile wa1 -an -f null /dev/null
 ffmpeg -y -v error -t $D1 -i "$F" -vf "fade=t=out:st=$(python3 -c "print($D1-0.5)"):d=0.5" -af "afade=t=out:st=$(python3 -c "print($D1-0.6)"):d=0.6" $X -pass 2 -passlogfile wa1 -c:a aac -b:a 128k -ar 44100 -movflags +faststart Apne_Hi_Vinashak_WhatsApp_Part1.mp4
-ffmpeg -y -v error -ss $SPLIT -t $D2 -i "$F" -vf "fade=t=in:st=0:d=0.3" $X -pass 1 -passlogfile wa2 -an -f null /dev/null
-ffmpeg -y -v error -ss $SPLIT -t $D2 -i "$F" -vf "fade=t=in:st=0:d=0.3" -af "afade=t=in:st=0:d=0.2" $X -pass 2 -passlogfile wa2 -c:a aac -b:a 128k -ar 44100 -movflags +faststart Apne_Hi_Vinashak_WhatsApp_Part2.mp4
+# part 2 single-pass: the two-pass run of a seeked input failed ("Incomplete MB-tree stats file") twice
+ffmpeg -y -v error -ss $SPLIT -i "$F" -t $D2 -vf "fade=t=in:st=0:d=0.3" -af "afade=t=in:st=0:d=0.2" -c:v libx264 -preset slow -crf 22 -maxrate 1900k -bufsize 3800k -profile:v high -level 4.1 -pix_fmt yuv420p -c:a aac -b:a 128k -ar 44100 -movflags +faststart Apne_Hi_Vinashak_WhatsApp_Part2.mp4
 rm -f wa1*.log* wa2*.log*
 for f in Apne_Hi_Vinashak_*.mp4; do echo "$f $(ffprobe -v error -show_entries format=duration,size -of csv=p=0 $f)"; done

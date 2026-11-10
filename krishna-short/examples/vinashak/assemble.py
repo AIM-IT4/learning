@@ -1,11 +1,12 @@
 """Assemble the documentary "अपने ही विनाशक" (Destroyers of Ourselves).
 
-  python3 assemble.py <clips_dir> <lines.json> <takes_dir> <picks.json> <out_dir>
+  python3 assemble.py <clips_dir> <lines.json> <takes_dir> <picks.json> <out_dir> [music_file]
 
 15 Flow clips joined with 0.5 s dissolves and a held, dimmed last frame for the end card; Charon narration cut
 line by line out of the chosen takes (letter-level alignment against faster-whisper word times) and placed on
 its shot; Hindi subtitles, sourced fact labels, title and end card drawn with libass; the clips' own sound kept
-well under the voice; two-pass loudnorm to -14 LUFS. Writes film.mp4, narration.wav, mix.wav, film.ass, timeline.json.
+well under the voice; optional background music (credited on the end card) far below the voice, a little higher in
+the pauses and over the end card; two-pass loudnorm to -14 LUFS. Writes film.mp4, narration.wav, mix.wav, film.ass, timeline.json.
 """
 import json, re, subprocess, sys, tempfile
 from difflib import SequenceMatcher
@@ -13,6 +14,9 @@ from pathlib import Path
 import numpy as np
 
 clips_dir, lines_f, takes_dir, picks_f, out = map(Path, sys.argv[1:6])
+MUSIC = Path(sys.argv[6]) if len(sys.argv) > 6 else None
+MUSIC_CREDIT = "संगीत: Gymnopédie No. 1 (Erik Satie) • Kevin MacLeod (incompetech.com) • CC BY 4.0"
+MUSIC_DB = {"under": -22.0, "gap": -12.0, "end": -10.0}    # music loudness relative to the narration (-16 LUFS)
 out.mkdir(parents=True, exist_ok=True)
 FONTS = str(Path(__file__).resolve().parents[2] / "code_scenes" / "fonts")
 SR, XF, HOLD, W, H = 48000, 0.5, 4.5, 1080, 1920
@@ -132,12 +136,22 @@ amb = np.pad(amb, ((0, max(0, len(track) - len(amb))), (0, 0)))[: len(track)]
 hop = SR // 100; env = np.sqrt(np.convolve(track ** 2, np.ones(hop * 3) / (hop * 3), "same"))[::hop]
 on = env > db(-42) * max(env.max(), 1e-9); hold = np.zeros_like(on)
 for i in np.where(on)[0]: hold[max(0, i - 30): i + 60] = True
-gdb = np.where(hold, -10.0, -1.0)                       # ambience at -24 LUFS: -34 under the voice, -25 in the gaps
+gdb = np.where(hold, -10.0, -3.0 if MUSIC else -1.0)    # ambience at -24 LUFS: -34 under the voice, -25 (-27 with music) in the gaps
 k = 25; gdb = np.convolve(np.pad(gdb, (k, k), mode="edge"), np.ones(2 * k + 1) / (2 * k + 1), "valid")
 gain = db(np.interp(np.arange(len(track)) / SR, np.arange(len(gdb)) / 100, gdb))
 tt = np.arange(len(track)) / SR
 gain *= np.clip((end_video + 2.5 - tt) / 2.5, 0, 1) * np.clip(tt / 0.6, 0, 1)     # sound fades over the end card
 mix = amb * gain[:, None] + track[:, None]
+if MUSIC:
+    mus = load(MUSIC, SR, 2)
+    mus = np.pad(mus, ((0, max(0, len(track) - len(mus))), (0, 0)))[: len(track)]
+    Lm = lufs(mus[: int(min(len(mus) / SR, end_video) * SR)])
+    mdb = np.where(hold, MUSIC_DB["under"], MUSIC_DB["gap"]) + (-16 - Lm)
+    tt100 = np.arange(len(mdb)) / 100
+    mdb = np.where(tt100 >= end_video - 0.5, MUSIC_DB["end"] + (-16 - Lm), mdb)
+    k2 = 50; mdb = np.convolve(np.pad(mdb, (k2, k2), mode="edge"), np.ones(2 * k2 + 1) / (2 * k2 + 1), "valid")   # ~1 s ramps
+    mg = db(np.interp(tt, tt100, mdb)) * np.clip(tt / 1.5, 0, 1) * np.clip((TOTAL - tt) / 3.0, 0, 1) ** 1.3
+    mix = mix + mus * mg[:, None]
 with tempfile.TemporaryDirectory() as td:
     pre = Path(td) / "pre.wav"; save(pre, mix)
     m = subprocess.run(["ffmpeg", "-v", "info", "-nostats", "-i", str(pre), "-af", "loudnorm=I=-14:TP=-1.5:LRA=11:print_format=json", "-f", "null", "-"], capture_output=True, text=True).stderr
@@ -176,6 +190,7 @@ for i, (head, src) in FACTS.items():
 ev(end_video - 0.2, TOTAL, "Dim", r"{\fad(900,0)\pos(0,0)\p1\1c&H000000&\1a&H50&}m 0 0 l 1080 0 1080 1920 0 1920{\p0}", layer=0)
 ev(end_video + 0.3, TOTAL, "Title", r"{\fad(800,0)\pos(540,860)}अपने ही विनाशक")
 ev(end_video + 1.1, TOTAL, "TSub", r"{\fad(800,0)\pos(540,990)}विनाशक भी हम… रक्षक भी हम।")
+if MUSIC: ev(end_video + 1.6, TOTAL, "Src", r"{\fad(600,0)\an2\pos(540,1700)}" + MUSIC_CREDIT)
 (out / "film.ass").write_text("\n".join(ass) + "\n", encoding="utf-8")
 
 # ---- picture
