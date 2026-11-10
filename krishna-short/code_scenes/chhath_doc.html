@@ -23,9 +23,12 @@ const DEF = {
     ['day1', 60.11, 67.793], ['day2', 67.793, 75.476], ['day3', 75.476, 83.159], ['day4', 83.159, 90.841],
   ],
   subs: [], // [start, end, text]
+  cues: {},  // absolute times of spoken key words: draupadi, shashthi, alive, today1..today4
+  disclose: [0.6, 60.0], // show "Voiceover generated with AI." over the narrated part
   total: 90.841,
 };
-let TM = DEF;
+let TM = DEF, SHOT_T0 = 0;
+const cue = (k, dflt) => (TM.cues && TM.cues[k] != null) ? TM.cues[k] - SHOT_T0 : dflt;
 const XF = 0.8; // transition length
 
 // ------------------------------------------------------------------ backgrounds
@@ -100,13 +103,13 @@ SC.karna = (u, T) => {
     }, 1360, u, C.blue);
     sparkles(300, 600, 400, 700, u, 30, 3);
   });
-  layer(1.0, () => { const a = ease((u - 4.5) / 1.2); if (a > 0) { g.save(); g.globalAlpha = a;
+  layer(1.0, () => { const a = ease((u - cue('draupadi', 4.5) + 0.4) / 1.0); if (a > 0) { g.save(); g.globalAlpha = a;
     shape(() => { g.rect(820, 1450, 600, 600); }, '#b88a5a', { w: 5, pattern: () => { for (let yy = 1450; yy < 2050; yy += 60) { g.strokeStyle = C.ink; g.lineWidth = 3; g.beginPath(); g.moveTo(820, yy); g.lineTo(1500, yy); g.stroke(); } } });
     figure(1000, 1460, 56, { kind: 'woman', crown: true, sari: C.red, sari2: C.yellow, border: C.gold, blouse: C.indigo, pose: 'namaste', seed: 4, dir: -1 }, u); g.restore(); } });
 };
 SC.shashthi = (u, T) => {
   camPath(u / T, [540, 1000, 1.0], [540, 940, 1.1]);
-  const appear = ease((u - 2.6) / 1.6), alive = ease((u - 5.6) / 1.4);
+  const appear = ease((u - cue('shashthi', 2.6) + 0.3) / 1.4), alive = ease((u - cue('alive', 5.6)) / 1.2);
   layer(0.3, () => {
     skyGrad([[0, '#6a1820'], [1, '#3a0c12']]); paperOver(0.45);
     for (let i = 0; i < 3; i++) { const x = 180 + i * 360; shape(() => { g.moveTo(x - 150, 1300); g.lineTo(x - 150, 650); g.quadraticCurveTo(x - 150, 470, x, 420); g.quadraticCurveTo(x + 150, 470, x + 150, 650); g.lineTo(x + 150, 1300); g.closePath(); }, '#2a0a10', { w: 6, inkCol: C.gold }); }
@@ -220,9 +223,9 @@ function chapter(u, T, small, big, o = {}) {
 function place(u, T, text, sub) {
   const a = ease((u - 0.9) / 0.6) * (1 - ease((u - T + 0.7) / 0.5)); if (a <= 0) return;
   const x = 70 + (1 - ease((u - 0.9) / 0.6)) * -30;
-  g.save(); g.globalAlpha = a; g.fillStyle = '#e8c070'; g.fillRect(x, 1390, 6, sub ? 92 : 56); g.restore();
-  tx(text, x + 24, 1436, '44px NotoDeva', '#fff4dc', { a, align: 'left', stroke: 'rgba(20,8,6,0.75)', sw: 8 });
-  if (sub) tx(sub, x + 24, 1478, '30px NotoDeva', '#f2d48a', { a, align: 'left', stroke: 'rgba(20,8,6,0.75)', sw: 6 });
+  g.save(); g.globalAlpha = a; g.fillStyle = '#e8c070'; g.fillRect(x, 1270, 6, sub ? 92 : 56); g.restore();
+  tx(text, x + 24, 1316, '44px NotoDeva', '#fff4dc', { a, align: 'left', stroke: 'rgba(20,8,6,0.75)', sw: 8 });
+  if (sub) tx(sub, x + 24, 1358, '30px NotoDeva', '#f2d48a', { a, align: 'left', stroke: 'rgba(20,8,6,0.75)', sw: 6 });
 }
 function subtitle(t) {
   const s = TM.subs.find(([a, b]) => t >= a && t < b); if (!s) return;
@@ -244,14 +247,15 @@ const OVER = {
   surya: (u, T) => { const a = ease((u - 0.8) / 1.0) * (1 - ease((u - T + 0.9) / 0.6)); if (a > 0) { topScrim(a, 620); tx('छठ', 540, 430, '230px "Yatra One"', '#ffd34d', { a, stroke: '#4a0a06', sw: 16, glow: 'rgba(255,170,60,0.9)', blur: 40 }); tx('आस्था की हज़ारों साल पुरानी कहानी', 540, 520, '46px Tiro', '#fff4dc', { a: a * ease((u - 1.6) / 0.8), stroke: 'rgba(20,8,6,0.8)', sw: 8 }); } },
   vedic: (u, T) => { chapter(u, T, 'अध्याय १ • वैदिक काल', 'सूर्य की उपासना'); },
   sita: (u, T) => { chapter(u, T, 'अध्याय २ • रामायण', 'माता सीता का व्रत'); place(u, T, 'मुंगेर, बिहार', 'गंगा तट • मान्यता'); },
-  karna: (u, T) => { chapter(u, T, 'अध्याय ३ • महाभारत', 'सूर्यपुत्र कर्ण'); if (u > 4.8) place(u - 4.8, T - 4.8, 'द्रौपदी', 'पांडवों के लिए व्रत'); },
+  karna: (u, T) => { chapter(u, T, 'अध्याय ३ • महाभारत', 'सूर्यपुत्र कर्ण'); const c = cue('draupadi', 4.8) - 0.8; if (u > c) place(u - c, T - c, 'द्रौपदी', 'पांडवों के लिए व्रत'); },
   shashthi: (u, T) => { chapter(u, T, 'अध्याय ४ • पुराण कथा', 'षष्ठी देवी • छठी मइया'); place(u, T, 'राजा प्रियव्रत और रानी मालिनी'); },
   deo: (u, T) => { chapter(u, T, 'अध्याय ५ • परंपरा', 'बिहार की धरोहर'); place(u, T, 'देव सूर्य मंदिर', 'औरंगाबाद, बिहार'); },
   today: (u, T) => {
-    const words = [['न कोई पुरोहित', 0.6], ['न कोई मूर्ति', 2.0], ['बस सूरज • जल • आस्था', 3.4]];
-    const out = 1 - ease((u - 6.4) / 0.5); topScrim(Math.max(out, 0) * ease(u / 0.6), 700);
+    const words = [['न कोई पुरोहित', cue('today1', 0.6)], ['न कोई मूर्ति', cue('today2', 2.0)], ['बस सूरज • जल • आस्था', cue('today3', 3.4)]];
+    const tt = cue('today4', 6.6);
+    const out = 1 - ease((u - tt + 0.2) / 0.5); topScrim(Math.max(out, 0) * ease(u / 0.6), 700);
     words.forEach(([w, s], i) => { const a = ease((u - s) / 0.5) * out; if (a > 0) tx(w, 540, 300 + i * 100, (i === 2 ? 72 : 64) + 'px Tiro', i === 2 ? '#ffd34d' : '#fff4dc', { a, stroke: 'rgba(20,8,6,0.85)', sw: 9, glow: i === 2 ? 'rgba(255,170,60,0.7)' : null }); });
-    const b = ease((u - 6.6) / 0.7); if (b > 0) { topScrim(b, 900); tx('चार दिन का महापर्व', 540, 470, '70px Tiro', '#fff4dc', { a: b, stroke: 'rgba(20,8,6,0.85)', sw: 9 }); tx('छठ', 540, 690, '220px "Yatra One"', '#ffd34d', { a: ease((u - 7.2) / 0.6), stroke: '#4a0a06', sw: 16, glow: 'rgba(255,170,60,0.9)', blur: 40 }); }
+    const b = ease((u - tt) / 0.7); if (b > 0) { topScrim(b, 900); tx('चार दिन का महापर्व', 540, 470, '70px Tiro', '#fff4dc', { a: b, stroke: 'rgba(20,8,6,0.85)', sw: 9 }); tx('छठ', 540, 690, '220px "Yatra One"', '#ffd34d', { a: ease((u - tt - 1.6) / 0.6), stroke: '#4a0a06', sw: 16, glow: 'rgba(255,170,60,0.9)', blur: 40 }); }
   },
   day1: (u, T) => dayCard(u, T, 'पहला दिन', 'नहाय-खाय', '13 नवंबर', 'गंगा स्नान • कद्दू-भात का प्रसाद'),
   day2: (u, T) => dayCard(u, T, 'दूसरा दिन', 'खरना', '14 नवंबर', 'गुड़ की खीर और रोटी • फिर 36 घंटे का निर्जला व्रत'),
@@ -274,7 +278,7 @@ function inkWipe(p, seed, cx, cy) {
   g.closePath();
 }
 function drawShot(i, t) {
-  const [id, a, b] = TM.shots[i], T = b - a + XF / 2, u = t - a;
+  const [id, a, b] = TM.shots[i], T = b - a + XF / 2, u = t - a; SHOT_T0 = a;
   const part2 = id.startsWith('day'), dd = part2 ? 0.7 : 1.5;
   REVEAL.d = ease(u / dd); REVEAL.f = ease((u - dd * 0.35) / (dd * 0.7));
   g.save(); SC[id](u, b - a); g.restore(); REVEAL.d = 1; REVEAL.f = 1;
@@ -291,8 +295,10 @@ function renderDoc(name, t) {
     g.save(); inkWipe(p, i * 7 + 1, W * (0.3 + 0.4 * ((i * 37) % 10) / 10), H * 0.55); g.strokeStyle = `rgba(40,15,5,${0.5 * (1 - p)})`; g.lineWidth = 14; g.stroke(); g.restore();
   } else drawShot(i, t);
   // overlays for the current shot (and the previous one while it fades)
-  g.save(); OVER[id] && OVER[id](t - a, b - a); g.restore();
+  SHOT_T0 = a; g.save(); OVER[id] && OVER[id](t - a, b - a); g.restore();
   subtitle(t);
+  if (TM.disclose && t > TM.disclose[0] && t < TM.disclose[1]) { const da = ease((t - TM.disclose[0]) / 0.6) * (1 - ease((t - TM.disclose[1] + 0.6) / 0.6));
+    tx('Voiceover generated with AI.', 540, 1688, '26px NotoDeva', 'rgba(255,255,255,0.85)', { a: da, stroke: 'rgba(0,0,0,0.6)', sw: 5 }); }
   // global fade in/out, vignette, grain
   const fin = ease(t / 0.8), fout = 1 - ease((t - TM.total + 1.2) / 1.0);
   const v = g.createRadialGradient(W / 2, H / 2, H * 0.35, W / 2, H / 2, H * 0.75); v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(10,4,2,0.38)'); g.fillStyle = v; g.fillRect(0, 0, W, H);
