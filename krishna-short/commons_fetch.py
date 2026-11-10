@@ -6,7 +6,7 @@ CREDITS.txt (title, author, licence, source page) for the post caption / end car
   python commons_fetch.py catalog.json --out media 3 4 7 10 466        # catalogue indices
   python commons_fetch.py catalog.json --out media "File:Chatt Ghat.jpg"
 
-Photos wider than --max-width come as Commons' own resized copy (standard sizes only), videos as the original.
+Photos come as Commons' own resized copy (largest standard width up to --max-width), videos as the original.
 Waits whenever Commons answers 429 (Retry-After), so it is slow but polite.
 """
 import argparse
@@ -60,8 +60,11 @@ def main():
         f = out / f"{p if p.isdigit() else 'f'}_{safe_name(x['title'])}"
         f = f.with_suffix(".jpg" if ext in (".jpeg", ".jpg") else ext)
         url = x["url"].split("?")[0]
-        if x["mime"].startswith("image/") and x["width"] > args.max_width and x.get("thumb"):
-            url = re.sub(r"/\d+px-", f"/{args.max_width}px-", x["thumb"].split("?")[0])
+        if x["mime"].startswith("image/") and x.get("thumb"):
+            # Commons' resized copies (standard widths) are served more readily than originals
+            sizes = [w for w in (960, 1280, 1920, 3840) if w <= args.max_width and w < x["width"]]
+            if sizes:
+                url = re.sub(r"/\d+px-", f"/{sizes[-1]}px-", x["thumb"].split("?")[0])
         if not f.exists():
             print(f"{p}: {x['title']}", flush=True)
             f.write_bytes(get(url))

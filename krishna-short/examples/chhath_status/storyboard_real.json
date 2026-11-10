@@ -1,0 +1,338 @@
+{
+ "song": "Jode Jode Phalwa (T-Series), used with the user's permission; 17.98 s to 77.98 s",
+ "start": 17.98,
+ "duration": 60.0,
+ "bpm": 124.95,
+ "beat0": 0.0,
+ "fade_out": 2.5,
+ "embers": 0.45,
+ "rays": [
+  [
+   3.9,
+   7.6
+  ],
+  [
+   51.9,
+   55.6
+  ]
+ ],
+ "frame": [
+  [
+   3.84,
+   11.3
+  ],
+  [
+   55.7,
+   60
+  ]
+ ],
+ "shots": [
+  {
+   "img": "340_Diwali_Lamps.jpg",
+   "bars": 2,
+   "move": "in",
+   "parallax": true
+  },
+  {
+   "img": "46_Offering_prayers_to_Sun_God_in_Chhath_Puja_Bihar.jpg",
+   "bars": 2,
+   "fx": "fadewhite",
+   "move": "in",
+   "parallax": true
+  },
+  {
+   "img": "3_Barani_Ghat_Vikaramshila_Setu_Bhagalpur_Chhath_Puja_Morning_Arghya.jpg",
+   "bars": 2,
+   "fx": "dissolve",
+   "move": "down",
+   "parallax": true
+  },
+  {
+   "img": "9_Sunset_at_Gandhi_Ghat.jpg",
+   "bars": 2,
+   "fx": "circleopen",
+   "move": "in",
+   "parallax": true,
+   "fit": "cover",
+   "focus": 0.12
+  },
+  {
+   "img": "32_Chhath_Puja_in_Bihar.jpg",
+   "bars": 2,
+   "fx": "dissolve",
+   "move": "out",
+   "parallax": true
+  },
+  {
+   "img": "35_20221030170942_IMG_0619.jpg",
+   "bars": 2,
+   "fx": "fadewhite",
+   "move": "in",
+   "parallax": true,
+   "kind": "beat"
+  },
+  {
+   "img": "352_Mithila_Painting_Inside_Darbhanga_Junction_Railway_Station.jpg",
+   "bars": 2,
+   "fx": "smoothup",
+   "move": "in"
+  },
+  {
+   "img": "37_DARBHANGA_RAJ.jpg",
+   "bars": 2,
+   "fx": "dissolve",
+   "move": "in"
+  },
+  {
+   "img": "71_Chhath_Puja_Chaudhary_Pokhair.jpg",
+   "bars": 2,
+   "fx": "circleopen",
+   "move": "out"
+  },
+  {
+   "img": "10_The_women_of_Kushwaha_caste_celebrating_Chhath_Mahaparva_in_Bihar.jpg",
+   "bars": 2,
+   "fx": "smoothleft",
+   "move": "up",
+   "parallax": true
+  },
+  {
+   "img": "94_A_view_of_sunrise_from_lychee_garden_in_Muzaffarpur.jpg",
+   "bars": 2,
+   "fx": "dissolve",
+   "move": "in"
+  },
+  {
+   "img": "48_Chatt_Ghat.jpg",
+   "bars": 2,
+   "fx": "radial",
+   "move": "out"
+  },
+  {
+   "img": "4_Chhath_Puja_Koshi_Bihar_India.jpg",
+   "bars": 1,
+   "fx": "fade",
+   "move": "in",
+   "parallax": true
+  },
+  {
+   "img": "13_Chhath_the_soul_of_Bihar.jpg",
+   "bars": 1,
+   "fx": "smoothup",
+   "move": "out"
+  },
+  {
+   "img": "291_The_Kosi_parv_Chhath_Pujha.jpg",
+   "bars": 1,
+   "fx": "dissolve",
+   "move": "in",
+   "parallax": true
+  },
+  {
+   "img": "31_Chath_Puja_Jaideopatty.jpg",
+   "bars": 2,
+   "fx": "fadewhite",
+   "move": "up",
+   "parallax": true,
+   "fit": "cover",
+   "focus": 0.6
+  },
+  {
+   "img": "70_Spiritual_Strength_at_Chhath_puja.jpg",
+   "bars": 3,
+   "fx": "fadeslow",
+   "move": "in",
+   "kind": "outro"
+  }
+ ],
+ "captions": [
+  {
+   "t": 0.3,
+   "end": 3.75,
+   "style": "Pre",
+   "text": "दीवाली बीत गई…",
+   "pos": [
+    540,
+    700
+   ]
+  },
+  {
+   "t": 2.0,
+   "end": 3.75,
+   "style": "PreSub",
+   "text": "अब हर बिहारी को इंतज़ार है…",
+   "pos": [
+    540,
+    850
+   ]
+  },
+  {
+   "t": 3.9,
+   "end": 10.9,
+   "style": "Banner",
+   "box": [
+    90,
+    255,
+    900,
+    380
+   ]
+  },
+  {
+   "t": 4.0,
+   "end": 10.9,
+   "style": "Title",
+   "text": "छठ महापर्व"
+  },
+  {
+   "t": 4.6,
+   "end": 10.9,
+   "style": "TitleSub",
+   "text": "लोक आस्था का चार दिवसीय महापर्व"
+  },
+  {
+   "t": 5.4,
+   "end": 10.9,
+   "style": "Banner",
+   "box": [
+    150,
+    1035,
+    780,
+    450
+   ],
+   "alpha": "18"
+  },
+  {
+   "t": 5.7,
+   "end": 10.9,
+   "style": "Row",
+   "y": 1120,
+   "date": "13 नवंबर",
+   "text": "नहाय-खाय"
+  },
+  {
+   "t": 6.1,
+   "end": 10.9,
+   "style": "Row",
+   "y": 1220,
+   "date": "14 नवंबर",
+   "text": "खरना"
+  },
+  {
+   "t": 6.5,
+   "end": 10.9,
+   "style": "Row",
+   "y": 1320,
+   "date": "15 नवंबर",
+   "text": "संध्या अर्घ्य"
+  },
+  {
+   "t": 6.9,
+   "end": 10.9,
+   "style": "Row",
+   "y": 1420,
+   "date": "16 नवंबर",
+   "text": "उषा अर्घ्य"
+  },
+  {
+   "t": 12.0,
+   "end": 15.2,
+   "style": "Loc",
+   "text": "पटना • गांधी घाट, गंगा"
+  },
+  {
+   "t": 15.8,
+   "end": 19.0,
+   "style": "Ritual",
+   "text": "संध्या अर्घ्य"
+  },
+  {
+   "t": 19.6,
+   "end": 23.0,
+   "style": "Hook",
+   "text": "जोड़े जोड़े फलवा"
+  },
+  {
+   "t": 23.4,
+   "end": 26.7,
+   "style": "Loc",
+   "text": "दरभंगा जंक्शन • मिथिला पेंटिंग"
+  },
+  {
+   "t": 27.3,
+   "end": 30.6,
+   "style": "Loc",
+   "text": "दरभंगा • राज किला"
+  },
+  {
+   "t": 31.1,
+   "end": 34.4,
+   "style": "Loc",
+   "text": "मधुबनी • चौधरी पोखर घाट"
+  },
+  {
+   "t": 38.8,
+   "end": 42.1,
+   "style": "Loc",
+   "text": "मुज़फ़्फ़रपुर • लीची के बाग़"
+  },
+  {
+   "t": 42.6,
+   "end": 45.9,
+   "style": "Loc",
+   "text": "मुज़फ़्फ़रपुर • गाँव का छठ घाट"
+  },
+  {
+   "t": 46.3,
+   "end": 47.9,
+   "style": "Ritual",
+   "text": "कोसी भराई"
+  },
+  {
+   "t": 48.2,
+   "end": 49.8,
+   "style": "Loc",
+   "text": "बिहार • दीपों से जगमग घाट"
+  },
+  {
+   "t": 52.3,
+   "end": 55.5,
+   "style": "Ritual",
+   "text": "उषा अर्घ्य"
+  },
+  {
+   "t": 55.9,
+   "end": 60.0,
+   "style": "Banner",
+   "box": [
+    70,
+    760,
+    940,
+    400
+   ]
+  },
+  {
+   "t": 56.1,
+   "end": 60.0,
+   "style": "End",
+   "text": "जय छठी मईया"
+  },
+  {
+   "t": 56.8,
+   "end": 60.0,
+   "style": "EndSub",
+   "text": "छठ पूजा की हार्दिक शुभकामनाएँ"
+  },
+  {
+   "t": 56.6,
+   "end": 60,
+   "style": "Credit",
+   "text": "तस्वीरें: Wikimedia Commons (CC BY-SA) • आवाज़: AI",
+   "pos": [
+    540,
+    1560
+   ]
+  }
+ ],
+ "voice_at": 0.0,
+ "voice_gain": 1.0
+}

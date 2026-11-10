@@ -60,3 +60,28 @@ ffmpeg -y -i chhath_status.mp4 -c:v libx264 -preset slow -b:v 1800k -pass 2 -c:a
 
 WhatsApp covers the top ~200 px and bottom ~250 px of a status with its own buttons, so all
 text stays between those.
+
+## Real-photo version with a Hindi voiceover (`storyboard_real.json`)
+
+Same song cut, cuts and captions, but every picture is a real, freely licensed photo from Wikimedia
+Commons (Patna Gandhi Ghat, Darbhanga Raj, the Mithila painting at Darbhanga Junction, Chaudhary
+Pokhar ghat in Madhubani, Muzaffarpur lychee gardens and a village ghat, Bhagalpur's Barani ghat, kosi,
+arghya ...), and an AI Hindi male voice speaks the opening while the song dips under it.
+
+```bash
+python commons_catalog.py --out catalog.json --thumbs thumbs "Category:Chhath in Bihar" "search:Chhath ghat" \
+  "search:Chhath arghya" "search:Diwali diya"
+python commons_catalog.py --out catalog2.json --thumbs thumbs2 "search:Gandhi Ghat Patna" "search:Darbhanga Raj" \
+  "search:Muzaffarpur" "search:Mithila painting"
+python commons_fetch.py catalog.json --out media --max-width 1920 340 3 10 4 67 48 71 32 291 35 7 13 31 332 46 70
+python commons_fetch.py catalog2.json --out media --max-width 1920 9 13 37 352 93 94
+printf "दीवाली बीत गई…\nअब हर बिहारी को इंतज़ार है…\nलोक आस्था के महापर्व, छठ का!\n" > vo.txt
+python make_voiceover.py --text vo.txt --voice rohan --lead 0.3 --gap 0.3 --tail 0.6 --out-audio voice.wav --out-lyrics vo.txt.times
+python make_festival.py examples/chhath_status/storyboard_real.json --images media --music song.wav --voice voice.wav \
+  --fonts fonts_dir --out chhath_status_real.mp4
+```
+
+Catalogue numbers depend on what Commons returns on the day; check the previews and `media/CREDITS.txt`.
+Most photos are CC BY-SA: the last seconds carry a small credit line; paste `media/CREDITS.txt` into the post.
+Commons may answer "429 too many requests" for original files from shared cloud servers; its resized copies
+(`--max-width 1920`) usually still come through.

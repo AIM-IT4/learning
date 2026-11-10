@@ -20,7 +20,7 @@ shots: [{img | video, bars, fx, move, parallax, kind, fit, focus, ss, speed}], c
   img: a photo or painting; video: a real video clip, played from `ss` seconds at `speed`.
   fit: "auto" (portrait fills the frame, wide pictures sit on a blurred copy of themselves), "cover" (always
   fill the frame, cropped around `focus` = 0 left .. 1 right) or "blur".
-frame: [[from, to], ...], rays: [[from, to], ...], embers: opacity.
+frame: [[from, to], ...], rays: [[from, to], ...], embers: opacity, voice_at / voice_gain (with --voice).
 Use music you have the rights to.  Needs: ffmpeg (libass), numpy, Pillow; torch + transformers for parallax.
 """
 import argparse
@@ -197,6 +197,7 @@ STYLES = {
     "PreSub":   ("Tiro Devanagari Hindi", 78, "&H00F2FAFF", "&H00101010", 3, 5, 0, -1),
     "RowDate":  ("Noto Sans Devanagari", 62, "&H004DD8FF", "&H00101010", 2, 4, 0, -1),
     "RowName":  ("Tiro Devanagari Hindi", 70, "&H00FFFFFF", "&H00101010", 2, 4, 0, -1),
+    "Credit":   ("Noto Sans Devanagari", 28, "&H00E0E0E0", "&H00101010", 2, 5, 0, 0),
 }
 
 
@@ -308,6 +309,8 @@ def main():
     ap.add_argument("storyboard")
     ap.add_argument("--images", required=True, help="folder with the storyboard's images")
     ap.add_argument("--music", required=True)
+    ap.add_argument("--voice", help="voiceover (wav/mp3) laid over the song from storyboard voice_at (s); "
+                                    "the song dips under the voice")
     ap.add_argument("--fonts", help="folder with the caption fonts (default: ./fonts next to this script)")
     ap.add_argument("--out", default="festival_status.mp4")
     ap.add_argument("--work", help="keep rendered clips here and reuse them")
@@ -400,8 +403,17 @@ def main():
     graph.append(f"{last}ass=cap.ass:fontsdir=.:shaping=complex,format=yuv420p[vout]")
     inputs += ["-ss", f"{float(sb['start']):.3f}", "-t", f"{total:.3f}", "-i", str(Path(args.music).resolve())]
     fo = float(sb.get("fade_out", 2.0))
-    graph.append(f"[{n}:a]aformat=channel_layouts=stereo,afade=t=in:d=0.25,afade=t=out:st={total - fo:.3f}:d={fo:.3f},"
-                 f"loudnorm=I=-14:TP=-1.5:LRA=11[aout]")
+    music = (f"[{n}:a]aformat=sample_rates=48000:channel_layouts=stereo,afade=t=in:d=0.25,"
+             f"afade=t=out:st={total - fo:.3f}:d={fo:.3f}")
+    if args.voice:
+        inputs += ["-i", str(Path(args.voice).resolve())]
+        ms_at = int(float(sb.get("voice_at", 0.0)) * 1000)
+        graph.append(f"{music}[mus];[{n + 1}:a]aformat=sample_rates=48000:channel_layouts=stereo,"
+                     f"adelay={ms_at}|{ms_at},volume={float(sb.get('voice_gain', 1.0)):.2f},apad,asplit=2[vo][vsc];"
+                     f"[mus][vsc]sidechaincompress=threshold=0.02:ratio=12:attack=20:release=450[duck];"
+                     f"[duck][vo]amix=inputs=2:duration=first:normalize=0,loudnorm=I=-14:TP=-1.5:LRA=11[aout]")
+    else:
+        graph.append(f"{music},loudnorm=I=-14:TP=-1.5:LRA=11[aout]")
     out = Path(args.out).resolve()
     print("compositing ...", flush=True)
     ms.run(["ffmpeg", "-y", *inputs, "-filter_complex", ";".join(graph), "-map", "[vout]", "-map", "[aout]",
