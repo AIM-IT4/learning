@@ -18,7 +18,7 @@ setCtx(ctx);
 // ------------------------------------------------------------------ timing (overridable: window.TIMING)
 const DEF = {
   shots: [ // [id, start, end]
-    ['surya', 0, 8.6], ['vedic', 8.6, 16.2], ['sita', 16.2, 22.8], ['karna', 22.8, 32.4], ['shashthi', 32.4, 42.2],
+    ['diwali', 0, 6.5], ['surya', 6.5, 12.6], ['vedic', 12.6, 16.2], ['sita', 16.2, 22.8], ['karna', 22.8, 32.4], ['shashthi', 32.4, 42.2],
     ['deo', 42.2, 50.0], ['today', 50.0, 60.11],
     ['day1', 60.11, 67.793], ['day2', 67.793, 75.476], ['day3', 75.476, 83.159], ['day4', 83.159, 90.841],
   ],
@@ -59,6 +59,48 @@ function inWater(fn, wl, t, col = C.blue) { fn(); g.save(); waterBand(wl, H + 40
 
 // ------------------------------------------------------------------ scenes (u = local time, T = length)
 const SC = {};
+function aripan(cx, cy, r, u) {
+  // Mithila floor art in white rice paste: concentric lotus rings, a central sun-lotus and Lakshmi's footprints
+  g.save(); g.translate(cx, cy); g.scale(1, 0.42);
+  const W8 = 'rgba(252,246,232,0.95)'; g.strokeStyle = W8; g.fillStyle = W8; g.lineCap = 'round';
+  const dd = REVEAL.d;
+  for (let ring = 0; ring < 4; ring++) {
+    const rr = r * (0.3 + ring * 0.2), n = 8 + ring * 4;
+    g.lineWidth = 7; g.setLineDash([TAU * rr * dd, TAU * rr]); g.beginPath(); g.arc(0, 0, rr, 0, TAU); g.stroke(); g.setLineDash([]);
+    if (REVEAL.f > 0.05) for (let i = 0; i < n; i++) { const a = i / n * TAU + ring * 0.3; g.save(); g.rotate(a); g.globalAlpha = REVEAL.f;
+      g.beginPath(); g.moveTo(rr, 0); g.quadraticCurveTo(rr + r * 0.08, -r * 0.05, rr + r * 0.16, 0); g.quadraticCurveTo(rr + r * 0.08, r * 0.05, rr, 0); g.fill(); g.restore(); }
+  }
+  g.globalAlpha = REVEAL.f;
+  for (let i = 0; i < 8; i++) { g.save(); g.rotate(i / 8 * TAU); g.beginPath(); g.ellipse(r * 0.13, 0, r * 0.12, r * 0.045, 0, 0, TAU); g.fill(); g.restore(); }
+  g.beginPath(); g.arc(0, 0, r * 0.06, 0, TAU); g.fillStyle = C.red; g.fill(); g.restore();
+  // Lakshmi's footprints walking in
+  for (let k = 0; k < 4; k++) { const fx = cx - r * 1.5 + k * r * 0.32, fy = cy + r * 0.62 - k * r * 0.06 + (k % 2) * 20;
+    g.save(); g.translate(fx, fy); g.rotate(-0.2); g.globalAlpha = REVEAL.f * 0.95; g.fillStyle = 'rgba(252,246,232,0.95)';
+    g.beginPath(); g.ellipse(0, 0, 16, 30, 0, 0, TAU); g.fill(); for (let tt = 0; tt < 5; tt++) { g.beginPath(); g.arc(-12 + tt * 6, -34 - Math.abs(tt - 2) * -2, 4, 0, TAU); g.fill(); } g.restore(); }
+  g.globalAlpha = 1;
+}
+SC.diwali = (u, T) => {
+  camPath(u / T, [540, 1000, 1.08], [540, 1040, 1.0]);
+  layer(0.2, () => { skyGrad([[0, '#0a0d2a'], [0.6, '#1a1640'], [1, '#2a1a3a']]); paperOver(0.25); stars(160, 5, 900, u); });  // Diwali is amavasya: no moon
+  layer(0.55, () => {
+    // Mithila house: mud wall with painted bands, a kohbar-style doorway
+    shape(() => g.rect(-200, 640, 1480, 760), '#8a5a3a', { w: 5, pattern: () => { patDots('rgba(40,20,10,0.25)', 34, 4, -200, 640, 1300, 1400); } });
+    shape(() => g.rect(-200, 640, 1480, 70), C.maroon, { w: 4, pattern: () => zigzagBand(-200, 1300, 690, 22, C.yellow, 44) });
+    shape(() => { g.moveTo(-220, 650); g.lineTo(540, 470); g.lineTo(1300, 650); g.closePath(); }, '#5a3a22', { w: 5, pattern: () => patLines('rgba(240,200,120,0.35)', 14, 3, 0.6, 1600) });
+    shape(() => { g.moveTo(420, 1400); g.lineTo(420, 940); g.quadraticCurveTo(540, 800, 660, 940); g.lineTo(660, 1400); g.closePath(); }, '#1a0e08', { w: 6, inkCol: C.gold });
+    for (const x of [300, 780]) { mFish(x, 860, 26, x < 540 ? 0.2 : Math.PI - 0.2, C.yellow, C.red, u); lotus(x, 1010, 34); }
+    // ledge with the row of diyas going out
+    shape(() => g.rect(-200, 1180, 1480, 36), '#6a3a22', { w: 4 });
+    for (let i = 0; i < 9; i++) {
+      const x = 70 + i * 118, out = 0.9 + ((i * 5) % 9) * 0.32, lit = i === 4 ? 1 : 1 - ease((u - out) / 0.45);
+      diya(x, 1178, 50, u, i, lit);
+      if (lit < 0.98) { const k = clamp((u - out) / 2.2); g.strokeStyle = `rgba(210,210,225,${0.45 * (1 - k)})`; g.lineWidth = 3; g.beginPath();
+        for (let j = 0; j <= 14; j++) g.lineTo(x + 30 + Math.sin(u * 2 + j * 0.6 + i) * j * 1.4, 1160 - j * 9 - k * 30); g.stroke(); }
+    }
+  });
+  layer(1.0, () => { shape(() => g.rect(-200, 1400, 1480, 800), '#5a3424', { w: 5, pattern: () => patDots('rgba(0,0,0,0.18)', 40, 5, -200, 1400, 1300, 2200) });
+    aripan(540, 1640, 300, u); diya(540, 1640, 90, u, 99, 1); });
+};
 SC.surya = (u, T) => {
   camPath(u / T, [540, 980, 1.0], [540, 900, 1.12]);
   const dawn = ease((u - 1) / 5);
@@ -244,6 +286,12 @@ function dayCard(u, T, n, name, date, desc) {
   botScrim(a); tx(desc, 540, 1600, '46px NotoDeva', '#ffffff', { a: a * ease((u - 0.4) / 0.4), stroke: 'rgba(0,0,0,0.75)', sw: 9 });
 }
 const OVER = {
+  diwali: (u, T) => {
+    const l1 = cue('diwali1', 0.4), l2 = cue('diwali2', 2.2), out = 1 - ease((u - T + 0.5) / 0.4);
+    const a1 = ease((u - l1) / 0.5) * out, a2 = ease((u - l2) / 0.5) * out;
+    if (a1 > 0) { topScrim(a1, 640); tx('दीवाली बीत गई…', 540, 360, '96px Tiro', '#ffd34d', { a: a1, stroke: '#3a0a06', sw: 12, glow: 'rgba(255,170,60,0.8)', blur: 30 }); }
+    if (a2 > 0) tx('अब हर बिहारी को इंतज़ार है…', 540, 470, '58px Tiro', '#fff4dc', { a: a2, stroke: 'rgba(20,8,6,0.85)', sw: 9 });
+  },
   surya: (u, T) => { const a = ease((u - 0.8) / 1.0) * (1 - ease((u - T + 0.9) / 0.6)); if (a > 0) { topScrim(a, 620); tx('छठ', 540, 430, '230px "Yatra One"', '#ffd34d', { a, stroke: '#4a0a06', sw: 16, glow: 'rgba(255,170,60,0.9)', blur: 40 }); tx('आस्था की हज़ारों साल पुरानी कहानी', 540, 520, '46px Tiro', '#fff4dc', { a: a * ease((u - 1.6) / 0.8), stroke: 'rgba(20,8,6,0.8)', sw: 8 }); } },
   vedic: (u, T) => { chapter(u, T, 'अध्याय १ • वैदिक काल', 'सूर्य की उपासना'); },
   sita: (u, T) => { chapter(u, T, 'अध्याय २ • रामायण', 'माता सीता का व्रत'); place(u, T, 'मुंगेर, बिहार', 'गंगा तट • मान्यता'); },

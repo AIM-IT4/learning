@@ -245,8 +245,9 @@ function soop(x, y, w, t, o = {}) {
   g.restore();
 }
 function diya(x, y, w, t, seed = 0, lit = 1) {
+  g.save(); g.translate(x, y);
   shape(() => { g.moveTo(-w / 2, 0); g.quadraticCurveTo(0, w * 0.55, w / 2, 0); g.quadraticCurveTo(w * 0.62, -w * 0.1, w * 0.68, -w * 0.12); g.quadraticCurveTo(w * 0.4, -w * 0.08, 0, -w * 0.06); g.quadraticCurveTo(-w * 0.4, -w * 0.06, -w / 2, 0); }, C.vermilion, { w: w * 0.06, pattern: () => patDots(C.yellow, w * 0.18, w * 0.03, -w, -w * 0.3, w, w) });
-  if (!lit) return;
+  if (!lit) { g.restore(); return; }
   const fl = 1 + 0.15 * nz(t * 6, seed), sw = nz(t * 4, seed + 2) * w * 0.05, fx = w * 0.62, fy = -w * 0.14;
   g.save(); g.globalCompositeOperation = 'lighter';
   const gr = g.createRadialGradient(fx, fy - w * 0.3, 0, fx, fy - w * 0.3, w * 2.2); gr.addColorStop(0, `rgba(255,180,60,${0.55 * lit})`); gr.addColorStop(1, 'rgba(255,140,30,0)');
@@ -254,7 +255,9 @@ function diya(x, y, w, t, seed = 0, lit = 1) {
   g.save(); g.globalAlpha = lit;
   shape(() => { g.moveTo(fx - w * 0.1, fy); g.quadraticCurveTo(fx - w * 0.14, fy - w * 0.3 * fl, fx + sw, fy - w * 0.6 * fl); g.quadraticCurveTo(fx + w * 0.14, fy - w * 0.3 * fl, fx + w * 0.1, fy); g.closePath(); }, C.yellow, { w: w * 0.04 });
   g.beginPath(); g.ellipse(fx, fy - w * 0.12, w * 0.04, w * 0.1, 0, 0, TAU); fillA(C.red); g.restore();
+  g.restore();
 }
+
 function lota(x, y, w, rot = 0) {
   g.save(); g.translate(x, y); g.rotate(rot);
   shape(() => { g.moveTo(-w * 0.25, -w * 0.62); g.lineTo(w * 0.25, -w * 0.62); g.lineTo(w * 0.18, -w * 0.48); g.quadraticCurveTo(w * 0.55, -w * 0.3, w * 0.45, 0); g.quadraticCurveTo(0, w * 0.22, -w * 0.45, 0); g.quadraticCurveTo(-w * 0.55, -w * 0.3, -w * 0.18, -w * 0.48); g.closePath(); }, C.gold,

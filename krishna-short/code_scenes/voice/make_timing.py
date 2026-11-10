@@ -13,6 +13,7 @@ from faster_whisper import WhisperModel
 
 ap = argparse.ArgumentParser()
 ap.add_argument("take_dir"); ap.add_argument("out_dir")
+ap.add_argument("--lines", default=str(Path(__file__).with_name("lines_v3.json")), help="spoken script, [name, text] pairs")
 ap.add_argument("--start", type=float, default=1.0); ap.add_argument("--gap", type=float, default=0.45)
 ap.add_argument("--part1", type=float, default=60.11); ap.add_argument("--total", type=float, default=90.841)
 a = ap.parse_args()
@@ -20,14 +21,18 @@ take, out = Path(a.take_dir), Path(a.out_dir); out.mkdir(parents=True, exist_ok=
 
 # display text: passages -> sentences -> subtitle chunks (split at "…" where a sentence is long)
 DISPLAY = {
-    "p1": [["हज़ारों साल पहले…", "जब इंसान ने उगते सूरज को जीवन का देवता माना, तभी से शुरू हुई सूर्य की उपासना।"],
-           ["ऋग्वेद की ऋचाओं में सूर्य की स्तुति है…", "और नदी में खड़े होकर जल से अर्घ्य देने की परंपरा।"]],
+    "p0": [["दीवाली बीत गई… अब हर बिहारी को इंतज़ार है…", "लोक आस्था के महापर्व, छठ पूजा का।"]],
+    "p1": [["पर यह परंपरा शुरू कहाँ से हुई?"], ["हज़ारों साल पहले, ऋग्वेद की ऋचाओं में सूर्य की स्तुति हुई…", "और नदी में खड़े होकर अर्घ्य देने की परंपरा बनी।"]],
     "p2": [["मान्यता है कि माता सीता ने मुंगेर में गंगा तट पर छठ का व्रत किया था।"],
-           ["महाभारत में सूर्य के पुत्र कर्ण रोज़ कमर भर पानी में खड़े होकर सूर्य को अर्घ्य देते थे…", "और द्रौपदी ने भी यही व्रत रखा।"]],
+           ["महाभारत में सूर्य के पुत्र कर्ण रोज़ कमर भर पानी में खड़े होकर अर्घ्य देते थे…", "और द्रौपदी ने भी यही व्रत रखा।"]],
     "p3": [["पुराणों में कथा है — राजा प्रियव्रत के पुत्र को षष्ठी देवी ने जीवनदान दिया।"], ["तभी से छठी मैया की पूजा होने लगी।"],
-           ["देव के सूर्य मंदिर से लेकर गंगा के घाटों तक…", "बिहार ने यह परंपरा पीढ़ी दर पीढ़ी संजोकर रखी।"]],
+           ["देव के सूर्य मंदिर से गंगा के घाटों तक…", "बिहार ने यह परंपरा पीढ़ी दर पीढ़ी संजोकर रखी।"]],
     "p4": [["न कोई पुरोहित… न कोई मूर्ति…", "बस सूरज, जल और अटूट आस्था।"], ["चार दिन का महापर्व — छठ पूजा।"]],
 }
+# spoken-text anchor for the start of every display chunk
+ANCHORS = {"p0": [["दीवाली", "लोक आस्था"]], "p1": [["पर यह"], ["हज़ारों", "और नदी"]], "p2": [["मान्यता"], ["महाभारत", "और द्रौपदी"]],
+           "p3": [["पुराणों"], ["तभी से"], ["देव के", "बिहार ने"]], "p4": [["न कोई पुरोहित", "बस सूरज"], ["चार दिन"]]}
+BIG_TYPE = {"p0", "p4"}   # shown as large on-screen words, so no subtitle
 SR = 48000
 def load(f, sr=SR):
     raw = subprocess.run(["ffmpeg", "-v", "error", "-i", str(f), "-ac", "1", "-ar", str(sr), "-f", "f32le", "-"], capture_output=True, check=True).stdout
@@ -53,14 +58,11 @@ def split_at_pauses(segs, n):
 model = WhisperModel("mobiuslabsgmbh/faster-whisper-large-v3-turbo", device="cpu", compute_type="int8", cpu_threads=4)
 def norm(s): return re.sub(r"[^ऀ-ॿ]", "", s.replace("़", ""))
 
-SPOKEN = dict(json.load(open(Path(__file__).with_name("lines_v2.json"), encoding="utf-8")))
-# spoken-text anchor for every display chunk (first few words of the chunk in the spoken script)
-ANCHORS = {"p1": [["हज़ारों", "जब इंसान"], ["रिग्वेद", "और नदी"]], "p2": [["मान्यता"], ["महाभारत", "और द्रौपदी"]],
-           "p3": [["पुराणों"], ["तभी से"], ["देव के", "बिहार ने"]], "p4": [["न कोई पुरोहित", "बस सूरज"], ["चार दिन"]]}
+SPOKEN = dict(json.load(open(a.lines, encoding="utf-8")))
 def n2(s): return re.sub(r"[^\u0900-\u097F]", "", s.replace("़", "").replace("ँ", "ं").replace("ॉ", "ो"))
 track = np.zeros(int(a.total * SR), np.float32)
 t, sentences, chunks, words, cue_t = a.start, [], [], [], {}
-for name in ["p1", "p2", "p3", "p4"]:
+for name in [p for p in ["p0", "p1", "p2", "p3", "p4"] if p in SPOKEN]:
     y = load(take / f"{name}.wav")
     idx = np.where(np.abs(y) > 0.01 * np.abs(y).max())[0]; lead = max(idx[0] - int(0.04 * SR), 0); y = y[lead: idx[-1] + int(0.12 * SR)]
     track[int(t * SR): int(t * SR) + len(y)] += y[: len(track) - int(t * SR)]
@@ -92,10 +94,10 @@ for name in ["p1", "p2", "p3", "p4"]:
         for j, ph in enumerate(sent):
             c0, c1 = bounds[k], bounds[k + 1]
             ta, tb = at(c0), at(c1, end=True)
-            chunks.append([round(ta - 0.08, 2), round(tb + 0.3, 2), DISPLAY[name][si][j]])
+            chunks.append([round(ta - 0.08, 2), round(tb + 0.3, 2), DISPLAY[name][si][j], name])
             if j == 0: sentences.append([round(ta, 2), round(tb, 2)])
             k += 1
-    for key, ph, nth in [("draupadi", "द्रौपदी", 1), ("shashthi", "षष्ठी", 1), ("alive", "जीवनदान", 1), ("today2", "न कोई मूर्ति", 1), ("today3", "बस सूरज", 1)]:
+    for key, ph, nth in [("diwali1", "दीवाली", 1), ("diwali2", "अब हर", 1), ("chhath0", "लोक आस्था", 1), ("draupadi", "द्रौपदी", 1), ("shashthi", "षष्ठी", 1), ("alive", "जीवनदान", 1), ("today2", "न कोई मूर्ति", 1), ("today3", "बस सूरज", 1)]:
         i = pos(ph)
         if i is not None and key not in cue_t: cue_t[key] = at(i)
     t += len(y) / SR + a.gap
@@ -103,17 +105,19 @@ narr_end = t - a.gap
 for i, c in enumerate(chunks):
     nxt = chunks[i + 1][0] if i + 1 < len(chunks) else c[1] + 1
     c[1] = round(min(max(c[1], c[0] + 1.2), nxt - 0.02), 2)
-cues = {"draupadi": cue_t.get("draupadi"), "shashthi": cue_t.get("shashthi"), "alive": cue_t.get("alive"),
-        "today1": sentences[7][0], "today2": cue_t.get("today2"), "today3": cue_t.get("today3"), "today4": sentences[8][0]}
+# sentence order: 0 Diwali, 1 question, 2 Rigveda, 3 Sita, 4 Mahabharata, 5 Purana, 6 Chhathi Maiya, 7 Deo, 8 no priest, 9 four days
+cues = {"diwali1": cue_t.get("diwali1"), "diwali2": cue_t.get("diwali2"), "draupadi": cue_t.get("draupadi"), "shashthi": cue_t.get("shashthi"),
+        "alive": cue_t.get("alive"), "today1": sentences[8][0], "today2": cue_t.get("today2"), "today3": cue_t.get("today3"), "today4": sentences[9][0]}
 S = sentences
-shots = [["surya", 0, S[1][0] - 0.35], ["vedic", S[1][0] - 0.35, S[2][0] - 0.35], ["sita", S[2][0] - 0.35, S[3][0] - 0.35],
-         ["karna", S[3][0] - 0.35, S[4][0] - 0.35], ["shashthi", S[4][0] - 0.35, S[6][0] - 0.35], ["deo", S[6][0] - 0.35, S[7][0] - 0.35],
-         ["today", S[7][0] - 0.35, a.part1]]
+cut = lambda x: x - 0.35
+shots = [["diwali", 0, cut(cue_t["chhath0"])], ["surya", cut(cue_t["chhath0"]), cut(S[2][0])], ["vedic", cut(S[2][0]), cut(S[3][0])],
+         ["sita", cut(S[3][0]), cut(S[4][0])], ["karna", cut(S[4][0]), cut(S[5][0])], ["shashthi", cut(S[5][0]), cut(S[7][0])],
+         ["deo", cut(S[7][0]), cut(S[8][0])], ["today", cut(S[8][0]), a.part1]]
 bar = 4 * 0.48017
 shots += [[f"day{i + 1}", round(a.part1 + i * 4 * bar, 3), round(a.part1 + (i + 1) * 4 * bar, 3)] for i in range(4)]
 shots = [[n, round(x, 3), round(y, 3)] for n, x, y in shots]
-timing = {"shots": shots, "subs": chunks, "cues": {k: (round(v, 2) if v is not None else None) for k, v in cues.items()},
-          "disclose": [0.6, round(narr_end + 0.8, 2)], "total": a.total}
+timing = {"shots": shots, "subs": [c[:3] for c in chunks if c[3] not in BIG_TYPE], "cues": {k: (round(v, 2) if v is not None else None) for k, v in cues.items()},
+          "disclose": None, "total": a.total}
 json.dump(timing, open(out / "timing.json", "w"), ensure_ascii=False, indent=1)
 subprocess.run(["ffmpeg", "-y", "-v", "error", "-f", "f32le", "-ar", str(SR), "-ac", "1", "-i", "-", str(out / "narration.wav")], input=track.tobytes(), check=True)
 json.dump(words, open(out / "words.json", "w"), ensure_ascii=False, indent=1)
