@@ -1,0 +1,306 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Chhath documentary</title>
+<style>
+@font-face { font-family: 'Yatra One'; src: url('fonts/YatraOne.ttf'); }
+@font-face { font-family: 'Tiro'; src: url('fonts/TiroDevanagariHindi-0.ttf'); }
+@font-face { font-family: 'NotoDeva'; src: url('fonts/NotoSansDevanagari-0.ttf'); }
+@font-face { font-family: 'Rozha'; src: url('fonts/RozhaOne.ttf'); }
+html,body{margin:0;background:#000}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="mithila.js"></script>
+<script>
+// "छठ — आस्था की कहानी": a 60 s animated Mithila-painting documentary on how Chhath began, then 30 s of
+// the four days of rituals on the song. One timeline; render('doc', t) draws the frame at t seconds.
+const W = 1080, H = 1920, cv = document.getElementById('c'), ctx = cv.getContext('2d');
+setCtx(ctx);
+
+// ------------------------------------------------------------------ timing (overridable: window.TIMING)
+const DEF = {
+  shots: [ // [id, start, end]
+    ['surya', 0, 8.6], ['vedic', 8.6, 16.2], ['sita', 16.2, 22.8], ['karna', 22.8, 32.4], ['shashthi', 32.4, 42.2],
+    ['deo', 42.2, 50.0], ['today', 50.0, 60.11],
+    ['day1', 60.11, 67.793], ['day2', 67.793, 75.476], ['day3', 75.476, 83.159], ['day4', 83.159, 90.841],
+  ],
+  subs: [], // [start, end, text]
+  total: 90.841,
+};
+let TM = DEF;
+const XF = 0.8; // transition length
+
+// ------------------------------------------------------------------ backgrounds
+const PAPERS = {};
+function paper(name, base, seed) { if (!PAPERS[name]) PAPERS[name] = paperTexture(W, H, seed, base); return PAPERS[name]; }
+function skyGrad(stops, y0 = 0, y1 = H) { const gr = g.createLinearGradient(0, y0, 0, y1); stops.forEach(([o, c]) => gr.addColorStop(o, c)); g.fillStyle = gr; g.fillRect(-300, y0 - 300, W + 600, y1 - y0 + 600); }
+function paperOver(a = 0.5) { g.save(); g.globalCompositeOperation = 'multiply'; g.globalAlpha = a; g.drawImage(paper('cream', C.paper, 3), -300, -300, W + 600, H + 600); g.restore(); }
+
+// camera: layer(k, fn) draws fn with parallax depth k under the shot camera
+let CAM = { x: 540, y: 960, z: 1 };
+function layer(k, fn) {
+  g.save(); const z = 1 + (CAM.z - 1) * k;
+  g.translate(W / 2, H / 2); g.scale(z, z); g.translate(-(W / 2 + (CAM.x - W / 2) * k), -(H / 2 + (CAM.y - H / 2) * k));
+  fn(); g.restore();
+}
+function camPath(u, a, b) { const k = ease(u); CAM = { x: lerp(a[0], b[0], k), y: lerp(a[1], b[1], k), z: lerp(a[2], b[2], k) }; }
+function stream(x0, y0, x1, y1, t, n = 40, col = '255,250,235') {
+  for (let i = 0; i < n; i++) { const u = (t * 1.3 + i / n) % 1; const x = lerp(x0, x1, u), y = y0 + (y1 - y0) * u * u; g.fillStyle = `rgba(${col},${0.85 * (1 - u * 0.5)})`; g.beginPath(); g.arc(x + Math.sin(i * 3) * 3, y, 3.5 + 2 * Math.sin(i), 0, TAU); g.fill(); }
+}
+function lightBeams(x, y, t, a = 0.25, n = 9, spread = 1.2, len = 1600) {
+  g.save(); g.globalCompositeOperation = 'lighter';
+  for (let i = 0; i < n; i++) { const ang = Math.PI / 2 + (i - (n - 1) / 2) * spread / n + Math.sin(t * 0.4 + i) * 0.02; const gr = g.createLinearGradient(x, y, x + Math.cos(ang) * len, y + Math.sin(ang) * len); gr.addColorStop(0, `rgba(255,220,140,${a})`); gr.addColorStop(1, 'rgba(255,200,100,0)'); g.fillStyle = gr; g.beginPath(); g.moveTo(x, y); g.lineTo(x + Math.cos(ang - 0.04) * len, y + Math.sin(ang - 0.04) * len); g.lineTo(x + Math.cos(ang + 0.04) * len, y + Math.sin(ang + 0.04) * len); g.fill(); }
+  g.restore();
+}
+function sparkles(x, y, w, h, t, n, seed) { const r = R(seed); g.save(); g.globalCompositeOperation = 'lighter'; for (let i = 0; i < n; i++) { const px = x + r() * w, py = y + r() * h - ((t * (20 + r() * 30)) % h), a = 0.5 + 0.5 * Math.sin(t * 3 + i); g.fillStyle = `rgba(255,220,140,${0.6 * a})`; g.beginPath(); g.arc(px, py < y ? py + h : py, 2 + r() * 3, 0, TAU); g.fill(); } g.restore(); }
+// a figure standing in water: the water band covers it below the waterline
+function inWater(fn, wl, t, col = C.blue) { fn(); g.save(); waterBand(wl, H + 400, t, col, { a: 0.75 }); g.restore(); }
+
+// ------------------------------------------------------------------ scenes (u = local time, T = length)
+const SC = {};
+SC.surya = (u, T) => {
+  camPath(u / T, [540, 980, 1.0], [540, 900, 1.12]);
+  const dawn = ease((u - 1) / 5);
+  layer(0.2, () => { skyGrad([[0, '#141a46'], [0.55, lerp3('#1d2456', '#c2507a', dawn)], [0.68, lerp3('#2a2a60', '#f39a4a', dawn)], [1, '#3a2a60']]); paperOver(0.35); stars(140, 3, 1200, u); });
+  layer(0.45, () => { sun(540, lerp(1500, 860, easeOut(u / 6)), 165, u); });
+  layer(0.7, () => {
+    const hx = lerp(-700, 320, easeOut((u - 3.0) / 5));
+    const cols = [C.white, C.yellow, C.red, C.green, C.blue, C.orange, C.pink];
+    if (u > 3) for (let i = 6; i >= 0; i--) horse(hx + (i % 4) * 120 - Math.floor(i / 4) * 60, 1250 - Math.floor(i / 4) * 70, 46, u, cols[i], i * 1.3);
+  });
+  layer(1.0, () => { waterBand(1260, H, u, C.indigo, { a: 0.6 }); mFish(250 + u * 25, 1550, 34, 0.1, C.orange, C.yellow, u); mFish(820 - u * 20, 1700, 30, Math.PI + 0.1, C.green, C.yellow, u); });
+};
+function lerp3(a, b, k) { const pa = parseInt(a.slice(1), 16), pb = parseInt(b.slice(1), 16); const c = [16, 8, 0].map(s => Math.round(lerp((pa >> s) & 255, (pb >> s) & 255, k))); return `rgb(${c[0]},${c[1]},${c[2]})`; }
+SC.vedic = (u, T) => {
+  camPath(u / T, [560, 980, 1.06], [520, 1000, 1.0]);
+  layer(0.2, () => { skyGrad([[0, '#f6c9a0'], [0.5, '#f9dfb0'], [0.68, '#f5b678'], [1, '#e8a060']]); paperOver(0.55); sun(790, 760, 120, u);
+    g.font = '64px Tiro'; g.fillStyle = 'rgba(90,40,15,0.22)'; g.textAlign = 'center'; g.fillText('ॐ सूर्याय नमः', 540, 520); });
+  layer(0.5, () => { bird(260 + u * 30, 420, 34, u, C.green); bird(380 + u * 26, 380, 26, u + 1, C.blue); tree(130, 1270, 92, u, { seed: 5 }); });
+  layer(0.8, () => {
+    const rs = [[300, 1500, 0], [520, 1530, 1], [740, 1500, 2]];
+    inWater(() => rs.forEach(([x, y, k]) => {
+      const f = figure(x, y, 70, { kind: 'rishi', beard: true, tilak: true, dhoti: C.saffron, dhoti2: 'rgba(200,35,29,0.45)', uttariya: C.saffron, pose: 'pour', seed: k, bangles: false, alta: false }, u);
+      lota(f.hand[0] + 10, f.hand[1] - 6, 46, -1.2); stream(f.hand[0] + 30, f.hand[1] - 18, f.hand[0] + 120, 1300, u + k * 0.3, 26);
+    }), 1290, u, C.blue);
+  });
+};
+SC.sita = (u, T) => {
+  camPath(u / T, [520, 960, 1.0], [600, 920, 1.1]);
+  layer(0.2, () => { skyGrad([[0, '#f7d8a8'], [0.55, '#fbe6c0'], [0.7, '#f4b27a'], [1, '#e89a6a']]); paperOver(0.5); sun(830, 800, 110, u); });
+  layer(0.5, () => { shape(() => { g.moveTo(780, 1320); g.quadraticCurveTo(880, 1150, 1000, 1320); g.closePath(); }, '#8a6a5a', { w: 4, pattern: () => patDots('rgba(0,0,0,0.25)', 22, 3, 760, 1150, 1020, 1330) }); temple(890, 1210, 9, u); });
+  layer(0.8, () => { inWater(() => { const f = figure(560, 1560, 74, { kind: 'woman', crown: true, sari: C.yellow, sari2: C.red, border: C.red, blouse: C.green, pose: 'arghya', seed: 2 }, u); soop(f.mid[0], f.mid[1] - 14, 190, u, { rot: -0.1 }); }, 1330, u, C.blue); });
+  layer(1.1, () => { shape(() => { g.moveTo(-100, 1500); g.quadraticCurveTo(250, 1420, 420, 1560); g.lineTo(420, 2100); g.lineTo(-100, 2100); g.closePath(); }, '#c99a5a', { w: 5, pattern: () => patDots('rgba(90,50,20,0.35)', 26, 4, -100, 1400, 440, 2100) });
+    figure(190, 1760, 58, { kind: 'man', crown: true, skin: C.skinBlue, dhoti: C.yellow, border: C.red, uttariya: C.orange, pose: 'namaste', seed: 5, bangles: false, alta: false, mustache: false }, u); });
+};
+SC.karna = (u, T) => {
+  camPath(u / T, [470, 980, 1.08], [700, 1000, 1.08]);
+  layer(0.2, () => { skyGrad([[0, '#f0a868'], [0.45, '#f9d290'], [0.66, '#f6a860'], [1, '#d8784a']]); paperOver(0.5); sun(470, 690, 200, u); lightBeams(470, 690, u, 0.18, 11, 1.4, 1500); });
+  layer(0.8, () => {
+    inWater(() => {
+      const f = figure(470, 1600, 84, { kind: 'man', crown: true, kundal: true, kavach: true, dhoti: C.red, border: C.gold, uttariya: C.yellow, pose: 'pour', seed: 1, mustache: true, bangles: false, alta: false }, u);
+      lota(f.hand[0] + 22, f.hand[1] - 10, 74, -1.15); stream(f.hand[0] + 52, f.hand[1] - 30, f.hand[0] + 170, 1350, u, 34);
+    }, 1360, u, C.blue);
+    sparkles(300, 600, 400, 700, u, 30, 3);
+  });
+  layer(1.0, () => { const a = ease((u - 4.5) / 1.2); if (a > 0) { g.save(); g.globalAlpha = a;
+    shape(() => { g.rect(820, 1450, 600, 600); }, '#b88a5a', { w: 5, pattern: () => { for (let yy = 1450; yy < 2050; yy += 60) { g.strokeStyle = C.ink; g.lineWidth = 3; g.beginPath(); g.moveTo(820, yy); g.lineTo(1500, yy); g.stroke(); } } });
+    figure(1000, 1460, 56, { kind: 'woman', crown: true, sari: C.red, sari2: C.yellow, border: C.gold, blouse: C.indigo, pose: 'namaste', seed: 4, dir: -1 }, u); g.restore(); } });
+};
+SC.shashthi = (u, T) => {
+  camPath(u / T, [540, 1000, 1.0], [540, 940, 1.1]);
+  const appear = ease((u - 2.6) / 1.6), alive = ease((u - 5.6) / 1.4);
+  layer(0.3, () => {
+    skyGrad([[0, '#6a1820'], [1, '#3a0c12']]); paperOver(0.45);
+    for (let i = 0; i < 3; i++) { const x = 180 + i * 360; shape(() => { g.moveTo(x - 150, 1300); g.lineTo(x - 150, 650); g.quadraticCurveTo(x - 150, 470, x, 420); g.quadraticCurveTo(x + 150, 470, x + 150, 650); g.lineTo(x + 150, 1300); g.closePath(); }, '#2a0a10', { w: 6, inkCol: C.gold }); }
+    for (let i = 0; i < 4; i++) shape(() => g.rect(-20 + i * 360, 380, 40, 960), C.maroon, { w: 4, pattern: () => patDots(C.gold, 16, 3, -40 + i * 360, 380, 40 + i * 360, 1340) });
+    shape(() => g.rect(-300, 1300, 1680, 900), '#8a2a20', { w: 5, pattern: () => { patScales(C.gold, 60, 3, -300, 1300, 1400, 2200); } });
+  });
+  layer(0.75, () => {
+    if (appear > 0) { lightBeams(540, 760, u, 0.3 * appear, 16, 6.2, 1100); g.save(); g.globalAlpha = appear; g.translate(540, 1130); g.scale(0.85 + 0.15 * appear, 0.85 + 0.15 * appear); g.translate(-540, -1130);
+      lotus(540, 1150, 70); figure(500, 1130, 60, { kind: 'goddess', halo: true, crown: true, sari: C.red, sari2: C.gold, border: C.gold, blouse: C.yellow, pose: 'bless', seed: 7 }, u); g.restore(); }
+    figure(230, 1620, 60, { kind: 'man', crown: true, mustache: true, dhoti: C.yellow, border: C.red, uttariya: C.maroon, pose: 'namaste', seed: 3, bangles: false, alta: false }, u);
+    const q = figure(800, 1640, 62, { kind: 'woman', crown: true, sari: C.pink, sari2: C.gold, border: C.gold, blouse: C.green, pose: 'hold', seed: 6, dir: -1 }, u);
+    // the child: pale and still, then glowing and alive
+    const bx = q.mid[0] - 10, by = q.mid[1] + 6;
+    if (alive > 0) { g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(bx, by, 0, bx, by, 160); gr.addColorStop(0, `rgba(255,220,140,${0.7 * alive})`); gr.addColorStop(1, 'rgba(255,200,100,0)'); g.fillStyle = gr; g.fillRect(bx - 160, by - 160, 320, 320); g.restore(); }
+    shape(() => g.ellipse(bx, by, 62, 30, -0.15, 0, TAU), C.cream, { w: 4, pattern: () => patDots(C.gold, 14, 2.5, bx - 70, by - 40, bx + 70, by + 40) });
+    const hy = by - 14 + Math.sin(u * 3) * 2 * alive;
+    shape(() => g.arc(bx - 52, hy, 22, 0, TAU), lerp3('#c8b8a8', '#f0b07a', alive), { w: 3.5 });
+    g.beginPath(); g.arc(bx - 60, hy - 8, 10, Math.PI, 0); g.fillStyle = C.ink; g.fill();
+    g.beginPath(); if (alive > 0.5) g.arc(bx - 46, hy - 2, 3.2, 0, TAU); else g.rect(bx - 50, hy - 3, 8, 2); g.fillStyle = C.ink; g.fill();
+    g.beginPath(); g.arc(bx - 38, hy + 8, 3, 0, TAU); g.fillStyle = C.red; g.fill();
+  });
+};
+SC.deo = (u, T) => {
+  camPath(u / T, [540, 860, 1.12], [540, 980, 1.0]);
+  layer(0.2, () => { skyGrad([[0, '#f8c890'], [0.5, '#fde2b0'], [1, '#f0a868']]); paperOver(0.5); sun(540, 420, 120, u); });
+  layer(0.55, () => { temple(540, 1330, 68, u); for (const x of [130, 950]) tree(x, 1330, 60, u, { seed: x }); });
+  layer(0.85, () => {
+    waterBand(1420, H, u, C.blue, { a: 0.7 });
+    shape(() => g.rect(-200, 1330, 1480, 90), '#c9a06a', { w: 5, pattern: () => { for (let x = -200; x < 1300; x += 60) { g.strokeStyle = C.ink; g.lineWidth = 3; g.beginPath(); g.moveTo(x, 1330); g.lineTo(x, 1420); g.stroke(); } } });
+    for (let i = 0; i < 6; i++) { const x = ((u * 60 + i * 210) % 1500) - 250; const f = figure(x, 1395, 24, { kind: 'woman', sari: [C.yellow, C.red, C.pink, C.orange, C.green, C.red][i], sari2: C.gold, blouse: C.indigo, pose: 'carry', ghunghat: true, seed: i }, u + i);
+      g.save(); g.translate(f.hand[0] - 4, f.hand[1] + 12); daura(0, 0, 60, u); g.restore(); }
+    for (let i = 0; i < 9; i++) diya(80 + i * 115, 1500 + (i % 2) * 40, 26, u, i, 1);
+  });
+};
+SC.today = (u, T) => {
+  camPath(u / T, [540, 940, 1.14], [540, 980, 1.0]);
+  layer(0.2, () => { skyGrad([[0, '#5a2a6a'], [0.4, '#c8506a'], [0.62, '#f7a050'], [1, '#e07040']]); paperOver(0.4); sun(540, 930, 140, u); });
+  layer(0.6, () => { waterBand(1060, H, u, '#3a3a8a', { a: 0.55 });
+    for (let i = 0; i < 5; i++) { const x = 70 + i * 225, s = 54, y = 1400 + (i % 2) * 40; inWater(() => { const f = figure(x, y, s, { kind: 'woman', ghunghat: true, sari: [C.yellow, C.red, C.orange, C.pink, C.yellow][i], sari2: C.gold, blouse: C.green, pose: 'arghya', seed: i }, u); soop(f.mid[0], f.mid[1] - 10, 132, u, { seed: i }); }, y - 3.7 * s, u, '#3a3a8a'); }
+  });
+  layer(1.0, () => { const r = R(4); for (let i = 0; i < 14; i++) { const x = ((r() * 1200 + u * 18) % 1300) - 100, y = 1420 + r() * 420; diya(x, y, 34 + (y - 1420) * 0.05, u, i, 1); } });
+};
+// ---- the four days
+SC.day1 = (u, T) => {
+  camPath(u / T, [540, 960, 1.06], [540, 1000, 1.0]);
+  layer(0.2, () => { skyGrad([[0, '#9ad0ee'], [0.55, '#fde7b8'], [1, '#f6c27a']]); paperOver(0.5); sun(820, 620, 95, u); });
+  layer(0.7, () => { const dip = Math.sin(clamp((u - 0.6) / 2.2) * Math.PI); waterBand(1120, H, u, C.blue, { a: 0.7 });
+    inWater(() => { figure(540, 1420 + dip * 240, 64, { kind: 'woman', ghunghat: true, sari: C.yellow, sari2: C.red, border: C.red, blouse: C.red, pose: 'namaste', seed: 1 }, u); }, 1200, u, C.blue);
+    ripplesAt(540, 1205, 150, u); if (dip > 0.2) sparkles(380, 900, 320, 300, u, 18, 2); });
+  layer(1.0, () => { const a = ease((u - 3.4) / 0.8); if (a <= 0) return; g.save(); g.globalAlpha = a; g.translate(540, 1560); g.scale(0.9 + 0.1 * a, 0.9 + 0.1 * a);
+    shape(() => g.ellipse(0, 0, 420, 170, 0, 0, TAU), '#3f8a35', { w: 5, pattern: () => { g.strokeStyle = 'rgba(0,0,0,0.3)'; g.lineWidth = 3; g.beginPath(); g.moveTo(-420, 0); g.lineTo(420, 0); g.stroke(); for (let x = -380; x < 400; x += 50) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x + 40, -160); g.moveTo(x, 0); g.lineTo(x + 40, 160); g.stroke(); } } });
+    shape(() => { g.moveTo(-260, 40); g.quadraticCurveTo(-150, -110, -40, 40); g.closePath(); }, C.white, { w: 4, pattern: () => patDots('rgba(0,0,0,0.25)', 14, 2, -270, -110, -30, 50) });
+    shape(() => g.ellipse(60, 10, 95, 55, 0, 0, TAU), C.turmeric, { w: 4, pattern: () => patDots('rgba(160,90,0,0.6)', 16, 4, -40, -50, 160, 70) });
+    shape(() => g.ellipse(250, 20, 100, 58, 0, 0, TAU), '#a8c060', { w: 4, pattern: () => { for (let i = 0; i < 9; i++) { g.fillStyle = '#e8f0b0'; g.fillRect(190 + (i % 3) * 38, -10 + Math.floor(i / 3) * 22, 20, 14); } } });
+    steam(-150, -40, 0.8, u); steam(60, -30, 0.7, u); g.restore(); });
+};
+SC.day2 = (u, T) => {
+  camPath(u / T, [540, 980, 1.08], [540, 960, 1.0]);
+  layer(0.2, () => { skyGrad([[0, '#111a44'], [0.6, '#2a2a66'], [1, '#4a2a50']]); paperOver(0.3); stars(90, 7, 900, u); moon(820, 420, 70, '#151d48'); });
+  layer(0.7, () => {
+    shape(() => g.rect(-200, 1250, 1480, 900), '#b8875a', { w: 5, pattern: () => patDots('rgba(80,40,10,0.3)', 30, 4, -200, 1250, 1300, 2200) });
+    shape(() => g.rect(-200, 820, 1480, 440), '#d8a870', { w: 5, pattern: () => { patFlowers('rgba(200,35,29,0.5)', 120, 9, 1, -200, 860, 1300, 1260); } });
+    chulha(330, 1390, 110, u); lota(330, 1230, 150, 0); steam(330, 1120, 1, u, 3);
+    figure(800, 1520, 52, { kind: 'woman', ghunghat: true, sari: C.red, sari2: C.yellow, border: C.gold, blouse: C.yellow, pose: 'namaste', seed: 2, dir: -1 }, u);
+    diya(600, 1560, 50, u, 3, 1);
+  });
+  layer(1.0, () => { g.save(); g.translate(560, 1720);
+    shape(() => g.ellipse(0, 0, 360, 120, 0, 0, TAU), '#3f8a35', { w: 5, pattern: () => { g.strokeStyle = 'rgba(0,0,0,0.3)'; g.lineWidth = 3; g.beginPath(); g.moveTo(-360, 0); g.lineTo(360, 0); g.stroke(); } });
+    for (let i = 0; i < 3; i++) shape(() => g.ellipse(-180 + i * 70, -8 - i * 6, 80, 34, 0, 0, TAU), '#e6b878', { w: 4, pattern: () => patDots('rgba(120,60,10,0.5)', 14, 3, -280, -60, 0, 40) });
+    shape(() => g.ellipse(180, -10, 110, 52, 0, 0, TAU), '#f2e0b8', { w: 4, pattern: () => patDots('rgba(150,80,20,0.55)', 16, 3, 60, -60, 300, 50) });
+    steam(180, -40, 0.7, u); g.restore(); });
+};
+SC.day3 = (u, T) => {
+  camPath(u / T, [540, 960, 1.0], [560, 940, 1.08]);
+  layer(0.2, () => { skyGrad([[0, '#6a2a6a'], [0.45, '#e05a5a'], [0.65, '#f8a850'], [1, '#e07040']]); paperOver(0.4); sun(560, 980, 130, u); });
+  layer(0.6, () => { waterBand(1080, H, u, '#3a3a8a', { a: 0.55 });
+    for (let i = 0; i < 4; i++) { const x = 170 + i * 250; inWater(() => { const f = figure(x, 1390, 46, { kind: 'woman', ghunghat: true, sari: [C.yellow, C.red, C.pink, C.orange][i], sari2: C.gold, blouse: C.green, pose: 'arghya', seed: i }, u); soop(f.mid[0], f.mid[1] - 8, 112, u, { seed: i }); }, 1230, u, '#3a3a8a'); }
+  });
+  layer(1.05, () => {
+    shape(() => { g.moveTo(-200, 1560); g.quadraticCurveTo(540, 1500, 1300, 1580); g.lineTo(1300, 2200); g.lineTo(-200, 2200); g.closePath(); }, '#c99a5a', { w: 5, pattern: () => patDots('rgba(90,50,20,0.35)', 26, 4, -200, 1500, 1300, 2200) });
+    const x = lerp(-150, 1250, u / T);
+    const f = figure(x, 1880, 60, { kind: 'man', dhoti: C.yellow, border: C.red, uttariya: C.red, pose: 'carry', seed: 3, bangles: false, alta: false, mustache: true }, u);
+    const px = f.hand[0], py = f.hand[1] + 14; g.beginPath(); g.moveTo(px - 160, py + 20); g.lineTo(px + 160, py - 20); inkStroke(9, '#c9a060');
+    g.save(); g.translate(px - 150, py + 70); daura(0, 0, 90, u); g.restore(); g.save(); g.translate(px + 150, py + 30); daura(0, 0, 90, u); g.restore();
+    for (const sx of [-150, 150]) { g.beginPath(); g.moveTo(px + sx - 40, py + 70 - sx * 0.13); g.lineTo(px + sx, py + 18 - sx * 0.13); g.lineTo(px + sx + 40, py + 70 - sx * 0.13); inkStroke(2.5); }
+  });
+};
+SC.day4 = (u, T) => {
+  camPath(u / T, [540, 1000, 1.0], [540, 940, 1.1]);
+  layer(0.2, () => { skyGrad([[0, '#6a8ad0'], [0.45, '#f4b4a0'], [0.66, '#ffd090'], [1, '#f0a070']]); paperOver(0.45); sun(540, lerp(1120, 860, easeOut(u / 4)), 140, u); });
+  layer(0.6, () => { waterBand(1100, H, u, C.blue, { a: 0.6 });
+    for (let i = 0; i < 3; i++) { const x = 250 + i * 290; inWater(() => { const f = figure(x, 1430, 52, { kind: 'woman', ghunghat: true, sari: [C.orange, C.yellow, C.red][i], sari2: C.gold, blouse: C.indigo, pose: 'pour', seed: i }, u); lota(f.hand[0] + 6, f.hand[1] - 4, 36, -1.2); stream(f.hand[0] + 24, f.hand[1] - 14, f.hand[0] + 90, 1240, u + i * 0.2, 22); }, 1250, u, C.blue); }
+  });
+};
+
+// ------------------------------------------------------------------ overlays (screen space)
+function tx(text, x, y, font, fill, o = {}) {
+  g.save(); g.font = font; g.textAlign = o.align || 'center'; g.textBaseline = 'alphabetic'; g.globalAlpha = o.a ?? 1;
+  if (o.glow) { g.shadowColor = o.glow; g.shadowBlur = o.blur || 30; }
+  if (o.stroke) { g.lineWidth = o.sw || 10; g.strokeStyle = o.stroke; g.lineJoin = 'round'; g.strokeText(text, x, y); }
+  g.shadowBlur = 0; g.fillStyle = fill; g.fillText(text, x, y); g.restore();
+}
+function rule(x, y, w, a) { g.save(); g.globalAlpha = a; g.strokeStyle = '#e8c070'; g.lineWidth = 3; g.beginPath(); g.moveTo(x - w / 2, y); g.lineTo(x + w / 2, y); g.stroke(); g.fillStyle = '#e8c070'; g.beginPath(); g.arc(x, y, 7, 0, TAU); g.fill(); g.restore(); }
+function topScrim(a, h = 560) { g.save(); const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, `rgba(20,8,6,${0.62 * a})`); gr.addColorStop(1, 'rgba(20,8,6,0)'); g.fillStyle = gr; g.fillRect(0, 0, W, h); g.restore(); }
+function botScrim(a) { g.save(); const gr = g.createLinearGradient(0, H - 560, 0, H); gr.addColorStop(0, 'rgba(20,8,6,0)'); gr.addColorStop(1, `rgba(20,8,6,${0.7 * a})`); g.fillStyle = gr; g.fillRect(0, H - 560, W, 560); g.restore(); }
+function chapter(u, T, small, big, o = {}) {
+  const a = ease(u / 0.7) * (1 - ease((u - T + 0.6) / 0.5)); if (a <= 0) return;
+  topScrim(a); tx(small, 540, 262, '36px NotoDeva', '#f2d48a', { a, stroke: 'rgba(20,8,6,0.6)', sw: 6 }); rule(540, 288, 320 * ease(u / 0.9), a);
+  if (big) tx(big, 540, 380, (o.size || 84) + 'px Tiro', '#fff4dc', { a, stroke: 'rgba(30,10,6,0.85)', sw: 10, glow: 'rgba(255,190,90,0.6)', blur: 24 });
+}
+function place(u, T, text, sub) {
+  const a = ease((u - 0.9) / 0.6) * (1 - ease((u - T + 0.7) / 0.5)); if (a <= 0) return;
+  const x = 70 + (1 - ease((u - 0.9) / 0.6)) * -30;
+  g.save(); g.globalAlpha = a; g.fillStyle = '#e8c070'; g.fillRect(x, 1390, 6, sub ? 92 : 56); g.restore();
+  tx(text, x + 24, 1436, '44px NotoDeva', '#fff4dc', { a, align: 'left', stroke: 'rgba(20,8,6,0.75)', sw: 8 });
+  if (sub) tx(sub, x + 24, 1478, '30px NotoDeva', '#f2d48a', { a, align: 'left', stroke: 'rgba(20,8,6,0.75)', sw: 6 });
+}
+function subtitle(t) {
+  const s = TM.subs.find(([a, b]) => t >= a && t < b); if (!s) return;
+  const [a, b, text] = s, al = ease((t - a) / 0.25) * (1 - ease((t - b + 0.25) / 0.25));
+  g.save(); g.font = '42px NotoDeva'; const lines = wrap(text, 900);
+  lines.forEach((ln, i) => tx(ln, 540, 1560 + i * 56 - (lines.length - 1) * 28, '42px NotoDeva', '#ffffff', { a: al, stroke: 'rgba(0,0,0,0.75)', sw: 9 }));
+  g.restore();
+}
+function wrap(text, maxW) { const words = text.split(' '), out = []; let cur = ''; for (const w of words) { const n = cur ? cur + ' ' + w : w; if (g.measureText(n).width > maxW && cur) { out.push(cur); cur = w; } else cur = n; } if (cur) out.push(cur); return out; }
+function dayCard(u, T, n, name, date, desc) {
+  const a = ease(u / 0.35) * (1 - ease((u - T + 0.35) / 0.3)); if (a <= 0) return;
+  topScrim(a, 640); const pop = 0.8 + 0.2 * easeOut(u / 0.4);
+  tx(n, 540, 250, '40px NotoDeva', '#f2d48a', { a, stroke: 'rgba(20,8,6,0.6)', sw: 6 }); rule(540, 278, 260, a);
+  g.save(); g.translate(540, 400); g.scale(pop, pop); tx(name, 0, 0, '120px "Yatra One"', '#ffd34d', { a, stroke: '#5a0a06', sw: 14, glow: 'rgba(255,160,40,0.8)', blur: 30 }); g.restore();
+  tx(date, 540, 476, '48px Tiro', '#fff4dc', { a, stroke: 'rgba(20,8,6,0.8)', sw: 8 });
+  botScrim(a); tx(desc, 540, 1600, '46px NotoDeva', '#ffffff', { a: a * ease((u - 0.4) / 0.4), stroke: 'rgba(0,0,0,0.75)', sw: 9 });
+}
+const OVER = {
+  surya: (u, T) => { const a = ease((u - 0.8) / 1.0) * (1 - ease((u - T + 0.9) / 0.6)); if (a > 0) { topScrim(a, 620); tx('छठ', 540, 430, '230px "Yatra One"', '#ffd34d', { a, stroke: '#4a0a06', sw: 16, glow: 'rgba(255,170,60,0.9)', blur: 40 }); tx('आस्था की हज़ारों साल पुरानी कहानी', 540, 520, '46px Tiro', '#fff4dc', { a: a * ease((u - 1.6) / 0.8), stroke: 'rgba(20,8,6,0.8)', sw: 8 }); } },
+  vedic: (u, T) => { chapter(u, T, 'अध्याय १ • वैदिक काल', 'सूर्य की उपासना'); },
+  sita: (u, T) => { chapter(u, T, 'अध्याय २ • रामायण', 'माता सीता का व्रत'); place(u, T, 'मुंगेर, बिहार', 'गंगा तट • मान्यता'); },
+  karna: (u, T) => { chapter(u, T, 'अध्याय ३ • महाभारत', 'सूर्यपुत्र कर्ण'); if (u > 4.8) place(u - 4.8, T - 4.8, 'द्रौपदी', 'पांडवों के लिए व्रत'); },
+  shashthi: (u, T) => { chapter(u, T, 'अध्याय ४ • पुराण कथा', 'षष्ठी देवी • छठी मइया'); place(u, T, 'राजा प्रियव्रत और रानी मालिनी'); },
+  deo: (u, T) => { chapter(u, T, 'अध्याय ५ • परंपरा', 'बिहार की धरोहर'); place(u, T, 'देव सूर्य मंदिर', 'औरंगाबाद, बिहार'); },
+  today: (u, T) => {
+    const words = [['न कोई पुरोहित', 0.6], ['न कोई मूर्ति', 2.0], ['बस सूरज • जल • आस्था', 3.4]];
+    const out = 1 - ease((u - 6.4) / 0.5); topScrim(Math.max(out, 0) * ease(u / 0.6), 700);
+    words.forEach(([w, s], i) => { const a = ease((u - s) / 0.5) * out; if (a > 0) tx(w, 540, 300 + i * 100, (i === 2 ? 72 : 64) + 'px Tiro', i === 2 ? '#ffd34d' : '#fff4dc', { a, stroke: 'rgba(20,8,6,0.85)', sw: 9, glow: i === 2 ? 'rgba(255,170,60,0.7)' : null }); });
+    const b = ease((u - 6.6) / 0.7); if (b > 0) { topScrim(b, 900); tx('चार दिन का महापर्व', 540, 470, '70px Tiro', '#fff4dc', { a: b, stroke: 'rgba(20,8,6,0.85)', sw: 9 }); tx('छठ', 540, 690, '220px "Yatra One"', '#ffd34d', { a: ease((u - 7.2) / 0.6), stroke: '#4a0a06', sw: 16, glow: 'rgba(255,170,60,0.9)', blur: 40 }); }
+  },
+  day1: (u, T) => dayCard(u, T, 'पहला दिन', 'नहाय-खाय', '13 नवंबर', 'गंगा स्नान • कद्दू-भात का प्रसाद'),
+  day2: (u, T) => dayCard(u, T, 'दूसरा दिन', 'खरना', '14 नवंबर', 'गुड़ की खीर और रोटी • फिर 36 घंटे का निर्जला व्रत'),
+  day3: (u, T) => dayCard(u, T, 'तीसरा दिन', 'संध्या अर्घ्य', '15 नवंबर', 'डूबते सूर्य को अर्घ्य'),
+  day4: (u, T) => {
+    const endA = ease((u - (T - 3.0)) / 0.6);
+    if (endA < 1) { g.save(); g.globalAlpha = 1 - endA; dayCard(u, T + 10, 'चौथा दिन', 'उषा अर्घ्य', '16 नवंबर', 'उगते सूर्य को अर्घ्य • पारण'); g.restore(); }
+    if (endA > 0) { g.save(); g.globalAlpha = endA * 0.55; g.fillStyle = '#1a0806'; g.fillRect(0, 0, W, H); g.restore();
+      tx('जय छठी मइया', 540, 900, '130px "Yatra One"', '#ffd34d', { a: endA, stroke: '#4a0a06', sw: 14, glow: 'rgba(255,170,60,0.9)', blur: 40 });
+      tx('छठ पूजा की हार्दिक शुभकामनाएँ', 540, 1010, '54px Tiro', '#fff4dc', { a: ease((u - (T - 2.4)) / 0.6), stroke: 'rgba(20,8,6,0.85)', sw: 8 }); }
+  },
+};
+
+// ------------------------------------------------------------------ transitions, grain, frame
+const GRAIN = Array.from({ length: 4 }, (_, k) => { const c2 = document.createElement('canvas'); c2.width = 540; c2.height = 960; const x = c2.getContext('2d'), im = x.createImageData(540, 960), r = R(k + 11); for (let i = 0; i < im.data.length; i += 4) { const v = 128 + (r() - 0.5) * 90; im.data[i] = im.data[i + 1] = im.data[i + 2] = v; im.data[i + 3] = 255; } x.putImageData(im, 0, 0); return c2; });
+function inkWipe(p, seed, cx, cy) {
+  const r = R(seed), ph = [r() * 6, r() * 6, r() * 6], Rm = Math.hypot(W, H) * 0.75 * easeOut(p);
+  g.beginPath();
+  for (let i = 0; i <= 90; i++) { const a = i / 90 * TAU, rr = Rm * (1 + 0.12 * Math.sin(5 * a + ph[0]) + 0.07 * Math.sin(11 * a + ph[1]) + 0.04 * Math.sin(23 * a + ph[2])); const x = cx + Math.cos(a) * rr, y = cy + Math.sin(a) * rr; i ? g.lineTo(x, y) : g.moveTo(x, y); }
+  g.closePath();
+}
+function drawShot(i, t) {
+  const [id, a, b] = TM.shots[i], T = b - a + XF / 2, u = t - a;
+  const part2 = id.startsWith('day'), dd = part2 ? 0.7 : 1.5;
+  REVEAL.d = ease(u / dd); REVEAL.f = ease((u - dd * 0.35) / (dd * 0.7));
+  g.save(); SC[id](u, b - a); g.restore(); REVEAL.d = 1; REVEAL.f = 1;
+}
+function renderDoc(name, t) {
+  g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; g.globalCompositeOperation = 'source-over'; g.setLineDash([]);
+  g.fillStyle = '#000'; g.fillRect(0, 0, W, H);
+  const S = TM.shots; let i = S.findIndex(([, a, b]) => t >= a && t < b); if (i < 0) i = S.length - 1;
+  const [id, a, b] = S[i];
+  const prev = i > 0 && t < a + XF / 2 ? i - 1 : -1;
+  if (prev >= 0) {
+    drawShot(prev, t); const p = (t - (a - XF / 2)) / XF;
+    g.save(); inkWipe(p, i * 7 + 1, W * (0.3 + 0.4 * ((i * 37) % 10) / 10), H * 0.55); g.clip(); drawShot(i, t); g.restore();
+    g.save(); inkWipe(p, i * 7 + 1, W * (0.3 + 0.4 * ((i * 37) % 10) / 10), H * 0.55); g.strokeStyle = `rgba(40,15,5,${0.5 * (1 - p)})`; g.lineWidth = 14; g.stroke(); g.restore();
+  } else drawShot(i, t);
+  // overlays for the current shot (and the previous one while it fades)
+  g.save(); OVER[id] && OVER[id](t - a, b - a); g.restore();
+  subtitle(t);
+  // global fade in/out, vignette, grain
+  const fin = ease(t / 0.8), fout = 1 - ease((t - TM.total + 1.2) / 1.0);
+  const v = g.createRadialGradient(W / 2, H / 2, H * 0.35, W / 2, H / 2, H * 0.75); v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(10,4,2,0.38)'); g.fillStyle = v; g.fillRect(0, 0, W, H);
+  g.save(); g.globalCompositeOperation = 'overlay'; g.globalAlpha = 0.09; g.drawImage(GRAIN[Math.floor(t * 30) % 4], 0, 0, W, H); g.restore();
+  if (fin < 1 || fout < 1) { g.fillStyle = `rgba(0,0,0,${1 - Math.min(fin, fout)})`; g.fillRect(0, 0, W, H); }
+  return cv.toDataURL('image/jpeg', 0.93);
+}
+window.render = (name, t, T, type) => renderDoc(name, t);
+window.setTiming = tm => { TM = { ...DEF, ...tm }; };
+Promise.all(['36px NotoDeva', '60px Tiro', '60px "Yatra One"'].map(f => document.fonts.load(f, 'छठ महापर्व'))).then(() => { paper('cream', C.paper, 3); window.ready = true; });
+</script></body></html>

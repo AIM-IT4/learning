@@ -9,6 +9,8 @@ every shot with "video": "<scene>.mp4" gets a clip a little longer than its bars
   node render_scenes.cjs chhath_scenes.html ../examples/chhath_status/storyboard_code.json --out clips
   node render_scenes.cjs chhath_scenes.html storyboard.json --out stills --still 1.5     # one PNG per scene
   options: --only diwali,title   --fps 30   --force   --webgl (three.js pages: chhath_3d.html)
+  one continuous timeline instead of a storyboard:  --timeline doc:90.7 [--timing timing.json] --serve
+  preview frames of a timeline:  --stills 1,5,12.5
 Needs: Node with the playwright package and its Chromium, ffmpeg on PATH.
 */
 const { chromium } = require('playwright');
@@ -25,6 +27,10 @@ function args() {
     else if (a[i] === '--fps') o.fps = parseInt(a[++i], 10);
     else if (a[i] === '--force') o.force = true;
     else if (a[i] === '--webgl') o.webgl = true;
+    else if (a[i] === '--serve') o.serve = true;
+    else if (a[i] === '--timeline') { const [n, T] = a[++i].split(':'); o.timeline = { name: n, dur: parseFloat(T) }; }
+    else if (a[i] === '--stills') o.stills = a[++i].split(',').map(Number);
+    else if (a[i] === '--timing') o.timing = a[++i];
     else o.pos.push(a[i]);
   }
   return o;
@@ -43,9 +49,9 @@ function scenesFrom(sb) {
 
 (async () => {
   const o = args();
-  const [html, storyboard] = o.pos;
-  const sb = JSON.parse(fs.readFileSync(storyboard, 'utf8'));
-  let scenes = scenesFrom(sb);
+  const [html, storyboard] = o.pos;  // storyboard is ignored with --timeline
+  let scenes = o.timeline ? [{ name: o.timeline.name, file: o.timeline.name + '.mp4', dur: o.timeline.dur }]
+    : scenesFrom(JSON.parse(fs.readFileSync(storyboard, 'utf8')));
   if (o.only) scenes = scenes.filter(s => o.only.includes(s.name));
   fs.mkdirSync(o.out, { recursive: true });
   // --webgl: software WebGL (SwiftShader) and the page served from a fake origin, so ES modules can load
@@ -53,7 +59,7 @@ function scenesFrom(sb) {
   const page = await browser.newPage({ viewport: { width: 1080, height: 1920 } });
   page.on('pageerror', e => console.error('page error:', e.message));
   page.on('console', m => { if (m.type() === 'error') console.error('console:', m.text()); });
-  if (o.webgl) {
+  if (o.webgl || o.serve) {
     const root = path.dirname(path.resolve(html));
     const types = { '.js': 'text/javascript', '.html': 'text/html', '.json': 'application/json' };
     await page.route('http://scene.local/**', r => {
@@ -63,10 +69,16 @@ function scenesFrom(sb) {
     });
     await page.goto('http://scene.local/' + path.basename(html));
     await page.waitForFunction(() => window.ready === true, null, { timeout: 60000 });
+    if (o.timing) await page.evaluate(tm => window.setTiming(tm), JSON.parse(fs.readFileSync(o.timing, 'utf8')));
   } else {
     await page.goto('file://' + path.resolve(html));
   }
   for (const s of scenes) {
+    if (o.stills) {
+      for (const t of o.stills) { const d = await page.evaluate(([n, t, T]) => window.render(n, t, T, 'image/jpeg'), [s.name, t, s.dur]);
+        fs.writeFileSync(path.join(o.out, `${s.name}_${t.toFixed(1).padStart(5, '0')}.jpg`), Buffer.from(d.split(',')[1], 'base64')); }
+      continue;
+    }
     if (o.still !== undefined) {
       const d = await page.evaluate(([n, t, T]) => window.render(n, t, T, 'image/png'), [s.name, Math.min(o.still, s.dur - 0.1), s.dur]);
       fs.writeFileSync(path.join(o.out, s.name + '.png'), Buffer.from(d.split(',')[1], 'base64'));
