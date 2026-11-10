@@ -102,3 +102,20 @@ node code_scenes/render_scenes.cjs code_scenes/chhath_scenes.html examples/chhat
 python make_festival.py examples/chhath_status/storyboard_code.json --images clips --music song.wav \
   --voice voice.wav --fonts fonts_dir --out chhath_status_animated.mp4
 ```
+
+## 3D version (`code_scenes/chhath_3d.html`, three.js)
+
+The same 17 shots built as 3D scenes from primitives (no model files, photos or AI images): a gradient
+sunset/sunrise sky with a glowing sun, reflective water (three.js `Water`), stone ghats, clay diyas with
+flickering flames and bloom, 3D vratis in patterned saris with gold borders and covered heads raising the
+soop or pouring from a brass lota, crowds on the ghat and in the river, a Gandhi Setu-style bridge,
+Darbhanga's Raj Qila, a litchi orchard with women carrying daura, a decorated ghat with string lights,
+kosi with a clay elephant, and the Madhubani sun/painting reused as textures from `chhath_scenes.html`.
+Rendered with software WebGL in headless Chromium (no graphics card needed, about 1 s per frame):
+
+```bash
+cd code_scenes && npm install three@0.169.0          # playwright comes with the environment
+node render_scenes.cjs chhath_3d.html ../examples/chhath_status/storyboard_code.json --webgl --out clips3d
+cd .. && python make_festival.py examples/chhath_status/storyboard_code.json --images code_scenes/clips3d \
+  --music song.wav --voice voice.wav --fonts fonts_dir --out chhath_status_3d.mp4
+```

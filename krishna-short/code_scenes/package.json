@@ -1,0 +1,6 @@
+{
+  "name": "chhath-code-scenes",
+  "private": true,
+  "description": "Code-drawn scenes for the Chhath status (2D canvas and 3D WebGL with three.js)",
+  "dependencies": { "playwright": "^1.48.0", "three": "0.169.0" }
+}

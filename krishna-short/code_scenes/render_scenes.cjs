@@ -8,7 +8,7 @@ every shot with "video": "<scene>.mp4" gets a clip a little longer than its bars
 
   node render_scenes.cjs chhath_scenes.html ../examples/chhath_status/storyboard_code.json --out clips
   node render_scenes.cjs chhath_scenes.html storyboard.json --out stills --still 1.5     # one PNG per scene
-  options: --only diwali,title   --fps 30   --force
+  options: --only diwali,title   --fps 30   --force   --webgl (three.js pages: chhath_3d.html)
 Needs: Node with the playwright package and its Chromium, ffmpeg on PATH.
 */
 const { chromium } = require('playwright');
@@ -24,6 +24,7 @@ function args() {
     else if (a[i] === '--only') o.only = a[++i].split(',');
     else if (a[i] === '--fps') o.fps = parseInt(a[++i], 10);
     else if (a[i] === '--force') o.force = true;
+    else if (a[i] === '--webgl') o.webgl = true;
     else o.pos.push(a[i]);
   }
   return o;
@@ -47,10 +48,24 @@ function scenesFrom(sb) {
   let scenes = scenesFrom(sb);
   if (o.only) scenes = scenes.filter(s => o.only.includes(s.name));
   fs.mkdirSync(o.out, { recursive: true });
-  const browser = await chromium.launch();
+  // --webgl: software WebGL (SwiftShader) and the page served from a fake origin, so ES modules can load
+  const browser = await chromium.launch(o.webgl ? { args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] } : {});
   const page = await browser.newPage({ viewport: { width: 1080, height: 1920 } });
   page.on('pageerror', e => console.error('page error:', e.message));
-  await page.goto('file://' + path.resolve(html));
+  page.on('console', m => { if (m.type() === 'error') console.error('console:', m.text()); });
+  if (o.webgl) {
+    const root = path.dirname(path.resolve(html));
+    const types = { '.js': 'text/javascript', '.html': 'text/html', '.json': 'application/json' };
+    await page.route('http://scene.local/**', r => {
+      const f = path.join(root, decodeURIComponent(new URL(r.request().url()).pathname));
+      if (!f.startsWith(root) || !fs.existsSync(f)) return r.fulfill({ status: 404, body: 'not found' });
+      r.fulfill({ body: fs.readFileSync(f), contentType: types[path.extname(f)] || 'application/octet-stream' });
+    });
+    await page.goto('http://scene.local/' + path.basename(html));
+    await page.waitForFunction(() => window.ready === true, null, { timeout: 60000 });
+  } else {
+    await page.goto('file://' + path.resolve(html));
+  }
   for (const s of scenes) {
     if (o.still !== undefined) {
       const d = await page.evaluate(([n, t, T]) => window.render(n, t, T, 'image/png'), [s.name, Math.min(o.still, s.dur - 0.1), s.dur]);
