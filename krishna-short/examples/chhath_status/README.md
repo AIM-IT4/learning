@@ -85,3 +85,20 @@ Catalogue numbers depend on what Commons returns on the day; check the previews 
 Most photos are CC BY-SA: the last seconds carry a small credit line; paste `media/CREDITS.txt` into the post.
 Commons may answer "429 too many requests" for original files from shared cloud servers; its resized copies
 (`--max-width 1920`) usually still come through.
+
+## Animated version: everything drawn by code (`storyboard_code.json`)
+
+No photos and no AI images: `code_scenes/chhath_scenes.html` draws all 17 scenes with the Canvas 2D API
+(Diwali diyas going out, a Madhubani sun, the Ganga at sunset, a Gandhi Setu-style bridge over Patna's ghat,
+vratis in saris raising the soop to the sun, a soop whose offerings pop in by pairs on "जोड़े जोड़े फलवा",
+a Mithila painting drawing itself, Darbhanga's Raj Qila, a village pokhar, Muzaffarpur's litchi orchard
+with women carrying daura, a decorated ghat with lights, kosi bharai, diya-lit steps, floating diyas,
+usha arghya with a lota, and a sunrise ghat for the end card). `render_scenes.cjs` renders them in
+headless Chromium; `make_festival.py` adds the song, the voiceover, captions, border, rays and sparks.
+
+```bash
+node code_scenes/render_scenes.cjs code_scenes/chhath_scenes.html examples/chhath_status/storyboard_code.json \
+  --out clips                         # add --still 2 for one preview PNG per scene
+python make_festival.py examples/chhath_status/storyboard_code.json --images clips --music song.wav \
+  --voice voice.wav --fonts fonts_dir --out chhath_status_animated.mp4
+```

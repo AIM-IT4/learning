@@ -16,7 +16,7 @@ Built for songs like Chhath geet or bhajans, where a beat-cut glitch reel would 
       --fonts fonts --out chhath_status.mp4
 
 Storyboard (JSON): start (s into the song), duration, bpm, beat0 (first beat, s into the clip), fade_out,
-shots: [{img | video, bars, fx, move, parallax, kind, fit, focus, ss, speed}], captions: [{t, end, style, text, pos}],
+shots: [{img | video, bars, fx, move, parallax, kind, fit, focus, ss, speed, zoom, grade}], captions: [{t, end, style, text, pos}],
   img: a photo or painting; video: a real video clip, played from `ss` seconds at `speed`.
   fit: "auto" (portrait fills the frame, wide pictures sit on a blurred copy of themselves), "cover" (always
   fill the frame, cropped around `focus` = 0 left .. 1 right) or "blur".
@@ -275,7 +275,7 @@ def frame_filter(w, h, fit, focus, scale=1):
             f"[b]scale={fg_w}:-2[fg];[bg][fg]overlay=(W-w)/2:(H-h)/2")
 
 
-def render_video(src, ss, frames, out, speed=1.0, fit="auto", focus=0.5, zoom=0.04):
+def render_video(src, ss, frames, out, speed=1.0, fit="auto", focus=0.5, zoom=0.04, grade=True):
     """`frames` frames of a real video from `ss` s; speed < 1 slows it down (frame blending), a slow push-in on top."""
     w, h = probe_size(src)
     need = frames / FPS * speed + 1.0
@@ -283,7 +283,7 @@ def render_video(src, ss, frames, out, speed=1.0, fit="auto", focus=0.5, zoom=0.
     slow = f"setpts=PTS/{speed},minterpolate=fps={FPS}:mi_mode=blend," if speed < 0.999 else f"fps={FPS},"
     vf = (f"setpts=PTS-STARTPTS,{slow}{frame_filter(w, h, fit, focus)},setsar=1,"
           f"scale=w='trunc({W}*(1+{zoom}*n/{n})/2)*2':h=-2:eval=frame,crop={W}:{H},"
-          f"{ms.GRADE},format=yuv420p")
+          f"{ms.GRADE + ',' if grade else ''}format=yuv420p")
     ms.run(["ffmpeg", "-y", "-ss", f"{ss:.3f}", "-t", f"{need:.3f}", "-i", str(src), "-filter_complex", vf,
             "-frames:v", str(frames), "-an", "-r", str(FPS), "-c:v", "libx264", "-preset", "veryfast", "-crf", "16",
             str(out)])
@@ -348,9 +348,10 @@ def main():
         if "video" in s:
             src = Path(args.images) / s["video"]
             ss, speed = float(s.get("ss", 0)), float(s.get("speed", 1))
-            out = cache / f"{src.stem}_{b - a}_{ss:.2f}_{speed:.2f}_{fit}_{int(focus * 100)}.mp4"
+            zoom, grade = float(s.get("zoom", 0.04)), bool(s.get("grade", True))
+            out = cache / f"{src.stem}_{b - a}_{ss:.2f}_{speed:.2f}_{fit}_{int(focus * 100)}_{zoom:.3f}_{int(grade)}.mp4"
             if not out.exists():
-                render_video(src, ss, b - a, out, speed, fit, focus)
+                render_video(src, ss, b - a, out, speed, fit, focus, zoom, grade)
         else:
             img = framed_image(Path(args.images) / s["img"], fit, focus, cache)
             w0, h0 = Image.open(img).size
