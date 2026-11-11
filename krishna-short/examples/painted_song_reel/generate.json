@@ -1,0 +1,118 @@
+{
+ "project": "SochengeReel",
+ "characters": {
+  "Kabir": "A 24-year-old Indian man in 1992, drawn as a hand-painted digital illustration (semi-realistic storybook painting with soft visible brush strokes, not a photo): lean build, warm brown skin, thick glossy black hair in a soft voluminous side-swept 1990s puff, clean-shaven, bright playful dark eyes and a boyish half-smile. He wears a light-blue denim jacket with the sleeves pushed up over a plain white t-shirt. Head and shoulders portrait, warm golden afternoon light, plain soft cream background.",
+  "Naina": "A 21-year-old Indian woman in 1992, drawn as a hand-painted digital illustration (semi-realistic storybook painting with soft visible brush strokes, not a photo): slender, warm wheat-brown skin, big expressive kohl-lined dark eyes, a small round red bindi, long thick wavy black hair worn loose over one shoulder, small gold jhumka earrings and thin glass bangles. She wears a pastel-pink chiffon salwar kameez with a long flowing matching pink dupatta. Head and shoulders portrait, warm golden afternoon light, plain soft cream background."
+ },
+ "scenes": [
+  {
+   "type": "image",
+   "aspect_ratio": "16:9",
+   "download_quality": "upscaled",
+   "prompt": "Kabir lies on his back on a grassy hilltop in the late afternoon, one arm folded behind his head, twirling a white daisy between his fingers above his face, gazing up dreamily at soft white clouds with a shy half-smile. Wide shot from a low angle beside him, the sky filling most of the frame. Hand-painted digital illustration in a semi-realistic romantic storybook style, soft visible brush strokes, warm golden light, rich warm colours, India 1992, no text anywhere.",
+   "reference_images": [
+    "asset:Kabir"
+   ]
+  },
+  {
+   "type": "image",
+   "aspect_ratio": "16:9",
+   "download_quality": "upscaled",
+   "prompt": "A wide summer sky at golden hour full of soft white cumulus clouds; in the middle, two clouds drift together into the gentle shape of a heart, lit warm gold at the edges, a few birds far away. Hand-painted digital illustration in a semi-realistic romantic storybook style, soft visible brush strokes, warm golden light, rich warm colours, no text anywhere."
+  },
+  {
+   "type": "image",
+   "aspect_ratio": "16:9",
+   "download_quality": "upscaled",
+   "prompt": "Naina sits on a wooden swing hanging from a big old banyan tree in a green field at golden hour, swinging forward with her head tilted back, laughing, her long pink dupatta and loose hair flowing in the wind behind her. Medium-wide shot. Hand-painted digital illustration in a semi-realistic romantic storybook style, soft visible brush strokes, warm golden light, rich warm colours, India 1992, no text anywhere.",
+   "reference_images": [
+    "asset:Naina"
+   ]
+  },
+  {
+   "type": "image",
+   "aspect_ratio": "16:9",
+   "download_quality": "upscaled",
+   "prompt": "Extreme close-up of Kabir's fingers plucking a white petal from a daisy, a few loose white petals floating in the warm air, the cuff of his light-blue denim jacket and green grass softly out of focus behind. Hand-painted digital illustration in a semi-realistic romantic storybook style, soft visible brush strokes, warm golden light, rich warm colours, no text anywhere.",
+   "reference_images": [
+    "asset:Kabir"
+   ]
+  },
+  {
+   "type": "image",
+   "aspect_ratio": "16:9",
+   "download_quality": "upscaled",
+   "prompt": "Naina leans at an open wooden window of an old pastel house at dusk, resting her chin on her palm on the windowsill, looking out dreamily with a small secret smile; pink bougainvillea frames the window. Medium shot from outside the window. Hand-painted digital illustration in a semi-realistic romantic storybook style, soft visible brush strokes, warm dusk light, rich warm colours, India 1992, no text anywhere.",
+   "reference_images": [
+    "asset:Naina"
+   ]
+  },
+  {
+   "type": "image",
+   "aspect_ratio": "16:9",
+   "download_quality": "upscaled",
+   "prompt": "Naina sits cross-legged on her bed with a 1990s cream push-button landline telephone in her lap, the receiver at her ear, twirling its curly cord around her finger and smiling shyly with lowered eyes; warm lamplight and fairy lights in a pastel bedroom. Medium shot. Hand-painted digital illustration in a semi-realistic romantic storybook style, soft visible brush strokes, warm evening light, rich warm colours, India 1992, no text anywhere.",
+   "reference_images": [
+    "asset:Naina"
+   ]
+  },
+  {
+   "type": "image",
+   "aspect_ratio": "16:9",
+   "download_quality": "upscaled",
+   "prompt": "Kabir stands inside a small glass-and-wood roadside telephone booth in the evening, holding the black receiver of a coin phone to his ear, grinning nervously and running one hand through his hair; warm street lamps and a dusky blue street glow behind him. Medium shot through the open booth door. Hand-painted digital illustration in a semi-realistic romantic storybook style, soft visible brush strokes, warm lamplight, rich colours, India 1992, no text anywhere.",
+   "reference_images": [
+    "asset:Kabir"
+   ]
+  },
+  {
+   "type": "image",
+   "aspect_ratio": "16:9",
+   "download_quality": "upscaled",
+   "prompt": "Top-down view of an old open diary on a wooden desk, its cream pages covered in soft faded handwriting too blurred to read, a pressed pink rose and a few dried white daisy petals lying across the pages, a fountain pen beside it, warm lamplight from one side. Hand-painted digital illustration in a semi-realistic romantic storybook style, soft visible brush strokes, rich warm colours."
+  },
+  {
+   "type": "image",
+   "aspect_ratio": "16:9",
+   "download_quality": "upscaled",
+   "prompt": "Night: Kabir lies awake on his bed in a white t-shirt under a slowly turning ceiling fan, silver moonlight from the window falling across his face, both hands resting on his chest over his heart, eyes wide open, restless and smiling to himself. Top-down shot from the ceiling. Hand-painted digital illustration in a semi-realistic romantic storybook style, soft visible brush strokes, cool blue moonlight with a warm lamp glow, India 1992, no text anywhere.",
+   "reference_images": [
+    "asset:Kabir"
+   ]
+  },
+  {
+   "type": "image",
+   "aspect_ratio": "16:9",
+   "download_quality": "upscaled",
+   "prompt": "Night under a deep blue starry sky with the Milky Way: two flat rooftops of old houses face each other across a narrow lane; on the left rooftop Naina stands at the parapet in her pink salwar kameez, on the right rooftop Kabir stands at his parapet in his denim jacket, both looking across at each other and smiling, small figures in a wide shot, warm window lights glowing below. Hand-painted digital illustration in a semi-realistic romantic storybook style, soft visible brush strokes, rich deep blues and warm golds, India 1992, no text anywhere.",
+   "reference_images": [
+    "asset:Kabir",
+    "asset:Naina"
+   ]
+  },
+  {
+   "type": "image",
+   "aspect_ratio": "16:9",
+   "download_quality": "upscaled",
+   "prompt": "Close-up of Kabir's hand holding up a daisy with just one last white petal left on it, against a soft golden sunset bokeh; his happy smiling face softly out of focus behind the flower. Hand-painted digital illustration in a semi-realistic romantic storybook style, soft visible brush strokes, warm golden light, rich warm colours, no text anywhere.",
+   "reference_images": [
+    "asset:Kabir"
+   ]
+  },
+  {
+   "type": "image",
+   "aspect_ratio": "16:9",
+   "download_quality": "upscaled",
+   "prompt": "Close-up of Naina hiding the lower half of her face behind her sheer pink dupatta, only her sparkling kohl-lined eyes visible, smiling shyly toward the camera; warm golden backlight and floating dust motes. Hand-painted digital illustration in a semi-realistic romantic storybook style, soft visible brush strokes, warm golden light, rich warm colours, India 1992, no text anywhere.",
+   "reference_images": [
+    "asset:Naina"
+   ]
+  },
+  {
+   "type": "image",
+   "aspect_ratio": "9:16",
+   "download_quality": "upscaled",
+   "prompt": "A laptop computer open on a dark desk at night, seen from in front and slightly above, its keyboard glowing with soft purple and pink backlight and a purple glow spilling onto the dark desk; the laptop screen shows a plain flat bright green colour filling the whole screen edge to edge; the rest of the room is dark with a faint purple haze. Realistic photo taken on a phone, vertical frame, the laptop in the lower middle of the frame with dark empty space above it."
+  }
+ ]
+}
