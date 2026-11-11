@@ -1,14 +1,17 @@
 # चुप्पी का गुनाह (The Sin of Silence): two-voice story film
 
-A 1:56 vertical (1080x1920) Hindi short. Banaras, 1975: Aditya, a poor young poet renting the rooftop room of an old
-haveli, and Gauri, the daughter of the house who plays the sitar, love each other and never say it. A rich doctor's
-proposal comes for her; she goes to his door one night waiting for one word, "रुको"; he stays silent and leaves for
-Calcutta at dawn. Forty years later he comes back to the same ghat. An original story written in the spirit of
-Dharamvir Bharati's *Gunahon Ka Devta* (pure unspoken love, sacrifice, regret); not an adaptation, since the novel is
-still under copyright.
+A 2:56 vertical (1080x1920) Hindi short. Banaras, 1975: Aditya, a poor young poet who arrives with a tin trunk to rent
+the rooftop room of an old haveli, and Gauri, the daughter of the house who plays the sitar, love each other and never
+say it. He watches her face at the Ganga aarti; her father treats him like a son, and he cannot betray that trust. A
+rich doctor's proposal comes for her; she goes to his door one night waiting for one word, "रुको"; he stays silent and
+leaves for Calcutta at dawn. She marries and rereads his unfinished poem every night; he writes hundreds of letters and
+posts none. Forty years later he comes back to the same ghat, she shows him the poem's last line, and a young couple
+laughing on the steps closes the film. An original story written in the spirit of Dharamvir Bharati's *Gunahon Ka
+Devta* (pure unspoken love, sacrifice, regret); not an adaptation, since the novel is still under copyright.
 
 The two narrators alternate, each remembering the same moments: Gauri = Gemini 2.5 Pro TTS **Sulafat**, Aditya =
-**Charon**. Pictures: 15 Google Flow clips (Veo 3.1 Lite, 9:16, 8 s, 10 credits each = 150) driven through flow-mcp.
+**Charon**. Pictures: 23 Google Flow clips (Veo 3.1 Lite, 9:16, 8 s, 10 credits each = 230) driven through flow-mcp.
+The first cut (1:56) used clips 1-15 and lines L01-L17; the extended cut adds clips 16-23 and lines LA-LH.
 No clips, audio or video are kept in this repo.
 
 ## Make it
@@ -16,21 +19,27 @@ No clips, audio or video are kept in this repo.
    `flow_character` Aditya and Gauri (the descriptions are the CHARACTER LOCK text in `generate.json`). The first
    character upload in a project can stop at Flow's "Rights to use this image" notice; it needs "I agree" once.
    Veo 3.1 Lite takes character references (Ingredients): test one shot first, it held both faces in every clip.
-2. Clips: `flow_generate` with `generate.json` (shots 3-15 can go in one call after testing 1-2; numbering continues).
-   Shots 12-15 show the old couple from behind, as hands, or the woman's face without a reference.
+2. Clips: `flow_generate` with `generate.json` (numbering continues from the highest clip in the folder).
+   Clips 1, 11-15 and 21-23 (the old couple seen from behind, in profile or as hands, and a young couple) have no
+   reference; clips 10 and 19 dress Gauri as a bride and as a married woman through `outfit`. Flow can refuse a clip with "Audio generation failed" (nothing
+   is charged): clip 16 went through after its action and Sound line were reworded (the text here is the one that worked).
 3. Voices: every line is its own take (`lines.json`: `text` is what is spoken, numbers spelled out; `sub` is the
    subtitle). Two candidates each; direction: Aditya "an old man remembering his youth and his lost love: warm, slow,
    soft, quiet regret", Gauri "a woman remembering an old love: soft, tender, slightly hushed". Speech-check with
    `code_scenes/voice/check_takes.py lines.json takes`; `picks.json` holds the takes used (L01 c1: the other take said
-   "लव" for "लफ़्ज़").
+   "लव" for "लफ़्ज़"). The poem quote's timing inside LF1 (`POEM` in `assemble.py`) comes from word timestamps
+   (faster-whisper large-v3-turbo, `word_timestamps=True`) on the picked take.
 4. Music: Kevin MacLeod, "Sad Trio" (incompetech.com, CC BY 4.0; not kept here), steady under the whole film:
    22 dB under the voices while they speak, 12 dB under in the pauses, 10 dB under over the end card; credited on the
    end card.
-5. Assemble: `python3 assemble.py <clips_dir> lines.json <takes_dir> picks.json <music.mp3> <out>`: 0.5 s dissolves,
-   each speaker levelled to -16 LUFS, lines placed on their shots (Gauri's "मैंने बस इतना कहा…" opens 1.6 s before its
-   cut so the last line ends before the end card), subtitles in two colours (Gauri rose-pink, Aditya cream), title over
-   the opening, the night shots Flow lit like day graded in the edit (shot 5 lamplight, shots 7-8 night), end card held
-   ~4 s after the last word, loudnorm -14 LUFS. Prints a WhatsApp split inside a pause.
-6. Export: `bash export.sh <out> <split>` (HQ + two WhatsApp parts under 60 s / 16 MB).
+5. Assemble: `python3 assemble.py <clips_dir> lines.json <takes_dir> picks.json <music.mp3> <out>`. `EDIT` is the cut:
+   shots in story order with the lines spoken over each, how long each stays on screen (a shot carrying two lines is
+   slowed up to 1.5x with blended frames and time-stretched sound; a shot with spare time is trimmed), J-cuts (`lead`),
+   and grades for scenes Flow lit like day (lamplight, night, lamp at night, dusk). 0.5 s dissolves, each speaker
+   levelled to -16 LUFS, subtitles in two colours (Gauri rose-pink, Aditya cream), title over the opening, the poem's
+   last line written by hand (Kalam) over the old paper while Gauri reads it, end card held ~4 s after the last word,
+   loudnorm -14 LUFS. Writes `timeline.json` with WhatsApp split points: the fewest parts of at most 59.8 s, each cut
+   inside a pause between lines (`--no-video` checks the timing without rendering).
+6. Export: `python3 export.py <out> Chuppi_Ka_Gunah` (HQ + WhatsApp parts under 60 s / 16 MB; three for this cut).
 
 `../../flow/flow-mcp-setup.sh` installs flow-mcp in a cloud session (paste it into the environment's setup script).
