@@ -1,7 +1,8 @@
 """The 3.4-second intro of the reel (1080x1920, 30 fps): a laptop on a dark desk with a glowing keyboard, two tiles
 on top ("Claude" x the song), the laptop screen showing the chat that made the reel, then a player window opening on
 the finished music video; it dims to black at the end.
-  python3 render_intro.py <laptop.jpeg> <mv.mp4> <out.mp4>
+  python3 render_intro.py <laptop.jpeg|png> <mv.mp4> <out.mp4> [chat.json]
+chat.json (optional): {"lines": [...], "file_label": "Video · 66.8 s", "flow_mark": false} - the reply shown on the screen.
 The laptop picture must show a flat green screen: it is found by colour and replaced in perspective.
 """
 import math, subprocess, sys
@@ -15,6 +16,8 @@ HERE = Path(__file__).resolve().parent
 FD = Path(__file__).resolve().parents[2] / "code_scenes" / "fonts"
 REPO_FONTS = FD
 laptop_p, mv_p, out_p = sys.argv[1:4]
+import json as _json
+CHAT = _json.load(open(sys.argv[4], encoding='utf-8')) if len(sys.argv) > 4 else {}
 
 def ease(u, kind="inout"):
     u = min(1.0, max(0.0, u))
@@ -23,8 +26,9 @@ def ease(u, kind="inout"):
 # ---------------------------------------------------------------- the laptop picture and its screen
 lap0 = cv2.imread(laptop_p)
 h0, w0 = lap0.shape[:2]
-mk = np.zeros((h0, w0), np.uint8); cv2.circle(mk, (w0 - 113, h0 - 113), 40, 255, -1)       # Flow's corner mark
-lap0 = cv2.inpaint(lap0, mk, 9, cv2.INPAINT_TELEA)
+if CHAT.get('flow_mark', True):                                                     # Flow's corner mark
+    mk = np.zeros((h0, w0), np.uint8); cv2.circle(mk, (w0 - 113, h0 - 113), 40, 255, -1)
+    lap0 = cv2.inpaint(lap0, mk, 9, cv2.INPAINT_TELEA)
 def find_green(img):
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     g = ((hsv[..., 0] > 40) & (hsv[..., 0] < 90) & (hsv[..., 1] > 90) & (hsv[..., 2] > 70)).astype(np.uint8) * 255
@@ -80,6 +84,7 @@ def chat_screen(show_file):
              "the phone call, the diary, rooftops under the stars.",
              "", "Painted every shot in Flow, depth maps done, moving each",
              "still in 2.5D. Rendering the master: 1080x1920, 30 fps."]
+    lines = CHAT.get('lines', lines)
     for t in lines:
         d.text((360, y), t, font=font(F_UI, 25), fill=(222, 216, 204)); y += 42
     if show_file:
@@ -88,7 +93,7 @@ def chat_screen(show_file):
         d.rounded_rectangle([382, y + 18, 432, y + 74], radius=8, fill=(90, 88, 84))
         d.polygon([(400, y + 34), (400, y + 58), (420, y + 46)], fill=(230, 226, 216))
         d.text((452, y + 16), "Sochenge_Tumhe_Pyar_reel.mp4", font=font(F_UIM, 23), fill=(235, 230, 220))
-        d.text((452, y + 50), "Video · 27.5 s", font=font(F_UI, 20), fill=(160, 156, 148))
+        d.text((452, y + 50), CHAT.get("file_label", "Video · 27.5 s"), font=font(F_UI, 20), fill=(160, 156, 148))
     d.rounded_rectangle([360, SH - 110, 1540, SH - 40], radius=20, fill=(50, 49, 46), outline=(74, 72, 68), width=2)
     d.text((390, SH - 92), "Reply…", font=font(F_UI, 23), fill=(130, 126, 120))
     return np.array(im)[..., ::-1].astype(np.float32)

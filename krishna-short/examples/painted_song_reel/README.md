@@ -39,3 +39,18 @@ both come back at 720p.
 
 Fonts (OFL): Poppins Light/Medium for the card and the screen, Noto Sans Devanagari Bold for the lyric strips, Yatra
 One for the song tile. `code_scenes/fonts` is not in git; `bash get_fonts.sh` fetches them there from npm.
+
+## Claude-only version, drawn in code (`code_drawn/`)
+The same reel with no picture generator at all: every scene is drawn and animated with the 2D canvas (flat
+illustrated style), 1:07 long (song 47.4-114.2 s: the hook twice, "ये दिल बेक़रार", "ख़्वाबों में छुपाया तुमको, यादों में
+बसाया तुमको", "मिलोगे हमें तुम जानम कहीं ना कहीं", the hook and "ये दिल बेक़रार" again). `core.js` (sky, sun, clouds,
+stars, Milky Way, grass, daisies, petals, motes, fireflies, torn-paper strips), `chars.js` (Kabir and Naina: heads in
+profile and from the front, hands, small full figures), `scenes.js` (hill and daisy, heart of clouds, swing under the
+banyan, window and dandelion, plucked petals, sleepless night under the fan, her eye with him reflected in it, the
+dream, the box of photographs, the bazaar, rooftops, the sunset ending), `mv_code.html` (21 shots cut on the
+downbeat, transitions: whip, zoom-through, flash, fade, dip; vignette and grain), `laptop.html` (the intro's laptop).
+   - `node code_drawn/render_code.cjs code_drawn/mv_code.html out/mv.mp4` (1868 frames, about 6 minutes;
+     `--shots` writes one still per shot, `--stills 1,5,9` stills at those times)
+   - laptop picture: open `code_drawn/laptop.html` the same way and save `window.png()` (1536x2752, green screen)
+   - `python3 render_intro.py out/laptop.png out/mv.mp4 out/intro.mp4 code_drawn/chat.json`, the card, then
+     `bash assemble_reel.sh out <song> 47.437 out/reel.mp4` as above.
