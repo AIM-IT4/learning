@@ -1,0 +1,174 @@
+"""Assemble the story film "चुप्पी का गुनाह" (The Sin of Silence): two narrators, Gauri and Aditya.
+
+  python3 assemble.py <clips_dir> <lines.json> <takes_dir> <picks.json> <music_file> <out_dir>
+
+15 Flow clips joined with 0.5 s dissolves and a held, dimmed last frame for the end card. Each narration line is its
+own take (Charon for Aditya, Sulafat for Gauri), trimmed to its speech, each voice levelled to -16 LUFS, placed on its
+shot. Hindi subtitles in two colours (Gauri warm rose, Aditya cream), title over the opening, end card with the music
+credit, drawn with libass. The clips' own sound is kept under the voices; the music (Kevin MacLeod, CC BY 4.0) sits
+22 dB under the voices while they speak, 12 dB under in the pauses, 10 dB under over the end card. Two-pass loudnorm
+to -14 LUFS. Prints a WhatsApp split point that falls inside a pause.
+"""
+import json, re, subprocess, sys, tempfile
+from pathlib import Path
+import numpy as np
+
+clips_dir, lines_f, takes_dir, picks_f, music_f, out = map(Path, sys.argv[1:7])
+out.mkdir(parents=True, exist_ok=True)
+FONTS = str(Path(__file__).resolve().parents[2] / "code_scenes" / "fonts")
+SR, XF, HOLD, W, H = 48000, 0.5, 4.0, 1080, 1920
+L = json.load(open(lines_f, encoding="utf-8"))["takes"]
+picks = json.load(open(picks_f))
+MUSIC_CREDIT = "संगीत: Sad Trio • Kevin MacLeod (incompetech.com) • CC BY 4.0"
+MUSIC_DB = {"under": -22.0, "gap": -12.0, "end": -10.0}      # music loudness relative to the voices (-16 LUFS)
+# shot index (0-based) -> the lines spoken over it, in order
+SHOT_LINES = {0: ["L01"], 1: ["L02", "L03"], 2: ["L04"], 3: ["L05"], 4: ["L06"], 5: ["L07"], 6: ["L08"], 7: ["L09"], 8: ["L10"],
+              9: ["L11"], 10: ["L12"], 11: ["L13"], 12: ["L14"], 13: ["L15", "L16"], 14: ["L17"]}
+LEAD = {"L15": -1.6}                                             # per-line start offset from its shot cut (default 0.6 s); L15 opens over shot 13 (J-cut)
+
+def run(cmd, **kw): return subprocess.run(cmd, check=True, **kw)
+def load(f, sr=SR, ch=1):
+    raw = run(["ffmpeg", "-v", "error", "-i", str(f), "-ac", str(ch), "-ar", str(sr), "-f", "f32le", "-"], capture_output=True).stdout
+    return np.frombuffer(raw, np.float32).reshape(-1, ch).copy() if ch > 1 else np.frombuffer(raw, np.float32).copy()
+def save(f, y):
+    y2 = y if y.ndim == 2 else y[:, None]
+    run(["ffmpeg", "-y", "-v", "error", "-f", "f32le", "-ar", str(SR), "-ac", str(y2.shape[1]), "-i", "-", "-c:a", "pcm_s24le", str(f)], input=y2.astype(np.float32).tobytes())
+def lufs(y):
+    with tempfile.NamedTemporaryFile(suffix=".wav") as tf:
+        save(tf.name, y)
+        err = subprocess.run(["ffmpeg", "-v", "info", "-nostats", "-i", tf.name, "-af", "ebur128", "-f", "null", "-"], capture_output=True, text=True).stderr
+    v = re.findall(r"I:\s+(-?[\d.]+) LUFS", err)
+    return float(v[-1]) if v else -70.0
+def vdur(f): return float(run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=duration", "-of", "csv=p=0", str(f)], capture_output=True, text=True).stdout.strip())
+db = lambda x: 10 ** (x / 20)
+def trim_speech(y):
+    hop = SR // 100; e = np.sqrt(np.convolve(y ** 2, np.ones(hop * 2) / (hop * 2), "same"))[::hop]
+    on = np.where(e > db(-40) * max(e.max(), 1e-9))[0]
+    a = max(0, on[0] * hop - int(0.06 * SR)); b = min(len(y), (on[-1] + 1) * hop + int(0.18 * SR))
+    seg = y[a:b].copy(); n = int(0.02 * SR); seg[:n] *= np.linspace(0, 1, n); seg[-n:] *= np.linspace(1, 0, n)
+    return seg
+
+# ---- shots
+clips = [clips_dir / f"scene-{i:02d}.mp4" for i in range(1, 16)]
+durs = [vdur(c) for c in clips]
+starts = [0.0]
+for d in durs[:-1]: starts.append(starts[-1] + d - XF)
+end_video = starts[-1] + durs[-1]
+TOTAL = round(end_video + 12.0, 3)          # room while placing lines; set from the last line below
+
+# ---- voices: each line trimmed, each speaker levelled to -16 LUFS
+seg = {n: trim_speech(load(takes_dir / f"{n}_{picks[n]}.wav")) for n in L}
+for who in ("M", "F"):
+    names = [n for n in L if L[n]["who"] == who]
+    g = -16 - lufs(np.concatenate(seg_ := [seg[n] for n in names]))
+    for n in names: seg[n] = seg[n] * db(g)
+track = np.zeros(int(TOTAL * SR), np.float32)
+placed, prev_end, prev_who = {}, 0.0, None
+for i in range(15):
+    for j, n in enumerate(SHOT_LINES[i]):
+        gap = 0.35 if L[n]["who"] == prev_who else 0.55
+        t = max(starts[i] + LEAD.get(n, 0.6) if j == 0 else 0.0, prev_end + gap)
+        i0 = int(t * SR); y = seg[n]
+        if i0 + len(y) > len(track): raise SystemExit(f"{n} runs past the end ({t:.2f}+{len(y) / SR:.2f} > {TOTAL})")
+        track[i0: i0 + len(y)] += y
+        prev_end, prev_who = t + len(y) / SR, L[n]["who"]
+        placed[n] = [round(t, 2), round(prev_end, 2)]
+TOTAL = round(max(end_video + HOLD, prev_end + 3.8), 3)       # the end card holds ~4 s after the last word
+track = track[: int(TOTAL * SR)]
+save(out / "narration.wav", track)
+
+# ---- the clips' own sound (levelled to -24 LUFS, dissolved like the picture), under the voices
+amb = None
+for c, d in zip(clips, durs):
+    a = load(c, SR, 2)[: int(d * SR)]
+    a = np.pad(a, ((0, max(0, int(d * SR) - len(a))), (0, 0)))
+    g = np.clip(-24 - lufs(a), -12, 12) if np.abs(a).max() > 1e-4 else 0
+    a = a * db(g)
+    if amb is None: amb = a
+    else:
+        n = int(XF * SR); fo = np.cos(np.linspace(0, np.pi / 2, n))[:, None]; fi = np.sin(np.linspace(0, np.pi / 2, n))[:, None]
+        amb = np.concatenate([amb[:-n], amb[-n:] * fo + a[:n] * fi, a[n:]])
+amb = np.pad(amb, ((0, max(0, len(track) - len(amb))), (0, 0)))[: len(track)]
+hop = SR // 100; env = np.sqrt(np.convolve(track ** 2, np.ones(hop * 3) / (hop * 3), "same"))[::hop]
+on = env > db(-42) * max(env.max(), 1e-9); hold = np.zeros_like(on)
+for k in np.where(on)[0]: hold[max(0, k - 30): k + 60] = True
+tt100 = np.arange(len(hold)) / 100
+gdb = np.where(hold, -10.0, -3.0)
+k = 25; gdb = np.convolve(np.pad(gdb, (k, k), mode="edge"), np.ones(2 * k + 1) / (2 * k + 1), "valid")
+tt = np.arange(len(track)) / SR
+gain = db(np.interp(tt, tt100, gdb)) * np.clip((end_video + 2.5 - tt) / 2.5, 0, 1) * np.clip(tt / 0.6, 0, 1)
+mix = amb * gain[:, None] + track[:, None]
+# ---- music
+mus = load(music_f, SR, 2)
+mus = np.pad(mus, ((0, max(0, len(track) - len(mus))), (0, 0)))[: len(track)]
+Lm = lufs(mus[: int(min(len(mus) / SR, end_video) * SR)])
+mdb = np.where(hold, MUSIC_DB["under"], MUSIC_DB["gap"]) + (-16 - Lm)
+mdb = np.where(tt100 >= end_video - 0.5, MUSIC_DB["end"] + (-16 - Lm), mdb)
+k2 = 50; mdb = np.convolve(np.pad(mdb, (k2, k2), mode="edge"), np.ones(2 * k2 + 1) / (2 * k2 + 1), "valid")
+mg = db(np.interp(tt, tt100, mdb)) * np.clip(tt / 1.5, 0, 1) * np.clip((TOTAL - tt) / 3.0, 0, 1) ** 1.3
+mix = mix + mus * mg[:, None]
+with tempfile.TemporaryDirectory() as td:
+    pre = Path(td) / "pre.wav"; save(pre, mix)
+    m = subprocess.run(["ffmpeg", "-v", "info", "-nostats", "-i", str(pre), "-af", "loudnorm=I=-14:TP=-1.5:LRA=11:print_format=json", "-f", "null", "-"], capture_output=True, text=True).stderr
+    j = json.loads(m[m.rindex("{"): m.rindex("}") + 1])
+    ln = (f"loudnorm=I=-14:TP=-1.5:LRA=11:measured_I={j['input_i']}:measured_TP={j['input_tp']}:measured_LRA={j['input_lra']}:"
+          f"measured_thresh={j['input_thresh']}:offset={j['target_offset']}:linear=true")
+    run(["ffmpeg", "-y", "-v", "error", "-i", str(pre), "-af", ln + ",aresample=48000", "-c:a", "pcm_s24le", str(out / "mix.wav")])
+
+# ---- title, subtitles, end card (ASS, drawn by libass). Devanagari needs letter spacing 0.
+def ts(x):
+    x = max(0.0, x); h = int(x // 3600); m_ = int(x % 3600 // 60); s = x % 60
+    return f"{h}:{m_:02d}:{s:05.2f}"
+ass = ["[Script Info]", "ScriptType: v4.00+", f"PlayResX: {W}", f"PlayResY: {H}", "WrapStyle: 0", "ScaledBorderAndShadow: yes", "",
+       "[V4+ Styles]",
+       "Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding",
+       "Style: SubF,Noto Sans Devanagari,50,&H00C8B8FF,&H00C8B8FF,&H00140A12,&H64000000,0,0,0,0,100,100,0,0,1,3.5,1.5,2,90,90,300,1",
+       "Style: SubM,Noto Sans Devanagari,50,&H00E6F4FF,&H00E6F4FF,&H00000000,&H64000000,0,0,0,0,100,100,0,0,1,3.5,1.5,2,90,90,300,1",
+       "Style: Title,Rozha One,132,&H004DD3FF,&H004DD3FF,&H00060A3A,&H64000000,0,0,0,0,100,100,0,0,1,7,2,5,40,40,0,1",
+       "Style: TSub,Tiro Devanagari Hindi,52,&H00DCF4FF,&H00DCF4FF,&H00060A14,&H64000000,0,0,0,0,100,100,0,0,1,4,1,5,60,60,0,1",
+       "Style: Src,Noto Sans Devanagari,27,&H00DCE6F2,&H00DCE6F2,&H70000000,&H00000000,0,0,0,0,100,100,0,0,3,12,0,2,70,70,0,1",
+       "Style: Dim,Noto Sans Devanagari,20,&H00000000,&H00000000,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,7,0,0,0,1",
+       "", "[Events]", "Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text"]
+ev = lambda a, b, style, text, layer=1: ass.append(f"Dialogue: {layer},{ts(a)},{ts(b)},{style},,0,0,0,,{text}")
+order = [n for i in range(15) for n in SHOT_LINES[i]]
+for idx, n in enumerate(order):
+    a, b = placed[n]
+    nxt = placed[order[idx + 1]][0] if idx + 1 < len(order) else TOTAL
+    ev(a - 0.08, min(b + 0.35, nxt - 0.05), "SubF" if L[n]["who"] == "F" else "SubM", r"{\fad(150,150)}" + L[n]["sub"])
+t_in = placed["L01"][1] + 0.2
+ev(t_in, starts[1] + 0.3, "Title", r"{\fad(700,500)\pos(540,820)}चुप्पी का गुनाह")
+ev(t_in + 0.6, starts[1] + 0.3, "TSub", r"{\fad(700,500)\pos(540,950)}एक अनकही प्रेम कहानी")
+ev(end_video - 0.2, TOTAL, "Dim", r"{\fad(900,0)\pos(0,0)\p1\1c&H000000&\1a&H60&}m 0 0 l 1080 0 1080 1920 0 1920{\p0}", layer=0)
+card = max(end_video + 0.2, placed["L17"][1] - 0.6)
+ev(card, TOTAL, "Title", r"{\fad(800,0)\pos(540,820)}चुप्पी का गुनाह")
+ev(card + 0.7, TOTAL, "TSub", r"{\fad(800,0)\pos(540,950)}जिससे प्यार हो… उससे कह देना।")
+ev(card + 1.2, TOTAL, "Src", r"{\fad(600,0)\pos(540,1720)}" + MUSIC_CREDIT)
+(out / "film.ass").write_text("\n".join(ass) + "\n", encoding="utf-8")
+
+# ---- picture
+# night scenes that Flow lit like day: graded in the edit (shot index -> look)
+GRADES = {"night": "eq=brightness=-0.11:contrast=1.08:saturation=0.72,colorbalance=bs=0.10:bm=0.05:rm=-0.03,vignette=PI/4",
+          "lamp": "eq=brightness=-0.08:contrast=1.06:saturation=0.9,colorbalance=rs=0.06:gs=0.02:bs=-0.07,vignette=PI/4"}
+GRADE_OF = {4: "lamp", 6: "night", 7: "night"}
+fc = [f"[{i}:v]scale={W}:{H}:flags=lanczos,setsar=1,fps=24,format=yuv420p," + (GRADES[GRADE_OF[i]] + "," if i in GRADE_OF else "") +
+      f"trim=duration={durs[i]:.3f},setpts=PTS-STARTPTS[v{i}]" for i in range(15)]
+cur, acc = "v0", durs[0]
+for i in range(1, 15):
+    fc.append(f"[{cur}][v{i}]xfade=transition=fade:duration={XF}:offset={acc - XF:.3f}[x{i}]"); cur = f"x{i}"; acc += durs[i] - XF
+fc.append(f"[{cur}]tpad=stop_mode=clone:stop_duration={TOTAL - end_video + 0.1:.3f},ass={out / 'film.ass'}:fontsdir={FONTS},fade=t=in:st=0:d=0.8,fade=t=out:st={TOTAL - 1.0:.3f}:d=1.0[vout]")
+cmd = ["ffmpeg", "-y", "-v", "error"]
+for c in clips: cmd += ["-i", str(c)]
+cmd += ["-i", str(out / "mix.wav"), "-filter_complex", ";".join(fc), "-map", "[vout]", "-map", "15:a", "-t", f"{TOTAL:.3f}",
+        "-c:v", "libx264", "-preset", "medium", "-crf", "18", "-profile:v", "high", "-level", "4.1", "-pix_fmt", "yuv420p",
+        "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", str(out / "film.mp4")]
+run(cmd)
+# ---- WhatsApp split: inside a pause between lines, both parts at most 59.8 s
+lo, hi, best = TOTAL - 59.8, 59.8, None
+for a_, b_ in zip(order, order[1:]):
+    g0, g1 = placed[a_][1] + 0.12, placed[b_][0] - 0.12
+    f0, f1 = max(g0, lo), min(g1, hi)
+    if f1 > f0 and (best is None or f1 - f0 > best[1] - best[0]): best = (f0, f1)
+split = round((best[0] + best[1]) / 2, 2) if best else None
+json.dump({"split": split, "starts": [round(s, 3) for s in starts], "durs": durs, "lines": placed, "end_video": end_video, "total": TOTAL},
+          open(out / "timeline.json", "w"), indent=1, ensure_ascii=False)
+print(json.dumps({"split": split, "total": TOTAL, "end_video": round(end_video, 2), "last_line_end": placed["L17"][1], "lines": placed}, ensure_ascii=False))

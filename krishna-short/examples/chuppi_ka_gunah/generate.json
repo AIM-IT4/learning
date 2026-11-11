@@ -1,0 +1,169 @@
+{
+ "project": "ChuppiKaGunah",
+ "scenes": [
+  {
+   "prompt": "Extreme close-up at dawn: the wrinkled hand of an old Indian woman, thin gold bangles on her wrist, rests on a yellowed folded old letter lying on worn stone ghat steps; her thumb slowly strokes the letter once. Behind, out of focus, small oil-lamp diyas float on the misty Ganges. Static close shot with a very slow push-in. Photoreal cinematic film, vertical 9:16, present-day Banaras, cool blue and gold dawn light, gentle film grain. Sound: soft river water and a distant temple bell; no music, no speech.",
+   "type": "video",
+   "model": "Veo 3.1 - Lite",
+   "aspect_ratio": "9:16",
+   "max_credits": 12,
+   "download_quality": "original",
+   "retries": 1
+  },
+  {
+   "prompt": "Aditya sits on the low parapet of an old haveli rooftop in Banaras writing in a small notebook with a pen; colourful cotton saris dry on a washing line behind him and the Ganges ghats lie below. He stops writing, looks up toward the rooftop stairs and smiles softly. Medium shot, slow push-in. Photoreal cinematic film, vertical 9:16, Banaras in 1975, warm 35mm film grain, soft natural light. Sound: morning birds, the distant river, faint temple bells; no music, no speech.",
+   "type": "video",
+   "model": "Veo 3.1 - Lite",
+   "aspect_ratio": "9:16",
+   "max_credits": 12,
+   "download_quality": "original",
+   "retries": 1,
+   "reference_images": [
+    "asset:Aditya"
+   ]
+  },
+  {
+   "prompt": "Gauri sits cross-legged on a woven mat beside a tall sunlit wooden window inside an old Banaras haveli, playing a sitar; on the wall beside the open door falls the still shadow of a young man standing on the stairs, listening. She glances toward the door, smiles shyly and lowers her eyes. Medium shot, static camera. Photoreal cinematic film, vertical 9:16, Banaras in 1975, warm 35mm film grain, soft natural light. Sound: a gentle sitar melody she is playing, birdsong; no speech.",
+   "type": "video",
+   "model": "Veo 3.1 - Lite",
+   "aspect_ratio": "9:16",
+   "max_credits": 12,
+   "download_quality": "original",
+   "retries": 1,
+   "reference_images": [
+    "asset:Gauri"
+   ]
+  },
+  {
+   "prompt": "Monsoon rain on an old stone ghat in Banaras: Aditya and Gauri walk slowly down the wet steps side by side under one black umbrella that he holds; she glances up at his face while he keeps looking straight ahead. Medium-wide shot from the side, slow tracking alongside them. Photoreal cinematic film, vertical 9:16, Banaras in 1975, warm 35mm film grain, soft natural light. Sound: heavy rain drumming on the umbrella and the river; no music, no speech.",
+   "type": "video",
+   "model": "Veo 3.1 - Lite",
+   "aspect_ratio": "9:16",
+   "max_credits": 12,
+   "download_quality": "original",
+   "retries": 1,
+   "reference_images": [
+    "asset:Aditya",
+    "asset:Gauri"
+   ]
+  },
+  {
+   "prompt": "Night, a small simple rooftop room with books and a narrow cot: Gauri sits alone on the floor beside a glowing oil lamp reading a small handwritten notebook; she smiles, closes it and presses it to her heart. Medium close-up, static camera. Photoreal cinematic film, vertical 9:16, Banaras in 1975, warm 35mm film grain, soft natural light. Sound: crickets and the soft flicker of the lamp; no music, no speech.",
+   "type": "video",
+   "model": "Veo 3.1 - Lite",
+   "aspect_ratio": "9:16",
+   "max_credits": 12,
+   "download_quality": "original",
+   "retries": 1,
+   "reference_images": [
+    "asset:Gauri"
+   ]
+  },
+  {
+   "prompt": "Daytime courtyard of an old Banaras haveli: in soft focus in the background, elderly men in white dhotis and an older woman sit on a charpai with cups of tea; in the foreground Gauri stands half-hidden behind a carved stone pillar, listening, and slowly lowers her eyes. Medium shot, slow push-in toward Gauri. Photoreal cinematic film, vertical 9:16, Banaras in 1975, warm 35mm film grain, soft natural light. Sound: soft courtyard ambience and birds; no music, no speech.",
+   "type": "video",
+   "model": "Veo 3.1 - Lite",
+   "aspect_ratio": "9:16",
+   "max_credits": 12,
+   "download_quality": "original",
+   "retries": 1,
+   "reference_images": [
+    "asset:Gauri"
+   ]
+  },
+  {
+   "prompt": "Night, a narrow old stone staircase lit by a single hanging lantern: Gauri, a shawl around her shoulders, stands before a closed wooden door; she slowly raises her hand to knock, stops just before touching the door, and lowers her hand. Medium close-up, static camera. Photoreal cinematic film, vertical 9:16, Banaras in 1975, warm 35mm film grain, soft natural light. Sound: night silence, a distant dog, the lantern creaking; no music, no speech.",
+   "type": "video",
+   "model": "Veo 3.1 - Lite",
+   "aspect_ratio": "9:16",
+   "max_credits": 12,
+   "download_quality": "original",
+   "retries": 1,
+   "reference_images": [
+    "asset:Gauri"
+   ]
+  },
+  {
+   "prompt": "Night, inside a small rooftop room lit by an oil lamp: Aditya stands with his forehead resting against the inside of a closed wooden door, eyes shut, his hand on the iron latch; slowly he takes his hand off the latch. Close-up, static camera. Photoreal cinematic film, vertical 9:16, Banaras in 1975, warm 35mm film grain, soft natural light. Sound: night silence and his slow breathing; no music.",
+   "type": "video",
+   "model": "Veo 3.1 - Lite",
+   "aspect_ratio": "9:16",
+   "max_credits": 12,
+   "download_quality": "original",
+   "retries": 1,
+   "reference_images": [
+    "asset:Aditya"
+   ]
+  },
+  {
+   "prompt": "Dawn at an old Indian railway platform in the 1970s: a long train pulls slowly out of the station; Aditya sits at a barred train window looking back toward the platform with a sad face as the train carries him away. Medium shot from the platform, static camera. Photoreal cinematic film, vertical 9:16, Banaras in 1975, warm 35mm film grain, soft natural light. Sound: train wheels and a long horn; no music, no speech.",
+   "type": "video",
+   "model": "Veo 3.1 - Lite",
+   "aspect_ratio": "9:16",
+   "max_credits": 12,
+   "download_quality": "original",
+   "retries": 1,
+   "reference_images": [
+    "asset:Aditya"
+   ]
+  },
+  {
+   "prompt": "A traditional Hindu wedding at night: Gauri sits beside a small sacred fire in a marigold-decorated courtyard and looks into the flames; a single tear rolls down her cheek. Close-up, very slow push-in. Photoreal cinematic film, vertical 9:16, Banaras in 1975, warm 35mm film grain, soft natural light. Sound: a distant shehnai and the crackle of the fire; no speech.",
+   "type": "video",
+   "model": "Veo 3.1 - Lite",
+   "aspect_ratio": "9:16",
+   "max_credits": 12,
+   "download_quality": "original",
+   "retries": 1,
+   "reference_images": [
+    "asset:Gauri"
+   ],
+   "outfit": "a red bridal sari with gold embroidery, gold bridal jewellery and a red veil over her hair"
+  },
+  {
+   "prompt": "Years later, night, a small room in Calcutta: a grey-haired man in a white kurta, seen from behind, sits at a wooden desk piled with poetry books and loose pages, rain streaming down the window in front of him; he slowly puts down his pen. Medium shot from behind, static camera. Photoreal cinematic film, vertical 9:16, 1990s Calcutta, moody lamp light against blue night, film grain. Sound: rain on the window and a ticking clock; no music, no speech.",
+   "type": "video",
+   "model": "Veo 3.1 - Lite",
+   "aspect_ratio": "9:16",
+   "max_credits": 12,
+   "download_quality": "original",
+   "retries": 1
+  },
+  {
+   "prompt": "Present-day dawn on the stone steps of a Banaras ghat: an old man with white hair and round glasses, in a white kurta and a brown shawl, slowly walks down the steps toward the river with a wooden walking stick, seen from behind, the misty Ganges and wooden boats ahead of him. Wide shot, slow push-in behind him. Photoreal cinematic film, vertical 9:16, present-day Banaras, cool blue and gold dawn light, gentle film grain. Sound: the river, distant temple bells, birds; no music, no speech.",
+   "type": "video",
+   "model": "Veo 3.1 - Lite",
+   "aspect_ratio": "9:16",
+   "max_credits": 12,
+   "download_quality": "original",
+   "retries": 1
+  },
+  {
+   "prompt": "Present-day dawn on the ghat steps: an old Indian woman with silver hair in a bun, wearing a cream cotton sari, sits on the stone steps beside a small brass pot; she slowly turns her head toward someone approaching off-screen and her eyes fill with tears of recognition. Medium close-up, static camera. Photoreal cinematic film, vertical 9:16, present-day Banaras, cool blue and gold dawn light, gentle film grain. Sound: the river and birds; no music, no speech.",
+   "type": "video",
+   "model": "Veo 3.1 - Lite",
+   "aspect_ratio": "9:16",
+   "max_credits": 12,
+   "download_quality": "original",
+   "retries": 1
+  },
+  {
+   "prompt": "Present-day dawn, extreme close-up on worn stone ghat steps: an old woman's wrinkled hand with thin gold bangles slowly comes to rest on top of an old man's wrinkled hand; a yellowed folded letter lies beside them on the stone. Static close shot. Photoreal cinematic film, vertical 9:16, present-day Banaras, cool blue and gold dawn light, gentle film grain. Sound: river water and a soft wind; no music, no speech.",
+   "type": "video",
+   "model": "Veo 3.1 - Lite",
+   "aspect_ratio": "9:16",
+   "max_credits": 12,
+   "download_quality": "original",
+   "retries": 1
+  },
+  {
+   "prompt": "Sunrise over the Ganges in Banaras: two elderly people, a man in a white kurta and shawl and a woman in a cream sari, sit side by side on the stone ghat steps, small in the frame and seen from behind, while a single lit diya drifts past on the golden water. Wide static shot with a very slow push-in. Photoreal cinematic film, vertical 9:16, present-day Banaras, cool blue and gold dawn light, gentle film grain. Sound: the river, morning birds, distant temple bells; no music, no speech.",
+   "type": "video",
+   "model": "Veo 3.1 - Lite",
+   "aspect_ratio": "9:16",
+   "max_credits": 12,
+   "download_quality": "original",
+   "retries": 1
+  }
+ ]
+}
