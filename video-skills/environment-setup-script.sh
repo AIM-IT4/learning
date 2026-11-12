@@ -2,8 +2,9 @@
 # Setup script for the Claude Code cloud environment. Paste this whole file into the environment's settings (cloud
 # environment menu in the session title bar -> Edit -> Setup script). Every NEW session then starts with:
 #   1. the code-drawn video skills in ~/.claude/skills (39 skills: painted-animation, anime-cel, paper-cutout, ...)
-#   2. flow-mcp (Google Flow through Chrome; the Google sign-in is not kept between sessions)
-# It needs nothing from the AIM-IT4/learning repo; each part runs even if the other fails.
+#   2. painted-song-reel (this repo's skill: a painted music-video reel for any song), fetched from GitHub
+#   3. flow-mcp (Google Flow through Chrome; the Google sign-in is not kept between sessions)
+# Each part runs even if another fails.
 
 # ======================================================================== 1. video skills
 ( set -e
@@ -58,7 +59,22 @@ EOF
 echo "installed $n video skills into $DEST"
 ) || echo "video skills: install failed"
 
-# ======================================================================== 2. flow-mcp
+# ======================================================================== 2. painted-song-reel
+# This repo's own skill (AIM-IT4/learning is public): a painted music-video reel for any song. Its models (about 9 GB)
+# are fetched the first time it is used (its scripts/setup.sh), not here.
+( set -e
+T=$(mktemp -d); trap 'rm -rf "$T"' EXIT
+git init -q "$T/l"; cd "$T/l"
+git remote add origin https://github.com/AIM-IT4/learning
+git sparse-checkout set video-skills/painted-song-reel
+git fetch -q --depth 1 --filter=blob:none origin ccr-713d3cac-20zpd5 || git fetch -q --depth 1 --filter=blob:none origin main
+git -c advice.detachedHead=false checkout -q FETCH_HEAD
+mkdir -p "$HOME/.claude/skills"; rm -rf "$HOME/.claude/skills/painted-song-reel"
+cp -r video-skills/painted-song-reel "$HOME/.claude/skills/painted-song-reel"
+echo "installed painted-song-reel"
+) || echo "painted-song-reel: install failed"
+
+# ======================================================================== 3. flow-mcp
 DIR=/opt/flow-mcp
 if [ ! -f "$DIR/dist/index.js" ]; then
   rm -rf "$DIR"

@@ -1,0 +1,1164 @@
+{
+ "_about": "The reel delivered for 'Sochenge Tumhe Pyar' (Deewana, 1992), song 47.437-114.2 s, 123 BPM: paint spec (style, negative, cast, face, shots), the seeds picked after the candidates (picks), the 21-shot cut and the 10 sung lines. Cut times are given as t1 (MV seconds) because they were measured before analyse_song.py existed; for a new song use bars.",
+ "song": {
+  "title": "Sochenge Tumhe Pyar",
+  "mv0": 51.937,
+  "end": 114.2,
+  "bpm": 123.05,
+  "mood": "romantic, longing, 90s Bollywood"
+ },
+ "intro": {
+  "title": "Sochenge Tumhe Pyar",
+  "tile": "सोचेंगे",
+  "tile_rgb": [
+   [
+    232,
+    92,
+    110
+   ],
+   [
+    192,
+    62,
+    85
+   ]
+  ],
+  "file_label": "Video · 66.8 s",
+  "flow_mark": false,
+  "lines": [
+   "Hook found at 0:52, the mukhda twice and the antara, 123 BPM.",
+   "Painted 21 scenes in a soft semi-realistic style: the grass and",
+   "the daisy, the swing, her window, the dream among the stars,",
+   "the bazaar, two terraces at night, the sunset under the tree.",
+   "Every face repainted in close-up: eyes, nose and lips.",
+   "Animating each painting: camera moves, depth, petals, a cloud heart,",
+   "lyrics word by word, zoom-blur cuts on the beat. 1080x1920, 30 fps."
+  ]
+ },
+ "style": "Beautiful semi-realistic digital painting, smooth soft shading, painterly brushwork, gentle warm light:",
+ "negative": "photo, 3d render, anime, cartoon, oversharpened, harsh contrast, hdr, glowing outlines, deformed face, asymmetrical eyes, cross-eyed, bad anatomy, extra fingers, bad hands, duplicate person, blurry, lowres, text, watermark",
+ "cast": {
+  "K": "a handsome young Indian man in a brown shirt, with thick wavy black hair and light stubble",
+  "N": "a beautiful young Indian woman in a pink salwar kameez, with long wavy black hair, a red bindi and gold jhumkas"
+ },
+ "face": {
+  "K": "a handsome young Indian man with thick wavy black hair, light stubble and warm brown skin",
+  "N": "a beautiful young Indian woman with long black hair, a small red bindi and gold jhumka earrings",
+  "": "a young Indian person with warm brown skin",
+  "?": "a young Indian person with warm brown skin, a gentle smile"
+ },
+ "shots": {
+  "hill": {
+   "prompt": "{K} lying alone on his back in tall golden grass at sunset, holding a white daisy above his smiling face",
+   "seeds": [
+    211,
+    212
+   ],
+   "faces": "K"
+  },
+  "hillclose": {
+   "prompt": "close-up of {K} lying in golden grass at sunset, eyes closed, gentle smile, daisies around him",
+   "seeds": [
+    221,
+    222
+   ],
+   "faces": "K",
+   "eyes": "closed"
+  },
+  "heart": {
+   "prompt": "a golden sunset sky with soft pink clouds and warm glowing light, wide and empty, no people",
+   "seeds": [
+    231,
+    232
+   ],
+   "faces": ""
+  },
+  "swing": {
+   "prompt": "{N} alone, laughing on a wooden swing under an old banyan tree at golden hour, her pink dupatta flying",
+   "seeds": [
+    241,
+    242
+   ],
+   "faces": "N"
+  },
+  "window": {
+   "prompt": "{N} alone, leaning on an open wooden window with pink bougainvillea, chin on her palm, dreamy shy smile",
+   "seeds": [
+    251,
+    252
+   ],
+   "faces": "N"
+  },
+  "daisy": {
+   "prompt": "close-up of a hand gently picking a white petal from a daisy, white petals falling, golden grass blurred behind",
+   "seeds": [
+    261,
+    262
+   ],
+   "faces": ""
+  },
+  "bed": {
+   "prompt": "{K} lying awake alone in bed at night, smiling, moonlight from a window across the white sheets",
+   "seeds": [
+    271,
+    272
+   ],
+   "faces": "K"
+  },
+  "bedcalm": {
+   "prompt": "{K} sleeping peacefully alone in bed at night, a gentle smile, soft moonlight on his face and pillow",
+   "seeds": [
+    273,
+    274
+   ],
+   "faces": "K",
+   "eyes": "closed"
+  },
+  "eye": {
+   "prompt": "extreme close-up of one dark brown eye of a young Indian woman, kohl eyeliner, long lashes, golden sparkles",
+   "seeds": [
+    281,
+    282
+   ],
+   "faces": ""
+  },
+  "dream": {
+   "prompt": "{N} twirling alone in a dreamy night sky full of stars beside a big golden moon, her pink dupatta swirling",
+   "seeds": [
+    291,
+    292
+   ],
+   "faces": "N"
+  },
+  "dream2": {
+   "prompt": "{N} dancing alone among stars and glowing pink clouds in a dream, smiling, her long hair flowing",
+   "seeds": [
+    293,
+    294
+   ],
+   "faces": "N"
+  },
+  "box": {
+   "prompt": "an open old wooden box with folded love letters and red roses on a wooden table, warm lamp light, no people",
+   "seeds": [
+    301,
+    302
+   ],
+   "faces": ""
+  },
+  "bazaar": {
+   "prompt": "{N} standing alone in a crowded old Indian bazaar at dusk under warm string lights, looking around, searching",
+   "seeds": [
+    311,
+    312
+   ],
+   "faces": "N"
+  },
+  "found": {
+   "prompt": "close-up of {N} in a bazaar at dusk, warm string lights behind her, her face lighting up with a happy smile",
+   "seeds": [
+    321,
+    322
+   ],
+   "faces": "N"
+  },
+  "kterrace": {
+   "prompt": "{K} standing alone on the flat terrace of an old Indian house at night, smiling across the lane, starry sky",
+   "seeds": [
+    331,
+    332
+   ],
+   "faces": "K"
+  },
+  "nterrace": {
+   "prompt": "{N} standing alone on the flat terrace of an old Indian house at night, smiling shyly, starry sky",
+   "seeds": [
+    341,
+    342
+   ],
+   "faces": "N"
+  },
+  "sunset": {
+   "prompt": "a young Indian man in a cream shirt and a young Indian woman in a pink salwar kameez smiling at each other under a flowering tree at sunset",
+   "seeds": [
+    351,
+    352
+   ],
+   "faces": "??"
+  }
+ },
+ "steps": 5,
+ "cfg": 2.0,
+ "sampler": "dpm",
+ "picks": [
+  "heart:231",
+  "heart:232:heart2",
+  "daisy:261",
+  "eye:281",
+  "box:301",
+  "box:302:box2",
+  "hill:212",
+  "hillclose:221",
+  "swing:241",
+  "swing:242:swing2",
+  "window:251",
+  "window:252:window2",
+  "bed:271",
+  "bedcalm:274",
+  "dream:291",
+  "dream2:294",
+  "bazaar:312",
+  "found:321",
+  "kterrace:331",
+  "nterrace:342",
+  "sunset:351"
+ ],
+ "cut": [
+  {
+   "img": "hill",
+   "t1": 3.952,
+   "z": [
+    1.04,
+    1.18
+   ],
+   "c": [
+    [
+     0.5,
+     0.52
+    ],
+    [
+     0.45,
+     0.4
+    ]
+   ],
+   "par": [
+    0,
+    34
+   ],
+   "d0": 0.4,
+   "fx": [
+    {
+     "kind": "dust",
+     "n": 24,
+     "alpha": 0.8
+    }
+   ],
+   "out": "whipup",
+   "out_d": 0.34
+  },
+  {
+   "img": "heart",
+   "t1": 5.902,
+   "z": [
+    1.04,
+    1.22
+   ],
+   "c": [
+    [
+     0.48,
+     0.52
+    ],
+    [
+     0.4,
+     0.4
+    ]
+   ],
+   "par": [
+    -18,
+    0
+   ],
+   "d0": 0.5,
+   "ease": "in",
+   "overlays": [
+    {
+     "kind": "heart",
+     "x": 700,
+     "y": 300,
+     "size": 470,
+     "form": 1.6
+    }
+   ],
+   "out": "zoom",
+   "out_d": 0.4
+  },
+  {
+   "img": "swing",
+   "t1": 7.783,
+   "z": [
+    1.08,
+    1.2
+   ],
+   "c": [
+    [
+     0.52,
+     0.48
+    ],
+    [
+     0.52,
+     0.36
+    ]
+   ],
+   "swing": [
+    1.4,
+    1.95
+   ],
+   "par": [
+    24,
+    0
+   ],
+   "d0": 0.45,
+   "fx": [
+    {
+     "kind": "petals",
+     "n": 8,
+     "alpha": 0.8
+    }
+   ],
+   "out": "whip",
+   "out_d": 0.3
+  },
+  {
+   "img": "window",
+   "t1": 11.591,
+   "z": [
+    1.05,
+    1.24
+   ],
+   "c": [
+    [
+     0.55,
+     0.48
+    ],
+    [
+     0.58,
+     0.34
+    ]
+   ],
+   "dolly": 0.12,
+   "d0": 0.55,
+   "fx": [
+    {
+     "kind": "petals",
+     "n": 6,
+     "alpha": 0.7,
+     "t_off": 1.2
+    },
+    {
+     "kind": "dust",
+     "n": 14,
+     "alpha": 0.6
+    }
+   ],
+   "out": "zoom",
+   "out_d": 0.4
+  },
+  {
+   "img": "hillclose",
+   "t1": 13.518,
+   "z": [
+    1.04,
+    1.16
+   ],
+   "c": [
+    [
+     0.54,
+     0.5
+    ],
+    [
+     0.57,
+     0.36
+    ]
+   ],
+   "par": [
+    0,
+    -18
+   ],
+   "d0": 0.5,
+   "fx": [
+    {
+     "kind": "dust",
+     "n": 18,
+     "alpha": 0.7
+    }
+   ],
+   "out": "whip",
+   "out_d": 0.3
+  },
+  {
+   "img": "daisy",
+   "t1": 15.399,
+   "z": [
+    1.06,
+    1.2
+   ],
+   "c": [
+    [
+     0.5,
+     0.5
+    ],
+    [
+     0.47,
+     0.4
+    ]
+   ],
+   "par": [
+    -20,
+    0
+   ],
+   "d0": 0.5,
+   "fx": [
+    {
+     "kind": "petals",
+     "n": 14
+    }
+   ],
+   "out": "flash",
+   "out_d": 0.3
+  },
+  {
+   "img": "bed",
+   "t1": 19.23,
+   "z": [
+    1.08,
+    1.22
+   ],
+   "c": [
+    [
+     0.5,
+     0.48
+    ],
+    [
+     0.47,
+     0.36
+    ]
+   ],
+   "rot": [
+    -2.2,
+    2.2
+   ],
+   "grade": "night",
+   "d0": 0.5,
+   "fx": [
+    {
+     "kind": "dust",
+     "n": 16,
+     "alpha": 0.5
+    }
+   ],
+   "out": "fade",
+   "out_d": 0.45
+  },
+  {
+   "img": "eye",
+   "t1": 23.038,
+   "z": [
+    1.04,
+    2.1
+   ],
+   "c": [
+    [
+     0.54,
+     0.5
+    ],
+    [
+     0.615,
+     0.475
+    ]
+   ],
+   "ease": "in",
+   "d0": 0.5,
+   "out": "zoom",
+   "out_d": 0.46
+  },
+  {
+   "img": "dream",
+   "t1": 26.87,
+   "z": [
+    1.06,
+    1.18
+   ],
+   "c": [
+    [
+     0.52,
+     0.5
+    ],
+    [
+     0.55,
+     0.38
+    ]
+   ],
+   "rot": [
+    1.8,
+    -1.8
+   ],
+   "d0": 0.45,
+   "fx": [
+    {
+     "kind": "stars",
+     "n": 26,
+     "area": [
+      60,
+      40,
+      1860,
+      520
+     ]
+    },
+    {
+     "kind": "bokeh",
+     "n": 10,
+     "alpha": 0.6
+    }
+   ],
+   "out": "fade",
+   "out_d": 0.4
+  },
+  {
+   "img": "box",
+   "t1": 30.678,
+   "z": [
+    1.05,
+    1.2
+   ],
+   "c": [
+    [
+     0.52,
+     0.52
+    ],
+    [
+     0.6,
+     0.48
+    ]
+   ],
+   "par": [
+    0,
+    20
+   ],
+   "d0": 0.5,
+   "fx": [
+    {
+     "kind": "dust",
+     "n": 22,
+     "alpha": 0.7
+    }
+   ],
+   "out": "whip",
+   "out_d": 0.3
+  },
+  {
+   "img": "dream2",
+   "t1": 32.582,
+   "z": [
+    1.12,
+    1.25
+   ],
+   "c": [
+    [
+     0.4,
+     0.4
+    ],
+    [
+     0.38,
+     0.3
+    ]
+   ],
+   "rot": [
+    -1.5,
+    1.0
+   ],
+   "fx": [
+    {
+     "kind": "stars",
+     "n": 20,
+     "area": [
+      60,
+      40,
+      1860,
+      1000
+     ]
+    }
+   ],
+   "out": "whip",
+   "out_d": 0.3
+  },
+  {
+   "img": "swing2",
+   "t1": 34.486,
+   "z": [
+    1.1,
+    1.22
+   ],
+   "c": [
+    [
+     0.62,
+     0.42
+    ],
+    [
+     0.64,
+     0.32
+    ]
+   ],
+   "swing": [
+    1.2,
+    1.95
+   ],
+   "fx": [
+    {
+     "kind": "petals",
+     "n": 6,
+     "alpha": 0.7
+    }
+   ],
+   "out": "whip",
+   "out_d": 0.3
+  },
+  {
+   "img": "box2",
+   "t1": 36.39,
+   "z": [
+    1.1,
+    1.25
+   ],
+   "c": [
+    [
+     0.5,
+     0.46
+    ],
+    [
+     0.48,
+     0.4
+    ]
+   ],
+   "fx": [
+    {
+     "kind": "dust",
+     "n": 18,
+     "alpha": 0.7
+    }
+   ],
+   "out": "whip",
+   "out_d": 0.3
+  },
+  {
+   "img": "window2",
+   "t1": 38.317,
+   "z": [
+    1.12,
+    1.24
+   ],
+   "c": [
+    [
+     0.6,
+     0.4
+    ],
+    [
+     0.62,
+     0.3
+    ]
+   ],
+   "fx": [
+    {
+     "kind": "dust",
+     "n": 12,
+     "alpha": 0.6
+    }
+   ],
+   "out": "zoom",
+   "out_d": 0.4
+  },
+  {
+   "img": "bazaar",
+   "t1": 42.125,
+   "z": [
+    1.04,
+    1.18
+   ],
+   "c": [
+    [
+     0.5,
+     0.52
+    ],
+    [
+     0.54,
+     0.4
+    ]
+   ],
+   "par": [
+    26,
+    0
+   ],
+   "d0": 0.4,
+   "fx": [
+    {
+     "kind": "bokeh",
+     "n": 16
+    }
+   ],
+   "out": "whipup",
+   "out_d": 0.32
+  },
+  {
+   "img": "kterrace",
+   "t1": 45.933,
+   "z": [
+    1.1,
+    1.26
+   ],
+   "c": [
+    [
+     0.5,
+     0.48
+    ],
+    [
+     0.56,
+     0.36
+    ]
+   ],
+   "grade": "night",
+   "d0": 0.45,
+   "fx": [
+    {
+     "kind": "stars",
+     "n": 18,
+     "area": [
+      0,
+      0,
+      1920,
+      360
+     ]
+    }
+   ],
+   "out": "whip",
+   "out_d": 0.3
+  },
+  {
+   "img": "nterrace",
+   "t1": 47.861,
+   "z": [
+    1.1,
+    1.24
+   ],
+   "c": [
+    [
+     0.5,
+     0.42
+    ],
+    [
+     0.52,
+     0.3
+    ]
+   ],
+   "grade": "night",
+   "d0": 0.45,
+   "fx": [
+    {
+     "kind": "stars",
+     "n": 14,
+     "area": [
+      0,
+      0,
+      1920,
+      260
+     ]
+    }
+   ],
+   "out": "flash",
+   "out_d": 0.3
+  },
+  {
+   "img": "found",
+   "t1": 49.765,
+   "z": [
+    1.08,
+    1.2
+   ],
+   "c": [
+    [
+     0.54,
+     0.44
+    ],
+    [
+     0.55,
+     0.36
+    ]
+   ],
+   "d0": 0.5,
+   "fx": [
+    {
+     "kind": "bokeh",
+     "n": 14
+    }
+   ],
+   "out": "fade",
+   "out_d": 0.4
+  },
+  {
+   "img": "bedcalm",
+   "t1": 51.692,
+   "z": [
+    1.15,
+    1.28
+   ],
+   "c": [
+    [
+     0.48,
+     0.45
+    ],
+    [
+     0.46,
+     0.36
+    ]
+   ],
+   "rot": [
+    1.5,
+    -1.5
+   ],
+   "grade": "night",
+   "fx": [
+    {
+     "kind": "dust",
+     "n": 12,
+     "alpha": 0.5
+    }
+   ],
+   "out": "whipup",
+   "out_d": 0.32
+  },
+  {
+   "img": "heart2",
+   "t1": 53.596,
+   "z": [
+    1.15,
+    1.3
+   ],
+   "c": [
+    [
+     0.4,
+     0.42
+    ],
+    [
+     0.38,
+     0.38
+    ]
+   ],
+   "overlays": [
+    {
+     "kind": "heart",
+     "x": 700,
+     "y": 330,
+     "size": 500,
+     "form": 0.01
+    }
+   ],
+   "fx": [
+    {
+     "kind": "petals",
+     "n": 8,
+     "alpha": 0.7
+    }
+   ],
+   "out": "zoom",
+   "out_d": 0.4
+  },
+  {
+   "img": "sunset",
+   "z": [
+    1.03,
+    1.2
+   ],
+   "c": [
+    [
+     0.5,
+     0.52
+    ],
+    [
+     0.45,
+     0.4
+    ]
+   ],
+   "par": [
+    0,
+    22
+   ],
+   "d0": 0.45,
+   "fx": [
+    {
+     "kind": "petals",
+     "n": 12,
+     "alpha": 0.85
+    },
+    {
+     "kind": "bokeh",
+     "n": 10,
+     "alpha": 0.6
+    }
+   ]
+  }
+ ],
+ "lines": [
+  {
+   "words": [
+    [
+     "सोचेंगे",
+     52.0
+    ],
+    [
+     "तुम्हें",
+     53.4
+    ],
+    [
+     "प्यार",
+     53.9
+    ],
+    [
+     "करें",
+     55.8
+    ],
+    [
+     "के",
+     57.06
+    ],
+    [
+     "नहीं",
+     57.38
+    ]
+   ],
+   "end": 59.2
+  },
+  {
+   "words": [
+    [
+     "सोचेंगे",
+     59.3
+    ],
+    [
+     "तुम्हें",
+     61.0
+    ],
+    [
+     "प्यार",
+     61.56
+    ],
+    [
+     "करें",
+     62.9
+    ],
+    [
+     "के",
+     64.72
+    ],
+    [
+     "नहीं",
+     65.04
+    ]
+   ],
+   "end": 67.1
+  },
+  {
+   "words": [
+    [
+     "ये",
+     67.3
+    ],
+    [
+     "दिल",
+     68.2
+    ],
+    [
+     "बेक़रार",
+     68.62
+    ],
+    [
+     "करें",
+     71.42
+    ],
+    [
+     "के",
+     72.32
+    ],
+    [
+     "नहीं",
+     72.7
+    ]
+   ],
+   "end": 74.05
+  },
+  {
+   "words": [
+    [
+     "ख़्वाबों",
+     74.18
+    ],
+    [
+     "में",
+     76.14
+    ],
+    [
+     "छुपाया",
+     76.46
+    ],
+    [
+     "तुमको",
+     77.66
+    ]
+   ],
+   "end": 78.55
+  },
+  {
+   "words": [
+    [
+     "यादों",
+     78.72
+    ],
+    [
+     "में",
+     79.94
+    ],
+    [
+     "बसाया",
+     80.28
+    ],
+    [
+     "तुमको",
+     81.44
+    ]
+   ],
+   "end": 82.5
+  },
+  {
+   "words": [
+    [
+     "ख़्वाबों",
+     82.66
+    ],
+    [
+     "में",
+     83.86
+    ],
+    [
+     "छुपाया",
+     84.12
+    ],
+    [
+     "तुमको",
+     85.26
+    ]
+   ],
+   "end": 86.15
+  },
+  {
+   "words": [
+    [
+     "यादों",
+     86.26
+    ],
+    [
+     "में",
+     87.58
+    ],
+    [
+     "बसाया",
+     87.88
+    ],
+    [
+     "तुमको",
+     89.02
+    ]
+   ],
+   "end": 90.05
+  },
+  {
+   "words": [
+    [
+     "मिलोगे",
+     90.18
+    ],
+    [
+     "हमें",
+     91.72
+    ],
+    [
+     "तुम",
+     92.54
+    ],
+    [
+     "जानम",
+     92.98
+    ],
+    [
+     "कहीं",
+     94.08
+    ],
+    [
+     "ना",
+     95.24
+    ],
+    [
+     "कहीं",
+     95.6
+    ]
+   ],
+   "end": 97.6
+  },
+  {
+   "words": [
+    [
+     "सोचेंगे",
+     98.12
+    ],
+    [
+     "तुम्हें",
+     99.14
+    ],
+    [
+     "प्यार",
+     99.64
+    ],
+    [
+     "करें",
+     101.42
+    ],
+    [
+     "के",
+     102.86
+    ],
+    [
+     "नहीं",
+     103.18
+    ]
+   ],
+   "end": 104.9
+  },
+  {
+   "words": [
+    [
+     "ये",
+     105.02
+    ],
+    [
+     "दिल",
+     106.34
+    ],
+    [
+     "बेक़रार",
+     106.9
+    ],
+    [
+     "करें",
+     108.92
+    ],
+    [
+     "के",
+     110.6
+    ],
+    [
+     "नहीं",
+     110.92
+    ]
+   ],
+   "end": 112.9
+  }
+ ],
+ "captions": {
+  "y": 955,
+  "size": 62
+ }
+}

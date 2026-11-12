@@ -1,0 +1,54 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Laptop on a dark desk</title>
+<style>html, body { margin: 0; background: #000; } canvas { display: block; }</style></head>
+<body><canvas id="cv" width="1536" height="2752"></canvas>
+<script>
+'use strict';
+// A laptop on a dark desk at night, keyboard glowing purple and pink, the screen a flat green (#00ff00) so the
+// intro renderer can find it and put the chat and the player on it. Drawn with shapes; window.png() returns it.
+const cv = document.getElementById('cv'), g = cv.getContext('2d'), W = cv.width, H = cv.height;
+const lin = (x0, y0, x1, y1, st) => { const r = g.createLinearGradient(x0, y0, x1, y1); st.forEach(([o, c]) => r.addColorStop(o, c)); return r; };
+const rad = (x, y, r0, r1, st) => { const r = g.createRadialGradient(x, y, r0, x, y, r1); st.forEach(([o, c]) => r.addColorStop(o, c)); return r; };
+function poly(p) { g.beginPath(); g.moveTo(p[0][0], p[0][1]); for (const q of p.slice(1)) g.lineTo(q[0], q[1]); g.closePath(); }
+function rr(x, y, w, h, r) { g.beginPath(); g.roundRect(x, y, w, h, r); }
+function glow(x, y, r, c, a = 1) { g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = a; g.fillStyle = rad(x, y, 0, r, [[0, c], [1, 'rgba(0,0,0,0)']]); g.fillRect(x - r, y - r, 2 * r, 2 * r); g.restore(); }
+function draw() {
+  // room
+  g.fillStyle = lin(0, 0, 0, H, [[0, '#07050c'], [0.45, '#140d20'], [0.62, '#1b1128'], [1, '#08060b']]); g.fillRect(0, 0, W, H);
+  glow(W / 2, 1500, 900, 'rgba(120,50,170,0.35)');
+  // desk
+  poly([[0, 1640], [W, 1640], [W, H], [0, H]]); g.fillStyle = lin(0, 1640, 0, H, [[0, '#1c1424'], [1, '#09070c']]); g.fill();
+  g.fillStyle = 'rgba(255,255,255,0.03)'; for (let i = 0; i < 30; i++) g.fillRect(0, 1650 + i * 40, W, 2);
+  glow(W / 2, 2020, 760, 'rgba(200,70,220,0.55)'); glow(W / 2 - 200, 2100, 420, 'rgba(255,90,200,0.35)'); glow(W / 2 + 260, 2080, 420, 'rgba(140,80,255,0.35)');
+  // lid and screen
+  const L = 168, R = W - 168, top = 980, bot = 1700;
+  poly([[L - 10, top - 14], [R + 10, top - 14], [R + 24, bot + 6], [L - 24, bot + 6]]); g.fillStyle = '#121016'; g.fill();
+  poly([[L + 22, top + 20], [R - 22, top + 20], [R - 8, bot - 26], [L + 8, bot - 26]]); g.fillStyle = '#00ff00'; g.fill();
+  // base with the keyboard in perspective
+  const by0 = bot + 6, by1 = 2250;
+  poly([[L - 24, by0], [R + 24, by0], [R + 150, by1], [L - 150, by1]]); g.fillStyle = lin(0, by0, 0, by1, [[0, '#2b2733'], [1, '#1a1720']]); g.fill();
+  poly([[L - 150, by1], [R + 150, by1], [R + 140, by1 + 34], [L - 140, by1 + 34]]); g.fillStyle = '#0f0d13'; g.fill();
+  const kx0 = L + 30, kx1 = R - 30, ky0 = by0 + 40, ky1 = by0 + 330, rows = 6;
+  for (let r = 0; r < rows; r++) {
+    const v0 = r / rows, v1 = (r + 0.82) / rows, y0 = ky0 + (ky1 - ky0) * v0, y1 = ky0 + (ky1 - ky0) * v1;
+    const sp0 = (by1 - by0) ? (y0 - by0) / (by1 - by0) : 0, sp1 = (y1 - by0) / (by1 - by0);
+    const xl0 = kx0 - 160 * sp0, xr0 = kx1 + 160 * sp0, xl1 = kx0 - 160 * sp1, xr1 = kx1 + 160 * sp1, n = r === rows - 1 ? 9 : 15;
+    for (let k = 0; k < n; k++) {
+      let a = k / n, b = (k + 0.86) / n; if (r === rows - 1 && k === 4) { b = (k + 2.86) / n; }
+      if (r === rows - 1 && (k === 5 || k === 6)) continue;
+      const q = [[xl0 + (xr0 - xl0) * a, y0], [xl0 + (xr0 - xl0) * b, y0], [xl1 + (xr1 - xl1) * b, y1], [xl1 + (xr1 - xl1) * a, y1]];
+      g.save(); g.shadowColor = k % 3 ? 'rgba(220,90,255,0.9)' : 'rgba(255,110,210,0.9)'; g.shadowBlur = 18; poly(q); g.fillStyle = '#16121c'; g.fill(); g.restore();
+      poly(q); g.strokeStyle = k % 3 ? 'rgba(225,120,255,0.95)' : 'rgba(255,140,220,0.95)'; g.lineWidth = 3; g.stroke();
+      const cx = (q[0][0] + q[2][0]) / 2, cy = (q[0][1] + q[2][1]) / 2; g.fillStyle = 'rgba(255,200,255,0.65)'; g.fillRect(cx - 6, cy - 3, 12, 6);
+    }
+  }
+  // touchpad
+  poly([[W / 2 - 260, ky1 + 40], [W / 2 + 260, ky1 + 40], [W / 2 + 300, by1 - 50], [W / 2 - 300, by1 - 50]]); g.fillStyle = 'rgba(255,255,255,0.05)'; g.fill(); g.strokeStyle = 'rgba(200,140,255,0.35)'; g.lineWidth = 3; g.stroke();
+  glow(W / 2, by0 + 190, 700, 'rgba(210,90,255,0.28)');
+  // light the screen throws on the room
+  glow(W / 2, top + 300, 900, 'rgba(120,140,255,0.10)');
+}
+draw();
+window.png = () => cv.toDataURL('image/png');
+window.ready = true;
+</script></body></html>

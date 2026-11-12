@@ -1,6 +1,6 @@
 # Video skills for Claude Code (code-drawn animation)
 
-39 open-source Claude Code skills that make animated videos and music videos **entirely in code** (no image or video
+This repo's `painted-song-reel` skill (below) plus 39 open-source Claude Code skills that make animated videos and music videos **entirely in code** (no image or video
 generator): Claude writes the drawing code, a headless Chrome renders every frame, ffmpeg encodes the MP4.
 
 | skill | look | source |
@@ -18,14 +18,24 @@ generator): Claude writes the drawing code, a headless Chrome renders every fram
 All MIT. Pinned to the commits reviewed on 2026-11-12 (scripts read for remote-code execution and data leaks: none;
 the bundled media tools' telemetry is switched off by the installer with `DO_NOT_TRACK=1`).
 
+## This repo's own skill: `painted-song-reel`
+A painted-style animated music-video reel for ANY song (the format of the viral "painted-style music video made with
+Claude" reels): "Claude x song" laptop intro, rotate-your-phone card, then a sideways music video of semi-realistic
+paintings of original characters moved by the camera (depth parallax, petals / rain / stars, cuts on the downbeat) with
+karaoke lyric strips from the first sung word. Story, palette and painting style follow the song's mood and lyrics
+(`painted-song-reel/reference/moods.md`). Everything runs locally on CPU with open-source models (DreamShaper XL
+Lightning + a face-repair pass, Depth Anything V2, faster-whisper, demucs): no Flow, no credits, about 1.5 hours a reel.
+Ask: "make a painted reel for this song" and attach the song. Source: `painted-song-reel/` (SKILL.md, scripts,
+reference); first use runs its `scripts/setup.sh` (packages, fonts, about 9 GB of models).
+
 ## Make them available
 
 - **This machine / any running session:** `bash video-skills/install-video-skills.sh` (installs into
   `~/.claude/skills`; Claude Code lists them immediately, no restart). In another session without this repo, ask
   Claude to run that script from the AIM-IT4/learning repo (branch `ccr-713d3cac-20zpd5`).
 - **Every new cloud session:** paste `video-skills/environment-setup-script.sh` into the environment's settings
-  (cloud environment menu in the session title bar -> Edit -> Setup script). It installs these skills and flow-mcp,
-  and needs nothing from this repo.
+  (cloud environment menu in the session title bar -> Edit -> Setup script). It installs these skills,
+  painted-song-reel (fetched from this public repo) and flow-mcp.
 - Requirements (already in the cloud image): Node 22, ffmpeg, Chrome. Each engine's project gets its npm packages
   when scaffolded: `bash ~/.claude/skills/<engine>/scripts/new_project.sh <dir>`.
 

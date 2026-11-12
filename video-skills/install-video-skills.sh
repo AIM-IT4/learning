@@ -9,6 +9,7 @@
 #   tuzhechen2005/painted-animation MIT  kinetic-reel (its painted-animation is the same engine as reelmimic's)
 #   am-will/music-video-reimagined  MIT  music-video-reimagined (remake a music video as a hand-painted cartoon)
 #   cth9191/animate                 MIT  animate (procedural animation: cut paper, ink, riso, sketchbook, pixel, ...)
+#   ./painted-song-reel (this repo)       painted-song-reel (painted music-video reel for any song, local painter)
 #
 # Not installed: reelmimic's .claude/settings.json hooks (they drive its own app) and Joker-chichi/claude-mv-skill
 # (a copy of painted-animation with extra intake rules). Telemetry of the bundled media tools is switched off.
@@ -36,6 +37,9 @@ put "$TMP/painted/skills/kinetic-reel" kinetic-reel
 put "$TMP/reimagined/skills/music-video-reimagined" music-video-reimagined
 put "$TMP/animate/plugins/animate/skills/animate" animate
 n=$((n + 3))
+# this repo's own skill: painted-song-reel (a painted music-video reel for any song; see painted-song-reel/SKILL.md)
+HERE="$(cd "$(dirname "$0")" && pwd)"
+if [ -d "$HERE/painted-song-reel" ]; then put "$HERE/painted-song-reel" painted-song-reel; n=$((n + 1)); fi
 # the reelmimic docs give project-relative paths (.claude/skills/...); point them at the user-level install
 find "$DEST" -name '*.md' -path '*skills*' -print0 | xargs -0 sed -i -E 's#([ `"(])\.claude/skills/#\1~/.claude/skills/#g'
 

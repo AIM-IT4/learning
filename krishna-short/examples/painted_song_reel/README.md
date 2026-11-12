@@ -1,5 +1,8 @@
 # Painted song reel ("Claude x song", rotate your phone)
 
+Packaged for any song as the Claude Code skill `painted-song-reel` (`video-skills/painted-song-reel`: song analysis,
+mood guide, painter with face repair, renderer, intro, assembly). This folder keeps the first reel's working files.
+
 A ~28 s vertical (1080x1920) reel for any song, in the format of the viral "painted-style animated music video"
 reels: a laptop on a dark desk with a glowing keyboard and two tiles on top ("Claude" x the song), the screen showing
 the chat that made it and then a player opening on the finished video; a one-second "PLEASE ROTATE YOUR PHONE" card
