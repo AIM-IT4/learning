@@ -1,6 +1,7 @@
 """Original music beds, synthesised with numpy/scipy (no samples, nothing copyrighted).
 usage: python3 bed_synth.py <style> <seconds> <out.wav> [--hit SECONDS]
 styles: pop (UI, 112 bpm, C major) | marimba (curious ostinato, 96 bpm, D dorian) | pulse (confident, 100 bpm, A minor)
+        | space (slow pads, 76 bpm, E minor) | tiles (bouncy marimba groove, 104 bpm, F major)
 --hit puts a riser into a final hit at that time (the end card), then a soft tail."""
 import argparse
 import numpy as np
@@ -104,6 +105,12 @@ def build(style, seconds, hit):
     elif style == "marimba":
         bpm, prog = 96, [(38, (62, 65, 69)), (36, (60, 64, 67)), (43, (62, 67, 71)), (38, (62, 65, 69))]   # Dm C G Dm (dorian)
         arp = [0, 2, 1, 2]
+    elif style == "space":
+        bpm, prog = 76, [(40, (64, 67, 71)), (36, (60, 64, 67)), (43, (62, 67, 71)), (38, (62, 66, 69))]   # Em C G D
+        arp = [0, 2, 1, 2]
+    elif style == "tiles":
+        bpm, prog = 104, [(41, (65, 69, 72)), (38, (62, 65, 69)), (46, (62, 65, 70)), (48, (64, 67, 72))]  # F Dm Bb C
+        arp = [0, 1, 2, 1]
     else:
         bpm, prog = 100, [(45, (57, 60, 64)), (41, (57, 60, 65)), (48, (60, 64, 67)), (43, (59, 62, 67))]   # Am F C G
         arp = [0, 1, 2, 1]
@@ -136,6 +143,24 @@ def build(style, seconds, hit):
             for k in range(8):
                 place(dry, hat(0.35 if k % 2 else 0.18, 110), t0 + k * beat / 2)
             if b >= 2: place(dry, kick(0.22), t0)
+        elif style == "space":
+            place(wet_in, pad(chord, bar + 0.6, 0.13, 1300), t0)
+            place(dry, sub(root - 12, bar * 0.95, 0.10), t0)
+            for k in (0, 2):
+                place(wet_in, pluck(chord[arp[(b + k) % 4]] + 24, 1.2, 0.05, 0.4), t0 + k * beat)
+            for k in range(4):
+                place(dry, hat(0.16, 140), t0 + k * beat)
+            if b >= 3: place(dry, kick(0.18), t0)
+        elif style == "tiles":
+            place(wet_in, pad(chord, bar + 0.4, 0.07, 1500), t0)
+            place(dry, sub(root - 12, bar * 0.95, 0.11), t0)
+            for k in range(8):
+                m = chord[arp[k % 4]] + (12 if k >= 4 else 0)
+                place(wet_in, marimba(m, 0.45, 0.13), t0 + k * beat / 2)
+                place(dry, hat(0.4 if k % 2 else 0.2, 100), t0 + k * beat / 2)
+            if b >= 1:
+                place(dry, kick(0.3), t0); place(dry, kick(0.3), t0 + 2 * beat)
+            if b >= 2: place(wet_in, clap(0.28), t0 + 3 * beat)
         else:
             place(wet_in, pad(chord, bar + 0.4, 0.11, 2200), t0)
             for k in range(8):

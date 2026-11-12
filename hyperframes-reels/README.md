@@ -12,8 +12,11 @@ with a `SPEC.md` that gives the script, the palette and every shot as a number.
 | `shape/` | एक शेप, छह काम — one shape morphs through six UI jobs, an oversized cursor clicks each | 20.0 s | Manish (consented, saved voice) | house style, dot-grid canvas |
 | `recur/` | रिकर्शन, तीन अंदाज़ में — code + call stack, nesting dolls, a Droste tunnel | 29.5 s | Manish | house style, three genres |
 | `site3d/` | Desk2Quant laid flat — the live site in 3D, a camera glides over its real words | 28.5 s | Manish | the site itself, captured and stitched |
+| `maze/` | भूलभुलैया — one Truchet tile, random turns, a maze (card-flip waves, seamless two-colour rule) | 19.2 s | Manish | house style |
+| `tess/` | चौथा आयाम — point, line, square, cube, tesseract; 4D maths drawn every frame | 24.9 s | Manish | house style, axis colours |
+| `eqd/` | Equity Derivatives Quant Notes & Code — a one-take launch film over the product's real cover | 22.4 s | Manish | the product cover |
 
-The last three follow prompt-motion.com entries: shape morphing through UI states and the landing page 3D scroll
+The shape, recursion and site reels follow prompt-motion.com entries: shape morphing through UI states and the landing page 3D scroll
 (@twoclipping), and recursion explained in genres (@emollick). Their music beds are synthesised by `tools/bed_synth.py`
 (numpy, no samples). The site reel's page comes from `tools/site_capture/` (screen-by-screen capture of the live site, stitched,
 cut into tiles) and its highlight boxes from the same script's word measurements; every claim on screen is on the live page.
@@ -44,3 +47,8 @@ private studio repo (`d2q-private-uploads/studio/voices`). No audio, fonts or re
    background job; a detached render is cancelled when its parent exits; it needs ~1 GB free disk).
 6. The render masters at about −12.5 LUFS; trim the audio to about −14 LUFS for Reels and Shorts:
    `ffmpeg -i in.mp4 -map 0 -c:v copy -af volume=-1.5dB -c:a aac -b:a 192k -movflags +faststart out.mp4`.
+
+Round 3 (maze, tess, eqd) follows three more prompt-motion.com entries: the most popular one (a looping Truchet pattern), the
+wireframe cube, and the keynote-style launch film. Voice notes: this voice softens aspirated छ and भ and garbles very short lines,
+so "साधारण" replaces "छोटी", "साया" replaces "परछाईं", "डिस्काउंट" replaces "छूट", English product terms are written in Latin
+script, and "नया लॉन्च" is shown, not spoken. `tools/mkindex.py` writes a root index.html from a list of sound effects.

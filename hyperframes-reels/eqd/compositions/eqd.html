@@ -1,0 +1,168 @@
+<template>
+  <style>
+    @font-face { font-family: "Yatra One"; src: url("assets/fonts/YatraOne.ttf"); }
+    @font-face { font-family: "Noto Sans Devanagari"; font-weight: 700; src: url("assets/fonts/NotoSansDevanagari_700Bold.ttf"); }
+    @font-face { font-family: "Poppins"; font-weight: 700; src: url("assets/fonts/Poppins_700Bold.ttf"); }
+    #root { position: absolute; inset: 0; background: #f7f7f3; overflow: hidden; }
+    #e-dots { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    /* camera: #e-tilt sits at the focal point (540, 900) and turns in 3D; #e-cam scales the 1200 px cover so (fx, fy) lands on the focal point */
+    #e-tilt { position: absolute; left: 540px; top: 900px; width: 0; height: 0; }
+    #e-cam { position: absolute; left: 0; top: 0; width: 1200px; height: 1200px; }
+    #e-cover { position: absolute; left: 0; top: 0; width: 1200px; height: 1200px; border-radius: 26px; background: url(assets/eqd-cover.webp) center / 100% 100% no-repeat;
+               box-shadow: 0 30px 80px rgba(18, 34, 31, 0.28); }
+    #e-skew { position: absolute; left: 0; top: 0; width: 1200px; height: 1200px; }
+    /* the top card */
+    #e-top { position: absolute; left: 60px; top: 230px; width: 960px; height: 258px; background: #ffffff; border: 4px solid #12221f; border-radius: 34px;
+             box-shadow: 0 14px 40px rgba(18, 34, 31, 0.18); overflow: hidden; }
+    .e-b { position: absolute; left: 0; top: 0; width: 952px; height: 250px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+           text-align: center; color: #12221f; font-family: "Noto Sans Devanagari"; font-weight: 700; }
+    #e-b1 .new { font-family: "Poppins"; font-weight: 700; font-size: 44px; letter-spacing: 6px; color: #12221f; background: #ffd23f; border: 4px solid #12221f;
+                 border-radius: 14px; padding: 2px 22px; }
+    #e-b1 .t { font-family: "Yatra One"; font-size: 150px; line-height: 1.1; margin-top: 6px; }
+    .e-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; width: 920px; }
+    .e-chip { padding: 6px 24px; border: 4px solid #12221f; border-radius: 40px; background: #ffffff; font-family: "Poppins"; font-weight: 700; font-size: 48px; line-height: 1.25; }
+    #e-b3 { flex-direction: row; gap: 26px; }
+    #e-b3 .num { font-family: "Poppins"; font-weight: 700; font-size: 210px; line-height: 1; color: #12221f; font-variant-numeric: tabular-nums; }
+    #e-b3 .lab { font-size: 84px; line-height: 1.1; text-align: left; }
+    #e-b4 .code { width: 860px; padding: 20px 32px; background: #12221f; border-radius: 26px; text-align: left; font-family: "JetBrains Mono"; font-size: 46px; line-height: 1.5;
+                  color: #f7f7f3; white-space: pre; }
+    #e-b4 .code b { color: #7fd6cf; font-weight: 400; } #e-b4 .code i { color: #ffd23f; font-style: normal; } #e-b4 .code u { color: #8aa39e; text-decoration: none; }
+    #e-url { position: absolute; left: 0; top: 925px; width: 1080px; text-align: center; font-family: "Poppins"; font-weight: 700; font-size: 92px; color: #12221f; letter-spacing: -1px; }
+    #e-live { position: absolute; left: 0; top: 858px; width: 1080px; display: flex; justify-content: center; }
+    #e-live span { display: flex; align-items: center; gap: 14px; padding: 4px 22px; border-radius: 30px; background: #0b7f79; color: #ffffff; font-family: "Poppins";
+                   font-weight: 700; font-size: 40px; letter-spacing: 3px; }
+    #e-live i { display: block; width: 18px; height: 18px; border-radius: 9px; background: #ffd23f; }
+    #e-ticket { position: absolute; left: 110px; top: 1075px; width: 860px; height: 170px; }
+    #e-ticket .tk { position: absolute; inset: 0; background: #ffd23f; border: 5px solid #12221f; border-radius: 22px; display: flex; align-items: center; padding: 0 34px; gap: 26px; }
+    #e-ticket .code { font-family: "JetBrains Mono"; font-weight: 700; font-size: 92px; letter-spacing: 6px; color: #12221f; }
+    #e-ticket .code span { display: inline-block; }
+    #e-ticket .sep { width: 0; height: 120px; border-left: 5px dashed #12221f; }
+    #e-ticket .off { font-family: "Poppins"; font-weight: 700; font-size: 70px; line-height: 1; color: #12221f; }
+    #e-ticket .off small { display: block; font-family: "Noto Sans Devanagari"; font-size: 34px; color: #12221f; margin-top: 6px; }
+    #e-note { position: absolute; left: 0; top: 1262px; width: 1080px; text-align: center; font-family: "Noto Sans Devanagari"; font-weight: 700; font-size: 30px; color: #4b5b58; }
+    .e-cap { position: absolute; left: 60px; top: 1330px; width: 960px; text-align: center; font-family: "Noto Sans Devanagari"; font-weight: 700; font-size: 46px;
+             line-height: 1.3; color: #12221f; text-wrap: balance; background: rgba(255, 255, 255, 0.95); border-radius: 20px; padding: 6px 10px; }
+    .e-cap span { display: inline-block; padding: 0 8px; margin: 0 1px; border-radius: 8px; opacity: 0.4; }
+  </style>
+  <div id="root" data-composition-id="eqd" data-width="1080" data-height="1920">
+    <svg id="e-dots" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg">
+      <defs><pattern id="e-dp" width="40" height="40" patternUnits="userSpaceOnUse"><circle cx="20" cy="20" r="2.2" fill="#12221f" /></pattern></defs>
+      <rect width="1080" height="1920" fill="url(#e-dp)" opacity="0.07" />
+    </svg>
+    <!-- the product's real cover (desk2quant.com/assets/images/covers/equity-derivatives-quant-notes-1200.webp) -->
+    <div id="e-tilt" data-layout-allow-overflow>
+      <div id="e-cam" data-layout-allow-overflow>
+        <div id="e-cover"></div>
+        <!-- the cover's own skew curve, traced again on "वॉल सरफ़ेसेज़" (cover coordinates) -->
+        <svg id="e-skew" viewBox="0 0 1200 1200" xmlns="http://www.w3.org/2000/svg">
+          <path id="e-curve" d="M 178 625 C 330 680, 520 742, 640 762 C 790 787, 900 800, 1000 798" fill="none" stroke="#ffd23f" stroke-width="16"
+                stroke-linecap="round" stroke-dasharray="900" stroke-dashoffset="900" />
+          <rect id="e-box1" x="70" y="972" width="340" height="132" rx="12" fill="none" stroke="#0b7f79" stroke-width="10" />
+          <rect id="e-box2" x="431" y="972" width="339" height="132" rx="12" fill="none" stroke="#0b7f79" stroke-width="10" />
+          <rect id="e-box3" x="791" y="972" width="339" height="132" rx="12" fill="none" stroke="#0b7f79" stroke-width="10" />
+        </svg>
+      </div>
+    </div>
+
+    <div id="e-top">
+      <div id="e-b1" class="e-b"><span class="new">NEW</span><span class="t">नया लॉन्च</span></div>
+      <div id="e-b2" class="e-b"><div class="e-chips"><span id="e-k1" class="e-chip">Forwards</span><span id="e-k2" class="e-chip">Futures</span>
+        <span id="e-k3" class="e-chip">Dividends</span><span id="e-k4" class="e-chip">Vol Surfaces</span><span id="e-k5" class="e-chip">Exotics</span></div></div>
+      <div id="e-b3" class="e-b"><span id="e-num" class="num">0</span><span class="lab">पन्ने</span></div>
+      <div id="e-b4" class="e-b"><div class="code"><b>import</b> eqd_lab
+<u># </u><i>25</i><u> Labs · </u><i>151</i><u> tests</u></div></div>
+    </div>
+    <div id="e-live"><span><i></i>LIVE</span></div>
+    <div id="e-url">desk2quant.com</div>
+    <div id="e-ticket"><div class="tk"><span class="code"><span id="e-q1">E</span><span id="e-q2">Q</span><span id="e-q3">D</span><span id="e-q4">20</span></span>
+      <span class="sep"></span><span class="off">20% OFF<small>लॉन्च ऑफ़र</small></span></div></div>
+    <div id="e-note">शैक्षिक सामग्री · ट्रेडिंग सलाह नहीं</div>
+
+    <div id="e-c2" class="e-cap"><span>Equity</span><span>Derivatives,</span><span>क्वांट</span><span>नोट्स</span><span>और</span><span>कोड।</span></div>
+    <div id="e-c3" class="e-cap"><span>Forwards,</span><span>Futures,</span><span>Dividends,</span></div>
+    <div id="e-c4" class="e-cap"><span>Vol</span><span>Surfaces,</span><span>और</span><span>Exotics।</span></div>
+    <div id="e-c5" class="e-cap"><span>दो</span><span>सौ</span><span>एक</span><span>पन्ने,</span><span>साथ</span><span>में</span><span>कोड।</span></div>
+    <div id="e-c6" class="e-cap"><span>अभी</span><span>लाइव</span><span>है,</span></div>
+    <div id="e-c7" class="e-cap"><span>डेस्क</span><span>टू</span><span>क्वांट</span><span>डॉट</span><span>कॉम</span><span>पर।</span></div>
+    <div id="e-c8" class="e-cap"><span>कोड</span><span>E</span><span>Q</span><span>D</span><span>20</span><span>से,</span></div>
+    <div id="e-c9" class="e-cap"><span>बीस</span><span>परसेंट</span><span>डिस्काउंट।</span></div>
+  </div>
+  <script>
+    (function () {
+      const V = 1.2;                                   // 1.2 s of poster and music before the voice; "नया लॉन्च" is on screen, not spoken
+      const W = [-1.0, -0.9, 0.0, 0.26, 1.55, 2.2, 2.48, 2.64, 3.27, 4.07, 5.07, 6.23, 6.41, 7.57, 7.71,
+                 8.92, 9.12, 9.34, 9.64, 10.82, 11.08, 11.22, 12.52, 12.76, 13.0, 13.87, 14.12, 14.3, 14.62, 14.82,
+                 15.08, 15.63, 15.81, 15.96, 16.11, 16.25, 16.47, 17.48, 17.71, 18.05];
+      const VO_END = 18.61;
+      const GROUPS = [6, 3, 4, 7, 3, 6, 6, 3];          // captions start at word 2 (words 0-1 are the unspoken poster)
+      const t = (i) => W[i] + V;
+      const tl = gsap.timeline({ paused: true });
+
+      // camera move: cover point (fx, fy) to the focal point at zoom s, with a 3D turn (ry, rx)
+      const cam = (at, d, c, ease = "power3.inOut") => {
+        tl.to("#e-cam", { x: -c.s * c.fx, y: -c.s * c.fy, scale: c.s, duration: d, ease }, at);
+        tl.to("#e-tilt", { rotationY: c.ry || 0, rotationX: c.rx || 0, duration: d, ease }, at);
+      };
+      gsap.set("#e-cam", { transformOrigin: "0 0", x: -0.62 * 600, y: -0.62 * 560, scale: 0.62 });
+      gsap.set("#e-tilt", { transformPerspective: 1700, rotationY: -26, rotationX: 10 });
+      gsap.set(["#e-b2", "#e-b3", "#e-b4", "#e-live", "#e-url", "#e-ticket", "#e-note", ".e-cap", ".e-chip", "#e-box1", "#e-box2", "#e-box3"], { opacity: 0 });
+
+      const beat = (from, to, at) => {
+        if (from) tl.to(from, { opacity: 0, y: -40, duration: 0.2, ease: "power2.in" }, at - 0.2);
+        tl.fromTo(to, { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 0.32, ease: "expo.out" }, at);
+      };
+
+      // 1 — the poster: NEW / नया लॉन्च over the cover turned in space; on the title it swings flat and fills the frame
+      tl.to("#e-tilt", { rotationY: -18, duration: t(2) - 0.2, ease: "none" }, 0);
+      cam(t(2) - 0.2, 1.0, { fx: 530, fy: 300, s: 1.0 });
+      // 2 — the five topics, one chip per word; the skew on the cover is traced again on "वॉल सरफ़ेसेज़"
+      beat("#e-b1", "#e-b2", t(8) - 0.05);
+      cam(t(8) - 0.3, 1.0, { fx: 600, fy: 600, s: 0.95, ry: 6, rx: 4 });   // title fully below the card, chart in the middle
+      [8, 9, 10, 11, 14].forEach((i, k) => tl.fromTo("#e-k" + (k + 1), { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2.5)" }, t(i)));
+      [8, 9, 10, 11, 14].forEach((i, k) => tl.to("#e-k" + (k + 1), { backgroundColor: "#ffd23f", duration: 0.15 }, t(i)));
+      tl.to("#e-curve", { attr: { "stroke-dashoffset": 0 }, duration: 0.8, ease: "power2.inOut" }, t(11));
+      // 3 — 201 pages: dive to the 201 box while the count runs
+      beat("#e-b2", "#e-b3", t(15) - 0.05);
+      cam(t(15) - 0.3, 0.8, { fx: 240, fy: 1037, s: 1.55 });
+      tl.fromTo("#e-box1", { opacity: 0 }, { opacity: 1, duration: 0.2 }, t(15));
+      const N = { v: 0 }, num = document.getElementById("e-num");
+      tl.fromTo(N, { v: 0 }, { v: 201, duration: 1.0, ease: "power2.out", immediateRender: false, onUpdate: () => { num.textContent = Math.round(N.v); } }, t(15));
+      // 4 — "साथ में कोड": across to the modules + code box, then the Q&A box; the card turns into code
+      beat("#e-b3", "#e-b4", t(19));
+      tl.to("#e-box1", { opacity: 0, duration: 0.15 }, t(19) - 0.1);
+      cam(t(19) - 0.2, 0.7, { fx: 600, fy: 1037, s: 1.55 });
+      tl.fromTo("#e-box2", { opacity: 0 }, { opacity: 1, duration: 0.2 }, t(19) + 0.3);
+      tl.to("#e-box2", { opacity: 0, duration: 0.15 }, t(21) + 0.4);
+      cam(t(21) + 0.3, 0.6, { fx: 960, fy: 1037, s: 1.55 });
+      tl.fromTo("#e-box3", { opacity: 0 }, { opacity: 1, duration: 0.2 }, t(21) + 0.7);
+      // 5 — live now: pull back to the whole cover, high in the frame; LIVE and the address below
+      tl.to(["#e-top", "#e-box3"], { opacity: 0, y: -30, duration: 0.25, ease: "power2.in" }, t(23) - 0.3);
+      cam(t(23) - 0.3, 0.9, { fx: 600, fy: 600, s: 0.45, ry: -8, rx: 6 });
+      tl.to("#e-tilt", { y: -340, duration: 0.9, ease: "power3.inOut" }, t(23) - 0.3);
+      tl.fromTo("#e-live", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2.5)" }, t(23) + 0.35);
+      tl.fromTo("#e-live i", { scale: 1 }, { scale: 1.5, duration: 0.4, yoyo: true, repeat: 7, ease: "sine.inOut" }, t(23) + 0.65);
+      tl.fromTo("#e-url", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.35, ease: "expo.out" }, t(25));
+      // 6 — the launch offer: a ticket slides in; its letters light as they are spelled; 20% OFF lands on "बीस"
+      tl.fromTo("#e-ticket", { opacity: 0, x: 900, rotation: 6 }, { opacity: 1, x: 0, rotation: -2, duration: 0.5, ease: "back.out(1.4)" }, t(31) - 0.2);
+      [32, 33, 34, 35].forEach((i, k) => tl.fromTo("#e-q" + (k + 1), { color: "#12221f", scale: 1 }, { color: "#0b7f79", scale: 1.25, duration: 0.12, yoyo: true, repeat: 1, immediateRender: false }, t(i)));
+      tl.fromTo("#e-ticket .off", { scale: 1 }, { scale: 1.18, duration: 0.15, yoyo: true, repeat: 1, ease: "power2.out" }, t(37));
+      tl.fromTo("#e-note", { opacity: 0 }, { opacity: 1, duration: 0.4 }, t(39) + 0.4);
+      tl.to("#e-tilt", { rotationY: 8, duration: 3.5, ease: "sine.inOut" }, t(31));
+
+      // captions (they leave room for the ticket at the end)
+      let i0 = 2;
+      GROUPS.forEach((n, g) => {
+        const id = "#e-c" + (g + 2), spans = document.querySelectorAll(id + " span");
+        tl.fromTo(id, { opacity: 0 }, { opacity: 1, duration: 0.1 }, t(i0) - 0.1);
+        tl.to(id, { opacity: 0, duration: 0.07 }, g < GROUPS.length - 1 ? t(i0 + n) - 0.19 : VO_END + V + 0.3);
+        for (let k = 0; k < n; k++) {
+          tl.set(spans[k], { opacity: 1, backgroundColor: "rgba(255,210,63,1)" }, t(i0 + k));
+          if (k > 0) tl.set(spans[k - 1], { backgroundColor: "rgba(255,210,63,0)" }, t(i0 + k));
+        }
+        i0 += n;
+      });
+
+      window.__timelines["eqd"] = tl;
+    })();
+  </script>
+</template>

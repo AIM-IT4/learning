@@ -1,0 +1,29 @@
+{
+ "parts": [
+  [
+   "takes/a1s1_seed12.wav",
+   0,
+   null
+  ],
+  [
+   "takes/a1.wav",
+   1.2,
+   10.45
+  ],
+  [
+   "takes/a1s6_seed13.wav",
+   0,
+   null
+  ],
+  [
+   "takes/a1.wav",
+   13.6,
+   null
+  ]
+ ],
+ "gaps": [
+  0.4,
+  0.3,
+  0.45
+ ]
+}

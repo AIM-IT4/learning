@@ -1,0 +1,150 @@
+<template>
+  <style>
+    @font-face { font-family: "Yatra One"; src: url("assets/fonts/YatraOne.ttf"); }
+    @font-face { font-family: "Noto Sans Devanagari"; font-weight: 700; src: url("assets/fonts/NotoSansDevanagari_700Bold.ttf"); }
+    @font-face { font-family: "Poppins"; font-weight: 700; src: url("assets/fonts/Poppins_700Bold.ttf"); }
+    #root { position: absolute; inset: 0; background: #f7f7f3; overflow: hidden; }
+    #m-art { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #m-title { position: absolute; left: 140px; top: 236px; width: 800px; height: 190px; background: #f7f7f3; border: 5px solid #12221f; border-radius: 34px;
+               box-shadow: 0 12px 0 #12221f; text-align: center; font-family: "Yatra One"; font-size: 130px; line-height: 180px; color: #12221f; }
+    .m-tag { position: absolute; top: 1210px; width: 300px; text-align: center; font-family: "Noto Sans Devanagari"; font-weight: 700; font-size: 52px; color: #12221f; }
+    .m-tag b { font-family: "Poppins"; color: #0b7f79; margin-right: 10px; }
+    #m-tA { left: 150px; } #m-tB { left: 630px; }
+    .m-cap { position: absolute; left: 60px; top: 1330px; width: 960px; text-align: center; font-family: "Noto Sans Devanagari"; font-weight: 700; font-size: 46px;
+             line-height: 1.3; color: #12221f; text-wrap: balance; background: rgba(247, 247, 243, 0.96); border: 4px solid #12221f; border-radius: 22px;
+             padding: 6px 10px; }
+    .m-cap span { display: inline-block; padding: 0 8px; margin: 0 1px; border-radius: 8px; opacity: 0.4; }
+  </style>
+  <div id="root" data-composition-id="maze" data-width="1080" data-height="1920">
+    <svg id="m-art" data-layout-allow-overflow viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg">
+      <g id="m-cam"><g id="m-grid"></g></g>
+      <!-- the two choices, side by side, for "सीधा रखिए, या घुमा दीजिए" -->
+      <g id="m-pair"></g>
+    </svg>
+    <div id="m-title">भूलभुलैया</div>
+    <div id="m-tA" class="m-tag"><b>A</b>सीधा</div>
+    <div id="m-tB" class="m-tag"><b>B</b>घुमाया</div>
+
+    <div id="m-c1" class="m-cap"><span>एक</span><span>साधारण</span><span>सी</span><span>टाइल।</span></div>
+    <div id="m-c2" class="m-cap"><span>इसमें</span><span>बस</span><span>दो</span><span>मोड़</span><span>हैं।</span></div>
+    <div id="m-c3" class="m-cap"><span>इसे</span><span>सीधा</span><span>रखिए,</span><span>या</span><span>घुमा</span><span>दीजिए।</span></div>
+    <div id="m-c4" class="m-cap"><span>अब</span><span>ऐसी</span><span>सैकड़ों</span><span>टाइल्स</span><span>बिछाइए,</span></div>
+    <div id="m-c5" class="m-cap"><span>हर</span><span>एक</span><span>को</span><span>बेतरतीब</span><span>घुमाकर…</span></div>
+    <div id="m-c6" class="m-cap"><span>और</span><span>देखिए,</span><span>एक</span><span>भूलभुलैया</span><span>बन</span><span>गई!</span></div>
+    <div id="m-c7" class="m-cap"><span>एक</span><span>नियम,</span><span>दो</span><span>विकल्प,</span><span>और</span><span>अनगिनत</span><span>डिज़ाइन।</span></div>
+  </div>
+  <script>
+    (function () {
+      const V = 0.3;
+      const W = [0.0, 0.18, 0.62, 0.8, 1.56, 1.86, 2.04, 2.2, 2.44, 3.31, 3.54, 3.84, 4.66,
+                 4.82, 5.16, 6.56, 6.72, 7.04, 7.4, 7.66, 8.71, 8.92, 9.1, 9.18, 9.66, 10.57,
+                 10.69, 11.62, 11.81, 12.35, 12.53, 13.27, 13.46, 14.17, 14.38, 15.12, 15.32, 15.7];
+      const VO_END = 16.22;
+      const GROUPS = [4, 5, 6, 5, 5, 6, 7];
+      const t = (i) => W[i] + V;
+      const NS = "http://www.w3.org/2000/svg";
+      const el = (tag, a, p) => { const e = document.createElementNS(NS, tag); for (const k in a) e.setAttribute(k, a[k]); p.appendChild(e); return e; };
+
+      // ---- the tile: two quarter-circle turns. Orientation 0 has its turns round the top-left and bottom-right corners; 1 is turned 90°.
+      // Two-colour rule (always seamless): the corner pieces of tile (i, j) take colour (i + j + o) % 2, the band between them the other one.
+      const S = 84, COLS = 13, ROWS = 23, X0 = -6, Y0 = -6, CI = 6, CJ = 11;       // tile (6, 11) sits at the centre (540, 960)
+      const COL = ["#0b7f79", "#f7f7f3"], INK = "#12221f";
+      let seed = 20261112;
+      const rnd = () => { seed |= 0; seed = (seed + 0x6d2b79f5) | 0; let x = Math.imul(seed ^ (seed >>> 15), 1 | seed); x = (x + Math.imul(x ^ (x >>> 7), 61 | x)) ^ x; return ((x ^ (x >>> 14)) >>> 0) / 4294967296; };
+      const tile = (parent, x, y, attrs = {}, outline = false) => {
+        const g = el("g", Object.assign({ transform: `translate(${x} ${y})` }, attrs), parent);
+        const r = el("g", {}, g);                            // the part that turns (GSAP rotates this about the tile centre)
+        const band = el("rect", { width: S, height: S }, r);
+        const c1 = el("path", { d: `M0 0 L${S / 2} 0 A${S / 2} ${S / 2} 0 0 1 0 ${S / 2} Z` }, r);
+        const c2 = el("path", { d: `M${S} ${S} L${S / 2} ${S} A${S / 2} ${S / 2} 0 0 1 ${S} ${S / 2} Z` }, r);
+        el("path", { d: `M${S / 2} 0 A${S / 2} ${S / 2} 0 0 1 0 ${S / 2} M${S} ${S / 2} A${S / 2} ${S / 2} 0 0 1 ${S / 2} ${S}`, fill: "none", stroke: INK,
+                     "stroke-width": 7, "stroke-linecap": "round" }, r);
+        const ol = outline ? el("rect", { width: S, height: S, fill: "none", stroke: INK, "stroke-width": 2.5 }, g) : null;   // the tile's edge, while it is shown alone
+        return { g, r, band, c1, c2, ol };
+      };
+      const grid = document.getElementById("m-grid"), T = [];
+      for (let j = 0; j < ROWS; j++) for (let i = 0; i < COLS; i++) {
+        const tt = tile(grid, X0 + i * S, Y0 + j * S, {}, i === CI && j === CJ);
+        tt.i = i; tt.j = j; tt.d = Math.hypot(i - CI, j - CJ); T.push(tt);
+      }
+      // orientation sets: all 0 when laid, then four seeded random rolls
+      const ROLLS = [T.map(() => 0)];
+      for (let k = 0; k < 4; k++) ROLLS.push(T.map(() => (rnd() < 0.5 ? 1 : 0)));
+      const paint = (tt, o) => {                              // fill colours for orientation o (applied with the fills hidden or on a flip)
+        const c = (tt.i + tt.j + o) % 2;
+        return { corner: COL[c], band: COL[1 - c] };
+      };
+      T.forEach((tt) => { const p = paint(tt, 0); for (const [e, c] of [[tt.band, p.band], [tt.c1, p.corner], [tt.c2, p.corner]]) { e.setAttribute("fill", c); e.setAttribute("stroke", c); e.setAttribute("stroke-width", 1.4); } });
+      // the two-choice pair (A straight, B turned) for the explanation
+      const pair = document.getElementById("m-pair");
+      const pA = tile(pair, 0, 0, { id: "m-pA" }, true), pB = tile(pair, 0, 0, { id: "m-pB" }, true);
+      [pA, pB].forEach((p) => { p.band.setAttribute("fill", "#ffffff"); p.c1.setAttribute("fill", "#ffffff"); p.c2.setAttribute("fill", "#ffffff"); });
+
+      const tl = gsap.timeline({ paused: true });
+      const center = T.find((tt) => tt.i === CI && tt.j === CJ);
+      const fills = T.flatMap((tt) => [tt.band, tt.c1, tt.c2]);
+      gsap.set(T.filter((tt) => tt !== center).map((tt) => tt.g), { opacity: 0 });
+      gsap.set(fills, { opacity: 0 });
+      gsap.set(["#m-pair", ".m-tag", ".m-cap"], { opacity: 0 });
+      // camera: start on the one tile, 480 px wide
+      const Z0 = 480 / S;
+      gsap.set("#m-cam", { scale: Z0, svgOrigin: "540 960" });
+
+      // the two turns light up as "दो मोड़" is said
+      const arcs = center.r.querySelector("path:last-of-type");
+      tl.fromTo(arcs, { attr: { stroke: INK } }, { attr: { stroke: "#ffd23f" }, duration: 0.15, immediateRender: false }, t(6));
+      tl.to(arcs, { attr: { stroke: INK }, duration: 0.3 }, t(8) + 0.35);
+      // "सीधा … या घुमा": the big tile steps aside into a pair, A straight and B turned
+      tl.to("#m-cam", { opacity: 0, duration: 0.25 }, t(9) - 0.2);
+      gsap.set("#m-pA", { x: 300 - 110, y: 900 - 110, scale: 220 / S, transformOrigin: "0 0" });
+      gsap.set("#m-pB", { x: 780 - 110, y: 900 - 110, scale: 220 / S, transformOrigin: "0 0" });
+      tl.fromTo("#m-pair", { opacity: 0 }, { opacity: 1, duration: 0.25 }, t(9) - 0.1);
+      tl.fromTo("#m-tA", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.25 }, t(10));
+      tl.to(pB.r, { rotation: 90, transformOrigin: "50% 50%", duration: 0.45, ease: "back.out(1.8)" }, t(13));
+      tl.fromTo("#m-tB", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.25 }, t(13) + 0.1);
+
+      // "सैकड़ों टाइल्स": the grid is laid outward from the centre while the camera pulls back to the whole floor
+      tl.to(["#m-pair", ".m-tag"], { opacity: 0, duration: 0.2 }, t(15));
+      tl.set(center.ol, { opacity: 0 }, t(15));
+      tl.set("#m-cam", { opacity: 1, scale: 2.2, svgOrigin: "540 960" }, t(15) + 0.05);
+      tl.to("#m-cam", { scale: 1, duration: t(19) - t(15) + 0.4, ease: "power2.inOut", svgOrigin: "540 960" }, t(15) + 0.05);
+      T.forEach((tt) => { if (tt !== center) tl.fromTo(tt.g, { opacity: 0 }, { opacity: 1, duration: 0.2 }, t(16) + tt.d * 0.06); });
+
+      // a wave of flips: each tile turns to its new orientation (and, once the colours are on, swaps them)
+      const wave = (from, to, at, step = 0.045) => {     // a card flip: squash flat, swap unseen, open mirrored (= the turned tile)
+        T.forEach((tt, n) => {
+          if (ROLLS[from][n] === ROLLS[to][n]) return;
+          const when = at + tt.d * step, o = ROLLS[to][n], p = paint(tt, o);
+          tl.to(tt.r, { scaleX: 0, duration: 0.16, ease: "power2.in", transformOrigin: "50% 50%" }, when);
+          tl.set([tt.c1, tt.c2], { attr: { fill: p.corner, stroke: p.corner } }, when + 0.16);
+          tl.set(tt.band, { attr: { fill: p.band, stroke: p.band } }, when + 0.16);
+          tl.to(tt.r, { scaleX: o ? -1 : 1, duration: 0.18, ease: "power2.out", transformOrigin: "50% 50%" }, when + 0.16);
+        });
+      };
+      wave(0, 1, t(23) - 0.1);                                 // "बेतरतीब": the lines become a maze
+      // "भूलभुलैया": the two colours flood in from the centre
+      T.forEach((tt) => tl.to([tt.band, tt.c1, tt.c2], { opacity: 1, duration: 0.3 }, t(28) - 0.1 + tt.d * 0.035));
+      // one rule, two choices, endless designs: three new rolls
+      wave(1, 2, t(32) - 0.15, 0.03);
+      wave(2, 3, t(34) - 0.15, 0.03);
+      wave(3, 4, t(36) - 0.15, 0.03);
+      // hold: a slow push in, the title stays
+      tl.to("#m-cam", { scale: 1.08, duration: 3.2, ease: "power1.inOut", svgOrigin: "540 960" }, t(37) + 0.5);
+
+      // captions
+      let i0 = 0;
+      GROUPS.forEach((n, g) => {
+        const id = "#m-c" + (g + 1), spans = document.querySelectorAll(id + " span");
+        tl.fromTo(id, { opacity: 0 }, { opacity: 1, duration: 0.1 }, t(i0) - 0.1);
+        tl.to(id, { opacity: 0, duration: 0.07 }, g < GROUPS.length - 1 ? t(i0 + n) - 0.19 : VO_END + V + 0.5);
+        for (let k = 0; k < n; k++) {
+          tl.set(spans[k], { opacity: 1, backgroundColor: "rgba(255,210,63,1)" }, t(i0 + k));
+          if (k > 0) tl.set(spans[k - 1], { backgroundColor: "rgba(255,210,63,0)" }, t(i0 + k));
+        }
+        i0 += n;
+      });
+
+      window.__timelines["maze"] = tl;
+    })();
+  </script>
+</template>
