@@ -50,23 +50,26 @@ def faces(img):
     YUNET.setInputSize((w, h)); _, f = YUNET.detect(a)
     return [] if f is None else [[float(v) / k for v in r[:4]] + [float(r[-1])] for r in f]
 
-def face_pass(img, who, seed, scale=1.0):
+def face_pass(img, who, seed, scale=1.0, closed=False):
     """Repaint each detected face (the largest two) at 896-1152 px and blend it back."""
     if not who: return img, []                          # no people in this shot: leave it alone
     img = img.copy(); found = sorted(faces(img), key=lambda r: -r[2] * r[3])
     for k, (x, y, w, h, sc) in enumerate(found[:2]):
-        if w < 24 * scale: continue
+        if w < 24 * scale or (k and (w < 0.45 * found[0][2] or sc < 0.75)): continue   # tiny, a blurred face in the
+                                                                                       # crowd, or not sure it is a face
         cx, cy, side = x + w / 2, y + h * 0.45, max(w, h) * 2.3
         x0, y0 = int(max(0, cx - side / 2)), int(max(0, cy - side / 2))
         x1, y1 = int(min(img.width, cx + side / 2)), int(min(img.height, cy + side / 2))
         crop = img.crop((x0, y0, x1, y1)); cw, ch = crop.size
         tag = who[k] if k < len(who) else ""               # a passer-by is not the heroine
         desc = spec["face"].get(tag, "a young Indian person")
-        fp = (f"{spec['style']} close-up portrait of {desc}, beautiful detailed face, symmetrical eyes with detailed irises and "
-              "catchlights, natural nose, soft natural lips, smooth skin")
+        eyes = ("eyes gently closed, peaceful face, long lashes on closed eyelids" if closed else    # a sleeping face stays asleep
+                "symmetrical eyes with detailed irises and catchlights")
+        fp = f"{spec['style']} close-up portrait of {desc}, beautiful detailed face, {eyes}, natural nose, soft natural lips, smooth skin"
+        neg = spec["negative"] + (", open eyes, looking at viewer" if closed else "")
         side_ = int(min(1152, max(896, cw)) // 8 * 8)
         big = crop.resize((side_, int(side_ * ch / cw) // 8 * 8), Image.LANCZOS)
-        rep = i2i(prompt=fp, negative_prompt=spec["negative"], image=big, strength=0.42, num_inference_steps=8, guidance_scale=CFG,
+        rep = i2i(prompt=fp, negative_prompt=neg, image=big, strength=0.42, num_inference_steps=8, guidance_scale=CFG,
                   generator=torch.Generator().manual_seed(seed + 7 * k)).images[0].resize((cw, ch), Image.LANCZOS)
         a, b = np.asarray(crop).astype(np.float32), np.asarray(rep).astype(np.float32)
         b = (b - b.mean((0, 1))) / (b.std((0, 1)) + 1e-6) * a.std((0, 1)) + a.mean((0, 1))      # keep the painting's colours
@@ -99,7 +102,8 @@ elif mode in ("finish", "test"):
         t1 = time.time()
         im0 = Image.open(src).convert("RGB"); up = spec.get("upscale", 2.0)
         if up != 1: im0 = im0.resize((round(im0.width * up), round(im0.height * up)), Image.LANCZOS)
-        img, found = face_pass(im0, spec["shots"][name].get("faces", ""), seed, up)
+        sh = spec["shots"][name]
+        img, found = face_pass(im0, sh.get("faces", ""), seed, up, sh.get("eyes") == "closed")
         img.save(out / f"final_{alias}.png")
         print(f"{alias} ({name}:{seed}): paint {t1 - t:.0f} s, faces {[round(f[2]) for f in found]} in {time.time() - t1:.0f} s", flush=True)
 print("done", flush=True)

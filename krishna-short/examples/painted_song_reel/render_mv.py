@@ -1,6 +1,6 @@
 """Render the landscape music-video part of a painted-style song reel.
 
-  python3 render_mv.py shots.json out.mp4 [--from T --to T] [--still T out.png]
+  python3 render_mv.py shots.json out.mp4 [--from T --to T] [--still T out.png] [--stills T,T,... dir]
 
 Each shot is one painted still, moved in 2.5D: a camera move (zoom, centre, roll) plus depth parallax (near layers
 shift and grow more than far ones, from a Depth Anything V2 map), cut on the beat. Transitions at the cuts: zoom-through
@@ -208,9 +208,9 @@ for j, c in enumerate(cfg.get("captions", [])):
 
 def draw_captions(f, t):
     for c in captions:
-        if not (c["t0"] - 0.2 <= t <= c["t1"] + 0.35): continue
-        q = min(1.0, (t - c["t0"] + 0.2) / 0.2)
-        out = max(0.0, min(1.0, (c["t1"] + 0.35 - t) / 0.35))
+        if not (c["t0"] - 0.15 <= t <= c["t1"] + 0.18): continue     # quick in and out, so two lines never overlap
+        q = min(1.0, (t - c["t0"] + 0.15) / 0.15)
+        out = max(0.0, min(1.0, (c["t1"] + 0.18 - t) / 0.18))
         rx = c["spans_"][0][0]                                    # karaoke: dark ink up to here
         ws = c["words"]
         for i, (_, ts) in enumerate(ws):
@@ -368,6 +368,10 @@ def finish(f, t):
 
 if "--still" in args:
     i = args.index("--still"); t = float(args[i + 1]); cv2.imwrite(args[i + 2], finish(frame_at(t), t)); sys.exit()
+if "--stills" in args:                                  # --stills 1.5,7.2,... <dir>: several checking frames in one go
+    i = args.index("--stills"); d = Path(args[i + 2]); d.mkdir(parents=True, exist_ok=True)
+    for t in map(float, args[i + 1].split(",")): cv2.imwrite(str(d / f"still_{t:06.2f}.jpg"), finish(frame_at(t), t))
+    sys.exit()
 t0 = float(args[args.index("--from") + 1]) if "--from" in args else cfg["start"]
 t1 = float(args[args.index("--to") + 1]) if "--to" in args else cfg["end"]
 n = int(round((t1 - t0) * FPS))

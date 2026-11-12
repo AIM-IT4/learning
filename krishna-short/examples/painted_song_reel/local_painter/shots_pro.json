@@ -26,7 +26,8 @@
     221,
     222
    ],
-   "faces": "K"
+   "faces": "K",
+   "eyes": "closed"
   },
   "heart": {
    "prompt": "a golden sunset sky with soft pink clouds and warm glowing light, wide and empty, no people",
@@ -74,7 +75,8 @@
     273,
     274
    ],
-   "faces": "K"
+   "faces": "K",
+   "eyes": "closed"
   },
   "eye": {
    "prompt": "extreme close-up of one dark brown eye of a young Indian woman, kohl eyeliner, long lashes, golden sparkles",

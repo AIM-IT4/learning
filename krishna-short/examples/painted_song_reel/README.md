@@ -57,7 +57,8 @@ Stability AI's licence).
 2. `python3 local_painter/paint.py refine local_painter/shots.json out/ hill:12 hillclose:23 heart:33 swing:41
    window:101 daisy:62 bed:71 bed:72:bedcalm eye:81 dream:93 dream:92:dream2 box:116 bazaar:121 found:132
    kterrace:163 nterrace:173 sunset:152` (the picks used for "Sochenge Tumhe Pyar") -> `out/final_<name>.png`.
-3. `python3 local_painter/build_painted.py out/ shots_full.json` (21 shots over 62.26 s: camera targets on the faces,
+3. `python3 local_painter/build_painted.py out/ shots_full.json` (its camera targets now follow the v2 paintings below;
+   the v1 ones are in this file's git history) (21 shots over 62.26 s: camera targets on the faces,
    night grade for the bedroom and terraces, a cloud heart that forms in the sky, petals / bokeh / stars, lyric strips
    where the words are sung), then `python3 render_mv.py shots_full.json out/mv.mp4` (about 10 min; depth maps
    cached in `REEL_CACHE`).
@@ -82,10 +83,19 @@ repainted at 896-1152 px with img2img (strength 0.42), colour-matched and blende
    contact sheet; about 35 min for the 17 shots). The prompts begin with the style and say "alone" for one person.
    Each shot names its cast (`faces`: "K", "N", "??" for two people, "" for none) so the face pass knows whom it
    is repainting.
-2. `python3 local_painter/paint_pro.py finish local_painter/shots_pro.json out/pro PICKS` -> `out/pro/final_<name>.png`
-3. `python3 local_painter/build_painted.py out/pro shots_full.json`, then
-   `REEL_CACHE=out/depth_pro python3 render_mv.py shots_full.json out/mv.mp4` (use a new depth cache when the
-   paintings change: it is keyed by file name).
+2. Pick one option per shot by eye (discard the ones that show the same person twice; about one shot in four does),
+   then `python3 local_painter/paint_pro.py finish local_painter/shots_pro.json out/pro heart:231 heart:232:heart2
+   daisy:261 eye:281 box:301 box:302:box2 hill:212 hillclose:221 swing:241 swing:242:swing2 window:251
+   window:252:window2 bed:271 bedcalm:274 dream:291 dream2:294 bazaar:312 found:321 kterrace:331 nterrace:342
+   sunset:351` (the picks for "Sochenge Tumhe Pyar"; `name:seed:alias` uses a second option as its own shot, so the
+   repeat of the antara gets new pictures) -> `out/pro/final_<name>.png`. Faces much smaller than the main one
+   (a blurred crowd) are left alone. `python3 local_painter/grid.py out/pro sheet.jpg hill swing ...` shows the
+   finals with a 10% grid and the face centres, for the camera targets.
+3. `python3 local_painter/build_painted.py out/pro shots_full.json`, check one frame per shot with
+   `REEL_CACHE=out/depth_pro python3 render_mv.py shots_full.json out/mv.mp4 --stills 2.96,5.41,... out/stills`, then
+   render (use a new depth cache when the paintings change: it is keyed by file name). On 4 cores, 4 parts side by
+   side (`--from 0 --to 15.6`, `15.6-31.2`, `31.2-46.8`, `46.8-62.263`, joined with ffmpeg's concat demuxer and
+   `-c copy`) take about 6 minutes instead of 15.
 
 Lyrics: `build_painted.py` writes `captions`, one torn-paper strip per sung line from the first word to the end
 (word onsets measured on the vocal stem), at the bottom of the frame. Each strip starts in faded ink and every word
