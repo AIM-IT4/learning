@@ -31,9 +31,12 @@ Add "anime, cartoon, 3d render, photo" to the negative prompt for every style.
 | winter / hills | cold blue, warm windows | snowfall in the hills, shawls, chai stall, pine forest | snow, bokeh (window lights) | `cool`, `warm` inside | 2 bars, fades, slow drifts |
 
 ## Effects reference (render_mv.py)
-`fx`: `{"kind": "petals|dust|bokeh|stars|rain|snow|fireflies|embers", "n": 20, "alpha": 0.8, "color": [r, g, b],
+`fx`: `{"kind": "petals|dust|bokeh|stars|rain|snow|fireflies|embers|pearls", "n": 20, "alpha": 0.8, "color": [r, g, b],
 "area": [x0, y0, x1, y1], "t_off": 0}`. Usual counts: petals 6-14, dust 12-24, bokeh 10-16, stars 14-26 in the sky
-area, rain 120-200, snow 60-120, fireflies 18-30, embers 20-30.
+area, rain 120-200, snow 60-120, fireflies 18-30, embers 20-30, pearls 30-40.
+`anim` (the painting's own motion, on by default): `{"hair", "cloth", "foliage", "sky", "water", "lights", "breath"}`
+multipliers per shot; raise the element the lyric is about (hair in the wind 1.5, a river 1.5), lower anything that
+wobbles.
 `grade`: night, warm, cool, rain, sepia, dusk, dawn (per shot, or `"grade"` at the top of reel.json for all).
 `overlays`: `{"kind": "heart", "x": 700, "y": 300, "size": 470, "form": 1.6}` - a cloud drifting into a heart over
 `form` seconds, in screen pixels; `form: 0.01` = already formed.

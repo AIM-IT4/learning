@@ -1,0 +1,962 @@
+{
+ "_about": "The reel delivered for 'Duniya Kisi Ke Pyar Mein' (Sajjad Ali), song 121.4-188.95 s (MV from the antara at 125.9 to the end of the mukhda), 95.7 BPM: a new cast (emerald sharara with a gold dupatta over her hair; black sherwani), living paintings (anim on; hair 1.6 in the zulf shot), falling pearls for 'moti baras padein'. The walk pick (713) was recoloured with recolor_outfit.py.",
+ "song": {
+  "title": "Duniya Kisi Ke Pyar Mein",
+  "mv0": 125.9,
+  "end": 188.95,
+  "bpm": 95.7,
+  "mood": "romantic adoration, soft Sufi ghazal (Sajjad Ali); golden evening in an old haveli turning to a moonlit night"
+ },
+ "intro": {
+  "title": "Duniya Kisi Ke Pyar Mein",
+  "tile": "दुनिया",
+  "tile_rgb": [
+   [
+    214,
+    110,
+    96
+   ],
+   [
+    140,
+    40,
+    62
+   ]
+  ],
+  "file_label": "Video · 67.6 s",
+  "flow_mark": false,
+  "lines": [
+   "Found the antara and the mukhda at 2:06, 95.7 BPM, a soft ghazal.",
+   "Painted 16 scenes in a warm semi-realistic style: an old haveli,",
+   "her smile and a rain of pearls, buds opening, her hair in the",
+   "breeze, a Mughal paradise garden, a moonlit terrace under stars.",
+   "Every face repainted close-up; hair, dupatta and leaves now sway.",
+   "Animating each painting: camera, depth, wind, lamplight, petals,",
+   "lyrics word by word, cuts on the beat. 1080x1920, 30 fps."
+  ]
+ },
+ "style": "Beautiful semi-realistic digital painting, smooth soft shading, painterly brushwork, gentle warm light:",
+ "negative": "photo, 3d render, anime, cartoon, oversharpened, harsh contrast, hdr, glowing outlines, deformed face, asymmetrical eyes, cross-eyed, bad anatomy, extra fingers, bad hands, duplicate person, blurry, lowres, text, watermark",
+ "cast": {
+  "K": "a handsome young Indian man with short black hair, a thin moustache and a short beard, in a black sherwani with gold buttons",
+  "N": "an elegant young Indian woman with kohl-lined eyes and a gold nose ring, in an emerald green sharara, a sheer gold dupatta over her hair"
+ },
+ "face": {
+  "K": "a handsome young Indian man with short side-parted black hair, a thin moustache and a short neat beard",
+  "N": "an elegant young Indian woman with kohl-lined almond eyes, a gold nath nose ring and a sheer gold dupatta over her hair",
+  "": "a young Indian person with warm brown skin",
+  "?": "a young Indian person with warm brown skin, a gentle smile"
+ },
+ "shots": {
+  "haveli": {
+   "prompt": "the courtyard of an old Mughal haveli at golden hour, carved arches, hanging brass lanterns, rose petals on the floor, no people",
+   "seeds": [
+    401
+   ],
+   "faces": ""
+  },
+  "jharokha": {
+   "prompt": "{N} alone, smiling shyly at a carved stone jharokha window of an old haveli, golden evening light",
+   "seeds": [
+    611,
+    612
+   ],
+   "faces": "N"
+  },
+  "pearls": {
+   "prompt": "white pearls raining down and bouncing on a marble floor scattered with red rose petals, warm golden light, no people",
+   "seeds": [
+    421,
+    422
+   ],
+   "faces": ""
+  },
+  "arch": {
+   "prompt": "{K} alone, standing under a carved arch of an old haveli, smiling in wonder, warm lantern light",
+   "seeds": [
+    631,
+    632
+   ],
+   "faces": "K"
+  },
+  "laugh": {
+   "prompt": "close-up of {N} laughing joyfully, pearl necklace, warm golden light, blurred haveli behind her",
+   "seeds": [
+    641,
+    642
+   ],
+   "faces": "N"
+  },
+  "lanterns": {
+   "prompt": "hanging brass lanterns glowing at dusk in an old haveli courtyard, rose petals floating in the air, no people",
+   "seeds": [
+    451
+   ],
+   "faces": ""
+  },
+  "lookup": {
+   "prompt": "close-up of {N} lifting her eyes to look up, long eyelashes, a soft smile, warm evening light",
+   "seeds": [
+    661,
+    662
+   ],
+   "faces": "N"
+  },
+  "buds": {
+   "prompt": "rose buds and white jasmine flowers opening in a garden at golden hour, dew drops, soft glow, no people",
+   "seeds": [
+    471
+   ],
+   "faces": ""
+  },
+  "hair": {
+   "prompt": "{N} alone in a rose garden at golden hour, her dupatta slipping off her long black hair flowing in the breeze",
+   "seeds": [
+    681,
+    682
+   ],
+   "faces": "N"
+  },
+  "rose": {
+   "prompt": "{K} alone in a rose garden, eyes closed, smelling a red rose with a gentle smile, golden hour",
+   "seeds": [
+    691,
+    692
+   ],
+   "faces": "K",
+   "eyes": "closed"
+  },
+  "garden": {
+   "prompt": "a Mughal paradise garden at sunset, long water channels with fountains, cypress trees, rose beds, marble pavilion, no people",
+   "seeds": [
+    501
+   ],
+   "faces": ""
+  },
+  "walk": {
+   "prompt": "a romantic couple walking hand in hand away from us down a Mughal garden path at sunset, she in an emerald sharara with a gold dupatta, he in a black sherwani",
+   "seeds": [
+    713,
+    714
+   ],
+   "faces": "??"
+  },
+  "moonrise": {
+   "prompt": "a big full moon rising over the domes of an old haveli at night, starry sky, soft clouds, no people",
+   "seeds": [
+    521
+   ],
+   "faces": ""
+  },
+  "angel": {
+   "prompt": "{N} alone on a moonlit marble terrace at night, glowing softly like an angel, stars in the sky, gentle smile",
+   "seeds": [
+    731,
+    732
+   ],
+   "faces": "N"
+  },
+  "terrace": {
+   "prompt": "a young Indian woman in an emerald sharara resting her head on the shoulder of a young Indian man in a black sherwani on a moonlit terrace, stars",
+   "seeds": [
+    741,
+    742
+   ],
+   "faces": "??"
+  }
+ },
+ "steps": 5,
+ "cfg": 2.0,
+ "sampler": "dpm",
+ "cut": [
+  {
+   "img": "haveli",
+   "bars": 1,
+   "z": [
+    1.04,
+    1.16
+   ],
+   "c": [
+    [
+     0.5,
+     0.52
+    ],
+    [
+     0.42,
+     0.42
+    ]
+   ],
+   "par": [
+    0,
+    24
+   ],
+   "fx": [
+    {
+     "kind": "dust",
+     "n": 20,
+     "alpha": 0.7
+    },
+    {
+     "kind": "petals",
+     "n": 8,
+     "color": [
+      235,
+      120,
+      140
+     ]
+    }
+   ],
+   "out": "zoom",
+   "out_d": 0.4
+  },
+  {
+   "img": "jharokha",
+   "bars": 2,
+   "z": [
+    1.05,
+    1.2
+   ],
+   "c": [
+    [
+     0.53,
+     0.48
+    ],
+    [
+     0.57,
+     0.38
+    ]
+   ],
+   "fx": [
+    {
+     "kind": "dust",
+     "n": 14,
+     "alpha": 0.6
+    },
+    {
+     "kind": "bokeh",
+     "n": 8,
+     "alpha": 0.5
+    }
+   ],
+   "out": "whip",
+   "out_d": 0.3
+  },
+  {
+   "img": "pearls",
+   "bars": 1,
+   "z": [
+    1.05,
+    1.16
+   ],
+   "c": [
+    [
+     0.5,
+     0.5
+    ],
+    [
+     0.5,
+     0.44
+    ]
+   ],
+   "fx": [
+    {
+     "kind": "pearls",
+     "n": 36
+    },
+    {
+     "kind": "bokeh",
+     "n": 10,
+     "alpha": 0.6
+    }
+   ],
+   "out": "flash",
+   "out_d": 0.3
+  },
+  {
+   "img": "arch",
+   "bars": 1,
+   "z": [
+    1.06,
+    1.18
+   ],
+   "c": [
+    [
+     0.5,
+     0.5
+    ],
+    [
+     0.47,
+     0.46
+    ]
+   ],
+   "fx": [
+    {
+     "kind": "dust",
+     "n": 16,
+     "alpha": 0.6
+    }
+   ],
+   "out": "whip",
+   "out_d": 0.3
+  },
+  {
+   "img": "laugh",
+   "bars": 2,
+   "z": [
+    1.04,
+    1.12
+   ],
+   "c": [
+    [
+     0.5,
+     0.48
+    ],
+    [
+     0.5,
+     0.42
+    ]
+   ],
+   "fx": [
+    {
+     "kind": "bokeh",
+     "n": 12,
+     "alpha": 0.6
+    }
+   ],
+   "out": "zoom",
+   "out_d": 0.4
+  },
+  {
+   "img": "pearls2",
+   "bars": 1,
+   "z": [
+    1.08,
+    1.2
+   ],
+   "c": [
+    [
+     0.5,
+     0.5
+    ],
+    [
+     0.56,
+     0.42
+    ]
+   ],
+   "fx": [
+    {
+     "kind": "pearls",
+     "n": 40
+    }
+   ],
+   "out": "fade",
+   "out_d": 0.4
+  },
+  {
+   "img": "lanterns",
+   "bars": 1,
+   "z": [
+    1.04,
+    1.16
+   ],
+   "c": [
+    [
+     0.5,
+     0.5
+    ],
+    [
+     0.62,
+     0.38
+    ]
+   ],
+   "fx": [
+    {
+     "kind": "embers",
+     "n": 18
+    },
+    {
+     "kind": "dust",
+     "n": 14,
+     "alpha": 0.6
+    }
+   ],
+   "out": "whipup",
+   "out_d": 0.34
+  },
+  {
+   "img": "lookup",
+   "bars": 2,
+   "z": [
+    1.04,
+    1.14
+   ],
+   "c": [
+    [
+     0.5,
+     0.5
+    ],
+    [
+     0.47,
+     0.42
+    ]
+   ],
+   "fx": [
+    {
+     "kind": "dust",
+     "n": 12,
+     "alpha": 0.6
+    }
+   ],
+   "out": "fade",
+   "out_d": 0.4
+  },
+  {
+   "img": "buds",
+   "bars": 1,
+   "z": [
+    1.06,
+    1.2
+   ],
+   "c": [
+    [
+     0.5,
+     0.5
+    ],
+    [
+     0.5,
+     0.45
+    ]
+   ],
+   "fx": [
+    {
+     "kind": "petals",
+     "n": 10,
+     "color": [
+      235,
+      120,
+      140
+     ]
+    },
+    {
+     "kind": "dust",
+     "n": 18,
+     "alpha": 0.7
+    }
+   ],
+   "out": "whip",
+   "out_d": 0.3
+  },
+  {
+   "img": "hair",
+   "bars": 2,
+   "z": [
+    1.04,
+    1.16
+   ],
+   "c": [
+    [
+     0.45,
+     0.5
+    ],
+    [
+     0.41,
+     0.36
+    ]
+   ],
+   "anim": {
+    "hair": 1.6,
+    "cloth": 1.3
+   },
+   "fx": [
+    {
+     "kind": "petals",
+     "n": 12,
+     "color": [
+      235,
+      120,
+      140
+     ]
+    }
+   ],
+   "out": "fade",
+   "out_d": 0.4
+  },
+  {
+   "img": "rose",
+   "bars": 2,
+   "z": [
+    1.05,
+    1.18
+   ],
+   "c": [
+    [
+     0.52,
+     0.48
+    ],
+    [
+     0.57,
+     0.36
+    ]
+   ],
+   "fx": [
+    {
+     "kind": "petals",
+     "n": 8,
+     "color": [
+      235,
+      120,
+      140
+     ]
+    },
+    {
+     "kind": "dust",
+     "n": 12,
+     "alpha": 0.6
+    }
+   ],
+   "out": "zoom",
+   "out_d": 0.4
+  },
+  {
+   "img": "garden",
+   "bars": 2,
+   "z": [
+    1.03,
+    1.16
+   ],
+   "c": [
+    [
+     0.5,
+     0.56
+    ],
+    [
+     0.5,
+     0.5
+    ]
+   ],
+   "par": [
+    0,
+    26
+   ],
+   "fx": [
+    {
+     "kind": "dust",
+     "n": 16,
+     "alpha": 0.7
+    },
+    {
+     "kind": "petals",
+     "n": 6,
+     "color": [
+      235,
+      120,
+      140
+     ]
+    }
+   ],
+   "out": "whip",
+   "out_d": 0.3
+  },
+  {
+   "img": "walk",
+   "bars": 2,
+   "z": [
+    1.04,
+    1.18
+   ],
+   "c": [
+    [
+     0.5,
+     0.52
+    ],
+    [
+     0.48,
+     0.38
+    ]
+   ],
+   "fx": [
+    {
+     "kind": "petals",
+     "n": 12,
+     "color": [
+      235,
+      120,
+      140
+     ]
+    },
+    {
+     "kind": "bokeh",
+     "n": 8,
+     "alpha": 0.5
+    }
+   ],
+   "out": "fade",
+   "out_d": 0.45
+  },
+  {
+   "img": "moonrise",
+   "bars": 1,
+   "z": [
+    1.04,
+    1.16
+   ],
+   "c": [
+    [
+     0.5,
+     0.5
+    ],
+    [
+     0.53,
+     0.34
+    ]
+   ],
+   "fx": [
+    {
+     "kind": "stars",
+     "n": 24,
+     "area": [
+      0,
+      0,
+      1920,
+      520
+     ]
+    }
+   ],
+   "out": "whipdown",
+   "out_d": 0.34
+  },
+  {
+   "img": "angel",
+   "bars": 2,
+   "z": [
+    1.04,
+    1.14
+   ],
+   "c": [
+    [
+     0.5,
+     0.5
+    ],
+    [
+     0.47,
+     0.42
+    ]
+   ],
+   "fx": [
+    {
+     "kind": "stars",
+     "n": 20,
+     "area": [
+      0,
+      0,
+      1920,
+      400
+     ]
+    },
+    {
+     "kind": "fireflies",
+     "n": 20,
+     "color": [
+      255,
+      240,
+      200
+     ]
+    }
+   ],
+   "out": "fade",
+   "out_d": 0.4
+  },
+  {
+   "img": "terrace",
+   "bars": 2,
+   "z": [
+    1.03,
+    1.16
+   ],
+   "c": [
+    [
+     0.5,
+     0.5
+    ],
+    [
+     0.5,
+     0.42
+    ]
+   ],
+   "fx": [
+    {
+     "kind": "stars",
+     "n": 18,
+     "area": [
+      0,
+      0,
+      1920,
+      380
+     ]
+    },
+    {
+     "kind": "fireflies",
+     "n": 16,
+     "color": [
+      255,
+      236,
+      190
+     ]
+    }
+   ]
+  }
+ ],
+ "lines": [
+  {
+   "words": [
+    [
+     "भूले",
+     127.94
+    ],
+    [
+     "से",
+     129.34
+    ],
+    [
+     "मुस्कुराओ",
+     130.02
+    ],
+    [
+     "तो",
+     132.06
+    ],
+    [
+     "मोती",
+     132.54
+    ],
+    [
+     "बरस",
+     134.54
+    ],
+    [
+     "पड़ें",
+     135.46
+    ]
+   ],
+   "end": 136.52
+  },
+  {
+   "words": [
+    [
+     "भूले",
+     138.14
+    ],
+    [
+     "से",
+     139.54
+    ],
+    [
+     "मुस्कुराओ",
+     140.16
+    ],
+    [
+     "तो",
+     142.34
+    ],
+    [
+     "मोती",
+     142.7
+    ],
+    [
+     "बरस",
+     144.64
+    ],
+    [
+     "पड़ें",
+     145.6
+    ]
+   ],
+   "end": 146.76
+  },
+  {
+   "words": [
+    [
+     "पलकें",
+     148.7
+    ],
+    [
+     "उठा",
+     150.1
+    ],
+    [
+     "के",
+     150.64
+    ],
+    [
+     "देखो",
+     151.16
+    ],
+    [
+     "तो",
+     152.4
+    ],
+    [
+     "कलियाँ",
+     152.86
+    ],
+    [
+     "भी",
+     154.88
+    ],
+    [
+     "हँस",
+     155.28
+    ],
+    [
+     "पड़ें",
+     155.94
+    ]
+   ],
+   "end": 156.78
+  },
+  {
+   "words": [
+    [
+     "ख़ुशबू",
+     158.62
+    ],
+    [
+     "तुम्हारी",
+     160.02
+    ],
+    [
+     "ज़ुल्फ़",
+     161.42
+    ],
+    [
+     "की",
+     162.86
+    ],
+    [
+     "फूलों",
+     163.64
+    ],
+    [
+     "से",
+     165.16
+    ],
+    [
+     "कम",
+     165.56
+    ],
+    [
+     "नहीं",
+     166.1
+    ]
+   ],
+   "end": 167.42
+  },
+  {
+   "words": [
+    [
+     "दुनिया",
+     168.14
+    ],
+    [
+     "किसी",
+     170.08
+    ],
+    [
+     "के",
+     171.14
+    ],
+    [
+     "प्यार",
+     171.58
+    ],
+    [
+     "में",
+     173.08
+    ],
+    [
+     "जन्नत",
+     173.58
+    ],
+    [
+     "से",
+     175.46
+    ],
+    [
+     "कम",
+     175.84
+    ],
+    [
+     "नहीं",
+     176.38
+    ]
+   ],
+   "end": 177.4
+  },
+  {
+   "words": [
+    [
+     "इक",
+     178.6
+    ],
+    [
+     "दिलरुबा",
+     179.84
+    ],
+    [
+     "है",
+     181.26
+    ],
+    [
+     "दिल",
+     181.88
+    ],
+    [
+     "में",
+     182.78
+    ],
+    [
+     "जो",
+     183.4
+    ],
+    [
+     "हूरों",
+     184.0
+    ],
+    [
+     "से",
+     185.58
+    ],
+    [
+     "कम",
+     186.04
+    ],
+    [
+     "नहीं",
+     186.54
+    ]
+   ],
+   "end": 188.04
+  }
+ ],
+ "captions": {
+  "y": 955,
+  "size": 62
+ },
+ "picks": [
+  "haveli:401",
+  "jharokha:612",
+  "pearls:421",
+  "pearls:422:pearls2",
+  "arch:632",
+  "laugh:642",
+  "lanterns:451",
+  "lookup:661",
+  "buds:471",
+  "hair:681",
+  "rose:691",
+  "garden:501",
+  "walk:713",
+  "moonrise:521",
+  "angel:732",
+  "terrace:741"
+ ]
+}

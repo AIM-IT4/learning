@@ -16,7 +16,8 @@ What comes out: one 1080x1920 MP4 of about 65-70 s, built in this order:
 The music video, shot by shot:
 - **Shots:** about 20, one per 1-2 bars, each ONE painted still that never changes. The camera does all the moving (push, drift, roll), plus depth parallax from a depth map.
 - **Cuts:** on the downbeats, with whip pans, zoom-throughs, flashes and dissolves.
-- **Effects:** petals, dust, bokeh, stars, rain, snow, fireflies or embers, colour grades, and a cloud that forms a heart.
+- **Effects:** petals, dust, bokeh, stars, rain, snow, fireflies, embers or falling pearls, colour grades, and a cloud that forms a heart.
+- **Living paintings:** each painting also moves a little on its own. Hair and dupatta sway in a breeze, leaves, grass and flowers ripple, clouds drift, water shimmers, small lamps flicker and people breathe, while faces and hands stay still. Two small segmentation models find these regions, and a gentle wind field moves them (`anim`, on by default).
 - **Lyrics:** every sung line appears on a torn-paper strip, starting with the very first word. Each word darkens as it is sung.
 
 This is exactly how the reference reels are made (checked frame by frame): still paintings, with only the camera and the effects moving.
@@ -77,6 +78,16 @@ Whisper drops a line that repeats the one before it. The script listens again wh
 ## 2. Story and look: write `$R/reel.json`
 `reference/example_sochenge.json` is the complete reel that was delivered. Copy its shape.
 - **Cast:** 1-2 original characters. `cast` gives the outfit first and is pasted into prompts as `{K}`/`{N}`. `face` gives a face-only description for the repair pass. Keep the outfits and hair identical in every shot.
+- **A new cast for every song.** Never reuse an earlier reel's cast wording. Similar words ("beautiful young Indian woman, long black hair, jhumkas") always give the painter's same favourite face, and the user notices.
+  - Read `reference/casts_used.md` first. Change at least four of these against every cast listed there:
+    - outfit type and colour (not pink twice)
+    - hairstyle: open, braid, bun with gajra, dupatta over the hair, short
+    - face details: kohl, nose ring, beauty spot, glasses, moustache, beard, clean-shaven
+    - age
+    - skin tone
+    - era and setting: 90s film, Mughal, modern city, village
+  - Put the distinctive details in both `cast` and `face`, so the face repair keeps them.
+  - After the reel, add its cast to `casts_used.md`.
 - **Storyboard:** one shot per 1-2 bars (2-4 s each), 18-22 shots for a minute. Each picture comes from the words sung over it: show the image the line names. "ख़्वाबों में छुपाया तुमको" (hid you in my dreams), for example, became her dancing among the stars.
 - **Arc:** give the cut a shape, for example meet, longing, dream or memory, search, together. End on the strongest picture, held with a slow push and a fade.
 - **Repeated lines:** when a line repeats, use NEW pictures (a second option of a shot as its own alias, such as `swing:242:swing2`), not zoomed copies.
@@ -90,6 +101,7 @@ Whisper drops a line that repeats the one before it. The script listens again wh
   - `img` and `bars`, or `t1` in MV seconds.
   - `z` [start, end] and `c` [[x, y] start, [x, y] end] in 0-1 of the picture.
   - Optional: `rot`, `par`, `dolly`, `swing`, `ease`, `grade`, `fx`, `overlays`, and `out` + `out_d` (the transition into the next shot).
+  - `anim`: the painting's own motion. Leave it out to get the default. Use `false` for a still, a number to scale everything, or `{"hair": 1.6, "cloth": 1.3, "foliage", "sky", "water", "lights", "breath"}` to strengthen the hero element (hair in a "breeze" shot, water in a river shot). A top-level `"anim"` sets the default for every shot.
 - **`lines`:** each line's words as `[word, song_time]`, with `end` = when the line's last word ends.
 - **`captions`:** `{"y": 955, "size": 62}`. Raise `y` if faces sit low.
 - **`intro`:**
@@ -113,6 +125,12 @@ cd $R && HF_HUB_OFFLINE=1 nohup python3 $SK/scripts/paint_pro.py candidates reel
   - a face too small to read
 
   If both options fail, add a seed and paint that shot again.
+
+  Two-person shots fail most often. Two fixes help:
+  - Paint the couple seen from behind, walking away, or sitting apart.
+  - If a near-miss only has the wrong outfit colours, recolour it:
+    `python3 $SK/scripts/recolor_outfit.py paint/walk_713.png paint/walk_713.png --side right --hues 35-95 --to black`
+    (`--to shift:46 --value 0.8` turns olive into emerald). Keep the original first.
 - **Finish the picks:**
   ```
   HF_HUB_OFFLINE=1 nohup python3 $SK/scripts/paint_pro.py finish reel.json paint hill:212 swing:241 swing:242:swing2 ... > finish.log 2>&1 &
@@ -155,7 +173,14 @@ ffmpeg -y -v error -i $R/master.mp4 -c:v libx264 -preset slow -crf 21 -profile:v
   - Without the 2x enlargement, a close camera push goes soft.
   - Without `"eyes": "closed"`, sleeping faces wake up.
   - Its second-face guard skips crowds and false finds (a lamp, the moon, embroidery).
-- **Depth cache:** keyed by file name. A new reel needs a new `mv` folder, or `REEL_CACHE`.
+- **Depth cache:** keyed by file name, and so are the motion region maps (`*_anim.npz`). A new reel needs a new `mv` folder, or `REEL_CACHE`.
+- **Living-painting limits:**
+  - Motion stays small (hair tips about 7 px, leaves about 3 px on screen), so nothing tears.
+  - Clouds drift about 3 px a second.
+  - Only small warm bright spots in dark scenes flicker, never faces, jewellery or lit windows.
+  - Only the main characters breathe (the crowd stays put).
+  - If a painting wobbles, lower that shot's `anim` (for example `{"foliage": 0.5}`).
+  - Check motion with two stills 1.4 s apart and their difference image.
 - **Captions:**
   - Every line appears from its first word and leaves 0.35 s before the next. Lines never overlap.
   - Captions use the font of the lyrics' script, with raqm shaping. Check that `captions.lang` matches the script.
@@ -176,6 +201,9 @@ ffmpeg -y -v error -i $R/master.mp4 -c:v libx264 -preset slow -crf 21 -profile:v
 - `scripts/render_parts.sh`: check stills, then the 4-part render.
 - `scripts/render_intro.py`, `scripts/render_card.py`, `scripts/assemble_reel.sh`: intro, rotate card, and the final reel with the song.
 - `scripts/laptop.html`, `scripts/make_laptop.cjs`: the code-drawn laptop with the green screen.
+- `scripts/recolor_outfit.py`: fixes a person's outfit colour to match the cast (clothes parser, then a hue shift or black).
 - `scripts/setup.sh`: packages, fonts, models, laptop.
 - `reference/moods.md`: mood → look.
 - `reference/example_sochenge.json`: a complete reel ("Sochenge Tumhe Pyar", 21 shots, 10 lines).
+- `reference/example_duniya.json`: a complete reel with the living paintings and falling pearls ("Duniya Kisi Ke Pyar Mein", 16 shots cut by bars, 6 lines, Mughal-haveli ghazal look).
+- `reference/casts_used.md`: casts from earlier reels, never to be repeated.

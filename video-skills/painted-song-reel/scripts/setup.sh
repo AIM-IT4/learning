@@ -2,7 +2,7 @@
 # One-time setup for painted-song-reel (safe to re-run; quick when everything is there):
 #   python packages, fonts (OFL, from the npm packages of Google Fonts), the open-source models (about 9 GB in the
 #   Hugging Face cache: DreamShaper XL Lightning fp16, Depth Anything V2 Small, YuNet, faster-whisper large-v3-turbo,
-#   HTDemucs) and the intro's laptop picture.
+#   HTDemucs, two SegFormer-B2 segmenters for the living paintings) and the intro's laptop picture.
 #   bash setup.sh            everything
 #   bash setup.sh fonts      only the fonts;  EXTRA_FONTS="noto-sans-gurmukhi noto-sans-tamil" adds lyric fonts
 HERE="$(cd "$(dirname "$0")" && pwd)"; SK="$(dirname "$HERE")"
@@ -51,6 +51,8 @@ snapshot_download("depth-anything/Depth-Anything-V2-Small-hf")
 hf_hub_download("opencv/face_detection_yunet", "face_detection_yunet_2023mar.onnx")
 snapshot_download("mobiuslabsgmbh/faster-whisper-large-v3-turbo")
 snapshot_download("adefossez/HTDemucs", allow_patterns=["htdemucs.yaml", "955717e8*"])
+snapshot_download("nvidia/segformer-b2-finetuned-ade-512-512", allow_patterns=["*.json", "pytorch_model.bin"])   # living paintings:
+snapshot_download("mattmdjaga/segformer_b2_clothes", allow_patterns=["*.json", "*.safetensors"])                # scene + hair/clothes
 print("models ok")
 EOF
 

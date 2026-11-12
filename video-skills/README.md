@@ -22,7 +22,8 @@ the bundled media tools' telemetry is switched off by the installer with `DO_NOT
 A painted-style animated music-video reel for ANY song (the format of the viral "painted-style music video made with
 Claude" reels): "Claude x song" laptop intro, rotate-your-phone card, then a sideways music video of semi-realistic
 paintings of original characters moved by the camera (depth parallax, petals / rain / stars, cuts on the downbeat) with
-karaoke lyric strips from the first sung word. Story, palette and painting style follow the song's mood and lyrics
+karaoke lyric strips from the first sung word, and each painting gently alive (hair and dupatta in the breeze, leaves,
+clouds, water, lamps, breathing). Story, cast, palette and painting style follow the song's mood and lyrics
 (`painted-song-reel/reference/moods.md`). Everything runs locally on CPU with open-source models (DreamShaper XL
 Lightning + a face-repair pass, Depth Anything V2, faster-whisper, demucs): no Flow, no credits, about 1.5 hours a reel.
 Ask: "make a painted reel for this song" and attach the song. Source: `painted-song-reel/` (SKILL.md, scripts,

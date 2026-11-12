@@ -8,7 +8,12 @@ with radial blur, whip pans with motion blur, white flash, dissolve. Screen-spac
 twinkling stars, rain, snow, fireflies, embers, a cloud that forms a heart, karaoke lyric strips on torn paper (any
 script PIL + raqm can shape: caption_font / caption_lang in the json), colour grades, a light vignette and grain.
 Times in shots.json are MV seconds; the clip covers [start, end). Output 1920x1080, 30 fps, no sound.
-Depth maps are cached in $REEL_CACHE (default: depth_cache next to the output), keyed by the picture's file name.
+Life inside each painting (on by default; "anim" per shot or for the whole json: false, a number to scale it, or
+{"hair", "cloth", "foliage", "sky", "water", "lights", "breath": multipliers}): two small segmentation models find the
+hair, clothes, trees / grass / flowers, sky, water and the people, and a gentle wind field moves them - hair and
+dupatta sway, leaves and grass ripple, clouds drift, water shimmers, lamps flicker, people breathe - while faces and
+hands stay still. Depth maps and these region maps are cached in $REEL_CACHE (default: depth_cache next to the
+output), keyed by the picture's file name.
 """
 import json, math, subprocess, sys
 from pathlib import Path
@@ -65,7 +70,7 @@ def prepare(path):
 
 XO, YO = np.meshgrid(np.arange(W, dtype=np.float32) - W / 2 + 0.5, np.arange(H, dtype=np.float32) - H / 2 + 0.5)
 
-def render_still(img, depth, z, c, rot, par, dolly, d0, shift=(0.0, 0.0)):
+def render_still(img, depth, z, c, rot, par, dolly, d0, shift=(0.0, 0.0), anim=None, ta=0.0):
     """One frame of a still: zoom z (1 = cover the frame), centre c (0..1 of the still), roll rot (deg),
     parallax par (screen px a depth-1 point moves relative to depth d0), dolly (extra growth of near layers),
     shift (screen px, for whip transitions)."""
@@ -82,14 +87,136 @@ def render_still(img, depth, z, c, rot, par, dolly, d0, shift=(0.0, 0.0)):
         g = 1.0 / (1.0 + dolly * dd)
         mx = Cx + (mx - Cx) * g - par[0] * dd / s
         my = Cy + (my - Cy) * g - par[1] * dd / s
-    return cv2.remap(img, mx, my, cv2.INTER_LINEAR, borderMode=cv2.BORDER_REFLECT)
+    fl = None
+    if anim is not None:                               # the painting's own motion, in picture pixels
+        dx, dy, fl = anim_offsets(anim, mx, my, ta)
+        mx = mx + dx; my = my + dy
+    out = cv2.remap(img, mx, my, cv2.INTER_LINEAR, borderMode=cv2.BORDER_REFLECT)
+    return out if fl is None else out * (1.0 + fl[..., None])
+
+# ---------------------------------------------------------------- life inside the painting
+ANIM_KEYS = ("hair", "cloth", "foliage", "sky", "water", "lights", "breath")
+_SEG = {}
+def anim_params(sh):
+    """Multipliers for this shot: the json's "anim", then the shot's own "anim" (false = still)."""
+    p = {k: 1.0 for k in ANIM_KEYS}
+    for src in (cfg.get("anim", True), sh.get("anim", True)):
+        if src is False or src == 0: return None
+        if isinstance(src, (int, float)) and src is not True: p = {k: v * src for k, v in p.items()}
+        elif isinstance(src, dict): p.update({k: float(v) for k, v in src.items() if k in p})
+    return p
+
+def anim_compute(img):
+    """Region weights at 1/4 size: hair (more at the tips), cloth (more at the hem), foliage, sky, water, people
+    (for breathing), lights (+ a flicker phase per light). Faces and hands are kept out of every moving region."""
+    import torch
+    from transformers import SegformerForSemanticSegmentation, SegformerImageProcessor
+    from huggingface_hub import hf_hub_download
+    torch.set_num_threads(4)
+    if not _SEG:
+        for name, repo in (("ade", "nvidia/segformer-b2-finetuned-ade-512-512"), ("clo", "mattmdjaga/segformer_b2_clothes")):
+            _SEG[name] = (SegformerImageProcessor.from_pretrained(repo), SegformerForSemanticSegmentation.from_pretrained(repo).eval())
+        _SEG["yunet"] = cv2.FaceDetectorYN.create(hf_hub_download("opencv/face_detection_yunet", "face_detection_yunet_2023mar.onnx"), "", (320, 320), 0.6, 0.3, 50)
+    h, w = img.shape[:2]; fw, fh = w // 4, h // 4
+    u8 = np.clip(img, 0, 255).astype(np.uint8)
+    rgb = Image.fromarray(cv2.cvtColor(u8, cv2.COLOR_BGR2RGB)).resize((896, round(896 * h / w)))
+    def seg(name):
+        proc, model = _SEG[name]
+        with torch.no_grad(): lo = model(**proc(images=rgb, return_tensors="pt")).logits
+        return torch.nn.functional.interpolate(lo, size=(fh, fw), mode="bilinear").argmax(1)[0].numpy()
+    a, c = seg("ade"), seg("clo")
+    lab = _SEG["ade"][1].config.id2label
+    ade = lambda *ws: np.isin(a, [i for i, n in lab.items() if any(x in n for x in ws)])
+    Y, X = np.mgrid[0:fh, 0:fw].astype(np.float32)
+    blur = lambda m, s=2.0: cv2.GaussianBlur(m.astype(np.float32), (0, 0), s)
+    keep = 1.0 - np.clip(blur(cv2.dilate((np.isin(c, [11, 14, 15])).astype(np.uint8), np.ones((5, 5), np.uint8)), 2.5) * 1.6, 0, 1)
+    # faces (YuNet, on a copy at most 1344 wide) anchor the hair ramp: still at the scalp, freer towards the tips
+    k_ = min(1.0, 1344 / w); small = cv2.resize(u8, (round(w * k_), round(h * k_)))
+    _SEG["yunet"].setInputSize((small.shape[1], small.shape[0])); _, fc = _SEG["yunet"].detect(small)
+    faces = [] if fc is None else [(float(r[0] + r[2] / 2) / k_ / 4, float(r[1] + r[3] / 2) / k_ / 4, float(r[3]) / k_ / 4) for r in fc]
+    hair = (c == 2).astype(np.float32)
+    if faces:
+        ramp = np.full_like(hair, 1.0)
+        for (cx, cy, fhh) in faces:
+            d2 = (X - cx) ** 2 + (Y - cy) ** 2
+            r = np.clip((Y - cy) / (1.8 * fhh) + 0.25, 0.1, 1.0) * np.clip(np.sqrt(d2) / (1.2 * fhh), 0.25, 1.0)
+            near = d2 < (4.0 * fhh) ** 2
+            ramp = np.where(near, np.minimum(ramp, r), ramp)
+    else:
+        ramp = np.full_like(hair, 0.6)
+    cl = np.isin(c, [4, 5, 7, 17])
+    cramp = np.zeros_like(hair)
+    if cl.any():
+        ys = np.where(cl.any(1))[0]; y0, y1 = ys.min(), ys.max()
+        cramp = np.clip((Y - y0) / max(1, y1 - y0), 0, 1) ** 1.3 * 0.85 + 0.15
+    person = c > 0                                     # the main people only (the crowd stays put)
+    yb = float(np.where(person.any(1))[0].max()) if person.any() else float(fh)
+    # lights: small bright spots that stand out from a dark surround (lamps, candles, string lights) - not white flowers
+    hsv = cv2.cvtColor(cv2.resize(u8, (fw, fh), interpolation=cv2.INTER_AREA), cv2.COLOR_BGR2HSV).astype(np.float32)
+    V, S_ = hsv[..., 2], hsv[..., 1]
+    lamp_zone = ade("lamp", "light", "chandelier", "sconce", "candle")
+    dark = V.mean() < 115
+    H_ = hsv[..., 0]
+    away = cv2.dilate((person | ade("person")).astype(np.uint8), np.ones((9, 9), np.uint8)) == 0   # never a face or a jewel
+    cand = ((V > 210) & (V - cv2.GaussianBlur(V, (0, 0), 6) > 28) & (((H_ >= 5) & (H_ <= 45) & (S_ > 50)) | lamp_zone)
+            & (dark | lamp_zone) & away)
+    n_, labels, st, _ = cv2.connectedComponentsWithStats(cand.astype(np.uint8))
+    small_ = np.zeros(n_, bool); small_[1:] = st[1:, cv2.CC_STAT_AREA] < 0.0012 * fw * fh     # bulbs and flames, not windows
+    cand = small_[labels]
+    phase = np.random.default_rng(5).uniform(0, 2 * np.pi, n_ + 1).astype(np.float32)[labels]
+    light = blur(cv2.dilate(cand.astype(np.uint8), np.ones((3, 3), np.uint8)), 1.5)
+    return dict(hair=blur(hair) * ramp * keep, cloth=blur(cl) * cramp * keep,
+                foliage=blur(ade("tree", "grass", "plant", "flower", "field", "palm"), 2.5) * keep,
+                sky=blur(cv2.erode(ade("sky").astype(np.uint8), np.ones((5, 5), np.uint8)), 5.0), water=blur(ade("water", "sea", "river", "lake", "pool", "fountain"), 2.5),
+                breath=blur(person, 3.0) * (Y - yb) * 4.0, light=np.clip(light * 1.4, 0, 1), phase=blur(phase, 1.0))
+
+def anim_load(img, key, prm):
+    p = CACHE / f"{key}_anim.npz"
+    if p.exists():
+        z_ = np.load(p); A = {k: z_[k].astype(np.float32) for k in z_.files}
+    else:
+        A = anim_compute(img); np.savez_compressed(p, **{k: v.astype(np.float16) for k, v in A.items()})
+    fh, fw = A["hair"].shape; q = img.shape[1] / fw
+    A["q"] = q; A["Y"], A["X"] = (g.astype(np.float32) * q for g in np.mgrid[0:fh, 0:fw])
+    A["prm"] = prm; A["on"] = {k: float(np.abs(A[k]).max()) > 1e-3 for k in ("hair", "cloth", "foliage", "sky", "water", "breath", "light")}
+    return A
+
+def anim_offsets(A, mx, my, t):
+    """Picture-pixel offsets (dx, dy) to add to the sampling map, and the light flicker gain, at shot time t."""
+    w2, p, on, X, Y = 2 * math.pi, A["prm"], A["on"], A["X"], A["Y"]
+    dx = np.zeros_like(A["hair"]); dy = np.zeros_like(dx); fl = None
+    if on["hair"] and p["hair"]:
+        Wh = A["hair"] * p["hair"]
+        dx += 9.0 * Wh * (np.sin(w2 * 0.42 * t - Y / 170 + 0.3) + 0.35 * np.sin(w2 * 0.97 * t - Y / 90 + 1.1))
+        dy += 2.5 * Wh * np.sin(w2 * 0.55 * t - Y / 150 + 2.0)
+    if on["cloth"] and p["cloth"]:
+        Wc = A["cloth"] * p["cloth"]
+        dx += 5.0 * Wc * (np.sin(w2 * 0.33 * t - Y / 230 + 0.8) + 0.3 * np.sin(w2 * 0.81 * t - Y / 110))
+        dy += 1.5 * Wc * np.sin(w2 * 0.41 * t - Y / 200 + 1.7)
+    if on["foliage"] and p["foliage"]:
+        Wf = A["foliage"] * p["foliage"]
+        dx += 4.5 * Wf * (np.sin(w2 * 0.36 * t - X / 260 + Y / 600) + 0.4 * np.sin(w2 * 0.83 * t - X / 120 + 0.5))
+        dy += 1.5 * Wf * np.sin(w2 * 0.47 * t - X / 200)
+    if on["sky"] and p["sky"]: dx += -4.0 * t * A["sky"] * p["sky"]           # clouds drift ~4 px/s
+    if on["water"] and p["water"]:
+        Ww = A["water"] * p["water"]
+        dy += 2.5 * Ww * np.sin(w2 * 0.8 * t - X / 40); dx += 1.5 * Ww * np.sin(w2 * 0.6 * t - Y / 30)
+    if on["breath"] and p["breath"]: dy += -0.003 * A["breath"] * p["breath"] * math.sin(w2 * t / 3.6)
+    fx, fy = mx / A["q"], my / A["q"]
+    DX = cv2.remap(dx, fx, fy, cv2.INTER_LINEAR, borderMode=cv2.BORDER_REPLICATE)
+    DY = cv2.remap(dy, fx, fy, cv2.INTER_LINEAR, borderMode=cv2.BORDER_REPLICATE)
+    if on["light"] and p["lights"]:
+        ph = A["phase"]
+        f_ = A["light"] * (0.55 * np.sin(w2 * 1.7 * t + ph) + 0.45 * np.sin(w2 * 4.3 * t + 2.3 * ph)) * 0.22 * p["lights"]
+        fl = cv2.remap(f_, fx, fy, cv2.INTER_LINEAR, borderMode=cv2.BORDER_REPLICATE)
+    return DX, DY, fl
 
 # ---------------------------------------------------------------- screen-space extras
 COLORS = {"petals": (252, 246, 236), "dust": (255, 220, 150), "bokeh": (255, 200, 120), "snow": (255, 255, 255),
           "fireflies": (210, 255, 120), "embers": (255, 150, 60), "rain": (205, 215, 230)}     # RGB defaults
 
 class Particles:
-    """kind: petals | dust | bokeh | stars | rain | snow | fireflies | embers; color (RGB) overrides the default."""
+    """kind: petals | dust | bokeh | stars | rain | snow | fireflies | embers | pearls; color (RGB) overrides the default."""
     def __init__(self, kind, n, seed, area=(0, 0, W, H), color=None):
         r = np.random.default_rng(seed)
         self.kind, self.n = kind, n
@@ -111,6 +238,9 @@ class Particles:
             self.v = np.stack([r.uniform(-260, -180, n), r.uniform(1500, 2100, n)], 1); self.size = r.uniform(26, 60, n)
         elif kind == "snow":                                   # soft flakes drifting down with a sway
             self.v = np.stack([r.uniform(-20, 20, n), r.uniform(40, 110, n)], 1); self.size = r.uniform(2, 6, n); self.ph = r.uniform(0, 6.28, n)
+        elif kind == "pearls":                                 # shiny pearls raining down
+            self.v = np.stack([r.uniform(-25, 25, n), r.uniform(430, 700, n)], 1)
+            self.size = r.uniform(5.0, 11.0, n); self.ph = r.uniform(0, 6.28, n)
         elif kind in ("fireflies", "embers"):                  # glowing points: fireflies wander, embers rise
             up = (-90, -35) if kind == "embers" else (-14, 14)
             self.v = np.stack([r.uniform(-18, 18, n), r.uniform(*up, n)], 1); self.size = r.uniform(2.5, 5.5, n); self.ph = r.uniform(0, 6.28, n)
@@ -163,6 +293,16 @@ class Particles:
                 x = (self.p[k, 0] + self.v[k, 0] * t + 22 * math.sin(0.9 * t + self.ph[k])) % W; y = (self.p[k, 1] + self.v[k, 1] * t) % (H + 20) - 10
                 cv2.circle(a, (int(x), int(y)), int(self.size[k]), 0.85, -1, cv2.LINE_AA)
             ov[:] = self.col; a = cv2.GaussianBlur(a, (0, 0), 1.4)
+        elif self.kind == "pearls":
+            for k in range(self.n):
+                x = (self.p[k, 0] + self.v[k, 0] * t + 8 * math.sin(1.3 * t + self.ph[k])) % (W + 40) - 20
+                y = (self.p[k, 1] + self.v[k, 1] * t) % (H + 60) - 30
+                rr_ = self.size[k]; c_ = (int(x), int(y))
+                cv2.circle(a, c_, int(rr_), 0.97, -1, cv2.LINE_AA)
+                cv2.circle(ov, c_, int(rr_), (196, 204, 214), -1, cv2.LINE_AA)                       # rim
+                cv2.circle(ov, (int(x - rr_ * 0.15), int(y - rr_ * 0.18)), int(rr_ * 0.78), (232, 238, 244), -1, cv2.LINE_AA)
+                cv2.circle(ov, (int(x - rr_ * 0.35), int(y - rr_ * 0.4)), max(1, int(rr_ * 0.3)), (255, 255, 255), -1, cv2.LINE_AA)
+            a = cv2.GaussianBlur(a, (0, 0), 0.7); ov = cv2.GaussianBlur(ov, (0, 0), 0.7)
         elif self.kind in ("fireflies", "embers"):
             for k in range(self.n):
                 x = (self.p[k, 0] + self.v[k, 0] * t + 16 * math.sin(0.7 * t + self.ph[k])) % W
@@ -229,6 +369,8 @@ def paste_rgba(frame, rgba, cx, cy, scale=1.0, rot=0.0, alpha=1.0):
 shots = cfg["shots"]
 for k, sh in enumerate(shots):
     sh["img_"], sh["depth_"] = prepare(sh["img"])
+    prm = anim_params(sh)
+    sh["anim_"] = anim_load(sh["img_"], Path(sh["img"]).stem, prm) if prm else None
     sh["fx_"] = [Particles(fx["kind"], fx.get("n", 30), 100 + 10 * k + j, tuple(fx.get("area", (0, 0, W, H))), fx.get("color"))
                  for j, fx in enumerate(sh.get("fx", []))]
 strips = []
@@ -321,7 +463,8 @@ def shot_frame(k, t, extra_zoom=1.0, shift=(0.0, 0.0)):
     mg = 0.012 + 0.55 * abs(math.sin(math.radians(rot))) + (abs(par[0]) / W + abs(par[1]) / H) * 0.6
     hx, hy = min(0.5, W / (2 * s_ * ws) + mg), min(0.5, H / (2 * s_ * hs) + mg)
     c = (min(max(c[0], hx), 1 - hx), min(max(c[1], hy), 1 - hy))
-    f = render_still(sh["img_"], sh["depth_"], z, c, rot, par, sh.get("dolly", 0.0) * e, sh.get("d0", 0.5), shift)
+    f = render_still(sh["img_"], sh["depth_"], z, c, rot, par, sh.get("dolly", 0.0) * e, sh.get("d0", 0.5), shift,
+                     sh.get("anim_"), t - sh["t0"])
     gr = sh.get("grade", cfg.get("grade"))
     if gr in GRADES:                                   # colour grade per shot (or for the whole reel)
         mul, add, sat = GRADES[gr]
