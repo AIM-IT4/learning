@@ -1,0 +1,279 @@
+<template>
+  <style>
+    @font-face { font-family: "Yatra One"; src: url("assets/fonts/YatraOne.ttf"); }
+    @font-face { font-family: "Noto Sans Devanagari"; font-weight: 700; src: url("assets/fonts/NotoSansDevanagari_700Bold.ttf"); }
+    @font-face { font-family: "Poppins"; font-weight: 700; src: url("assets/fonts/Poppins_700Bold.ttf"); }
+    #root { position: absolute; inset: 0; background: #f7f7f3; overflow: hidden; }
+    #r-art { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    .r-chip { position: absolute; top: 236px; width: 290px; height: 96px; border: 5px solid #12221f; border-radius: 48px; text-align: center;
+              font-family: "Noto Sans Devanagari"; font-weight: 700; font-size: 46px; line-height: 84px; color: #12221f; background: #f7f7f3; }
+    .r-chip b { font-family: "Poppins"; font-weight: 700; color: inherit; opacity: 0.7; margin-right: 10px; }
+    #r-ch1 { left: 70px; } #r-ch2 { left: 395px; } #r-ch3 { left: 720px; }
+    .r-cap { position: absolute; left: 60px; top: 1330px; width: 960px; text-align: center; font-family: "Noto Sans Devanagari"; font-weight: 700;
+             font-size: 46px; line-height: 1.3; color: #12221f; text-wrap: balance; background: rgba(247, 247, 243, 0.94); border-radius: 20px; padding: 6px 10px; }
+    .r-cap span { display: inline-block; padding: 0 8px; margin: 0 1px; border-radius: 8px; opacity: 0.4; }
+    #r-code { position: absolute; left: 80px; top: 380px; width: 920px; height: 560px; background: #12221f; border-radius: 28px; }
+    #r-code .ln { position: absolute; left: 100px; font-family: "JetBrains Mono", "Noto Sans Devanagari"; font-size: 38px; line-height: 56px; color: #f7f7f3;
+                  white-space: pre; }
+    #r-code .k { color: #7fd6cf; } #r-code .f { color: #ffd23f; } #r-code .c { color: #8aa39e; font-family: "Noto Sans Devanagari"; font-size: 34px; }
+    #r-code .n { color: #f0a58f; }
+    #r-fname { position: absolute; left: 160px; top: 22px; font-family: "JetBrains Mono"; font-size: 28px; color: #8aa39e; }
+    #r-out { position: absolute; left: 100px; top: 470px; font-family: "JetBrains Mono"; font-size: 40px; color: #ffd23f; white-space: pre; }
+    .r-hl { position: absolute; left: 70px; width: 820px; height: 56px; border-radius: 10px; background: rgba(127, 214, 207, 0.18); transform-origin: 0% 50%; }
+    .r-fr { position: absolute; height: 52px; padding: 0 22px; border-left: 8px solid #0b7f79; border-radius: 6px; background: #ffffff;
+            font-family: "JetBrains Mono"; font-size: 32px; line-height: 52px; color: #12221f; white-space: nowrap; box-shadow: 0 2px 0 rgba(18, 34, 31, 0.15); }
+    #r-f0 { background: #ffd23f; border-left-color: #12221f; }
+    #r-f0 i { font-style: normal; font-family: "Noto Sans Devanagari"; font-weight: 700; font-size: 30px; margin-left: 14px; }
+    #r-tag { position: absolute; left: 770px; top: 780px; padding: 6px 26px; border-radius: 12px; background: #ffd23f; font-family: "Noto Sans Devanagari";
+             font-weight: 700; font-size: 54px; color: #12221f; }
+    #r-end { position: absolute; left: 0; top: 560px; width: 1080px; text-align: center; }
+    #r-end .t { display: block; font-family: "Yatra One"; font-size: 170px; line-height: 1.15; color: #12221f; }
+    #r-end .s { display: block; margin-top: 18px; font-family: "Noto Sans Devanagari"; font-weight: 700; font-size: 64px; line-height: 1.45; color: #12221f; }
+    #r-end em { font-style: normal; background: #ffd23f; padding: 0 12px; }
+    #r-inf { position: absolute; left: 0; top: 340px; width: 1080px; text-align: center; font-family: "Poppins"; font-weight: 700; font-size: 300px;
+             line-height: 1; color: #ffd23f; text-shadow: 0 4px 0 #12221f; }
+  </style>
+  <div id="root" data-composition-id="recur" data-width="1080" data-height="1920">
+    <svg id="r-art" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <clipPath id="r-top"><rect x="0" y="0" width="1080" height="905" /></clipPath>
+        <clipPath id="r-bot"><rect x="0" y="905" width="1080" height="1015" /></clipPath>
+      </defs>
+      <!-- intro: the title as a picture inside itself (built by script: 6 levels) -->
+      <g id="r-nestz"><g id="r-nest"></g></g>
+      <!-- 2: nesting dolls (built by script: 4 levels, each a top and a bottom half) -->
+      <g id="r-dolls"></g>
+      <g id="r-line"></g>
+      <!-- 3: the mirror tunnel (built by script: 12 frames, each 0.8x and turned 7 degrees) -->
+      <g id="r-mirz"><g id="r-mir"></g></g>
+    </svg>
+
+    <!-- 1: the code -->
+    <div id="r-code">
+      <svg width="920" height="70" style="position:absolute;left:0;top:0"><circle cx="44" cy="40" r="11" fill="#e07a5f" /><circle cx="78" cy="40" r="11" fill="#ffd23f" />
+        <circle cx="112" cy="40" r="11" fill="#0b7f79" /></svg>
+      <div id="r-fname">countdown.js</div>
+      <div id="r-hl1" class="r-hl" style="top: 92px"></div>
+      <div id="r-hl4" class="r-hl" style="top: 260px"></div>
+      <div class="ln" style="top: 92px"><span class="k">function</span> <span class="f">countdown</span>(n) {</div>
+      <div class="ln" style="top: 148px">  <span class="k">if</span> (n === <span class="n">0</span>) <span class="k">return</span>;  <span class="c">// बेस केस</span></div>
+      <div class="ln" style="top: 204px">  print(n);</div>
+      <div class="ln" style="top: 260px">  <span class="f">countdown</span>(n - <span class="n">1</span>);  <span class="c">// खुद को</span></div>
+      <div class="ln" style="top: 316px">}</div>
+      <svg width="920" height="4" style="position:absolute;left:0;top:420px"><rect x="40" y="0" width="840" height="3" fill="#3a4a47" /></svg>
+      <div id="r-out">&gt; </div>
+    </div>
+    <!-- 1: the self-call arrow in the editor's gutter, from line 4 back to line 1 (drawn above the editor) -->
+    <svg id="r-arr" viewBox="0 0 1080 1920" style="position: absolute; left: 0; top: 0; width: 1080px; height: 1920px">
+      <path id="r-arrow" d="M 168 668 C 106 668, 106 500, 168 500" fill="none" stroke="#ffd23f" stroke-width="7" stroke-linecap="round"
+            stroke-dasharray="300" stroke-dashoffset="300" />
+      <path id="r-ahead" d="M 150 486 L 170 500 L 150 514" fill="none" stroke="#ffd23f" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+    <!-- 1: the call stack grows down, one frame per call -->
+    <div id="r-f5" class="r-fr" style="left: 200px; top: 970px">countdown(5)</div>
+    <div id="r-f4" class="r-fr" style="left: 230px; top: 1028px">countdown(4)</div>
+    <div id="r-f3" class="r-fr" style="left: 260px; top: 1086px">countdown(3)</div>
+    <div id="r-f2" class="r-fr" style="left: 290px; top: 1144px">countdown(2)</div>
+    <div id="r-f1" class="r-fr" style="left: 320px; top: 1202px">countdown(1)</div>
+    <div id="r-f0" class="r-fr" style="left: 350px; top: 1260px">countdown(0) → return<i>बेस केस</i></div>
+
+    <div id="r-tag">बेस केस</div>
+    <div id="r-inf">∞</div>
+
+    <div id="r-ch1" class="r-chip"><b>1</b>कोड</div>
+    <div id="r-ch2" class="r-chip"><b>2</b>गुड़िया</div>
+    <div id="r-ch3" class="r-chip"><b>3</b>आईना</div>
+
+    <div id="r-end"><span class="t">रिकर्शन</span><span class="s">खुद को बुलाओ,<br />पर <em>रुकना</em> मत भूलो।</span></div>
+
+    <div id="r-c1" class="r-cap"><span>रिकर्शन</span><span>क्या</span><span>है?</span></div>
+    <div id="r-c2" class="r-cap"><span>तीन</span><span>अंदाज़</span><span>में</span><span>समझिए।</span></div>
+    <div id="r-c3" class="r-cap"><span>पहला,</span><span>कोड</span><span>में।</span></div>
+    <div id="r-c4" class="r-cap"><span>एक</span><span>फ़ंक्शन,</span><span>जो</span><span>खुद</span><span>को</span><span>ही</span><span>बुलाता</span><span>है।</span></div>
+    <div id="r-c5" class="r-cap"><span>पाँच,</span><span>चार,</span><span>तीन,</span><span>दो,</span><span>एक…</span></div>
+    <div id="r-c6" class="r-cap"><span>और</span><span>रुक</span><span>गया।</span></div>
+    <div id="r-c7" class="r-cap"><span>दूसरा,</span><span>गुड़िया</span><span>में।</span></div>
+    <div id="r-c8" class="r-cap"><span>हर</span><span>गुड़िया</span><span>के</span><span>अंदर,</span><span>एक</span><span>छोटी</span><span>गुड़िया।</span></div>
+    <div id="r-c9" class="r-cap"><span>सबसे</span><span>छोटी</span><span>पर</span><span>रुकना,</span></div>
+    <div id="r-c10" class="r-cap"><span>यही</span><span>है</span><span>बेस</span><span>केस।</span></div>
+    <div id="r-c11" class="r-cap"><span>तीसरा,</span><span>आईने</span><span>में।</span></div>
+    <div id="r-c12" class="r-cap"><span>तस्वीर</span><span>के</span><span>अंदर</span><span>तस्वीर…</span></div>
+    <div id="r-c13" class="r-cap"><span>और</span><span>बिना</span><span>बेस</span><span>केस</span><span>के,</span></div>
+    <div id="r-c14" class="r-cap"><span>ये</span><span>कभी</span><span>ख़त्म</span><span>नहीं</span><span>होता।</span></div>
+  </div>
+  <script>
+    (function () {
+      // word onsets (s) on the joined voice; the voice starts at V
+      const V = 0.3;
+      const W = [0.0, 0.38, 0.58, 1.8, 2.0, 2.28, 2.4, 3.5, 4.15, 4.32, 4.95, 5.16, 5.95,
+                 6.1, 6.28, 6.38, 6.48, 6.84, 7.8, 8.55, 9.25, 10.0, 10.7, 11.55, 11.72, 11.92,
+                 12.66, 13.96, 14.28, 14.96, 15.1, 15.36, 15.48, 16.41, 16.6, 16.88, 18.06, 18.36, 18.6,
+                 18.76, 19.56, 19.78, 19.9, 20.12, 20.87, 21.38, 21.7, 22.02, 22.38, 22.5, 22.76, 23.32,
+                 23.48, 23.72, 23.94, 24.18, 25.12, 25.3, 25.44, 25.76, 25.92];
+      const VO_END = 26.25;
+      const GROUPS = [3, 4, 3, 8, 5, 3, 3, 7, 4, 4, 3, 4, 5, 5];
+      const t = (i) => W[i] + V;
+      const NS = "http://www.w3.org/2000/svg";
+      const el = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); parent.appendChild(e); return e; };
+
+      // ---- intro: "रिकर्शन" inside itself. Level k+1 = level k scaled 0.66 about the fixed point (540, 1040).
+      const nest = document.getElementById("r-nest"), F = 0.66, CX = 540, CY = 420 + 0.912 * 680;
+      for (let k = 0; k < 7; k++) {
+        const s = Math.pow(F, k), w = 940 * s, h = 680 * s, x0 = CX + (70 - CX) * s, y0 = CY + (420 - CY) * s;
+        el("rect", { x: x0, y: y0, width: w, height: h, rx: 40 * s, fill: k % 2 ? "#e3f1ef" : "#ffffff", stroke: "#12221f", "stroke-width": Math.max(1.5, 8 * s) }, nest);
+        const tx = el("text", { x: CX, y: y0 + 0.255 * h, "text-anchor": "middle", "font-family": "Yatra One", "font-size": 0.19 * h, fill: k % 2 ? "#075e59" : "#12221f" }, nest);
+        tx.textContent = "रिकर्शन";
+      }
+      // ---- 2: a nesting doll, drawn once per level
+      const DOLL = "M 540 560 C 615 560 660 610 660 680 C 660 720 645 745 630 760 C 720 800 760 900 760 1010 C 760 1120 700 1200 540 1200 C 380 1200 320 1120 320 1010 C 320 900 360 800 450 760 C 435 745 420 720 420 680 C 420 610 465 560 540 560 Z";
+      const LV = [["#0b7f79", "#ffd23f"], ["#ffd23f", "#0b7f79"], ["#12221f", "#ffd23f"], ["#e07a5f", "#ffffff"]];
+      const drawDoll = (g, body, accent) => {
+        el("path", { d: DOLL, fill: body, stroke: "#12221f", "stroke-width": 8 }, g);
+        el("ellipse", { cx: 540, cy: 688, rx: 80, ry: 72, fill: "#fbefe1", stroke: "#12221f", "stroke-width": 5 }, g);
+        el("path", { d: "M 462 662 Q 540 590 618 662", fill: "none", stroke: "#12221f", "stroke-width": 6 }, g);
+        el("circle", { cx: 512, cy: 690, r: 8, fill: "#12221f" }, g); el("circle", { cx: 568, cy: 690, r: 8, fill: "#12221f" }, g);
+        el("circle", { cx: 500, cy: 718, r: 12, fill: "#e07a5f", opacity: 0.7 }, g); el("circle", { cx: 580, cy: 718, r: 12, fill: "#e07a5f", opacity: 0.7 }, g);
+        el("path", { d: "M 525 730 Q 540 742 555 730", fill: "none", stroke: "#12221f", "stroke-width": 5, "stroke-linecap": "round" }, g);
+        el("ellipse", { cx: 540, cy: 1015, rx: 150, ry: 155, fill: "#f7f7f3", stroke: "#12221f", "stroke-width": 5 }, g);
+        for (let p = 0; p < 6; p++) {
+          const a = (p / 6) * Math.PI * 2;
+          el("ellipse", { cx: 540 + 58 * Math.cos(a), cy: 1015 + 58 * Math.sin(a), rx: 34, ry: 22, fill: accent, stroke: "#12221f", "stroke-width": 3,
+                          transform: `rotate(${(a * 180) / Math.PI} ${540 + 58 * Math.cos(a)} ${1015 + 58 * Math.sin(a)})` }, g);
+        }
+        el("circle", { cx: 540, cy: 1015, r: 30, fill: body === "#ffd23f" ? "#e07a5f" : "#ffd23f", stroke: "#12221f", "stroke-width": 4 }, g);
+        el("line", { x1: 330, y1: 905, x2: 750, y2: 905, stroke: "#12221f", "stroke-width": 5, opacity: 0.6 }, g);
+      };
+      const dolls = document.getElementById("r-dolls"), halves = [];
+      const halvesByK = [];
+      [3, 2, 1, 0].forEach((k) => {           // innermost first, so each doll sits inside (behind) the one that holds it
+        const [body, accent] = LV[k];
+        const lv = el("g", { id: "r-d" + k }, dolls), parts = [];
+        ["r-top", "r-bot"].forEach((clip, j) => {
+          const g = el("g", { "clip-path": `url(#${clip})` }, lv);
+          drawDoll(g, body, accent);
+          parts.push(g);
+        });
+        halvesByK[k] = parts;
+      });
+      halves.push(...halvesByK);
+      // the four dolls side by side, big to small, labelled like the calls in the code: n = 3 ... n = 0 (the base case)
+      const line = document.getElementById("r-line"), LS = [0.6, 0.47, 0.37, 0.29], LX = [231, 506, 731, 917];
+      LV.forEach(([body, accent], k) => {
+        const outer = el("g", { id: "r-l" + k }, line);
+        const g = el("g", { transform: `translate(${LX[k]} 1100) scale(${LS[k]}) translate(-540 -1200)` }, outer);
+        drawDoll(g, body, accent);
+        const tx = el("text", { x: LX[k], y: 1158, "text-anchor": "middle", "font-family": "JetBrains Mono", "font-size": 36, fill: k === 3 ? "#0b7f79" : "#12221f" }, outer);
+        tx.textContent = "n=" + (3 - k);
+      });
+      // ---- 3: the mirror tunnel. Level k = scale 0.8^k, turned 7k degrees about (540, 900).
+      const mir = document.getElementById("r-mir"), MF = 0.8, MR = 7, MC = [540, 900];
+      const MCOL = ["#0b7f79", "#f7f7f3", "#ffd23f", "#f7f7f3"];
+      for (let k = 0; k < 16; k++) {
+        const s = Math.pow(MF, k), w = 1500 * s, h = 2100 * s;
+        const g = el("g", { transform: `rotate(${MR * k} ${MC[0]} ${MC[1]})` }, mir);
+        el("rect", { x: MC[0] - w / 2, y: MC[1] - h / 2, width: w, height: h, rx: 30 * s, fill: MCOL[k % 4], stroke: "#12221f", "stroke-width": Math.max(1.5, 12 * s) }, g);
+      }
+      const mirz = document.getElementById("r-mirz");
+      const Z = { p: 0 };
+      const drawMir = () => {     // zoom in by whole levels forever: after 4 levels the picture repeats exactly
+        const q = Z.p % 4, s = Math.pow(1 / MF, q), r = -MR * q;
+        mirz.setAttribute("transform", `translate(${MC[0]} ${MC[1]}) rotate(${r}) scale(${s}) translate(${-MC[0]} ${-MC[1]})`);
+      };
+      drawMir();
+
+      const tl = gsap.timeline({ paused: true });
+      gsap.set(["#r-code", ".r-fr", "#r-tag", "#r-inf", "#r-end", ".r-chip", ".r-cap", "#r-dolls", "#r-mirz", "#r-ahead", ".r-hl", "#r-line > g"], { opacity: 0 });
+      gsap.set(["#r-d1", "#r-d2", "#r-d3"], { opacity: 0 });
+
+      // ---- intro: the poster is the title inside itself; on "क्या" it zooms in one level, on "तीन" the three chips land
+      const NZ = { p: 0 }, nestz = document.getElementById("r-nestz");
+      const drawNest = () => { const s = Math.pow(1 / F, NZ.p); nestz.setAttribute("transform", `translate(${CX} ${CY}) scale(${s}) translate(${-CX} ${-CY})`); };
+      tl.to(NZ, { p: 1, duration: 1.1, ease: "power2.inOut", onUpdate: drawNest }, t(1) - 0.1);
+      gsap.set(".r-chip", { y: 924 });                         // in the intro the chips sit under the title (y 1160)
+      ["#r-ch1", "#r-ch2", "#r-ch3"].forEach((id, k) => tl.fromTo(id, { opacity: 0, y: 964 }, { opacity: 1, y: 924, duration: 0.3, ease: "back.out(2)" }, t(3) + k * 0.1));
+
+      // ---- 1: code. The title dives into its own centre; the editor slides up; chip 1 lights.
+      const chipOn = (id, at) => tl.to(id, { backgroundColor: "#0b7f79", color: "#f7f7f3", borderColor: "#0b7f79", duration: 0.2 }, at);
+      const chipOff = (id, at) => tl.to(id, { backgroundColor: "#f7f7f3", color: "#7d8886", borderColor: "#c9d1cf", duration: 0.2 }, at);
+      tl.to(NZ, { p: 3.2, duration: 0.6, ease: "power3.in", onUpdate: drawNest }, t(7) - 0.1);
+      tl.to("#r-nestz", { opacity: 0, duration: 0.2 }, t(7) + 0.3);
+      tl.to(".r-chip", { y: 0, duration: 0.5, ease: "power3.inOut" }, t(7) - 0.1);   // ...and rise into the header
+      chipOn("#r-ch1", t(7) + 0.3);
+      tl.fromTo("#r-code", { opacity: 0, y: 120 }, { opacity: 1, y: 0, duration: 0.45, ease: "expo.out" }, t(8) - 0.15);
+      tl.fromTo("#r-hl1", { opacity: 1, scaleX: 0 }, { scaleX: 1, duration: 0.3, ease: "power3.out" }, t(11));
+      tl.to("#r-hl1", { opacity: 0, duration: 0.2 }, t(13) - 0.1);
+      tl.fromTo("#r-hl4", { opacity: 1, scaleX: 0 }, { scaleX: 1, duration: 0.3, ease: "power3.out" }, t(13));
+      tl.to("#r-arrow", { attr: { "stroke-dashoffset": 0 }, duration: 0.55, ease: "power2.inOut" }, t(16) - 0.2);
+      tl.to("#r-ahead", { opacity: 1, duration: 0.1 }, t(16) + 0.3);
+      // five calls: each count pushes a frame and prints the number
+      const out = document.getElementById("r-out");
+      ["#r-f5", "#r-f4", "#r-f3", "#r-f2", "#r-f1"].forEach((id, k) => {
+        const at = t(18 + k);
+        tl.fromTo(id, { opacity: 0, x: -60 }, { opacity: 1, x: 0, duration: 0.25, ease: "expo.out" }, at);
+        tl.set(out, { textContent: "> " + [5, 4, 3, 2, 1].slice(0, k + 1).join("  ") }, at);
+        tl.fromTo("#r-arrow", { attr: { stroke: "#f7f7f3" } }, { attr: { stroke: "#ffd23f" }, duration: 0.3, immediateRender: false }, at);
+      });
+      // the base case stops it; then the stack unwinds
+      tl.fromTo("#r-f0", { opacity: 0, x: -60 }, { opacity: 1, x: 0, duration: 0.25, ease: "back.out(2)" }, t(23));
+      tl.fromTo("#r-f0", { scale: 1 }, { scale: 1.06, duration: 0.12, yoyo: true, repeat: 1, transformOrigin: "0% 50%" }, t(25));
+      ["#r-f0", "#r-f1", "#r-f2", "#r-f3", "#r-f4", "#r-f5"].forEach((id, k) =>
+        tl.to(id, { opacity: 0, x: 80, duration: 0.18, ease: "power2.in" }, t(26) + 0.2 + k * 0.07));
+
+      // ---- 2: dolls. The editor leaves left; the big doll enters from the right; chip 2 lights.
+      tl.to("#r-code", { x: -1100, opacity: 0, duration: 0.4, ease: "power3.in" }, t(26) + 0.55);
+      tl.to(["#r-arrow", "#r-ahead"], { opacity: 0, duration: 0.2 }, t(26) + 0.55);
+      chipOff("#r-ch1", t(26) + 0.6); chipOn("#r-ch2", t(26) + 0.6);
+      tl.set("#r-dolls", { opacity: 1 }, t(26) + 0.7);
+      tl.fromTo("#r-d0", { x: 1000 }, { x: 0, duration: 0.5, ease: "expo.out" }, t(26) + 0.7);
+      // inner dolls wait inside at their size; opening = the top half flies off, the inner doll grows to full size, the old bottom drops away
+      const SC = [1, 0.78, 0.6, 0.45], ORG = "540 1200";     // each doll smaller than the last, all standing on the same base
+      [1, 2, 3].forEach((k) => gsap.set("#r-d" + k, { scale: 0.62 * SC[k - 1], svgOrigin: ORG }));
+      const open = (k, at) => {
+        const [top, bot] = halves[k];
+        tl.set("#r-d" + (k + 1), { opacity: 1 }, at);
+        tl.to(top, { y: -2400, rotation: -30, opacity: 0, svgOrigin: "540 900", duration: 0.6, ease: "power3.in" }, at);   // flies right out of the frame
+        tl.to(bot, { y: 800, opacity: 0, duration: 0.45, ease: "power2.in" }, at + 0.3);
+        tl.to("#r-d" + (k + 1), { scale: SC[k + 1], duration: 0.5, ease: "power3.inOut", svgOrigin: ORG }, at + 0.25);
+      };
+      open(0, t(30));
+      open(1, t(34) - 0.1);
+      open(2, t(37) - 0.1);
+      // the smallest one is solid: it does not open. That is the base case.
+      tl.to(halves[3][0], { y: -26, duration: 0.12, ease: "power2.out", svgOrigin: "540 900" }, t(39));
+      tl.to(halves[3][0], { y: 0, duration: 0.25, ease: "bounce.out", svgOrigin: "540 900" }, t(39) + 0.12);
+      // "यही है बेस केस": the whole family lines up, and the smallest (n=0) gets the tag
+      tl.to("#r-dolls", { opacity: 0, duration: 0.2 }, t(40) - 0.15);
+      ["#r-l0", "#r-l1", "#r-l2", "#r-l3"].forEach((id, k) => tl.fromTo(id, { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 0.35, ease: "back.out(1.8)" }, t(40) - 0.1 + k * 0.09));
+      tl.fromTo("#r-tag", { opacity: 0, scale: 0.6, rotation: -8 }, { opacity: 1, scale: 1, rotation: -4, duration: 0.3, ease: "back.out(2.5)" }, t(42));
+
+      // ---- 3: mirror. The doll and its tag drop away; the tunnel opens; chip 3 lights; it zooms in and never ends.
+      tl.to(["#r-line", "#r-tag"], { y: 900, opacity: 0, duration: 0.45, ease: "power3.in" }, t(44) - 0.3);
+      chipOff("#r-ch2", t(44)); chipOn("#r-ch3", t(44));
+      tl.fromTo("#r-mirz", { opacity: 0 }, { opacity: 1, duration: 0.35 }, t(44) - 0.05);
+      tl.to(Z, { p: 2.2, duration: t(52) - t(44), ease: "power1.in", onUpdate: drawMir }, t(44) - 0.05);
+      tl.to(Z, { p: 9, duration: VO_END + V - t(52) + 0.4, ease: "power2.in", onUpdate: drawMir }, t(52));
+      tl.fromTo("#r-inf", { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(2)" }, t(57));
+
+      // ---- end: stop. The tunnel dims behind the line to remember.
+      const END = VO_END + V + 0.35;
+      tl.to(["#r-mirz", "#r-inf"], { opacity: 0, duration: 0.3 }, END);
+      tl.to(".r-chip", { opacity: 1, backgroundColor: "#0b7f79", color: "#f7f7f3", borderColor: "#0b7f79", duration: 0.25, stagger: 0.08 }, END + 0.1);
+      tl.fromTo("#r-end", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.4, ease: "expo.out" }, END + 0.15);
+
+      // captions: the spoken word gets the yellow bar
+      let i0 = 0;
+      GROUPS.forEach((n, g) => {
+        const id = "#r-c" + (g + 1), spans = document.querySelectorAll(id + " span");
+        tl.fromTo(id, { opacity: 0 }, { opacity: 1, duration: 0.1 }, t(i0) - 0.1);
+        tl.to(id, { opacity: 0, duration: 0.1 }, g < GROUPS.length - 1 ? t(i0 + n) - 0.12 : VO_END + V + 0.3);
+        for (let k = 0; k < n; k++) {
+          tl.set(spans[k], { opacity: 1, backgroundColor: "rgba(255,210,63,1)" }, t(i0 + k));
+          if (k > 0) tl.set(spans[k - 1], { backgroundColor: "rgba(255,210,63,0)" }, t(i0 + k));
+        }
+        i0 += n;
+      });
+
+      window.__timelines["recur"] = tl;
+    })();
+  </script>
+</template>

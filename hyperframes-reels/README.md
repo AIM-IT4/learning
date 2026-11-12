@@ -9,6 +9,14 @@ with a `SPEC.md` that gives the script, the palette and every shot as a number.
 | `chai/` | मसाला चाय — the recipe in 25 s | 25.0 s | ElevenLabs `eleven_v4`, Hindi | risograph spice packet (turmeric, chai brown, chilli red) |
 | `compound/` | कंपाउंडिंग का जादू — ₹5,000/month for 20 years | 26.4 s | the founder's consented, saved voice | house reel style: paper, ink, teal, yellow highlight |
 | `kinetic/` | शब्द जब नाचते हैं — kinetic-type showreel | 21.6 s | the founder's consented, saved voice | house reel style, Yatra One display type |
+| `shape/` | एक शेप, छह काम — one shape morphs through six UI jobs, an oversized cursor clicks each | 20.0 s | Manish (consented, saved voice) | house style, dot-grid canvas |
+| `recur/` | रिकर्शन, तीन अंदाज़ में — code + call stack, nesting dolls, a Droste tunnel | 29.5 s | Manish | house style, three genres |
+| `site3d/` | Desk2Quant laid flat — the live site in 3D, a camera glides over its real words | 28.5 s | Manish | the site itself, captured and stitched |
+
+The last three follow prompt-motion.com entries: shape morphing through UI states and the landing page 3D scroll
+(@twoclipping), and recursion explained in genres (@emollick). Their music beds are synthesised by `tools/bed_synth.py`
+(numpy, no samples). The site reel's page comes from `tools/site_capture/` (screen-by-screen capture of the live site, stitched,
+cut into tiles) and its highlight boxes from the same script's word measurements; every claim on screen is on the live page.
 
 The founder's voice is spoken locally by Edge0 Audio8-TTS-Realistic-Air from the saved, consented reference in the
 private studio repo (`d2q-private-uploads/studio/voices`). No audio, fonts or renders are kept here (see `.gitignore`).

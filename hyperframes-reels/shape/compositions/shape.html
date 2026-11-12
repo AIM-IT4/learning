@@ -1,0 +1,277 @@
+<template>
+  <style>
+    @font-face { font-family: "Yatra One"; src: url("assets/fonts/YatraOne.ttf"); }
+    @font-face { font-family: "Noto Sans Devanagari"; font-weight: 700; src: url("assets/fonts/NotoSansDevanagari_700Bold.ttf"); }
+    @font-face { font-family: "Poppins"; font-weight: 700; src: url("assets/fonts/Poppins_700Bold.ttf"); }
+    #root { position: absolute; inset: 0; background: #f7f7f3; overflow: hidden; }
+    #u-art { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    .u-hd { position: absolute; left: 80px; font-family: "Yatra One"; font-size: 150px; line-height: 1.1; color: #12221f; white-space: nowrap; }
+    .u-hd em { font-style: normal; background: #ffd23f; padding: 0 16px; }
+    #u-h1 { top: 226px; }
+    #u-h2 { top: 430px; }
+    #u-e1 { top: 226px; }
+    #u-e2 { top: 430px; }
+    #u-e2 em { position: relative; background: none; padding: 0 16px; }
+    #u-e2 em b { position: relative; font-weight: inherit; }
+    #u-hl { position: absolute; left: 0; top: 18px; width: 100%; height: 150px; background: #ffd23f; transform-origin: 0% 50%; }
+    #u-cnt { position: absolute; left: 700px; top: 250px; width: 300px; text-align: right; font-family: "Poppins"; font-weight: 700; font-size: 120px;
+             line-height: 1; color: #0b7f79; font-variant-numeric: tabular-nums; }
+    #u-cntl { position: absolute; left: 700px; top: 380px; width: 300px; text-align: right; font-family: "Noto Sans Devanagari"; font-weight: 700;
+              font-size: 44px; color: #4b5b58; }
+    .u-lbl { position: absolute; left: 0; top: 1150px; width: 1080px; text-align: center; font-family: "Noto Sans Devanagari"; font-weight: 700;
+             font-size: 62px; color: #0b7f79; }
+    .u-cap { position: absolute; left: 60px; top: 1310px; width: 960px; text-align: center; font-family: "Noto Sans Devanagari"; font-weight: 700;
+             font-size: 46px; line-height: 1.3; color: #12221f; text-wrap: balance; }
+    .u-cap span { display: inline-block; padding: 0 8px; margin: 0 1px; border-radius: 8px; opacity: 0.4; }
+    #u-cur { position: absolute; left: 0; top: 0; width: 130px; height: 130px; z-index: 20; filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.28)); }
+  </style>
+  <div id="root" data-composition-id="shape" data-width="1080" data-height="1920">
+    <svg id="u-art" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="u-dots" width="40" height="40" patternUnits="userSpaceOnUse"><circle cx="20" cy="20" r="2.4" fill="#12221f" /></pattern>
+        <linearGradient id="u-artg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0b7f79" /><stop offset="1" stop-color="#ffd23f" /></linearGradient>
+      </defs>
+      <rect width="1080" height="1920" fill="url(#u-dots)" opacity="0.07" />
+      <!-- the one shape: only its size, corner radius and colour change -->
+      <g id="u-press">
+        <rect id="u-sh" x="420" y="780" width="240" height="240" rx="56" fill="#0b7f79" />
+        <!-- 1 button -->
+        <text id="u-btn" x="540" y="922" text-anchor="middle" font-family="Noto Sans Devanagari" font-weight="700" font-size="64" fill="#f7f7f3">शुरू करें →</text>
+        <!-- 2 loader -->
+        <g id="u-spin"><circle cx="540" cy="900" r="50" fill="none" stroke="#f7f7f3" stroke-width="12" stroke-linecap="round" stroke-dasharray="200 400" /></g>
+        <!-- 3 done -->
+        <circle id="u-ring" cx="540" cy="900" r="100" fill="none" stroke="#0b7f79" stroke-width="6" />
+        <path id="u-chk" d="M 493 902 L 526 935 L 590 866" fill="none" stroke="#f7f7f3" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"
+              stroke-dasharray="160" stroke-dashoffset="160" />
+        <!-- 4 notification -->
+        <g id="u-isl">
+          <circle cx="232" cy="900" r="42" fill="#0b7f79" />
+          <text x="232" y="917" text-anchor="middle" font-family="Noto Sans Devanagari" font-weight="700" font-size="46" fill="#f7f7f3">म</text>
+          <text x="300" y="893" font-family="Noto Sans Devanagari" font-weight="700" font-size="44" fill="#f7f7f3">नया मैसेज</text>
+          <text x="300" y="940" font-family="Noto Sans Devanagari" font-weight="700" font-size="32" fill="#9fb3ae">अभी अभी</text>
+          <circle id="u-dot" cx="868" cy="900" r="15" fill="#ffd23f" />
+        </g>
+        <!-- 5 music player -->
+        <g id="u-ply">
+          <rect x="170" y="775" width="250" height="250" rx="28" fill="url(#u-artg)" />
+          <text x="295" y="935" text-anchor="middle" font-family="Poppins" font-weight="700" font-size="120" fill="#12221f" opacity="0.85">♪</text>
+          <text x="455" y="845" font-family="Noto Sans Devanagari" font-weight="700" font-size="50" fill="#f7f7f3">मोशन ट्यून</text>
+          <text x="455" y="895" font-family="Noto Sans Devanagari" font-weight="700" font-size="32" fill="#9fb3ae">डेमो ट्रैक</text>
+          <rect x="455" y="955" width="440" height="10" rx="5" fill="#3a4a47" />
+          <rect id="u-prog" x="455" y="955" width="120" height="10" rx="5" fill="#ffd23f" />
+          <circle cx="860" cy="840" r="48" fill="#f7f7f3" />
+          <path id="u-play" d="M 846 816 L 846 864 L 885 840 Z" fill="#12221f" />
+          <g id="u-pause"><rect x="840" y="818" width="12" height="44" rx="3" fill="#12221f" /><rect x="866" y="818" width="12" height="44" rx="3" fill="#12221f" /></g>
+        </g>
+        <!-- 6 slider -->
+        <g id="u-sld">
+          <rect id="u-fill" x="130" y="883" width="70" height="34" rx="17" fill="#0b7f79" />
+          <circle id="u-knob" cx="200" cy="900" r="46" fill="#f7f7f3" stroke="#12221f" stroke-width="6" />
+          <text id="u-val" x="200" y="826" text-anchor="middle" font-family="Poppins" font-weight="700" font-size="42" fill="#12221f">0%</text>
+        </g>
+      </g>
+      <!-- click ripple at the cursor tip -->
+      <circle id="u-rip" cx="540" cy="900" r="12" fill="none" stroke="#12221f" stroke-width="5" opacity="0" />
+      <!-- end card: the six jobs -->
+      <g id="u-icons">
+        <g id="u-i1"><rect x="78" y="1188" width="124" height="44" rx="22" fill="#0b7f79" /></g>
+        <g id="u-i2"><circle cx="294" cy="1210" r="28" fill="none" stroke="#0b7f79" stroke-width="8" stroke-dasharray="110 200" stroke-linecap="round" /></g>
+        <g id="u-i3"><circle cx="440" cy="1210" r="32" fill="#0b7f79" /><path d="M 425 1211 L 436 1222 L 457 1199" fill="none" stroke="#f7f7f3" stroke-width="7"
+           stroke-linecap="round" stroke-linejoin="round" /></g>
+        <g id="u-i4"><rect x="528" y="1192" width="132" height="36" rx="18" fill="#12221f" /><circle cx="546" cy="1210" r="10" fill="#0b7f79" /></g>
+        <g id="u-i5"><rect x="690" y="1172" width="132" height="76" rx="14" fill="#12221f" /><rect x="700" y="1182" width="40" height="40" rx="7" fill="url(#u-artg)" />
+          <rect x="748" y="1232" width="64" height="5" rx="2.5" fill="#ffd23f" /></g>
+        <g id="u-i6"><rect x="858" y="1205" width="144" height="10" rx="5" fill="#dfe5e3" /><rect x="858" y="1205" width="96" height="10" rx="5" fill="#0b7f79" />
+          <circle cx="954" cy="1210" r="15" fill="#f7f7f3" stroke="#12221f" stroke-width="4" /></g>
+      </g>
+    </svg>
+
+    <div id="u-h1" class="u-hd">एक शेप,</div>
+    <div id="u-h2" class="u-hd"><em>छह काम</em></div>
+    <div id="u-e1" class="u-hd">हर हरकत का</div>
+    <div id="u-e2" class="u-hd">एक <em><i id="u-hl"></i><b>मक़सद।</b></em></div>
+    <div id="u-cnt">0/6</div>
+    <div id="u-cntl">काम</div>
+
+    <div id="u-l1" class="u-lbl">बटन</div>
+    <div id="u-l2" class="u-lbl">लोडिंग</div>
+    <div id="u-l3" class="u-lbl">हो गया</div>
+    <div id="u-l4" class="u-lbl">नोटिफ़िकेशन</div>
+    <div id="u-l5" class="u-lbl">म्यूज़िक प्लेयर</div>
+    <div id="u-l6" class="u-lbl">स्लाइडर</div>
+    <div id="u-l7" class="u-lbl">एक ही शेप</div>
+
+    <div id="u-c1" class="u-cap"><span>ये</span><span>एक</span><span>साधारण</span><span>सा</span><span>शेप</span><span>है।</span></div>
+    <div id="u-c2" class="u-cap"><span>क्लिक</span><span>कीजिए,</span><span>और</span><span>ये</span><span>बटन</span><span>बन</span><span>गया।</span></div>
+    <div id="u-c3" class="u-cap"><span>अब</span><span>लोडिंग…</span><span>और</span><span>काम</span><span>हो</span><span>गया!</span></div>
+    <div id="u-c4" class="u-cap"><span>अब</span><span>ये</span><span>बना</span><span>एक</span><span>नोटिफ़िकेशन,</span></div>
+    <div id="u-c5" class="u-cap"><span>फिर</span><span>म्यूज़िक</span><span>प्लेयर,</span></div>
+    <div id="u-c6" class="u-cap"><span>और</span><span>आख़िर</span><span>में,</span><span>एक</span><span>स्लाइडर।</span></div>
+    <div id="u-c7" class="u-cap"><span>एक</span><span>ही</span><span>शेप,</span><span>छह</span><span>काम।</span></div>
+    <div id="u-c8" class="u-cap"><span>अच्छे</span><span>मोशन</span><span>डिज़ाइन</span><span>में,</span></div>
+    <div id="u-c9" class="u-cap"><span>हर</span><span>हरकत</span><span>का</span><span>एक</span><span>मक़सद</span><span>होता</span><span>है।</span></div>
+
+    <!-- the oversized cursor: tip at 21% / 14% of its box -->
+    <svg id="u-cur" data-layout-allow-overflow viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M 5 3.3 L 5 19.5 L 9.1 15.6 L 11.9 21.6 L 14.6 20.4 L 11.8 14.5 L 17.4 14.4 Z" fill="#12221f" stroke="#f7f7f3" stroke-width="1.4"
+            stroke-linejoin="round" />
+    </svg>
+  </div>
+  <script>
+    (function () {
+      // word onsets (s) measured on the voice; the voice starts at V. Groups = caption lines.
+      const V = 0.3;
+      const W = [0.0, 0.18, 0.36, 0.78, 0.92, 1.16, 2.12, 2.38, 3.3, 3.44, 3.56, 3.78, 3.94, 4.45, 4.6, 5.4, 5.56, 5.78, 5.92, 6.7, 6.86, 6.96,
+                 7.18, 7.3, 8.45, 8.58, 8.9, 9.7, 9.88, 10.2, 10.44, 10.8, 11.8, 12.02, 12.1, 12.36, 12.62, 13.6, 13.86, 14.16, 14.48, 15.2, 15.34,
+                 15.62, 15.76, 15.92, 16.24, 16.5];
+      const VO_END = 16.76;
+      const GROUPS = [6, 7, 6, 5, 3, 5, 5, 4, 7];
+      const t = (i) => W[i] + V;
+
+      // ---- the shape: one rect, six jobs
+      const sh = document.getElementById("u-sh");
+      const S = [
+        { w: 240, h: 240, rr: 56, c: "#0b7f79" },   // 0 shape
+        { w: 620, h: 160, rr: 80, c: "#0b7f79" },   // 1 button
+        { w: 170, h: 170, rr: 85, c: "#0b7f79" },   // 2 loader
+        { w: 200, h: 200, rr: 100, c: "#0b7f79" },  // 3 done
+        { w: 760, h: 130, rr: 65, c: "#12221f" },   // 4 notification
+        { w: 820, h: 330, rr: 56, c: "#12221f" },   // 5 music player
+        { w: 820, h: 34, rr: 17, c: "#dfe5e3" },    // 6 slider
+      ];
+      const P = { w: 240, h: 240, rr: 56, c: "#0b7f79" };
+      const drawSh = () => {
+        sh.setAttribute("x", 540 - P.w / 2); sh.setAttribute("y", 900 - P.h / 2); sh.setAttribute("width", P.w); sh.setAttribute("height", P.h);
+        sh.setAttribute("rx", Math.min(P.rr, P.h / 2)); sh.setAttribute("fill", P.c);
+      };
+      const tl = gsap.timeline({ paused: true });
+      const morph = (to, at, d = 0.42, ease = "power3.inOut") => {
+        const s = S[to];
+        tl.to(P, { w: s.w, h: s.h, rr: s.rr, c: s.c, duration: d, ease, onUpdate: drawSh }, at);
+      };
+      const CONTENT = ["#u-btn", "#u-spin", "#u-chk", "#u-isl", "#u-ply", "#u-sld"];
+      gsap.set([...CONTENT, "#u-ring", "#u-pause", "#u-icons > g", "#u-e1", "#u-e2", ".u-lbl", ".u-cap"], { opacity: 0 });
+      gsap.set("#u-hl", { scaleX: 0 });
+      drawSh();
+
+      // the cursor: tip offset inside its 130 px box
+      const TX = 27.3, TY = 18.2;
+      const cur = "#u-cur";
+      const tip = (x, y) => ({ x: x - TX, y: y - TY });
+      gsap.set(cur, tip(560, 2060));
+      const glide = (x, y, at, d = 0.6, ease = "power3.out") => tl.to(cur, { ...tip(x, y), duration: d, ease }, at);
+      const click = (at, x, y) => {
+        tl.to(cur, { scale: 0.84, duration: 0.1, ease: "power2.in", transformOrigin: "21% 14%" }, at);
+        tl.to(cur, { scale: 1, duration: 0.22, ease: "power2.out", transformOrigin: "21% 14%" }, at + 0.1);
+        tl.fromTo("#u-rip", { attr: { cx: x, cy: y, r: 12 }, opacity: 0.55 }, { attr: { r: 70 }, opacity: 0, duration: 0.45, ease: "power2.out", immediateRender: false }, at + 0.06);
+      };
+      const press = (at) => {   // the target answers the click
+        tl.to("#u-press", { scale: 0.95, duration: 0.1, ease: "power2.in", svgOrigin: "540 900" }, at);
+        tl.to("#u-press", { scale: 1, duration: 0.3, ease: "back.out(3)", svgOrigin: "540 900" }, at + 0.1);
+      };
+      const cnt = document.getElementById("u-cnt");
+      const label = (k, at) => {
+        if (k > 1) tl.to("#u-l" + (k - 1), { opacity: 0, y: -20, duration: 0.15, ease: "power2.in" }, at - 0.15);
+        tl.fromTo("#u-l" + k, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.25, ease: "expo.out" }, at);
+        if (k <= 6) {
+          tl.set(cnt, { textContent: k + "/6" }, at);
+          tl.fromTo(cnt, { scale: 1.25 }, { scale: 1, duration: 0.35, ease: "back.out(3)", transformOrigin: "100% 50%" }, at);
+        }
+      };
+
+      // 0 — the poster: headline, counter 0/6, the shape. The cursor walks in from below.
+      glide(540, 900, t(4) - 0.2, 0.75);
+
+      // 1 — click: the shape becomes a button
+      click(t(6), 540, 900); press(t(6));
+      morph(1, t(6) + 0.05, 0.45, "back.out(1.4)");
+      tl.fromTo("#u-btn", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.25, ease: "power2.out", svgOrigin: "540 900" }, t(6) + 0.3);
+      label(1, t(10));
+      glide(770, 1000, t(6) + 0.45, 0.6, "power2.out");                        // steps aside so the label reads
+
+      // 2 — click the button: it shrinks into a loader
+      glide(735, 900, t(14) - 0.5, 0.3, "power2.inOut");
+      click(t(14) - 0.15, 735, 900);
+      tl.to("#u-btn", { opacity: 0, duration: 0.1 }, t(14) - 0.12);
+      morph(2, t(14) - 0.1, 0.35);
+      tl.fromTo("#u-spin", { opacity: 0 }, { opacity: 1, duration: 0.15 }, t(14) + 0.15);
+      tl.fromTo("#u-spin", { rotation: 0 }, { rotation: 720, duration: t(17) - t(14) + 0.1, ease: "none", svgOrigin: "540 900" }, t(14) + 0.15);
+      label(2, t(14));
+      glide(830, 1080, t(14) + 0.25, 0.7, "power2.out");                        // drifts aside while it loads
+
+      // 3 — done: a check mark draws, a ring pulses
+      tl.to("#u-spin", { opacity: 0, duration: 0.1 }, t(17) - 0.05);
+      morph(3, t(17) - 0.05, 0.3, "back.out(2)");
+      tl.set("#u-chk", { opacity: 1 }, t(17));
+      tl.fromTo("#u-chk", { attr: { "stroke-dashoffset": 160 } }, { attr: { "stroke-dashoffset": 0 }, duration: 0.32, ease: "power2.out", immediateRender: false }, t(17));
+      tl.fromTo("#u-ring", { opacity: 0.6, attr: { r: 100 } }, { opacity: 0, attr: { r: 175 }, duration: 0.6, ease: "power2.out", immediateRender: false }, t(17) + 0.05);
+      label(3, t(17));
+
+      // 4 — it stretches into a notification
+      tl.to("#u-chk", { opacity: 0, duration: 0.12 }, t(19) - 0.1);
+      morph(4, t(19), 0.5);
+      tl.fromTo("#u-isl", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.3, ease: "expo.out" }, t(19) + 0.35);
+      tl.fromTo("#u-dot", { attr: { r: 6 } }, { attr: { r: 15 }, duration: 0.4, ease: "back.out(3)", immediateRender: false }, t(19) + 0.5);
+      label(4, t(23));
+      glide(540, 900, t(23) + 0.2, 0.6);
+
+      // 5 — click the notification: it opens into a music player; then press play
+      click(t(24), 540, 900); press(t(24));
+      tl.to("#u-isl", { opacity: 0, duration: 0.1 }, t(24));
+      morph(5, t(24) + 0.03, 0.45, "back.out(1.2)");
+      tl.fromTo("#u-ply", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.3, ease: "expo.out" }, t(24) + 0.3);
+      label(5, t(25));
+      glide(860, 840, t(26) - 0.1, 0.4);
+      click(t(26) + 0.35, 860, 840);
+      tl.set("#u-play", { opacity: 0 }, t(26) + 0.4); tl.set("#u-pause", { opacity: 1 }, t(26) + 0.4);
+      tl.fromTo("#u-prog", { attr: { width: 120 } }, { attr: { width: 330 }, duration: t(28) - t(26) - 0.2, ease: "none", immediateRender: false }, t(26) + 0.4);
+
+      // 6 — it flattens into a slider; the cursor drags the knob all the way
+      glide(200, 900, t(28) + 0.05, 0.5, "power2.inOut");
+      tl.to("#u-ply", { opacity: 0, duration: 0.12 }, t(28));
+      morph(6, t(28) + 0.05, 0.45);
+      tl.fromTo("#u-sld", { opacity: 0 }, { opacity: 1, duration: 0.2 }, t(28) + 0.4);
+      label(6, t(31));
+      const K = { x: 200 };
+      const knob = document.getElementById("u-knob"), fill = document.getElementById("u-fill"), val = document.getElementById("u-val");
+      const drawK = () => { knob.setAttribute("cx", K.x); fill.setAttribute("width", K.x - 130); val.setAttribute("x", K.x); val.textContent = Math.round((K.x - 200) / 6.8) + "%"; };
+      tl.to(cur, { scale: 0.88, duration: 0.1, transformOrigin: "21% 14%" }, t(31) - 0.1);
+      tl.to(K, { x: 880, duration: 0.85, ease: "power2.inOut", onUpdate: drawK }, t(31));
+      tl.to(cur, { x: 880 - TX, duration: 0.85, ease: "power2.inOut" }, t(31));
+      tl.to(cur, { scale: 1, duration: 0.2, transformOrigin: "21% 14%" }, t(31) + 0.9);
+
+      // recap — "एक ही शेप, छह काम": it flicks back through every job to the plain shape
+      glide(900, 1120, t(32) - 0.15, 0.5, "power2.out");
+      tl.to("#u-sld", { opacity: 0, duration: 0.1 }, t(32));
+      [5, 4, 3, 2, 1, 0].forEach((s, k) => morph(s, t(32) + 0.05 + k * 0.17, 0.16, "power2.inOut"));
+      label(7, t(32));
+      tl.fromTo(["#u-h2", cnt], { scale: 1 }, { scale: 1.08, duration: 0.12, yoyo: true, repeat: 1, ease: "power2.out", transformOrigin: "0% 50%" }, t(35));
+
+      // end — every movement has a purpose: the six jobs line up
+      tl.to(["#u-h1", "#u-h2", "#u-cnt", "#u-cntl", "#u-l7"], { opacity: 0, filter: "blur(10px)", duration: 0.2, ease: "power2.in" }, t(37) - 0.2);
+      tl.fromTo("#u-e1", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.3, ease: "expo.out" }, t(37));
+      tl.fromTo("#u-e2", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.3, ease: "expo.out" }, t(37) + 0.12);
+      ["#u-i1", "#u-i2", "#u-i3", "#u-i4", "#u-i5", "#u-i6"].forEach((id, k) =>
+        tl.fromTo(id, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.3, ease: "back.out(2)" }, t(38) + k * 0.09));
+      tl.to(cur, { x: 1200, y: 1300, duration: 0.55, ease: "power2.in" }, t(37) - 0.1);           // leaves the frame as the end card comes in
+      tl.to("#u-hl", { scaleX: 1, duration: 0.35, ease: "power3.out" }, t(45));
+      tl.fromTo("#u-press", { scale: 1 }, { scale: 1.12, duration: 0.18, yoyo: true, repeat: 1, ease: "power2.out", svgOrigin: "540 900" }, t(45));
+
+      // captions: the spoken word gets the yellow bar
+      let i0 = 0;
+      GROUPS.forEach((n, g) => {
+        const id = "#u-c" + (g + 1), spans = document.querySelectorAll(id + " span");
+        tl.fromTo(id, { opacity: 0 }, { opacity: 1, duration: 0.1 }, t(i0) - 0.1);
+        const next = g < GROUPS.length - 1 ? t(i0 + n) - 0.12 : VO_END + V + 0.6;
+        tl.to(id, { opacity: 0, duration: 0.1 }, next);
+        for (let k = 0; k < n; k++) {
+          tl.set(spans[k], { opacity: 1, backgroundColor: "rgba(255,210,63,1)" }, t(i0 + k));
+          if (k > 0) tl.set(spans[k - 1], { backgroundColor: "rgba(255,210,63,0)" }, t(i0 + k));
+        }
+        i0 += n;
+      });
+
+      window.__timelines["shape"] = tl;
+    })();
+  </script>
+</template>

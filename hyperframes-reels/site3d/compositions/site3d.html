@@ -1,0 +1,207 @@
+<template>
+  <style>
+    @font-face { font-family: "Yatra One"; src: url("assets/fonts/YatraOne.ttf"); }
+    @font-face { font-family: "Noto Sans Devanagari"; font-weight: 700; src: url("assets/fonts/NotoSansDevanagari_700Bold.ttf"); }
+    @font-face { font-family: "Poppins"; font-weight: 700; src: url("assets/fonts/Poppins_700Bold.ttf"); }
+    #root { position: absolute; inset: 0; background: #e9ece7; overflow: hidden; }
+    #q-dots { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    /* the camera: the stage holds the perspective, #q-cam sits at the focal point (540, 900) and tilts, #q-pg slides under it */
+    #q-stage { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; perspective: 1500px; perspective-origin: 540px 900px; }
+    #q-cam { position: absolute; left: 540px; top: 900px; width: 0; height: 0; }
+    #q-pg { position: absolute; left: -640px; top: 0; width: 1280px; height: 19401px; background: #f7f7f3; box-shadow: 0 30px 90px rgba(18, 34, 31, 0.35); }
+    .q-t { position: absolute; left: 0; width: 1280px; height: 1600px; background-size: 100% 100%; }
+    .q-hl { position: absolute; background: rgba(255, 210, 63, 0.62); border-radius: 6px; transform-origin: 0% 50%; }
+    /* the keyword card */
+    #q-card { position: absolute; left: 60px; top: 230px; width: 960px; height: 260px; background: #ffffff; border-radius: 34px; border: 4px solid #12221f;
+              box-shadow: 0 14px 40px rgba(18, 34, 31, 0.18); overflow: hidden; }
+    .q-b { position: absolute; left: 0; top: 0; width: 952px; height: 252px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+           font-family: "Noto Sans Devanagari"; font-weight: 700; color: #12221f; text-align: center; }
+    .q-b .k { font-family: "Poppins"; font-weight: 700; color: #0b7f79; }
+    .q-b .sm { font-size: 40px; color: #4b5b58; }
+    #q-b1 { font-family: "Yatra One"; font-size: 116px; line-height: 1.1; flex-direction: row; gap: 26px; }
+    #q-b1 .ne { font-family: "Poppins"; color: #0b7f79; }
+    #q-b2 .row { display: flex; align-items: center; gap: 26px; }
+    .lg { display: block; background: url(assets/desk2quant-logo.png) center / contain no-repeat; }
+    #q-b2 .lg { width: 124px; height: 124px; }
+    #q-b2 .wm { font-family: "Poppins"; font-weight: 700; font-size: 96px; color: #12221f; letter-spacing: -1px; }
+    #q-b2 .two { font-size: 46px; margin-top: 8px; color: #0b7f79; }
+    .q-pills { display: flex; gap: 18px; margin-top: 18px; }
+    .q-pill { padding: 6px 26px; border: 4px solid #12221f; border-radius: 40px; font-size: 48px; line-height: 1.35; background: #ffffff; }
+    #q-b5 { flex-direction: row; gap: 30px; }
+    #q-b5 .num { font-family: "Poppins"; font-weight: 700; font-size: 170px; line-height: 1; color: #0b7f79; font-variant-numeric: tabular-nums; }
+    #q-b5 .lab { font-size: 72px; line-height: 1.2; text-align: left; }
+    #q-b6 .q-pills { gap: 12px; flex-wrap: wrap; justify-content: center; width: 900px; margin-top: 12px; }
+    #q-b6 .q-pill { font-size: 42px; padding: 4px 20px; border-width: 3px; }
+    #q-b7 { font-size: 100px; line-height: 1.2; }
+    /* the end card */
+    #q-end { position: absolute; left: 60px; top: 560px; width: 960px; height: 560px; background: #ffffff; border-radius: 40px; border: 4px solid #12221f;
+             box-shadow: 0 20px 60px rgba(18, 34, 31, 0.25); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    #q-end .lg { width: 210px; height: 210px; }
+    #q-end .url { margin-top: 26px; font-family: "Poppins"; font-weight: 700; font-size: 88px; color: #12221f; letter-spacing: -1px; }
+    #q-end .tag { margin-top: 6px; font-family: "Noto Sans Devanagari"; font-weight: 700; font-size: 44px; color: #0b7f79; }
+    .q-cap { position: absolute; left: 60px; top: 1330px; width: 960px; text-align: center; font-family: "Noto Sans Devanagari"; font-weight: 700; font-size: 46px;
+             line-height: 1.3; color: #12221f; text-wrap: balance; background: rgba(255, 255, 255, 0.95); border-radius: 20px; padding: 6px 10px;
+             box-shadow: 0 6px 18px rgba(18, 34, 31, 0.12); }
+    .q-cap span { display: inline-block; padding: 0 8px; margin: 0 1px; border-radius: 8px; opacity: 0.4; }
+  </style>
+  <div id="root" data-composition-id="site3d" data-width="1080" data-height="1920">
+    <svg id="q-dots" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg">
+      <defs><pattern id="q-dp" width="36" height="36" patternUnits="userSpaceOnUse"><circle cx="18" cy="18" r="2.2" fill="#12221f" /></pattern></defs>
+      <rect width="1080" height="1920" fill="url(#q-dp)" opacity="0.08" />
+    </svg>
+
+    <!-- desk2quant.com as it is today, laid flat (captured from the live site, stitched screen by screen) -->
+    <div id="q-stage" data-layout-allow-overflow>
+      <div id="q-cam" data-layout-allow-overflow>
+        <div id="q-pg" data-layout-allow-overflow>
+          <div class="q-t" style="top: 0px; background-image: url(assets/page/t00.jpg)"></div>
+          <div class="q-t" style="top: 1600px; background-image: url(assets/page/t01.jpg)"></div>
+          <div class="q-t" style="top: 3200px; background-image: url(assets/page/t02.jpg)"></div>
+          <div class="q-t" style="top: 4800px; background-image: url(assets/page/t03.jpg)"></div>
+          <div class="q-t" style="top: 6400px; background-image: url(assets/page/t04.jpg)"></div>
+          <div class="q-t" style="top: 8000px; background-image: url(assets/page/t05.jpg)"></div>
+          <div class="q-t" style="top: 9600px; background-image: url(assets/page/t06.jpg)"></div>
+          <div class="q-t" style="top: 11200px; background-image: url(assets/page/t07.jpg)"></div>
+          <div class="q-t" style="top: 12800px; background-image: url(assets/page/t08.jpg)"></div>
+          <div class="q-t" style="top: 14400px; background-image: url(assets/page/t09.jpg)"></div>
+          <div class="q-t" style="top: 16000px; background-image: url(assets/page/t10.jpg)"></div>
+          <div class="q-t" style="top: 17600px; background-image: url(assets/page/t11.jpg)"></div>
+          <div class="q-t" style="top: 19200px; height: 201px; background-image: url(assets/page/t12.jpg)"></div>
+          <!-- highlighter marks on the page's own words (page coordinates, measured on the live site) -->
+          <div id="q-h-int" class="q-hl" style="left: 32px; top: 410px; width: 217px; height: 58px"></div>
+          <div id="q-h-desk" class="q-hl" style="left: 433px; top: 410px; width: 121px; height: 58px"></div>
+          <div id="q-h-logo" class="q-hl" style="left: 52px; top: 100px; width: 166px; height: 46px"></div>
+          <div id="q-h-all" class="q-hl" style="left: 32px; top: 10312px; width: 214px; height: 36px"></div>
+          <div id="q-h-m1" class="q-hl" style="left: 64px; top: 11731px; width: 332px; height: 53px"></div>
+          <div id="q-h-m2" class="q-hl" style="left: 403px; top: 11731px; width: 259px; height: 53px"></div>
+          <div id="q-h-m3" class="q-hl" style="left: 668px; top: 11731px; width: 128px; height: 53px"></div>
+          <div id="q-h-m4" class="q-hl" style="left: 111px; top: 11780px; width: 208px; height: 53px"></div>
+          <div id="q-h-m5" class="q-hl" style="left: 326px; top: 11780px; width: 193px; height: 53px"></div>
+          <div id="q-h-one" class="q-hl" style="left: 32px; top: 12382px; width: 800px; height: 12px"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="q-card">
+      <div id="q-b1" class="q-b"><span>इंटरव्यू</span><span class="ne">≠</span><span>डेस्क</span></div>
+      <div id="q-b2" class="q-b"><div class="row"><i class="lg"></i><span class="wm">Desk2Quant</span></div>
+        <div id="q-two" class="two">इंटरव्यू + डेस्क: दोनों की तैयारी</div></div>
+      <div id="q-b4" class="q-b"><span class="sm">प्रैक्टिशनर्स के बनाए</span>
+        <div class="q-pills"><span id="q-p1" class="q-pill">नोट्स</span><span id="q-p2" class="q-pill">कोड लैब्स</span><span id="q-p3" class="q-pill">प्लेबुक्स</span></div></div>
+      <div id="q-b5" class="q-b"><span id="q-num" class="num">0+</span><span class="lab">लर्निंग<br />रिसोर्सेज़</span></div>
+      <div id="q-b6" class="q-b"><span class="sm">तरीका सीधा है:</span>
+        <div class="q-pills"><span id="q-v1" class="q-pill">सीखो</span><span id="q-v2" class="q-pill">इम्प्लीमेंट</span><span id="q-v3" class="q-pill">तोड़ो</span>
+          <span id="q-v4" class="q-pill">वैलिडेट</span><span id="q-v5" class="q-pill">समझाओ</span></div></div>
+      <div id="q-b7" class="q-b"><span><span class="k">1-on-1</span> मेंटरशिप</span></div>
+    </div>
+
+    <div id="q-end"><i class="lg"></i><span class="url">desk2quant.com</span><span class="tag">क्वांट इंटरव्यू और डेस्क, दोनों की तैयारी</span></div>
+
+    <div id="q-c1" class="q-cap"><span>क्वांट</span><span>इंटरव्यू</span><span>क्रैक</span><span>करना</span><span>एक</span><span>बात</span><span>है,</span></div>
+    <div id="q-c2" class="q-cap"><span>और</span><span>डेस्क</span><span>पर</span><span>टिकना,</span><span>दूसरी।</span></div>
+    <div id="q-c3" class="q-cap"><span>डेस्क</span><span>टू</span><span>क्वांट</span><span>पर,</span><span>दोनों</span><span>की</span><span>तैयारी</span><span>होती</span><span>है।</span></div>
+    <div id="q-c4" class="q-cap"><span>प्रैक्टिशनर्स</span><span>के</span><span>बनाए</span><span>नोट्स,</span></div>
+    <div id="q-c5" class="q-cap"><span>कोड</span><span>लैब्स,</span><span>और</span><span>इंटरव्यू</span><span>प्लेबुक्स।</span></div>
+    <div id="q-c6" class="q-cap"><span>54</span><span>से</span><span>ज़्यादा</span><span>रिसोर्सेज़।</span></div>
+    <div id="q-c7" class="q-cap"><span>तरीका</span><span>सीधा</span><span>है।</span></div>
+    <div id="q-c8" class="q-cap"><span>मॉडल</span><span>सीखो,</span><span>इम्प्लीमेंट</span><span>करो,</span></div>
+    <div id="q-c9" class="q-cap"><span>तोड़ो,</span><span>वैलिडेट</span><span>करो,</span><span>और</span><span>समझाओ।</span></div>
+    <div id="q-c10" class="q-cap"><span>साथ</span><span>में,</span><span>वन-</span><span>ऑन-</span><span>वन</span><span>मेंटरशिप</span><span>भी।</span></div>
+    <div id="q-c11" class="q-cap"><span>डेस्क</span><span>टू</span><span>क्वांट</span><span>डॉट</span><span>कॉम।</span></div>
+  </div>
+  <script>
+    (function () {
+      const V = 0.3;
+      const W = [0.0, 0.26, 0.58, 0.84, 1.32, 1.52, 1.74, 2.45, 2.62, 2.86, 3.04, 3.65, 4.44, 4.72, 4.86, 5.12, 5.89, 6.2, 6.26, 6.58, 6.78, 7.64,
+                 8.18, 8.3, 8.54, 9.49, 9.66, 10.59, 10.74, 11.16, 12.59, 12.82, 13.02, 13.34, 14.54, 14.84, 15.14, 15.99, 16.22, 17.24, 17.5, 18.54,
+                 19.19, 19.48, 20.19, 20.32, 21.69, 21.96, 22.69, 22.84, 22.96, 23.14, 23.42, 24.39, 24.65, 24.72, 25.19, 25.38];
+      const VO_END = 25.64;
+      const GROUPS = [7, 5, 9, 4, 5, 4, 3, 4, 5, 7, 5];
+      const t = (i) => W[i] + V;
+      const tl = gsap.timeline({ paused: true });
+
+      // ---- the camera: focus (fx, fy) on the page lands on the focal point; rx tilts the page away, rz turns it, s is the zoom
+      const camTo = (at, d, c, ease = "power3.inOut") => {
+        tl.to("#q-pg", { x: 640 - c.fx, y: -c.fy, duration: d, ease }, at);
+        tl.to("#q-cam", { rotationX: c.rx, rotation: c.rz, scale: c.s, duration: d, ease }, at);
+      };
+      gsap.set("#q-pg", { x: 640 - 380, y: -420 });
+      gsap.set("#q-cam", { rotationX: 34, rotation: -8, scale: 1.15 });
+      gsap.set([".q-hl"], { scaleX: 0 });
+      gsap.set(["#q-b2", "#q-b4", "#q-b5", "#q-b6", "#q-b7", "#q-two", "#q-end", ".q-cap", ".q-pill"], { opacity: 0 });
+
+      const mark = (id, at, d = 0.35) => tl.to(id, { scaleX: 1, duration: d, ease: "power3.out" }, at);
+      const beat = (from, to, at) => {            // swap the card's contents: out goes up, in comes from below
+        if (from) tl.to(from, { opacity: 0, y: -40, duration: 0.2, ease: "power2.in" }, at - 0.2);
+        tl.fromTo(to, { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 0.32, ease: "expo.out" }, at);
+      };
+      const pulse = (id, at) => tl.fromTo(id, { scale: 1 }, { scale: 1.12, duration: 0.14, yoyo: true, repeat: 1, ease: "power2.out" }, at);
+
+      // 1 — the hero: "इंटरव्यू ≠ डेस्क". A slow push-in; the page's own words get marked as they are said.
+      camTo(0, t(11), { fx: 400, fy: 425, rx: 30, rz: -6, s: 1.3 }, "power1.inOut");
+      mark("#q-h-int", t(1)); pulse("#q-b1 span:nth-child(1)", t(1));
+      mark("#q-h-desk", t(8)); pulse("#q-b1 span:nth-child(3)", t(8));
+      pulse("#q-b1 .ne", t(11));
+
+      // 2 — "डेस्क टू क्वांट": up to the nav logo; the card shows the real logo; then pull back to the whole hero for "दोनों"
+      camTo(t(12) - 0.35, 0.8, { fx: 300, fy: 150, rx: 26, rz: -4, s: 1.45 });
+      mark("#q-h-logo", t(12) + 0.3);
+      beat("#q-b1", "#q-b2", t(12));
+      camTo(t(16) - 0.2, 1.0, { fx: 620, fy: 470, rx: 40, rz: -8, s: 0.95 });
+      tl.fromTo("#q-two", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.3, ease: "expo.out" }, t(16));
+
+      // 3 — glide down to the products; one pill per kind of resource as it is said
+      camTo(t(21) - 0.3, 1.7, { fx: 600, fy: 3720, rx: 50, rz: -14, s: 1.0 });
+      beat("#q-b2", "#q-b4", t(21));
+      tl.to("#q-pg", { y: -4500, duration: t(30) - 0.2 - (t(21) + 1.4), ease: "none" }, t(21) + 1.4);
+      [["#q-p1", 24], ["#q-p2", 25], ["#q-p3", 29]].forEach(([id, i]) => {
+        tl.fromTo(id, { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2.5)" }, t(i));
+        tl.to(id, { backgroundColor: "#ffd23f", duration: 0.15 }, t(i));
+      });
+
+      // 4 — "54 से ज़्यादा": a fast run down the whole catalogue to the page's own "All 54 resources" link
+      beat("#q-b4", "#q-b5", t(30) - 0.1);
+      camTo(t(30) - 0.2, 1.25, { fx: 330, fy: 10220, rx: 46, rz: -12, s: 1.12 }, "power2.inOut");
+      const N = { v: 0 }, num = document.getElementById("q-num");
+      tl.fromTo(N, { v: 0 }, { v: 54, duration: 0.9, ease: "power2.out", immediateRender: false, onUpdate: () => { num.textContent = Math.round(N.v) + "+"; } }, t(30));
+      mark("#q-h-all", t(33));
+      pulse("#q-num", t(33));
+
+      // 5 — the method: flatten over the heading and mark each phrase as it is said
+      beat("#q-b5", "#q-b6", t(34));
+      camTo(t(34) - 0.1, 1.4, { fx: 450, fy: 11770, rx: 24, rz: -4, s: 1.28 });
+      tl.to("#q-pg", { y: -11800, duration: t(46) - 0.2 - t(37), ease: "none" }, t(37));
+      [["#q-h-m1", "#q-v1", 37], ["#q-h-m2", "#q-v2", 39], ["#q-h-m3", "#q-v3", 41], ["#q-h-m4", "#q-v4", 42], ["#q-h-m5", "#q-v5", 44]].forEach(([h, v, i]) => {
+        mark(h, t(i), 0.3);
+        tl.fromTo(v, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.25, ease: "back.out(2)" }, t(i));
+        tl.to(v, { backgroundColor: "#0b7f79", color: "#ffffff", borderColor: "#0b7f79", duration: 0.15 }, t(i));
+      });
+
+      // 6 — 1-on-1 mentorship
+      beat("#q-b6", "#q-b7", t(46));
+      camTo(t(46) - 0.2, 1.1, { fx: 560, fy: 12560, rx: 38, rz: -10, s: 1.05 });
+      mark("#q-h-one", t(48), 0.5);
+
+      // 7 — "desk2quant.com": pull far back, the page streams away under the end card
+      tl.to("#q-card", { opacity: 0, y: -60, duration: 0.25, ease: "power2.in" }, t(53) - 0.3);
+      camTo(t(53) - 0.35, 1.6, { fx: 640, fy: 14000, rx: 58, rz: -24, s: 0.45 });
+      tl.to("#q-pg", { y: -14600, duration: 3.5, ease: "none" }, t(53) + 1.25);
+      tl.fromTo("#q-end", { opacity: 0, scale: 0.85, y: 40 }, { opacity: 1, scale: 1, y: 0, duration: 0.45, ease: "back.out(1.6)" }, t(53));
+
+      // captions: the spoken word gets the yellow bar
+      let i0 = 0;
+      GROUPS.forEach((n, g) => {
+        const id = "#q-c" + (g + 1), spans = document.querySelectorAll(id + " span");
+        tl.fromTo(id, { opacity: 0 }, { opacity: 1, duration: 0.1 }, t(i0) - 0.1);
+        tl.to(id, { opacity: 0, duration: 0.1 }, g < GROUPS.length - 1 ? t(i0 + n) - 0.12 : VO_END + V + 0.4);
+        for (let k = 0; k < n; k++) {
+          tl.set(spans[k], { opacity: 1, backgroundColor: "rgba(255,210,63,1)" }, t(i0 + k));
+          if (k > 0) tl.set(spans[k - 1], { backgroundColor: "rgba(255,210,63,0)" }, t(i0 + k));
+        }
+        i0 += n;
+      });
+
+      window.__timelines["site3d"] = tl;
+    })();
+  </script>
+</template>

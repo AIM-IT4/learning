@@ -14,4 +14,8 @@ put() {  # project, then the sfx names
 put chai whoosh-short whoosh pop click-soft sparkle
 put compound pop riser impact-bass-1 click-soft sparkle
 put kinetic whoosh-short whoosh pop glitch-1 impact-bass-2 key-press typing click
+put shape click click-soft chime notification whoosh-short whoosh-cinematic pop sparkle
+put recur whoosh whoosh-short whoosh-cinematic pop ping key-press click-soft sparkle
+put site3d click-soft whoosh whoosh-short whoosh-cinematic pop ping key-press sparkle
 echo "fonts and sfx in place; add assets/vo.wav and assets/bgm.wav per project"
+echo "site3d also needs assets/desk2quant-logo.png (from the site) and assets/page/t00-t12.jpg (tools/site_capture)"

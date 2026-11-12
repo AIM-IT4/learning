@@ -1,0 +1,23 @@
+{
+ "parts": [
+  [
+   "takes/r1.wav",
+   0,
+   null
+  ],
+  [
+   "takes/r2a_seed12.wav",
+   0,
+   null
+  ],
+  [
+   "takes/r2.wav",
+   8.1,
+   null
+  ]
+ ],
+ "gaps": [
+  0.45,
+  0.35
+ ]
+}
