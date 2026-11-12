@@ -18,6 +18,27 @@ generator): Claude writes the drawing code, a headless Chrome renders every fram
 All MIT. Pinned to the commits reviewed on 2026-11-12 (scripts read for remote-code execution and data leaks: none;
 the bundled media tools' telemetry is switched off by the installer with `DO_NOT_TRACK=1`).
 
+## HyperFrames and Vox-style explainers
+- **HyperFrames** (`heygen-com/hyperframes`, Apache-2.0; the current official skills): `hyperframes` (read first:
+  HTML rendered to video, the work loop and what each kind of video needs: launch films, explainers, music videos,
+  charts, maps, captions), `hyperframes-cli`, `hyperframes-registry` (about 450 ready-made blocks: transitions, titles,
+  kinetic type, captions, charts, map overlays, a Vox-style `vox-annotate`), `media-use` (music, sound effects, voice,
+  images, with free local tools or HeyGen), `figma`, `slideshow`, `remotion-to-hyperframes`, `reverse-any-video`
+  (rebuild any video as an editable project) and `style-sampling` (episode templates such as a Vox-like Collage
+  Explainer; a HyperFrames Pro feature). They replace the older HyperFrames copies reelmimic ships; the skills
+  HyperFrames retired (hyperframes-core/-animation/..., faceless-explainer, general-video, motion-graphics, music-to-video,
+  product-launch-video, ...) are removed, as its own updater does, since their knowledge now lives in `hyperframes`.
+  The CLI runs with `npx hyperframes` (0.9.38 tested here; telemetry off through `HYPERFRAMES_NO_TELEMETRY=1`).
+- **vox-director** (`Alisa0808/vox-director`, MIT): one topic in, a finished Vox-style paper-collage explainer or ad
+  out (beat map and style gates, collage keyframes, motion, voice-over, music, captions); also a talking-head video or a
+  single photo restyled into the collage world.
+- **vox-explainer** (`CK42BB/vox-explainer-skill`, MIT): a lighter one-topic Vox-style explainer pipeline (script,
+  keyframes, animation, voice-over, music, ffmpeg assembly).
+
+Both Vox skills generate their pictures, motion, voice and music through the Atlas Cloud API: they need
+`ATLASCLOUD_API_KEY` set (atlascloud.ai, paid per video, roughly $3-8 a minute of film). Their scripts were read
+before install: they only call api.atlascloud.ai and download its results.
+
 ## This repo's own skill: `painted-song-reel`
 A painted-style animated music-video reel for ANY song (the format of the viral "painted-style music video made with
 Claude" reels): "Claude x song" laptop intro, rotate-your-phone card, then a sideways music video of semi-realistic
