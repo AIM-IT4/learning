@@ -1,0 +1,155 @@
+{
+ "style": "Beautiful semi-realistic digital painting, smooth soft shading, painterly brushwork, gentle warm light:",
+ "negative": "photo, 3d render, anime, cartoon, oversharpened, harsh contrast, hdr, glowing outlines, deformed face, asymmetrical eyes, cross-eyed, bad anatomy, extra fingers, bad hands, duplicate person, blurry, lowres, text, watermark",
+ "cast": {
+  "K": "a handsome young Indian man in a brown shirt, with thick wavy black hair and light stubble",
+  "N": "a beautiful young Indian woman in a pink salwar kameez, with long wavy black hair, a red bindi and gold jhumkas"
+ },
+ "face": {
+  "K": "a handsome young Indian man with thick wavy black hair, light stubble and warm brown skin",
+  "N": "a beautiful young Indian woman with long black hair, a small red bindi and gold jhumka earrings",
+  "": "a young Indian person with warm brown skin",
+  "?": "a young Indian person with warm brown skin, a gentle smile"
+ },
+ "shots": {
+  "hill": {
+   "prompt": "{K} lying alone on his back in tall golden grass at sunset, holding a white daisy above his smiling face",
+   "seeds": [
+    211,
+    212
+   ],
+   "faces": "K"
+  },
+  "hillclose": {
+   "prompt": "close-up of {K} lying in golden grass at sunset, eyes closed, gentle smile, daisies around him",
+   "seeds": [
+    221,
+    222
+   ],
+   "faces": "K"
+  },
+  "heart": {
+   "prompt": "a golden sunset sky with soft pink clouds and warm glowing light, wide and empty, no people",
+   "seeds": [
+    231,
+    232
+   ],
+   "faces": ""
+  },
+  "swing": {
+   "prompt": "{N} alone, laughing on a wooden swing under an old banyan tree at golden hour, her pink dupatta flying",
+   "seeds": [
+    241,
+    242
+   ],
+   "faces": "N"
+  },
+  "window": {
+   "prompt": "{N} alone, leaning on an open wooden window with pink bougainvillea, chin on her palm, dreamy shy smile",
+   "seeds": [
+    251,
+    252
+   ],
+   "faces": "N"
+  },
+  "daisy": {
+   "prompt": "close-up of a hand gently picking a white petal from a daisy, white petals falling, golden grass blurred behind",
+   "seeds": [
+    261,
+    262
+   ],
+   "faces": ""
+  },
+  "bed": {
+   "prompt": "{K} lying awake alone in bed at night, smiling, moonlight from a window across the white sheets",
+   "seeds": [
+    271,
+    272
+   ],
+   "faces": "K"
+  },
+  "bedcalm": {
+   "prompt": "{K} sleeping peacefully alone in bed at night, a gentle smile, soft moonlight on his face and pillow",
+   "seeds": [
+    273,
+    274
+   ],
+   "faces": "K"
+  },
+  "eye": {
+   "prompt": "extreme close-up of one dark brown eye of a young Indian woman, kohl eyeliner, long lashes, golden sparkles",
+   "seeds": [
+    281,
+    282
+   ],
+   "faces": ""
+  },
+  "dream": {
+   "prompt": "{N} twirling alone in a dreamy night sky full of stars beside a big golden moon, her pink dupatta swirling",
+   "seeds": [
+    291,
+    292
+   ],
+   "faces": "N"
+  },
+  "dream2": {
+   "prompt": "{N} dancing alone among stars and glowing pink clouds in a dream, smiling, her long hair flowing",
+   "seeds": [
+    293,
+    294
+   ],
+   "faces": "N"
+  },
+  "box": {
+   "prompt": "an open old wooden box with folded love letters and red roses on a wooden table, warm lamp light, no people",
+   "seeds": [
+    301,
+    302
+   ],
+   "faces": ""
+  },
+  "bazaar": {
+   "prompt": "{N} standing alone in a crowded old Indian bazaar at dusk under warm string lights, looking around, searching",
+   "seeds": [
+    311,
+    312
+   ],
+   "faces": "N"
+  },
+  "found": {
+   "prompt": "close-up of {N} in a bazaar at dusk, warm string lights behind her, her face lighting up with a happy smile",
+   "seeds": [
+    321,
+    322
+   ],
+   "faces": "N"
+  },
+  "kterrace": {
+   "prompt": "{K} standing alone on the flat terrace of an old Indian house at night, smiling across the lane, starry sky",
+   "seeds": [
+    331,
+    332
+   ],
+   "faces": "K"
+  },
+  "nterrace": {
+   "prompt": "{N} standing alone on the flat terrace of an old Indian house at night, smiling shyly, starry sky",
+   "seeds": [
+    341,
+    342
+   ],
+   "faces": "N"
+  },
+  "sunset": {
+   "prompt": "a young Indian man in a cream shirt and a young Indian woman in a pink salwar kameez smiling at each other under a flowering tree at sunset",
+   "seeds": [
+    351,
+    352
+   ],
+   "faces": "??"
+  }
+ },
+ "steps": 5,
+ "cfg": 2.0,
+ "sampler": "dpm"
+}

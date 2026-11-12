@@ -143,8 +143,9 @@ class Particles:
 
 FONT_DEV = str(Path(__import__("os").environ.get("REEL_FONTS", str(Path(__file__).resolve().parents[2] / "code_scenes" / "fonts"))) / "NotoSansDevanagari_700Bold.ttf")
 
-def strip_image(text, seed, size=46):
-    """A torn strip of white paper with one lyric line (RGBA, with its soft shadow)."""
+def strip_image(text, seed, size=46, ink=(28, 24, 22, 255), spans=False):
+    """A torn strip of white paper with one lyric line (RGBA, with its soft shadow). spans=True also returns each
+    word's [x0, x1] in the strip image (for the karaoke wipe)."""
     r = np.random.default_rng(seed)
     f = ImageFont.truetype(FONT_DEV, size, layout_engine=ImageFont.Layout.RAQM)
     bb = f.getbbox(text, language="hi")
@@ -169,9 +170,15 @@ def strip_image(text, seed, size=46):
     base[..., 3] = np.array(pm)
     paper = Image.fromarray(base, "RGBA")
     d = ImageDraw.Draw(paper)
-    d.text((pad + 35 - bb[0], pad + 22 - bb[1]), text, font=f, fill=(28, 24, 22, 255), language="hi")
-    out = Image.alpha_composite(shadow, paper)
-    return np.array(out).astype(np.float32)
+    ox = pad + 35 - bb[0]
+    d.text((ox, pad + 22 - bb[1]), text, font=f, fill=ink, language="hi")
+    out = np.array(Image.alpha_composite(shadow, paper)).astype(np.float32)
+    if not spans: return out
+    ws, sp = text.split(" "), []
+    for i in range(len(ws)):
+        a = f.getlength(" ".join(ws[:i]) + (" " if i else ""), language="hi") if i else 0.0
+        sp.append([ox + bb[0] + a, ox + bb[0] + f.getlength(" ".join(ws[:i + 1]), language="hi")])
+    return out, sp
 
 def paste_rgba(frame, rgba, cx, cy, scale=1.0, rot=0.0, alpha=1.0):
     if alpha <= 0: return frame
@@ -192,6 +199,30 @@ for k, sh in enumerate(shots):
 strips = []
 for j, s in enumerate(cfg.get("strips", [])):
     strips.append(dict(s, img_=strip_image(s["text"], 50 + j, s.get("size", 46))))
+captions = []
+for j, c in enumerate(cfg.get("captions", [])):
+    text = " ".join(w for w, _ in c["words"])
+    dim = strip_image(text, 80 + j, c.get("size", 60), ink=(150, 140, 132, 255))
+    dark, spans = strip_image(text, 80 + j, c.get("size", 60), spans=True)
+    captions.append(dict(c, dim_=dim, dark_=dark, spans_=spans, xx_=np.arange(dim.shape[1], dtype=np.float32)[None, :, None]))
+
+def draw_captions(f, t):
+    for c in captions:
+        if not (c["t0"] - 0.2 <= t <= c["t1"] + 0.35): continue
+        q = min(1.0, (t - c["t0"] + 0.2) / 0.2)
+        out = max(0.0, min(1.0, (c["t1"] + 0.35 - t) / 0.35))
+        rx = c["spans_"][0][0]                                    # karaoke: dark ink up to here
+        ws = c["words"]
+        for i, (_, ts) in enumerate(ws):
+            nxt = ws[i + 1][1] if i + 1 < len(ws) else c["t1"]
+            if t >= ts:
+                k = min(1.0, (t - ts) / max(0.12, min(0.45, nxt - ts)))
+                rx = c["spans_"][i][0] + k * (c["spans_"][i][1] - c["spans_"][i][0])
+        m = np.clip((rx - c["xx_"]) / 10.0 + 0.5, 0, 1)
+        img = c["dark_"] * m + c["dim_"] * (1 - m)
+        sc = 0.86 + 0.14 * ease(q, "out")
+        f = paste_rgba(f, img, c["x"], c["y"], sc, c.get("rot", 0), alpha=min(q * 1.4, out))
+    return f
 vig = None
 
 HEART_UNIT = [(16 * math.sin(a) ** 3, -(13 * math.cos(a) - 5 * math.cos(2 * a) - 2 * math.cos(3 * a) - math.cos(4 * a)))
@@ -321,6 +352,7 @@ def frame_at(t):
     return shot_frame(k, t)
 
 def finish(f, t):
+    f = draw_captions(f, t)
     global vig
     if vig is None:
         yy, xx = np.mgrid[0:H, 0:W].astype(np.float32)

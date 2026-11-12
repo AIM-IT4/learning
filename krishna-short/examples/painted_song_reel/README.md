@@ -69,6 +69,29 @@ Stability AI's licence).
 `overlays: [{kind: "heart", x, y, size, form}]`, the `bokeh` effect, and the camera centre is clamped so a zoom or
 roll never shows the picture's edge.
 
+### v2: professional faces and lyrics from the first word (`local_painter/paint_pro.py`)
+SDXL-Turbo's faces (eyes, noses, lips) were not clean enough. v2 paints with **DreamShaper XL Lightning**
+(`Lykon/dreamshaper-xl-lightning`, an SDXL fine-tune for painterly art; licence openrail++, commercial use allowed) at
+1344x768 (DPM++ 2M, 5 steps, CFG 2, a negative prompt against photo / 3D / anime / HDR looks and broken faces; about
+55 s a picture on 4 cores), then a **face-detail pass** like ADetailer: the picked painting is enlarged 2x (Lanczos,
+2688x1536, so the camera can push in), OpenCV's YuNet finds the faces, and each face area (2.3x the face box) is
+repainted at 896-1152 px with img2img (strength 0.42), colour-matched and blended back through a feathered oval
+(about 30 s a face). The DPM++ SDE Karras sampler made the paintings over-sharpened and HDR-looking, so it is not used.
+
+1. `python3 local_painter/paint_pro.py candidates local_painter/shots_pro.json out/pro` (2 options per shot and a
+   contact sheet; about 35 min for the 17 shots). The prompts begin with the style and say "alone" for one person.
+   Each shot names its cast (`faces`: "K", "N", "??" for two people, "" for none) so the face pass knows whom it
+   is repainting.
+2. `python3 local_painter/paint_pro.py finish local_painter/shots_pro.json out/pro PICKS` -> `out/pro/final_<name>.png`
+3. `python3 local_painter/build_painted.py out/pro shots_full.json`, then
+   `REEL_CACHE=out/depth_pro python3 render_mv.py shots_full.json out/mv.mp4` (use a new depth cache when the
+   paintings change: it is keyed by file name).
+
+Lyrics: `build_painted.py` writes `captions`, one torn-paper strip per sung line from the first word to the end
+(word onsets measured on the vocal stem), at the bottom of the frame. Each strip starts in faded ink and every word
+darkens as it is sung (a karaoke wipe). `render_mv.py` draws them with `captions: [{t0, t1, words: [[word, t]], x, y,
+rot, size}]`.
+
 ## Claude-only version, drawn in code (`code_drawn/`)
 The same reel with no picture generator at all: every scene is drawn and animated with the 2D canvas (flat
 illustrated style), 1:07 long (song 47.4-114.2 s: the hook twice, "ये दिल बेक़रार", "ख़्वाबों में छुपाया तुमको, यादों में

@@ -65,13 +65,28 @@ shots = [
 for k, sh in enumerate(shots):
     sh["t0"], sh["t1"] = T[k], T[k + 1]
 shots = shots[:N]
-strips = [
-    dict(shot=8, t=23.15, text="ख़्वाबों में छुपाया तुमको", x=560, y=880, rot=3, size=60),
-    dict(shot=9, t=26.95, text="यादों में बसाया तुमको", x=1360, y=860, rot=-3, size=60),
-    dict(shot=14, t=38.40, text="मिलोगे हमें तुम जानम", x=500, y=230, rot=3, size=60),
-    dict(shot=15, t=42.20, text="कहीं ना कहीं…", x=1300, y=820, rot=-2, size=64),
+# Lyric captions for every sung line (song seconds, word onsets from the vocal stem): torn-paper strips at the
+# bottom of the frame, each word darkening as it is sung.
+SONG0 = 51.937
+LINES = [
+    ([("सोचेंगे", 52.0), ("तुम्हें", 53.4), ("प्यार", 53.9), ("करें", 55.8), ("के", 57.06), ("नहीं", 57.38)], 59.2),
+    ([("सोचेंगे", 59.3), ("तुम्हें", 61.0), ("प्यार", 61.56), ("करें", 62.9), ("के", 64.72), ("नहीं", 65.04)], 67.1),
+    ([("ये", 67.3), ("दिल", 68.2), ("बेक़रार", 68.62), ("करें", 71.42), ("के", 72.32), ("नहीं", 72.7)], 74.05),
+    ([("ख़्वाबों", 74.18), ("में", 76.14), ("छुपाया", 76.46), ("तुमको", 77.66)], 78.55),
+    ([("यादों", 78.72), ("में", 79.94), ("बसाया", 80.28), ("तुमको", 81.44)], 82.5),
+    ([("ख़्वाबों", 82.66), ("में", 83.86), ("छुपाया", 84.12), ("तुमको", 85.26)], 86.15),
+    ([("यादों", 86.26), ("में", 87.58), ("बसाया", 87.88), ("तुमको", 89.02)], 90.05),
+    ([("मिलोगे", 90.18), ("हमें", 91.72), ("तुम", 92.54), ("जानम", 92.98), ("कहीं", 94.08), ("ना", 95.24), ("कहीं", 95.6)], 97.6),
+    ([("सोचेंगे", 98.12), ("तुम्हें", 99.14), ("प्यार", 99.64), ("करें", 101.42), ("के", 102.86), ("नहीं", 103.18)], 104.9),
+    ([("ये", 105.02), ("दिल", 106.34), ("बेक़रार", 106.9), ("करें", 108.92), ("के", 110.6), ("नहीं", 110.92)], 112.9),
 ]
+captions = []
+for i, (words, end) in enumerate(LINES):
+    t0 = words[0][1] - SONG0
+    nxt = LINES[i + 1][0][0][1] - SONG0 if i + 1 < len(LINES) else 99
+    captions.append(dict(t0=round(t0, 3), t1=round(min(end - SONG0, nxt - 0.3), 3), words=[[w, round(t - SONG0, 3)] for w, t in words],
+                         x=960 + (24 if i % 2 else -24), y=955, rot=(1.4 if i % 2 else -1.6), size=62))
 cfg = dict(start=0.0, end=shots[-1]["t1"], fade_in=0.14, fade_out=0.8 if N >= len(T) - 1 else None, flow_mark=False,
-           shots=shots, strips=[s for s in strips if s["shot"] < len(shots)])
+           shots=shots, strips=[], captions=[c for c in captions if c["t0"] < shots[-1]["t1"]])
 json.dump(cfg, open(OUT, "w"), ensure_ascii=False, indent=1)
 print(len(shots), "shots", cfg["start"], "->", cfg["end"])
