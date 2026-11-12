@@ -1,0 +1,10 @@
+# media stays out of git: voice, music, sound effects, fonts, renders, snapshots, takes
+*/assets/
+*/renders/
+*/snaps*/
+*/.hyperframes/
+takes/
+*.wav
+*.mp3
+*.mp4
+*.log

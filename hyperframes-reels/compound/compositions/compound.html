@@ -1,0 +1,195 @@
+<template>
+  <style>
+    @font-face { font-family: "Yatra One"; src: url("assets/fonts/YatraOne.ttf"); }
+    @font-face { font-family: "Noto Sans Devanagari"; font-weight: 700; src: url("assets/fonts/NotoSansDevanagari_700Bold.ttf"); }
+    @font-face { font-family: "Poppins"; font-weight: 600; src: url("assets/fonts/Poppins_600SemiBold.ttf"); }
+    #root { position: absolute; inset: 0; background: #f7f7f3; overflow: hidden; }
+    #k-art { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    .k-num { font-family: "Poppins", "Noto Sans Devanagari"; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .k-hi { font-family: "Noto Sans Devanagari"; font-weight: 700; white-space: nowrap; }
+    /* the hook fills the frame (y 300-880); the coin then drops from under it into column 1 */
+    #k-hook { position: absolute; left: 80px; top: 300px; }
+    #k-hook .a { display: block; font-size: 250px; line-height: 1; color: #12221f; }
+    #k-hook .b { display: block; margin-top: 18px; font-size: 104px; line-height: 1.4; color: #0b7f79; }
+    #k-hook .c { display: inline-block; margin-top: 14px; padding: 0 18px; font-size: 104px; line-height: 1.4; color: #12221f; background: #ffd23f; }
+    #k-total { position: absolute; left: 80px; top: 240px; }
+    #k-total .v { display: block; font-size: 176px; line-height: 1; color: #12221f; }
+    #k-total .l { display: block; margin-top: 12px; font-size: 62px; color: #0b7f79; }
+    #k-rate { position: absolute; left: 620px; top: 470px; padding: 8px 22px 4px; border: 6px solid #0b7f79; border-radius: 6px;
+              font-size: 58px; color: #0b7f79; transform-origin: 0% 50%; }
+    /* the legend sits in the empty top-left of the chart (columns 1-12 stay below y 1040) */
+    #k-leg { position: absolute; left: 96px; top: 700px; }
+    .k-row { position: relative; padding-left: 80px; margin-bottom: 30px; }
+    .k-row .sw { position: absolute; left: 0; top: 18px; width: 54px; height: 54px; border-radius: 6px; }
+    .k-row .v { display: block; font-size: 80px; line-height: 1.05; }
+    .k-row .l { display: inline-block; margin-top: 4px; font-size: 46px; line-height: 1.35; }
+    #k-gain .sw { background: #ffd23f; border: 4px solid #12221f; }
+    #k-gain .v { color: #12221f; }
+    #k-gain .l { color: #12221f; background: #ffd23f; padding: 0 10px; margin-left: -10px; }
+    #k-mine .sw { background: #0b7f79; }
+    #k-mine .v, #k-mine .l { color: #0b7f79; }
+    #k-ioi { position: absolute; left: 505px; top: 612px; width: 400px; text-align: right; font-size: 46px; line-height: 1.4; color: #0b7f79; }
+    #k-end1 { position: absolute; left: 80px; top: 236px; font-family: "Yatra One"; font-size: 140px; line-height: 1.08; color: #12221f; white-space: nowrap; }
+    #k-end2 { position: absolute; left: 84px; top: 560px; font-size: 66px; color: #12221f; background: #ffd23f; padding: 0 14px; }
+    #k-note { position: absolute; left: 84px; top: 700px; width: 600px; padding: 14px 18px; background: #f7f7f3; border-left: 6px solid #0b7f79;
+              font-size: 32px; line-height: 1.45; color: #4b5b58; white-space: normal; }
+    #k-yr { position: absolute; left: 0; top: 1266px; width: 1080px; height: 40px; }
+    #k-yr span { position: absolute; top: 0; font-family: "Poppins", "Noto Sans Devanagari"; font-weight: 600; font-size: 30px; color: #4b5b58; }
+    .k-cap { position: absolute; left: 60px; top: 1330px; width: 960px; text-align: center; font-family: "Noto Sans Devanagari"; font-weight: 700;
+             font-size: 46px; line-height: 1.3; color: #12221f; text-wrap: balance; }
+    .k-cap span { display: inline-block; padding: 0 8px; margin: 0 1px; border-radius: 8px; opacity: 0.4; }
+  </style>
+  <div id="root" data-composition-id="compound" data-width="1080" data-height="1920">
+    <svg id="k-art" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="k-dots" width="10" height="10" patternUnits="userSpaceOnUse"><circle cx="5" cy="5" r="2.2" fill="#0b7f79" /></pattern>
+        <filter id="k-paper" x="0" y="0" width="100%" height="100%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" seed="9" result="n" />
+          <feColorMatrix in="n" type="matrix" values="0 0 0 0 0.07  0 0 0 0 0.13  0 0 0 0 0.12  0 0 0 0.06 0" />
+        </filter>
+      </defs>
+      <!-- below the caption band: a coin-edge texture only -->
+      <rect x="0" y="1460" width="1080" height="460" fill="url(#k-dots)" opacity="0.08" />
+      <!-- the chart -->
+      <g id="k-chart">
+        <line id="k-base" x1="88" y1="1252" x2="992" y2="1252" stroke="#12221f" stroke-width="5" stroke-linecap="round" />
+        <line id="k-ref" x1="88" y1="602" x2="992" y2="602" stroke="#12221f" stroke-width="3" stroke-dasharray="10 12" opacity="0.5" />
+        <g id="k-cols"></g>
+        <path id="k-brk-g" d="M 1000 640 L 1018 640 L 1018 1090 L 1000 1090" fill="none" stroke="#12221f" stroke-width="6" stroke-linecap="round" />
+        <path id="k-brk-m" d="M 1000 1100 L 1018 1100 L 1018 1250 L 1000 1250" fill="none" stroke="#0b7f79" stroke-width="6" stroke-linecap="round" />
+        <!-- interest on interest: the curve rides 30 px above the real column tops (concave up), drawn on left to right -->
+        <clipPath id="k-arc-clip"><rect id="k-arc-r" x="0" y="0" width="0" height="1920" /></clipPath>
+        <path id="k-arc" clip-path="url(#k-arc-clip)" fill="none" stroke="#0b7f79" stroke-width="5" stroke-dasharray="14 12" stroke-linecap="round"
+              d="M 112 1212 C 120 1210, 142 1206, 158 1203 C 173 1199, 188 1196, 203 1192 C 218 1188, 234 1184, 249 1180 C 264 1176, 279 1172, 294 1167 C 310 1162, 325 1157, 340 1152 C 355 1147, 370 1141, 386 1135 C 401 1129, 416 1123, 431 1116 C 446 1110, 462 1103, 477 1095 C 492 1087, 507 1079, 522 1071 C 538 1062, 553 1053, 568 1044 C 583 1034, 598 1024, 614 1013 C 629 1002, 644 991, 659 979 C 674 967, 690 954, 705 940 C 720 926, 735 912, 750 896 C 766 881, 781 864, 796 847 C 811 830, 826 811, 842 791 C 857 772, 872 751, 887 729 C 902 707, 918 683, 933 658 C 948 633, 971 592, 978 579" />
+      </g>
+      <g id="k-coin"><circle cx="133" cy="560" r="34" fill="#ffd23f" stroke="#12221f" stroke-width="5" />
+        <text x="133" y="575" text-anchor="middle" font-family="Poppins" font-weight="600" font-size="40" fill="#12221f">₹</text></g>
+      <rect x="0" y="0" width="1080" height="1920" filter="url(#k-paper)" />
+    </svg>
+
+    <div id="k-hook"><span class="a k-num">₹5,000</span><span class="b k-hi">हर महीने</span><span class="c k-hi">× 20 साल = ?</span></div>
+    <div id="k-total"><span id="k-total-v" class="v k-num">₹0</span><span id="k-total-l" class="l k-hi">आपने जमा किए</span></div>
+    <div id="k-rate" class="k-hi">12% सालाना</div>
+    <div id="k-leg">
+      <div id="k-gain" class="k-row"><i class="sw"></i><span class="v k-num">₹37.5 लाख</span><span class="l k-hi">सिर्फ़ ब्याज से</span></div>
+      <div id="k-mine" class="k-row"><i class="sw"></i><span class="v k-num">₹12 लाख</span><span class="l k-hi">आपका पैसा</span></div>
+    </div>
+    <div id="k-ioi" class="k-hi">ब्याज पर ब्याज</div>
+    <div id="k-end1">कंपाउंडिंग<br />का जादू</div>
+    <div id="k-end2" class="k-hi">जल्दी शुरू कीजिए।</div>
+    <div id="k-note" class="k-hi">उदाहरण: ₹5,000 हर महीने, 12% सालाना रिटर्न (मासिक), 20 साल। रिटर्न की गारंटी नहीं।</div>
+    <div id="k-yr"><span id="k-y1" style="left: 101px">1</span><span id="k-y5" style="left: 284px">5</span><span id="k-y10" style="left: 503px">10</span>
+      <span id="k-y15" style="left: 731px">15</span><span id="k-y20" style="left: 930px">20 साल</span></div>
+
+    <div id="k-cap1" class="k-cap"><span>अगर</span><span>आप</span><span>हर</span><span>महीने</span><span>सिर्फ़</span><span>5,000</span><span>रुपये</span><span>बचाएँ…</span></div>
+    <div id="k-cap2" class="k-cap"><span>तो</span><span>20</span><span>साल</span><span>में</span><span>आप</span><span>जमा</span><span>करेंगे</span><span>12</span><span>लाख।</span></div>
+    <div id="k-cap3" class="k-cap"><span>लेकिन</span><span>12</span><span>प्रतिशत</span><span>सालाना</span><span>रिटर्न</span><span>पर…</span><span>यही</span><span>पैसा</span><span>बन</span><span>जाता</span><span>है —</span><span>करीब</span><span>50</span><span>लाख!</span></div>
+    <div id="k-cap4" class="k-cap"><span>यानी</span><span>37</span><span>लाख</span><span>से</span><span>ज़्यादा…</span><span>सिर्फ़</span><span>ब्याज</span><span>पर</span><span>ब्याज</span><span>से।</span></div>
+    <div id="k-cap5" class="k-cap"><span>यही</span><span>है</span><span>कंपाउंडिंग</span><span>का</span><span>जादू।</span><span>जल्दी</span><span>शुरू</span><span>कीजिए।</span></div>
+  </div>
+  <script>
+    (function () {
+      // ---- the voice is the clock: word onsets (seconds from the start of the voice), measured on the take
+      const V = 0.2;
+      const CAPS = [
+        [0.0, 0.3, 0.64, 0.9, 1.26, 1.54, 1.96, 2.42],
+        [3.8, 3.92, 4.14, 4.5, 4.72, 4.94, 5.24, 5.7, 5.96],
+        [7.2, 7.56, 7.82, 8.42, 8.94, 9.28, 10.35, 10.66, 11.08, 11.28, 11.64, 12.55, 12.88, 13.16],
+        [14.38, 14.74, 15.12, 15.6, 15.8, 16.93, 17.32, 17.68, 17.9, 18.22],
+        [19.43, 19.74, 19.92, 20.56, 20.73, 21.73, 22.12, 22.42],
+      ];
+      const CAP_END = [3.74, 7.14, 14.32, 19.37, 30];
+      const W = (p, i) => CAPS[p][i] + V;                      // film time of word i of line p
+      const C = {
+        coin: W(0, 7), years: W(1, 1), dep12: W(1, 7), rate: W(2, 1), grow: W(2, 4), payoff: W(2, 12),
+        gain: W(3, 1), ioi: W(3, 6), magic: W(4, 2), start: W(4, 5),
+      };
+
+      // ---- the data: ₹5,000 at the end of every month, 12% a year compounded monthly (1% a month)
+      const N = 20, X0 = 96, STEP = 45.6, BW = 32, BASE = 1250, TOP = 602, H = BASE - TOP;
+      const dep = [], tot = [];
+      for (let y = 1; y <= N; y++) { const m = 12 * y; dep.push(0.6 * y); tot.push(5000 * (Math.pow(1.01, m) - 1) / 0.01 / 1e5); }  // lakh
+      const cols = document.getElementById("k-cols"), NS = "http://www.w3.org/2000/svg";
+      const rects = [];
+      for (let i = 0; i < N; i++) {                             // the 20 columns are fixed marks; only their heights are animated
+        const d = document.createElementNS(NS, "rect"), g = document.createElementNS(NS, "rect");
+        d.setAttribute("id", "k-d" + (i + 1)); g.setAttribute("id", "k-g" + (i + 1));
+        for (const r of [d, g]) { r.setAttribute("x", X0 + i * STEP); r.setAttribute("width", BW); r.setAttribute("rx", 4); r.setAttribute("y", BASE); r.setAttribute("height", 0); }
+        d.setAttribute("fill", "#0b7f79"); g.setAttribute("fill", "#ffd23f"); g.setAttribute("stroke", "#12221f"); g.setAttribute("stroke-width", "2");
+        cols.appendChild(d); cols.appendChild(g); rects.push([d, g]);
+      }
+      const S = { dep: 0, gold: 0, ceil: 12 };                  // columns of deposit shown, columns of interest shown, value at the top line (lakh)
+      const draw = () => {
+        const k = H / S.ceil;
+        for (let i = 0; i < N; i++) {
+          const fd = Math.max(0, Math.min(1, S.dep - i)), fg = Math.max(0, Math.min(1, S.gold - i));
+          const hd = dep[i] * k * fd, hg = (tot[i] - dep[i]) * k * fg;
+          rects[i][0].setAttribute("y", BASE - hd); rects[i][0].setAttribute("height", hd);
+          rects[i][1].setAttribute("y", BASE - hd - hg); rects[i][1].setAttribute("height", hg);
+        }
+      };
+      const totalEl = document.getElementById("k-total-v");
+      const T = { v: 0 };
+      const showTotal = () => { const v = T.v; totalEl.textContent = v < 1 ? "₹" + Math.round(v * 100000).toLocaleString("en-IN") : "₹" + v.toFixed(1).replace(/\.0$/, "") + " लाख"; };
+
+      const tl = gsap.timeline({ paused: true });
+      gsap.set(["#k-total", "#k-rate", "#k-gain", "#k-mine", "#k-ioi", "#k-end1", "#k-end2", "#k-note", "#k-yr", ".k-cap", "#k-brk-g", "#k-brk-m", "#k-arc", "#k-ref"], { opacity: 0 });
+      gsap.set("#k-coin", { opacity: 0 });
+      draw(); showTotal();
+
+      // the hook holds; the coin drops on "बचाएँ"
+      tl.fromTo("#k-coin", { opacity: 0, y: 340 }, { opacity: 1, y: 660, duration: 0.32, ease: "power2.in" }, C.coin - 0.22);
+      tl.to("#k-coin", { scaleY: 0.2, opacity: 0, duration: 0.14, svgOrigin: "133 1250" }, C.coin + 0.12);
+      tl.fromTo(S, { dep: 0 }, { dep: 1, duration: 0.25, ease: "power2.out", onUpdate: draw, immediateRender: false }, C.coin + 0.1);
+
+      // 20 years of deposits rise as a straight ramp; the total counts to ₹12 लाख
+      tl.to("#k-hook", { opacity: 0, filter: "blur(10px)", duration: 0.2, ease: "power2.in" }, C.years - 0.25);
+      tl.fromTo(["#k-total", "#k-yr"], { opacity: 0 }, { opacity: 1, duration: 0.2, stagger: 0.08 }, C.years - 0.05);
+      tl.fromTo(S, { dep: 1 }, { dep: 20, duration: C.dep12 - C.years, ease: "none", onUpdate: draw, immediateRender: false }, C.years);
+      tl.fromTo(T, { v: 0.05 }, { v: 12, duration: C.dep12 - C.years + 0.1, ease: "power1.inOut", onUpdate: showTotal, immediateRender: false }, C.years);
+      tl.fromTo("#k-ref", { opacity: 0 }, { opacity: 0.5, duration: 0.2 }, C.dep12);
+
+      // 12% a year: interest grows on every column, exponentially; the axis makes room for it
+      tl.fromTo("#k-rate", { opacity: 0, scale: 1.3, filter: "blur(6px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.26, ease: "back.out(1.7)" }, C.rate);
+      tl.to("#k-total-l", { opacity: 0, duration: 0.12 }, C.grow - 0.15);
+      tl.fromTo(S, { gold: 0 }, { gold: 20, duration: C.payoff - C.grow, ease: "power2.in", onUpdate: draw, immediateRender: false }, C.grow);
+      tl.fromTo(S, { ceil: 12 }, { ceil: 50, duration: C.payoff - C.grow, ease: "power2.inOut", onUpdate: draw, immediateRender: false }, C.grow);
+      tl.fromTo(T, { v: 12 }, { v: 49.5, duration: C.payoff - C.grow, ease: "power2.in", onUpdate: showTotal, immediateRender: false }, C.grow);
+      tl.set("#k-total-l", { textContent: "20 साल बाद" }, C.payoff - 0.1);
+      tl.to("#k-total-l", { opacity: 1, duration: 0.15 }, C.payoff);
+      tl.to("#k-rate", { opacity: 0, filter: "blur(8px)", duration: 0.18 }, C.payoff + 0.5);
+
+      // annotate on the last column: ₹37.5 लाख is interest, ₹12 लाख is yours; then interest on interest
+      tl.fromTo("#k-brk-g", { opacity: 0 }, { opacity: 1, duration: 0.2 }, C.gain - 0.1);
+      tl.fromTo("#k-gain", { opacity: 0, x: 24, filter: "blur(6px)" }, { opacity: 1, x: 0, filter: "blur(0px)", duration: 0.3, ease: "expo.out" }, C.gain);
+      tl.fromTo("#k-brk-m", { opacity: 0 }, { opacity: 1, duration: 0.2 }, C.gain + 0.55);
+      tl.fromTo("#k-mine", { opacity: 0, x: 24, filter: "blur(6px)" }, { opacity: 1, x: 0, filter: "blur(0px)", duration: 0.3, ease: "expo.out" }, C.gain + 0.6);
+      const arcR = document.getElementById("k-arc-r"), AR = { w: 0 };
+      const showArc = () => arcR.setAttribute("width", AR.w);
+      tl.set("#k-arc", { opacity: 1 }, C.ioi - 0.2);
+      tl.fromTo(AR, { w: 0 }, { w: 1000, duration: 0.9, ease: "power2.inOut", onUpdate: showArc, immediateRender: false }, C.ioi - 0.2);
+      tl.fromTo("#k-ioi", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2 }, C.ioi);
+
+      // the line to remember
+      tl.to(["#k-total", "#k-gain", "#k-mine", "#k-ioi", "#k-arc", "#k-brk-g", "#k-brk-m", "#k-ref"], { opacity: 0, filter: "blur(10px)", duration: 0.22, ease: "power2.in" }, C.magic - 0.35);
+      tl.to("#k-cols rect", { opacity: 0.35, duration: 0.4, ease: "power2.inOut" }, C.magic - 0.35);
+      tl.fromTo("#k-end1", { opacity: 0, scale: 1.15, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.32, ease: "back.out(1.5)", transformOrigin: "0% 50%" }, C.magic);
+      tl.fromTo("#k-end2", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2 }, C.start);
+      tl.fromTo("#k-note", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, C.start + 0.5);
+
+      // captions: the spoken word gets the gold bar
+      CAPS.forEach((words, p) => {
+        const cap = "#k-cap" + (p + 1), spans = document.querySelectorAll(cap + " span");
+        tl.fromTo(cap, { opacity: 0 }, { opacity: 1, duration: 0.12 }, words[0] + V - 0.12);
+        if (p < CAPS.length - 1) tl.to(cap, { opacity: 0, duration: 0.12 }, CAP_END[p] + V - 0.12);
+        words.forEach((w, i) => {
+          tl.set(spans[i], { opacity: 1, backgroundColor: "rgba(255,210,63,1)" }, w + V);
+          if (i > 0) tl.set(spans[i - 1], { backgroundColor: "rgba(255,210,63,0)" }, w + V);
+        });
+      });
+      tl.to("#k-cap5", { opacity: 0, duration: 0.15 }, C.start + 1.3);
+
+      window.__timelines["compound"] = tl;
+    })();
+  </script>
+</template>

@@ -1,0 +1,354 @@
+<template>
+  <style>
+    @font-face { font-family: "Yatra One"; src: url("assets/fonts/YatraOne.ttf"); }
+    @font-face { font-family: "Noto Sans Devanagari"; font-weight: 700; src: url("assets/fonts/NotoSansDevanagari_700Bold.ttf"); }
+    @font-face { font-family: "Poppins"; font-weight: 600; src: url("assets/fonts/Poppins_600SemiBold.ttf"); }
+    #root { position: absolute; inset: 0; background: #f3b13b; overflow: hidden; }
+    #c-art { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    .c-title { position: absolute; left: 80px; font-family: "Yatra One"; color: #3a1d12; line-height: 1.05;
+               text-shadow: 5px 4px 0 rgba(226, 65, 42, 0.85); white-space: nowrap; }
+    #c-t1 { top: 160px; font-size: 156px; }
+    #c-t2 { top: 372px; left: 86px; font-family: "Noto Sans Devanagari"; font-weight: 700; font-size: 62px; text-shadow: none; }
+    .c-stamp { position: absolute; left: 80px; top: 520px; width: 560px; }
+    .c-stamp .n { display: block; font-family: "Poppins", "Noto Sans Devanagari"; font-weight: 600; font-size: 132px; line-height: 1;
+                  color: #c9321d; text-shadow: -5px -4px 0 rgba(58, 29, 18, 0.9); white-space: nowrap; }
+    .c-stamp .l { display: block; margin-top: 14px; font-family: "Noto Sans Devanagari"; font-weight: 700; font-size: 62px; color: #3a1d12; }
+    #c-timer-t { position: absolute; left: 775px; top: 562px; width: 170px; text-align: center; font-family: "Poppins"; font-weight: 600;
+                 font-size: 54px; color: #3a1d12; }
+    #c-bas { position: absolute; left: 110px; top: 930px; font-family: "Yatra One"; font-size: 124px; color: #c9321d;
+             text-shadow: -5px -4px 0 rgba(58, 29, 18, 0.9); }
+    #c-f1 { top: 168px; font-size: 104px; }
+    #c-f1 span { display: inline-block; margin-right: 22px; }
+    #c-f2 { top: 292px; font-size: 176px; color: #c9321d; text-shadow: -6px -5px 0 rgba(58, 29, 18, 0.9); }
+    #c-card { position: absolute; left: 80px; top: 560px; width: 560px; padding: 34px 38px 30px; background: #3a1d12; border-radius: 14px;
+              color: #f3b13b; font-family: "Noto Sans Devanagari"; font-weight: 700; }
+    #c-card .h { font-size: 36px; color: #ee7b2e; margin-bottom: 10px; }
+    #c-card .r { font-size: 46px; line-height: 1.52; white-space: nowrap; }
+    #c-card .r b { font-family: "Poppins", "Noto Sans Devanagari"; font-weight: 600; color: #fff1d6; margin-right: 12px; }
+    .c-cap { position: absolute; left: 60px; top: 1196px; width: 960px; text-align: center; font-family: "Noto Sans Devanagari";
+             font-weight: 700; font-size: 52px; line-height: 1.3; color: #3a1d12; }
+    .c-cap span { display: inline-block; padding: 0 8px; margin: 0 1px; border-radius: 8px; opacity: 0.38; }
+  </style>
+  <div id="root" data-composition-id="chai" data-width="1080" data-height="1920">
+    <svg id="c-art" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="c-dots" width="8" height="8" patternUnits="userSpaceOnUse"><circle cx="4" cy="4" r="1.9" fill="#3a1d12" /></pattern>
+        <filter id="c-paper" x="0" y="0" width="100%" height="100%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="4" result="n" />
+          <feColorMatrix in="n" type="matrix" values="0 0 0 0 0.23  0 0 0 0 0.11  0 0 0 0 0.07  0 0 0 0.09 0" />
+        </filter>
+        <clipPath id="c-rimclip"><ellipse cx="530" cy="880" rx="247" ry="38" /></clipPath>
+        <clipPath id="c-bodyclip"><path d="M 280 880 L 292 1050 Q 296 1080 330 1082 L 730 1082 Q 764 1080 768 1050 L 780 880 A 250 40 0 0 1 280 880 Z" /></clipPath>
+        <clipPath id="c-glassclip"><path d="M 762 962 L 898 962 L 884 1168 Q 883 1178 873 1178 L 787 1178 Q 777 1178 776 1168 Z" /></clipPath>
+      </defs>
+
+      <!-- counter below the caption band: texture only -->
+      <rect x="0" y="1342" width="1080" height="578" fill="#e39a2c" />
+      <rect x="0" y="1342" width="1080" height="578" fill="url(#c-dots)" opacity="0.16" />
+      <g stroke="#3a1d12" stroke-width="4" opacity="0.28">
+        <line x1="0" y1="1342" x2="1080" y2="1342" /><line x1="0" y1="1500" x2="1080" y2="1500" /><line x1="0" y1="1660" x2="1080" y2="1660" />
+        <line x1="0" y1="1820" x2="1080" y2="1820" />
+        <line x1="180" y1="1342" x2="180" y2="1920" /><line x1="360" y1="1342" x2="360" y2="1920" /><line x1="540" y1="1342" x2="540" y2="1920" />
+        <line x1="720" y1="1342" x2="720" y2="1920" /><line x1="900" y1="1342" x2="900" y2="1920" />
+      </g>
+
+      <!-- stove -->
+      <g id="c-stove">
+        <rect x="318" y="1130" width="424" height="14" rx="4" fill="#3a1d12" />
+        <rect x="340" y="1144" width="16" height="30" fill="#3a1d12" /><rect x="704" y="1144" width="16" height="30" fill="#3a1d12" />
+        <g id="c-flame"><g id="c-flame-in">
+          <path d="M 388 1128 Q 372 1108 388 1088 Q 404 1108 388 1128 Z" fill="#ee7b2e" /><path d="M 463 1128 Q 445 1104 463 1080 Q 481 1104 463 1128 Z" fill="#ee7b2e" />
+          <path d="M 538 1128 Q 518 1100 538 1074 Q 558 1100 538 1128 Z" fill="#ee7b2e" /><path d="M 613 1128 Q 595 1104 613 1080 Q 631 1104 613 1128 Z" fill="#ee7b2e" />
+          <path d="M 688 1128 Q 672 1108 688 1088 Q 704 1108 688 1128 Z" fill="#ee7b2e" />
+          <path d="M 463 1128 Q 455 1114 463 1100 Q 471 1114 463 1128 Z" fill="#c9321d" /><path d="M 538 1128 Q 528 1110 538 1094 Q 548 1110 538 1128 Z" fill="#c9321d" />
+          <path d="M 613 1128 Q 605 1114 613 1100 Q 621 1114 613 1128 Z" fill="#c9321d" />
+        </g></g>
+      </g>
+
+      <!-- the pan (handle on the left; it tilts right to pour) -->
+      <g id="c-pan">
+        <path d="M 286 890 L 104 872 Q 82 870 82 890 L 84 902 Q 86 914 104 914 L 286 912 Z" fill="#3a1d12" />
+        <ellipse cx="530" cy="880" rx="250" ry="40" fill="#8f98a3" stroke="#3a1d12" stroke-width="6" />
+        <g clip-path="url(#c-rimclip)">
+          <ellipse id="c-liquid" cx="530" cy="1040" rx="250" ry="36" fill="#9fd4e8" />
+          <g id="c-bubbles" fill="none" stroke="#fff4dc" stroke-width="3">
+            <circle id="c-b1" cx="390" cy="900" r="7" /><circle id="c-b2" cx="450" cy="912" r="5" /><circle id="c-b3" cx="505" cy="896" r="8" />
+            <circle id="c-b4" cx="560" cy="908" r="6" /><circle id="c-b5" cx="615" cy="899" r="7" /><circle id="c-b6" cx="668" cy="910" r="5" />
+            <circle id="c-b7" cx="430" cy="898" r="5" /><circle id="c-b8" cx="590" cy="914" r="6" />
+          </g>
+          <g fill="none" stroke="#fff4dc" stroke-width="4">
+            <ellipse id="c-sp1" cx="560" cy="902" rx="12" ry="3" /><ellipse id="c-sp2" cx="490" cy="902" rx="12" ry="3" />
+            <ellipse id="c-sp3" cx="545" cy="905" rx="12" ry="3" /><ellipse id="c-sp4" cx="610" cy="903" rx="12" ry="3" />
+            <ellipse id="c-sp5" cx="650" cy="905" rx="12" ry="3" /><ellipse id="c-sp6" cx="530" cy="903" rx="12" ry="3" />
+            <ellipse id="c-sp7" cx="575" cy="904" rx="12" ry="3" />
+          </g>
+        </g>
+        <path d="M 280 880 L 292 1050 Q 296 1080 330 1082 L 730 1082 Q 764 1080 768 1050 L 780 880 A 250 40 0 0 1 280 880 Z"
+              fill="#c9ced5" stroke="#3a1d12" stroke-width="6" stroke-linejoin="round" />
+        <g clip-path="url(#c-bodyclip)"><rect x="660" y="860" width="140" height="240" fill="url(#c-dots)" opacity="0.4" />
+          <rect x="280" y="1040" width="520" height="60" fill="url(#c-dots)" opacity="0.25" /></g>
+        <path d="M 330 940 L 336 1040" stroke="#ffffff" stroke-width="8" stroke-linecap="round" opacity="0.7" />
+      </g>
+
+      <!-- ingredients (each lands on the liquid when it is named) -->
+      <g id="c-ginger"><path d="M 520 585 Q 540 560 575 570 Q 610 565 615 590 Q 625 615 600 625 Q 585 640 560 630 Q 525 640 515 618 Q 505 600 520 585 Z"
+         fill="#e8c48a" stroke="#3a1d12" stroke-width="5" /><path d="M 540 592 Q 552 600 548 614 M 580 584 Q 590 596 584 610" stroke="#3a1d12" stroke-width="4" fill="none" /></g>
+      <g id="c-el1"><ellipse cx="480" cy="600" rx="27" ry="13" fill="#86a63f" stroke="#3a1d12" stroke-width="4" transform="rotate(-20 480 600)" />
+         <path d="M 458 607 Q 480 596 502 592" stroke="#3a1d12" stroke-width="3" fill="none" /></g>
+      <g id="c-el2"><ellipse cx="545" cy="592" rx="27" ry="13" fill="#86a63f" stroke="#3a1d12" stroke-width="4" transform="rotate(15 545 592)" />
+         <path d="M 522 586 Q 545 594 568 600" stroke="#3a1d12" stroke-width="3" fill="none" /></g>
+      <g id="c-lg1"><rect x="602" y="586" width="7" height="44" rx="3" fill="#5b2e17" /><circle cx="605" cy="582" r="7" fill="#5b2e17" />
+         <circle cx="596" cy="576" r="5" fill="#5b2e17" /><circle cx="614" cy="576" r="5" fill="#5b2e17" /><circle cx="605" cy="570" r="5" fill="#5b2e17" /></g>
+      <g id="c-lg2"><rect x="652" y="580" width="7" height="44" rx="3" fill="#5b2e17" /><circle cx="655" cy="576" r="7" fill="#5b2e17" />
+         <circle cx="646" cy="570" r="5" fill="#5b2e17" /><circle cx="664" cy="570" r="5" fill="#5b2e17" /><circle cx="655" cy="564" r="5" fill="#5b2e17" /></g>
+      <g id="c-su1"><rect x="503" y="583" width="36" height="36" rx="5" fill="#fff9ee" stroke="#3a1d12" stroke-width="4" />
+         <circle cx="515" cy="595" r="2" fill="#3a1d12" /><circle cx="527" cy="607" r="2" fill="#3a1d12" /></g>
+      <g id="c-su2"><rect x="560" y="575" width="36" height="36" rx="5" fill="#fff9ee" stroke="#3a1d12" stroke-width="4" />
+         <circle cx="572" cy="587" r="2" fill="#3a1d12" /><circle cx="585" cy="599" r="2" fill="#3a1d12" /></g>
+
+      <!-- measuring cup with water -->
+      <g id="c-cup">
+        <path d="M 820 660 Q 872 662 870 700 Q 868 738 816 738" stroke="#3a1d12" stroke-width="12" fill="none" stroke-linecap="round" />
+        <path d="M 700 640 L 820 640 L 808 760 Q 806 772 794 772 L 726 772 Q 714 772 712 760 Z" fill="#c9ced5" stroke="#3a1d12" stroke-width="6" stroke-linejoin="round" />
+        <ellipse cx="760" cy="652" rx="54" ry="9" fill="#9fd4e8" />
+        <line x1="716" y1="700" x2="744" y2="700" stroke="#3a1d12" stroke-width="4" />
+      </g>
+      <rect id="c-wstream" x="688" y="652" width="18" height="246" rx="9" fill="#9fd4e8" />
+
+      <!-- spoon of tea leaves -->
+      <g id="c-spoon">
+        <line x1="804" y1="636" x2="930" y2="596" stroke="#3a1d12" stroke-width="12" stroke-linecap="round" />
+        <ellipse cx="760" cy="642" rx="52" ry="22" fill="#c9ced5" stroke="#3a1d12" stroke-width="5" />
+        <g fill="#2b1409"><circle cx="740" cy="638" r="5" /><circle cx="752" cy="644" r="4" /><circle cx="764" cy="636" r="5" />
+          <circle cx="776" cy="642" r="4" /><circle cx="746" cy="648" r="4" /><circle cx="770" cy="649" r="4" /><circle cx="784" cy="636" r="3" /></g>
+      </g>
+      <g id="c-leaves" fill="#2b1409">
+        <circle id="c-lf1" cx="712" cy="650" r="5" /><circle id="c-lf2" cx="706" cy="656" r="4" /><circle id="c-lf3" cx="716" cy="660" r="5" />
+        <circle id="c-lf4" cx="702" cy="648" r="4" /><circle id="c-lf5" cx="710" cy="664" r="4" /><circle id="c-lf6" cx="720" cy="654" r="3" />
+        <circle id="c-lf7" cx="704" cy="660" r="5" /><circle id="c-lf8" cx="714" cy="646" r="4" />
+      </g>
+
+      <!-- milk jug -->
+      <g id="c-jug">
+        <path d="M 716 648 Q 700 640 692 646 Q 712 660 726 664 L 742 720 Q 744 772 790 776 Q 836 772 838 720 L 852 652 Q 856 640 842 640 L 728 640 Q 718 640 716 648 Z"
+              fill="#c9ced5" stroke="#3a1d12" stroke-width="6" stroke-linejoin="round" />
+        <ellipse cx="786" cy="648" rx="54" ry="8" fill="#fff7ea" />
+        <path d="M 850 668 Q 890 672 884 708 Q 878 738 836 736" stroke="#3a1d12" stroke-width="10" fill="none" stroke-linecap="round" />
+      </g>
+      <rect id="c-mstream" x="686" y="654" width="18" height="244" rx="9" fill="#fff7ea" stroke="#3a1d12" stroke-width="3" />
+
+      <!-- timer -->
+      <g id="c-timer">
+        <circle cx="860" cy="610" r="86" fill="#f3b13b" stroke="#3a1d12" stroke-width="6" />
+        <circle id="c-ring" cx="860" cy="610" r="70" fill="none" stroke="#c9321d" stroke-width="16" stroke-dasharray="439.8" stroke-dashoffset="0"
+                transform="rotate(-90 860 610)" />
+      </g>
+
+      <!-- strain into the glass -->
+      <g id="c-glass">
+        <g clip-path="url(#c-glassclip)"><rect id="c-gtea" x="760" y="972" width="140" height="210" fill="#c98a4e" /></g>
+        <path d="M 760 960 L 900 960 L 885 1170 Q 884 1180 874 1180 L 786 1180 Q 776 1180 775 1170 Z" fill="none" stroke="#3a1d12" stroke-width="6" stroke-linejoin="round" />
+        <path d="M 795 966 L 800 1172 M 830 966 L 830 1176 M 865 966 L 860 1172" stroke="#3a1d12" stroke-width="3" opacity="0.35" />
+      </g>
+      <g id="c-strainer">
+        <line x1="896" y1="928" x2="990" y2="896" stroke="#3a1d12" stroke-width="10" stroke-linecap="round" />
+        <ellipse cx="830" cy="936" rx="68" ry="15" fill="url(#c-dots)" stroke="#3a1d12" stroke-width="5" />
+      </g>
+      <path id="c-ch1" d="M 782 878 Q 812 884 826 928" stroke="#c98a4e" stroke-width="16" fill="none" stroke-linecap="round"
+            stroke-dasharray="70" stroke-dashoffset="70" />
+      <line id="c-ch2" x1="830" y1="948" x2="830" y2="1172" stroke="#c98a4e" stroke-width="12" stroke-linecap="round"
+            stroke-dasharray="224" stroke-dashoffset="224" />
+      <g fill="none" stroke="#3a1d12" stroke-width="5" stroke-linecap="round" opacity="0.6">
+        <path id="c-st1" d="M 800 940 Q 784 910 800 880 Q 816 850 800 820" stroke-dasharray="130" stroke-dashoffset="130" />
+        <path id="c-st2" d="M 832 930 Q 816 896 832 862 Q 848 828 832 796" stroke-dasharray="140" stroke-dashoffset="140" />
+        <path id="c-st3" d="M 864 940 Q 848 910 864 880 Q 880 850 864 820" stroke-dasharray="130" stroke-dashoffset="130" />
+      </g>
+      <line id="c-ul" x1="88" y1="452" x2="200" y2="452" stroke="#c9321d" stroke-width="10" stroke-linecap="round"
+            stroke-dasharray="112" stroke-dashoffset="112" />
+      <rect x="0" y="0" width="1080" height="1920" filter="url(#c-paper)" />
+    </svg>
+
+    <div id="c-t1" class="c-title">मसाला चाय</div>
+    <div id="c-t2" class="c-title">बिल्कुल सही नाप से</div>
+
+    <div id="c-s1" class="c-stamp"><span class="n">1 कप</span><span class="l">पानी</span></div>
+    <div id="c-s2" class="c-stamp"><span class="n">1 इंच</span><span class="l">अदरक</span></div>
+    <div id="c-s3" class="c-stamp"><span class="n">2</span><span class="l">इलायची</span></div>
+    <div id="c-s4" class="c-stamp"><span class="n">2</span><span class="l">लौंग</span></div>
+    <div id="c-s5" class="c-stamp"><span class="n">1 चम्मच</span><span class="l">चाय पत्ती</span></div>
+    <div id="c-s6" class="c-stamp"><span class="n">2 मिनट</span><span class="l">उबाल</span></div>
+    <div id="c-s7" class="c-stamp"><span class="n">½ कप</span><span class="l">दूध</span></div>
+    <div id="c-s8" class="c-stamp"><span class="n">2 चम्मच</span><span class="l">चीनी</span></div>
+    <div id="c-timer-t">2:00</div>
+    <div id="c-bas">बस!</div>
+
+    <div id="c-f1" class="c-title"><span id="c-f1a">आपकी</span><span id="c-f1b">मसाला</span><span id="c-f1c">चाय</span></div>
+    <div id="c-f2" class="c-title">तैयार!</div>
+    <div id="c-card">
+      <div class="h">1 कप चाय के लिए</div>
+      <div id="c-r1" class="r"><b>1 कप</b>पानी</div>
+      <div id="c-r2" class="r"><b>1 इंच</b>अदरक</div>
+      <div id="c-r3" class="r"><b>2</b>इलायची · <b>2</b>लौंग</div>
+      <div id="c-r4" class="r"><b>1 चम्मच</b>चाय पत्ती</div>
+      <div id="c-r5" class="r"><b>2 मिनट</b>उबाल</div>
+      <div id="c-r6" class="r"><b>½ कप</b>दूध</div>
+      <div id="c-r7" class="r"><b>2 चम्मच</b>चीनी</div>
+    </div>
+
+    <div id="c-cap1" class="c-cap"><span>एक</span><span>कप</span><span>मसाला</span><span>चाय…</span><span>बिल्कुल</span><span>सही</span><span>नाप</span><span>से।</span></div>
+    <div id="c-cap2" class="c-cap"><span>पहले,</span><span>पैन</span><span>में</span><span>एक</span><span>कप</span><span>पानी।</span></div>
+    <div id="c-cap3" class="c-cap"><span>फिर</span><span>कुटा</span><span>हुआ</span><span>अदरक,</span><span>दो</span><span>इलायची,</span><span>और</span><span>दो</span><span>लौंग।</span></div>
+    <div id="c-cap4" class="c-cap"><span>अब</span><span>एक</span><span>चम्मच</span><span>चाय</span><span>पत्ती…</span><span>और</span><span>दो</span><span>मिनट</span><span>उबाल।</span></div>
+    <div id="c-cap5" class="c-cap"><span>आधा</span><span>कप</span><span>दूध…</span><span>और</span><span>दो</span><span>चम्मच</span><span>चीनी।</span></div>
+    <div id="c-cap6" class="c-cap"><span>छानिए…</span><span>और</span><span>बस!</span><span>आपकी</span><span>मसाला</span><span>चाय</span><span>तैयार।</span></div>
+  </div>
+  <script>
+    (function () {
+      const V = 0.2;                                         // the voice starts 0.2 s into the film
+      const tl = gsap.timeline({ paused: true });
+      const T = (t) => t + V;
+      const CAPS = [
+        [0.0, 0.38, 0.6, 1.16, 1.52, 2.58, 3.02, 3.3],
+        [3.88, 4.42, 5.04, 5.38, 5.74, 5.96],
+        [6.76, 7.06, 7.46, 7.68, 8.48, 8.82, 9.44, 9.98, 10.32],
+        [11.12, 11.5, 11.9, 12.32, 12.66, 13.08, 13.7, 14.04, 14.38],
+        [15.38, 15.7, 15.98, 16.4, 16.94, 17.22, 17.72],
+        [18.56, 19.32, 19.88, 20.32, 21.04, 21.56, 21.9],
+      ];
+      const CAP_END = [3.7, 6.6, 10.95, 15.2, 18.4, 25];
+
+      // ---- initial states
+      gsap.set(["#c-s1", "#c-s2", "#c-s3", "#c-s4", "#c-s5", "#c-s6", "#c-s7", "#c-s8", "#c-timer-t", "#c-bas", "#c-f1a", "#c-f1b", "#c-f1c",
+                "#c-f2", "#c-card", "#c-timer", ".c-cap"], { opacity: 0 });
+      gsap.set(["#c-ginger", "#c-el1", "#c-el2", "#c-lg1", "#c-lg2", "#c-su1", "#c-su2", "#c-leaves"], { opacity: 0 });
+      gsap.set("#c-cup", { x: 460 }); gsap.set("#c-spoon", { x: 460 }); gsap.set("#c-jug", { x: 460 });
+      gsap.set("#c-glass", { x: 420 }); gsap.set("#c-strainer", { x: 420 });
+      gsap.set(["#c-wstream", "#c-mstream"], { scaleY: 0, transformOrigin: "50% 0%" });
+      gsap.set("#c-bubbles circle", { scale: 0, transformOrigin: "50% 50%" });
+      gsap.set("#c-gtea", { scaleY: 0, transformOrigin: "50% 100%" });
+      gsap.set(["#c-sp1", "#c-sp2", "#c-sp3", "#c-sp4", "#c-sp5", "#c-sp6", "#c-sp7"], { opacity: 0 });
+
+      // ---- the hook: "बिल्कुल सही नाप से" (the word सही gets the red underline)
+      tl.to("#c-ul", { attr: { "stroke-dashoffset": 0 }, duration: 0.3, ease: "power2.out" }, T(2.58));
+      gsap.set("#c-ul", { attr: { x1: 300, x2: 412 } });
+
+      // flame flicker (finite), switched off when the pan leaves the stove
+      tl.fromTo("#c-flame-in", { scaleY: 1 }, { scaleY: 0.86, duration: 0.24, ease: "sine.inOut", yoyo: true, repeat: 77, svgOrigin: "538 1128" }, 0);
+      tl.to("#c-flame", { scaleY: 0, opacity: 0, duration: 0.25, ease: "power2.in", svgOrigin: "538 1128" }, T(18.4));
+
+      const stampIn = (id, t) => tl.fromTo(id, { opacity: 0, scale: 1.22, filter: "blur(6px)" },
+        { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.26, ease: "back.out(1.6)", transformOrigin: "0% 50%" }, t);
+      const stampOut = (id, t) => tl.to(id, { opacity: 0, filter: "blur(8px)", duration: 0.16, ease: "power2.in" }, t);
+      const splash = (id, t) => tl.fromTo(id, { opacity: 0.95, attr: { rx: 10, ry: 3 } }, { opacity: 0, attr: { rx: 78, ry: 15 }, duration: 0.5, ease: "power2.out", immediateRender: false }, t);
+      const drop = (id, t, dy) => {                            // appear, fall onto the liquid at t, then sink
+        tl.fromTo(id, { opacity: 0, scale: 0.4, transformOrigin: "50% 50%" }, { opacity: 1, scale: 1, duration: 0.14, ease: "back.out(2)" }, t - 0.42);
+        tl.fromTo(id, { y: 0 }, { y: dy, duration: 0.28, ease: "power2.in" }, t - 0.28);
+        tl.to(id, { y: dy + 26, scale: 0.55, opacity: 0, duration: 0.32, ease: "power2.out" }, t + 0.02);
+      };
+
+      // ---- water: cup slides in on "पैन", pours on "एक कप"
+      tl.to("#c-cup", { x: 0, duration: 0.5, ease: "expo.out" }, T(4.42) - 0.1);
+      tl.to("#c-cup", { rotation: -78, duration: 0.38, ease: "power3.inOut", svgOrigin: "700 640" }, T(5.38) - 0.1);
+      tl.to("#c-wstream", { scaleY: 1, duration: 0.2, ease: "power2.in" }, T(5.38) + 0.2);
+      tl.to("#c-liquid", { attr: { cy: 905 }, duration: 0.85, ease: "power2.out" }, T(5.38) + 0.3);
+      tl.to("#c-wstream", { scaleY: 0, transformOrigin: "50% 100%", duration: 0.2, ease: "power2.in" }, T(6.55));
+      tl.to("#c-cup", { rotation: 0, duration: 0.3, ease: "power2.inOut", svgOrigin: "700 640" }, T(6.6));
+      tl.to("#c-cup", { x: 480, duration: 0.35, ease: "power3.in" }, T(6.95));
+      stampIn("#c-s1", T(5.96)); stampOut("#c-s1", T(7.6));
+
+      // ---- spices
+      drop("#c-ginger", T(7.68), 300); splash("#c-sp1", T(7.68)); stampIn("#c-s2", T(7.68) + 0.04); stampOut("#c-s2", T(8.82) - 0.17);
+      drop("#c-el1", T(8.82), 298); drop("#c-el2", T(8.82) + 0.16, 308); splash("#c-sp2", T(8.82)); splash("#c-sp3", T(8.82) + 0.16);
+      stampIn("#c-s3", T(8.82)); stampOut("#c-s3", T(9.95));
+      drop("#c-lg1", T(10.32), 300); drop("#c-lg2", T(10.32) + 0.16, 310); splash("#c-sp4", T(10.32)); splash("#c-sp5", T(10.32) + 0.16);
+      stampIn("#c-s4", T(10.32)); stampOut("#c-s4", T(11.85));
+
+      // ---- tea leaves on "चाय पत्ती", the water turns amber, then the 2-minute boil
+      tl.to("#c-spoon", { x: 0, duration: 0.45, ease: "expo.out" }, T(11.9) - 0.2);
+      tl.to("#c-spoon", { rotation: -62, duration: 0.3, ease: "power3.inOut", svgOrigin: "712 640" }, T(12.32));
+      tl.set("#c-leaves", { opacity: 1 }, T(12.32) + 0.25);
+      ["#c-lf1", "#c-lf2", "#c-lf3", "#c-lf4", "#c-lf5", "#c-lf6", "#c-lf7", "#c-lf8"].forEach((id, i) => {
+        const dx = [-140, -110, -80, -170, -60, -95, -125, -150][i];
+        tl.fromTo(id, { x: 0, y: 0, opacity: 1 }, { x: dx, y: 246 - (i % 3) * 6, duration: 0.3, ease: "power2.in" }, T(12.32) + 0.25 + i * 0.045);
+        tl.to(id, { opacity: 0, duration: 0.2 }, T(12.32) + 0.58 + i * 0.045);
+      });
+      splash("#c-sp6", T(12.66));
+      tl.to("#c-liquid", { attr: { fill: "#b8622a" }, duration: 0.9, ease: "power2.inOut" }, T(12.66));
+      tl.to("#c-spoon", { rotation: 0, duration: 0.25, ease: "power2.inOut", svgOrigin: "712 640" }, T(13.05));
+      tl.to("#c-spoon", { x: 480, duration: 0.35, ease: "power3.in" }, T(13.25));
+      stampIn("#c-s5", T(12.32)); stampOut("#c-s5", T(13.62));
+
+      stampIn("#c-s6", T(13.7));
+      tl.fromTo("#c-timer", { opacity: 0, scale: 0.6, svgOrigin: "860 610" }, { opacity: 1, scale: 1, duration: 0.28, ease: "back.out(1.7)", svgOrigin: "860 610" }, T(13.7));
+      tl.fromTo("#c-timer-t", { opacity: 0 }, { opacity: 1, duration: 0.2 }, T(13.75));
+      const clock = { s: 120 };
+      tl.fromTo(clock, { s: 120 }, { s: 0, duration: 1.35, ease: "none", onUpdate: () => {
+        const s = Math.round(clock.s); document.querySelector("#c-timer-t").textContent = Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
+      } }, T(14.04));
+      tl.fromTo("#c-ring", { attr: { "stroke-dashoffset": 0 } }, { attr: { "stroke-dashoffset": 439.8 }, duration: 1.35, ease: "none" }, T(14.04));
+      ["#c-b1", "#c-b2", "#c-b3", "#c-b4", "#c-b5", "#c-b6", "#c-b7", "#c-b8"].forEach((id, i) => {
+        for (const base of [T(14.0), T(16.9)]) {
+          const t0 = base + i * 0.16;
+          tl.fromTo(id, { scale: 0, y: 0 }, { scale: 1, y: -4, duration: 0.2, ease: "power2.out", transformOrigin: "50% 50%" }, t0);
+          tl.to(id, { scale: 0, y: -10, duration: 0.14, ease: "power2.in" }, t0 + 0.32);
+        }
+      });
+      tl.to(["#c-timer", "#c-timer-t"], { opacity: 0, filter: "blur(8px)", duration: 0.18 }, T(15.3));
+      stampOut("#c-s6", T(15.85));
+
+      // ---- milk on "दूध", sugar on "चीनी"
+      tl.to("#c-jug", { x: 0, duration: 0.5, ease: "expo.out" }, T(15.38));
+      tl.to("#c-jug", { rotation: -56, duration: 0.36, ease: "power3.inOut", svgOrigin: "700 650" }, T(15.98) - 0.15);
+      tl.to("#c-mstream", { scaleY: 1, duration: 0.2, ease: "power2.in" }, T(15.98) + 0.18);
+      tl.to("#c-liquid", { attr: { fill: "#d29a62", cy: 897 }, duration: 0.95, ease: "power2.inOut" }, T(15.98) + 0.3);
+      tl.to("#c-mstream", { scaleY: 0, transformOrigin: "50% 100%", duration: 0.2, ease: "power2.in" }, T(16.95));
+      tl.to("#c-jug", { rotation: 0, duration: 0.28, ease: "power2.inOut", svgOrigin: "700 650" }, T(17.0));
+      tl.to("#c-jug", { x: 480, duration: 0.35, ease: "power3.in" }, T(17.3));
+      stampIn("#c-s7", T(15.98)); stampOut("#c-s7", T(17.55));
+      drop("#c-su1", T(17.72), 300); drop("#c-su2", T(17.72) + 0.25, 312); splash("#c-sp7", T(17.72)); splash("#c-sp2", T(17.72) + 0.25);
+      stampIn("#c-s8", T(17.72)); stampOut("#c-s8", T(18.5));
+
+      // ---- strain on "छानिए": the pan tilts right over the strainer, the glass fills, "बस!"
+      tl.to(["#c-glass", "#c-strainer"], { x: 0, duration: 0.5, ease: "expo.out", stagger: 0.08 }, T(18.4));
+      tl.to("#c-pan", { rotation: 30, duration: 0.42, ease: "power3.inOut", svgOrigin: "780 880" }, T(18.56));
+      tl.to("#c-ch1", { attr: { "stroke-dashoffset": 0 }, duration: 0.14, ease: "power1.in" }, T(18.56) + 0.38);
+      tl.to("#c-ch2", { attr: { "stroke-dashoffset": 0 }, duration: 0.16, ease: "power1.in" }, T(18.56) + 0.5);
+      tl.to("#c-gtea", { scaleY: 1, duration: 1.2, ease: "power2.out" }, T(18.56) + 0.6);
+      tl.to("#c-liquid", { attr: { cy: 1010 }, duration: 1.2, ease: "power2.in" }, T(18.56) + 0.5);
+      tl.to("#c-ch1", { attr: { "stroke-dashoffset": -70 }, duration: 0.18, ease: "power1.in" }, T(19.88) + 0.05);
+      tl.to("#c-ch2", { attr: { "stroke-dashoffset": -224 }, duration: 0.2, ease: "power1.in" }, T(19.88) + 0.12);
+      tl.to("#c-pan", { rotation: 0, x: -980, duration: 0.5, ease: "power3.in", svgOrigin: "780 880" }, T(19.88) + 0.2);
+      tl.to("#c-stove", { x: -760, duration: 0.5, ease: "power3.in" }, T(19.88) + 0.26);
+      tl.fromTo("#c-bas", { opacity: 0, scale: 0.4, filter: "blur(4px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.24, ease: "back.out(2.2)", transformOrigin: "30% 60%" }, T(19.88));
+      tl.to("#c-bas", { opacity: 0, filter: "blur(8px)", duration: 0.18 }, T(20.32) + 0.2);
+
+      // ---- the payoff: the title is reprinted, the recipe card, steam
+      tl.to(["#c-t1", "#c-t2", "#c-ul"], { opacity: 0, filter: "blur(8px)", duration: 0.2, ease: "power2.in" }, T(20.32) - 0.25);
+      [["#c-f1a", 20.32], ["#c-f1b", 21.04], ["#c-f1c", 21.56]].forEach(([id, t]) =>
+        tl.fromTo(id, { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.16, ease: "power2.out" }, T(t)));
+      tl.fromTo("#c-f2", { opacity: 0, scale: 1.3, filter: "blur(6px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.3, ease: "back.out(1.7)", transformOrigin: "0% 60%" }, T(21.9));
+      ["#c-st1", "#c-st2", "#c-st3"].forEach((id, i) => {
+        tl.to(id, { attr: { "stroke-dashoffset": 0 }, duration: 0.8, ease: "power1.out" }, T(20.6) + i * 0.25);
+        tl.to(id, { y: -36, opacity: 0.25, duration: 2.6, ease: "sine.inOut" }, T(21.4) + i * 0.25);
+      });
+      tl.fromTo("#c-card", { opacity: 0, y: 160 }, { opacity: 1, y: 0, duration: 0.6, ease: "expo.out" }, T(22.3));
+      ["#c-r1", "#c-r2", "#c-r3", "#c-r4", "#c-r5", "#c-r6", "#c-r7"].forEach((id, i) =>
+        tl.fromTo(id, { opacity: 0, filter: "blur(5px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.16 }, T(22.5) + i * 0.07));
+
+      // ---- captions: each phrase shows over its line; the word being spoken gets the overprint bar
+      CAPS.forEach((words, p) => {
+        const cap = "#c-cap" + (p + 1), spans = document.querySelectorAll(cap + " span");
+        const start = T(words[0]) - 0.12, end = T(CAP_END[p]);
+        tl.fromTo(cap, { opacity: 0 }, { opacity: 1, duration: 0.12 }, start);
+        if (p < CAPS.length - 1) tl.to(cap, { opacity: 0, duration: 0.12 }, end - 0.12);
+        words.forEach((w, i) => {
+          tl.set(spans[i], { opacity: 1, backgroundColor: "#ee7b2e" }, T(w));
+          if (i > 0) tl.set(spans[i - 1], { backgroundColor: "rgba(238,123,46,0)" }, T(w));
+        });
+      });
+      tl.set("#c-cap6", { opacity: 0 }, T(22.25));
+
+      window.__timelines["chai"] = tl;
+    })();
+  </script>
+</template>

@@ -1,0 +1,209 @@
+<template>
+  <style>
+    @font-face { font-family: "Yatra One"; src: url("assets/fonts/YatraOne.ttf"); }
+    @font-face { font-family: "Noto Sans Devanagari"; font-weight: 700; src: url("assets/fonts/NotoSansDevanagari_700Bold.ttf"); }
+    @font-face { font-family: "Poppins"; font-weight: 600; src: url("assets/fonts/Poppins_600SemiBold.ttf"); }
+    @font-face { font-family: "Poppins"; font-weight: 700; src: url("assets/fonts/Poppins_700Bold.ttf"); }
+    #root { position: absolute; inset: 0; background: #f7f7f3; overflow: hidden; }
+    #m-flood { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; background: #0b7f79; }
+    #m-grain { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    .w { position: absolute; left: 0; width: 1080px; text-align: center; font-family: "Yatra One"; color: #12221f; line-height: 1.05; white-space: nowrap; }
+    .w span { display: inline-block; }
+    .s { position: absolute; left: 0; width: 1080px; text-align: center; font-family: "Noto Sans Devanagari"; font-weight: 700; color: #0b7f79; white-space: nowrap; }
+    #m-shabd { top: 300px; font-size: 400px; }
+    #m-jab { top: 750px; font-size: 110px; }
+    #m-nachte { top: 890px; font-size: 300px; }
+    #m-kahani { top: 330px; font-size: 280px; }
+    #m-khud { top: 680px; font-size: 104px; }
+    #m-bolti { top: 860px; font-size: 230px; }
+    #m-bubble { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #m-har { top: 330px; font-size: 110px; }
+    #m-akshar { top: 470px; font-size: 400px; }
+    #m-taal { top: 1060px; font-size: 104px; }
+    #m-dots { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #m-ghoom { top: 625px; font-size: 400px; }
+    #m-rang { top: 520px; font-size: 460px; }
+    #m-badal { top: 1110px; font-size: 120px; }
+    #m-bikh { top: 560px; font-size: 260px; }
+    #m-jud { top: 1000px; font-size: 140px; color: #12221f; }
+    #m-jud em { font-style: normal; background: #ffd23f; padding: 0 18px; }
+    #m-motion { top: 300px; font-size: 340px; }
+    #m-hl { position: absolute; left: 150px; top: 640px; width: 780px; height: 70px; background: #ffd23f; transform-origin: 0% 50%; }
+    #m-code { position: absolute; left: 80px; top: 830px; width: 920px; font-family: "Poppins"; font-weight: 600; font-size: 50px; color: #12221f;
+              background: #ffffff; border: 5px solid #12221f; border-radius: 12px; padding: 22px 28px; white-space: nowrap; }
+    #m-code b { color: #0b7f79; }
+    #m-code i { font-style: normal; display: inline-block; width: 4px; height: 52px; margin-left: 4px; background: #12221f; vertical-align: -8px; }
+    #m-tc { position: absolute; left: 80px; top: 1010px; width: 920px; display: flex; justify-content: space-between; align-items: center; }
+    #m-tc .k { font-family: "Noto Sans Devanagari"; font-weight: 700; font-size: 72px; color: #12221f; }
+    #m-tc .n { font-family: "Poppins"; font-weight: 700; font-size: 96px; color: #0b7f79; font-variant-numeric: tabular-nums; }
+    #m-strip { position: absolute; left: 0; top: 1180px; width: 1080px; height: 220px; }
+  </style>
+  <div id="root" data-composition-id="kinetic" data-width="1080" data-height="1920">
+    <div id="m-flood"></div>
+    <svg id="m-grain" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg">
+      <filter id="m-noise" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="3" />
+        <feColorMatrix type="matrix" values="0 0 0 0 0.07  0 0 0 0 0.13  0 0 0 0 0.12  0 0 0 0.06 0" /></filter>
+      <rect width="1080" height="1920" filter="url(#m-noise)" />
+    </svg>
+
+    <!-- 1: शब्द… जब नाचते हैं -->
+    <div id="m-shabd" data-layout-allow-overflow class="w"><span id="m-sh1">श</span><span id="m-sh2">ब्द</span></div>
+    <div id="m-jab" data-layout-allow-overflow class="s">जब</div>
+    <div id="m-nachte" data-layout-allow-overflow class="w"><span id="m-n1">ना</span><span id="m-n2">च</span><span id="m-n3">ते</span> <span id="m-n4" style="font-size: 165px">हैं</span></div>
+    <!-- 2: तो कहानी खुद बोलती है -->
+    <div id="m-kahani" data-layout-allow-overflow class="w">कहानी</div>
+    <div id="m-khud" class="s">खुद</div>
+    <svg id="m-bubble" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg">
+      <path id="m-bub" d="M 140 860 Q 140 820 180 820 L 900 820 Q 940 820 940 860 L 940 1110 Q 940 1150 900 1150 L 360 1150 L 260 1240 L 280 1150 L 180 1150 Q 140 1150 140 1110 Z"
+            fill="none" stroke="#0b7f79" stroke-width="12" stroke-linejoin="round" stroke-dasharray="2600" stroke-dashoffset="2600" />
+    </svg>
+    <div id="m-bolti" data-layout-allow-overflow class="w">बोलती है</div>
+    <!-- 3: हर अक्षर, एक ताल पर -->
+    <div id="m-har" class="s">हर</div>
+    <div id="m-akshar" class="w"><span id="m-a1">अ</span><span id="m-a2">क्ष</span><span id="m-a3">र</span></div>
+    <div id="m-taal" class="s">एक ताल पर</div>
+    <svg id="m-dots" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg">
+      <circle id="m-d1" cx="420" cy="1300" r="22" fill="#12221f" /><circle id="m-d2" cx="540" cy="1300" r="22" fill="#12221f" />
+      <circle id="m-d3" cx="660" cy="1300" r="22" fill="#12221f" />
+    </svg>
+    <!-- 4: घूमते हैं, रंग बदलते हैं, बिखरते हैं, और फिर जुड़ जाते हैं -->
+    <div id="m-ghoom" class="w"><span id="m-gh">घूमते</span></div>
+    <div id="m-rang" class="w"><span id="m-rg">रंग</span></div>
+    <div id="m-badal" class="s">बदलते हैं</div>
+    <div id="m-bikh" data-layout-allow-overflow class="w"><span id="m-b1">बि</span><span id="m-b2">ख</span><span id="m-b3">र</span><span id="m-b4">ते</span></div>
+    <div id="m-jud" class="s"><em>जुड़ जाते हैं</em></div>
+    <!-- 5: ये है मोशन… कोड से बना, फ्रेम दर फ्रेम -->
+    <div id="m-hl"></div>
+    <div id="m-motion" class="w">मोशन</div>
+    <div id="m-code"><b>tl</b>.to(<b>"शब्द"</b>, { y: 0 })<i></i></div>
+    <div id="m-tc"><span class="k">फ्रेम दर फ्रेम</span><span id="m-tcn" class="n">000</span></div>
+    <svg id="m-strip" data-layout-allow-overflow viewBox="0 0 1080 220" xmlns="http://www.w3.org/2000/svg">
+      <g id="m-film">
+        <rect x="-300" y="30" width="1700" height="160" fill="#12221f" />
+        <g fill="#f7f7f3">
+          <rect x="-280" y="44" width="26" height="18" rx="3" /><rect x="-220" y="44" width="26" height="18" rx="3" /><rect x="-160" y="44" width="26" height="18" rx="3" />
+          <rect x="-100" y="44" width="26" height="18" rx="3" /><rect x="-40" y="44" width="26" height="18" rx="3" /><rect x="20" y="44" width="26" height="18" rx="3" />
+          <rect x="80" y="44" width="26" height="18" rx="3" /><rect x="140" y="44" width="26" height="18" rx="3" /><rect x="200" y="44" width="26" height="18" rx="3" />
+          <rect x="260" y="44" width="26" height="18" rx="3" /><rect x="320" y="44" width="26" height="18" rx="3" /><rect x="380" y="44" width="26" height="18" rx="3" />
+          <rect x="440" y="44" width="26" height="18" rx="3" /><rect x="500" y="44" width="26" height="18" rx="3" /><rect x="560" y="44" width="26" height="18" rx="3" />
+          <rect x="620" y="44" width="26" height="18" rx="3" /><rect x="680" y="44" width="26" height="18" rx="3" /><rect x="740" y="44" width="26" height="18" rx="3" />
+          <rect x="800" y="44" width="26" height="18" rx="3" /><rect x="860" y="44" width="26" height="18" rx="3" /><rect x="920" y="44" width="26" height="18" rx="3" />
+          <rect x="980" y="44" width="26" height="18" rx="3" /><rect x="1040" y="44" width="26" height="18" rx="3" /><rect x="1100" y="44" width="26" height="18" rx="3" />
+          <rect x="1160" y="44" width="26" height="18" rx="3" /><rect x="1220" y="44" width="26" height="18" rx="3" /><rect x="1280" y="44" width="26" height="18" rx="3" />
+          <rect x="1340" y="44" width="26" height="18" rx="3" />
+        </g>
+        <g fill="#f7f7f3">
+          <rect x="-280" y="158" width="26" height="18" rx="3" /><rect x="-220" y="158" width="26" height="18" rx="3" /><rect x="-160" y="158" width="26" height="18" rx="3" />
+          <rect x="-100" y="158" width="26" height="18" rx="3" /><rect x="-40" y="158" width="26" height="18" rx="3" /><rect x="20" y="158" width="26" height="18" rx="3" />
+          <rect x="80" y="158" width="26" height="18" rx="3" /><rect x="140" y="158" width="26" height="18" rx="3" /><rect x="200" y="158" width="26" height="18" rx="3" />
+          <rect x="260" y="158" width="26" height="18" rx="3" /><rect x="320" y="158" width="26" height="18" rx="3" /><rect x="380" y="158" width="26" height="18" rx="3" />
+          <rect x="440" y="158" width="26" height="18" rx="3" /><rect x="500" y="158" width="26" height="18" rx="3" /><rect x="560" y="158" width="26" height="18" rx="3" />
+          <rect x="620" y="158" width="26" height="18" rx="3" /><rect x="680" y="158" width="26" height="18" rx="3" /><rect x="740" y="158" width="26" height="18" rx="3" />
+          <rect x="800" y="158" width="26" height="18" rx="3" /><rect x="860" y="158" width="26" height="18" rx="3" /><rect x="920" y="158" width="26" height="18" rx="3" />
+          <rect x="980" y="158" width="26" height="18" rx="3" /><rect x="1040" y="158" width="26" height="18" rx="3" /><rect x="1100" y="158" width="26" height="18" rx="3" />
+          <rect x="1160" y="158" width="26" height="18" rx="3" /><rect x="1220" y="158" width="26" height="18" rx="3" /><rect x="1280" y="158" width="26" height="18" rx="3" />
+          <rect x="1340" y="158" width="26" height="18" rx="3" />
+        </g>
+        <g fill="#ffd23f"><rect x="-260" y="76" width="160" height="68" rx="6" /><rect x="-80" y="76" width="160" height="68" rx="6" /><rect x="100" y="76" width="160" height="68" rx="6" />
+          <rect x="280" y="76" width="160" height="68" rx="6" /><rect x="460" y="76" width="160" height="68" rx="6" /><rect x="640" y="76" width="160" height="68" rx="6" />
+          <rect x="820" y="76" width="160" height="68" rx="6" /><rect x="1000" y="76" width="160" height="68" rx="6" /><rect x="1180" y="76" width="160" height="68" rx="6" /></g>
+      </g>
+    </svg>
+  </div>
+  <script>
+    (function () {
+      // word onsets (seconds from the start of the voice), measured on the take; the voice starts at V
+      const V = 0.2;
+      const K1 = { shabd: 0.0, jab: 1.4, nachte: 1.68, hain: 2.22, to: 3.05, kahani: 3.16, khud: 3.58, bolti: 3.82, hai: 4.26, har: 5.15, akshar: 5.4, ek: 6.65, taal: 6.92, par: 7.24, end: 7.8 };
+      const K2 = { ghoom: 8.25, hain1: 8.79, rang: 10.1, badal: 10.39, hain2: 10.87, bikh: 11.8, hain3: 12.33, aur: 13.35, phir: 13.55, jud: 13.77, jaate: 14.03, hain4: 14.39, ye: 15.22, hai: 15.44, motion: 15.66, code: 16.2, se: 16.78, bana: 17.0, frame: 17.38, dar: 18.1, frame2: 18.32, end: 18.95 };
+      const t = (x) => x + V;
+      const tl = gsap.timeline({ paused: true });
+      const hide = ["#m-jab", "#m-nachte", "#m-kahani", "#m-khud", "#m-bolti", "#m-har", "#m-akshar", "#m-taal", "#m-dots", "#m-ghoom", "#m-rang", "#m-badal",
+                    "#m-bikh", "#m-jud", "#m-motion", "#m-hl", "#m-code", "#m-tc", "#m-strip", "#m-flood"];
+      gsap.set(hide, { opacity: 0 });
+      const blurIn = (id, at, d = 0.18) => tl.fromTo(id, { opacity: 0, filter: "blur(10px)" }, { opacity: 1, filter: "blur(0px)", duration: d, ease: "power2.out" }, at);
+      const blurOut = (id, at, d = 0.16) => tl.to(id, { opacity: 0, filter: "blur(10px)", duration: d, ease: "power2.in" }, at);
+
+      // 1 — "शब्द" is already printed, big and centred (frame 0 is the poster); in the pause it moves up to make room,
+      //     then on "नाचते" its letters and the new word dance
+      tl.fromTo("#m-shabd", { y: 330, scale: 1.2 }, { y: 0, scale: 1, duration: 0.5, ease: "power3.inOut" }, t(K1.jab) - 0.45);
+      blurIn("#m-jab", t(K1.jab));
+      tl.fromTo("#m-nachte", { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: 0.3, ease: "expo.out" }, t(K1.nachte) - 0.05);
+      ["#m-n1", "#m-n2", "#m-n3", "#m-sh1", "#m-sh2"].forEach((id, i) => {
+        const at = t(K1.nachte) + 0.05 + i * 0.09;
+        tl.fromTo(id, { y: 0, rotation: 0 }, { y: -70, rotation: i % 2 ? 9 : -9, duration: 0.2, ease: "power2.out" }, at);
+        tl.to(id, { y: 0, rotation: 0, duration: 0.42, ease: "elastic.out(1, 0.45)" }, at + 0.2);
+      });
+      tl.fromTo("#m-n4", { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.3, ease: "back.out(2.4)" }, t(K1.hain));
+
+      // 2 — whip to the story: "कहानी" from the left, "बोलती है" from the right, a speech bubble draws around it
+      tl.to(["#m-shabd", "#m-jab", "#m-nachte"], { x: -1100, filter: "blur(14px)", duration: 0.3, ease: "power3.in" }, t(K1.to) - 0.1);
+      tl.fromTo("#m-kahani", { opacity: 1, x: 1100, filter: "blur(14px)" }, { x: 0, filter: "blur(0px)", duration: 0.34, ease: "expo.out" }, t(K1.kahani) - 0.15);
+      blurIn("#m-khud", t(K1.khud));
+      tl.fromTo("#m-bolti", { opacity: 1, x: -1100, filter: "blur(14px)" }, { x: 0, filter: "blur(0px)", duration: 0.34, ease: "expo.out" }, t(K1.bolti) - 0.12);
+      tl.to("#m-bub", { attr: { "stroke-dashoffset": 0 }, duration: 0.5, ease: "power2.inOut" }, t(K1.hai) - 0.1);
+
+      // 3 — one beat per letter: "अ" "क्ष" "र" punch on the beat, a metronome dot lights with each
+      blurOut(["#m-kahani", "#m-khud", "#m-bolti", "#m-bubble"], t(K1.har) - 0.2);
+      blurIn("#m-har", t(K1.har));
+      tl.fromTo("#m-akshar", { opacity: 0, scale: 1.4, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.28, ease: "expo.out" }, t(K1.akshar) - 0.05);
+      blurIn("#m-taal", t(K1.ek));
+      tl.fromTo("#m-dots", { opacity: 0 }, { opacity: 1, duration: 0.15 }, t(K1.ek));
+      const beat = (K1.par - K1.ek) / 2;
+      [["#m-a1", "#m-d1"], ["#m-a2", "#m-d2"], ["#m-a3", "#m-d3"]].forEach(([a, d], i) => {
+        const at = t(K1.ek) + i * beat;
+        tl.fromTo(a, { scale: 1, color: "#12221f" }, { scale: 1.28, color: "#0b7f79", duration: 0.08, ease: "power2.out" }, at);
+        tl.to(a, { scale: 1, color: "#12221f", duration: 0.3, ease: "power2.out" }, at + 0.1);
+        tl.fromTo(d, { attr: { fill: "#12221f", r: 22 } }, { attr: { fill: "#ffd23f", r: 30 }, duration: 0.08 }, at);
+        tl.to(d, { attr: { fill: "#12221f", r: 22 }, duration: 0.3 }, at + 0.12);
+      });
+
+      // 4 — it spins, it changes colour (the ground floods teal), it scatters, it comes back together
+      blurOut(["#m-har", "#m-akshar", "#m-taal", "#m-dots"], t(K2.ghoom) - 0.22);
+      blurIn("#m-ghoom", t(K2.ghoom) - 0.05, 0.14);
+      tl.fromTo("#m-gh", { rotation: 0, scale: 1 }, { rotation: 360, duration: 0.7, ease: "power3.inOut" }, t(K2.ghoom) + 0.05);
+      tl.to("#m-gh", { rotation: 720, duration: 0.7, ease: "power3.inOut" }, t(K2.hain1) + 0.1);       // and again on "हैं"
+      tl.to("#m-ghoom", { scale: 0, opacity: 0, rotation: 30, duration: 0.25, ease: "power3.in" }, t(K2.rang) - 0.22);
+      tl.fromTo("#m-rang", { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, t(K2.rang) - 0.05);
+      tl.fromTo("#m-rg", { color: "#12221f" }, { color: "#0b7f79", duration: 0.12 }, t(K2.badal));
+      tl.to("#m-rg", { color: "#ffd23f", duration: 0.12 }, t(K2.badal) + 0.18);
+      tl.fromTo("#m-flood", { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.inOut" }, t(K2.badal) + 0.2);
+      tl.to("#m-rg", { color: "#f7f7f3", duration: 0.12 }, t(K2.hain2));
+      blurIn("#m-badal", t(K2.badal) + 0.05);
+      tl.set("#m-badal", { color: "#f7f7f3" }, t(K2.badal) + 0.3);
+      blurOut(["#m-rang", "#m-badal"], t(K2.bikh) - 0.2);
+      tl.to("#m-flood", { opacity: 0, duration: 0.3, ease: "power2.inOut" }, t(K2.bikh) - 0.2);
+      blurIn("#m-bikh", t(K2.bikh) - 0.05, 0.12);
+      const SC = [[-30, -370, -30], [330, -300, 40], [-330, 380, 70], [-20, 400, -50]];   // one piece to each corner, inside the frame        // where each piece flies: up and down, inside the frame
+      ["#m-b1", "#m-b2", "#m-b3", "#m-b4"].forEach((id, i) => {
+        const [dx, dy, r] = SC[i];
+        tl.fromTo(id, { x: 0, y: 0, rotation: 0 }, { x: dx, y: dy, rotation: r, duration: 0.5, ease: "expo.out" }, t(K2.bikh) + 0.2 + i * 0.04);
+        tl.to(id, { x: 0, y: 0, rotation: 0, duration: 0.45, ease: "power3.inOut" }, t(K2.aur) + i * 0.04);   // home on "जुड़"
+      });
+      tl.fromTo("#m-jud", { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, t(K2.jud));
+
+      // 5 — "मोशन" lands with a highlighter stroke; the code types; the frame counter and the film strip run to the end
+      tl.to(["#m-bikh", "#m-jud"], { y: -260, opacity: 0, filter: "blur(12px)", duration: 0.28, ease: "power3.in" }, t(K2.ye) - 0.2);
+      tl.fromTo("#m-motion", { opacity: 0, scale: 2.2, filter: "blur(16px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.32, ease: "expo.out" }, t(K2.motion) - 0.08);
+      tl.fromTo("#m-hl", { opacity: 1, scaleX: 0 }, { scaleX: 1, duration: 0.35, ease: "power3.out" }, t(K2.motion) + 0.25);
+      const code = document.querySelector("#m-code"), FULL = code.innerHTML;
+      const plain = 'tl.to("शब्द", { y: 0 })';
+      tl.fromTo("#m-code", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.25, ease: "expo.out" }, t(K2.code) - 0.1);
+      const typed = { n: 0 };
+      tl.fromTo(typed, { n: 0 }, { n: plain.length, duration: 0.9, ease: "none", onUpdate: () => {
+        const n = Math.round(typed.n), s = plain.slice(0, n);
+        code.innerHTML = s.replace(/^tl/, "<b>tl</b>").replace('"शब्द"', '<b>"शब्द"</b>') + "<i></i>";
+      } }, t(K2.code));
+      tl.fromTo("#m-tc", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.25, ease: "expo.out" }, t(K2.frame) - 0.1);
+      tl.fromTo("#m-strip", { opacity: 0 }, { opacity: 1, duration: 0.25 }, t(K2.frame) - 0.1);
+      // the counter is honest: it shows the frame of this video being drawn (30 fps)
+      const fc = { f: 0 }, F0 = t(K2.frame) - 0.12;            // starts with the fade-in, so "000" never shows
+      tl.fromTo(fc, { f: 30 * F0 }, { f: 30 * (F0 + 4), duration: 4, ease: "none", immediateRender: false, onUpdate: () => {
+        document.querySelector("#m-tcn").textContent = String(Math.round(fc.f)).padStart(3, "0");
+      } }, F0);
+      tl.fromTo("#m-film", { x: 0 }, { x: -400, duration: 4, ease: "none" }, F0);
+
+      window.__timelines["kinetic"] = tl;
+    })();
+  </script>
+</template>
