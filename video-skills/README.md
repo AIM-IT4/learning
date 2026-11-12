@@ -46,5 +46,10 @@ model; anime-cel's own guide says it reads as "a clean digital TV-anime model sh
 anime-cel characters (with a proper salwar-kameez outfit added to the rig) over painted skies, plus a watercolour
 paper finish.
 
+**Update (same day):** the reference reel turned out to be still paintings moved by the camera with added effects
+(checked frame by frame). Painted human characters like it are made in
+`krishna-short/examples/painted_song_reel/local_painter/` with an open-source painter (SDXL-Turbo) running locally,
+plus that folder's still animator: no Flow, no credits.
+
 Notes: the painted engine on a machine without a GPU needs `--soft-gl`, and in `render.mjs` the page-load timeouts
 raised to 0 (a first frame takes more than the default 30 s).

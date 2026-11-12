@@ -36,10 +36,11 @@ def prepare(path):
     key = Path(path).stem
     img = cv2.imread(path, cv2.IMREAD_COLOR)
     h, w = img.shape[:2]
-    mark = np.zeros((h, w), np.uint8)
-    cx, cy, r = int(w - 113 * w / 2752), int(h - 113 * h / 1536), int(38 * w / 2752)
-    cv2.circle(mark, (cx, cy), r, 255, -1)
-    img = cv2.inpaint(img, mark, 9, cv2.INPAINT_TELEA)
+    if cfg.get("flow_mark", True):                     # Flow pictures carry a corner sparkle; others don't
+        mark = np.zeros((h, w), np.uint8)
+        cx, cy, r = int(w - 113 * w / 2752), int(h - 113 * h / 1536), int(38 * w / 2752)
+        cv2.circle(mark, (cx, cy), r, 255, -1)
+        img = cv2.inpaint(img, mark, 9, cv2.INPAINT_TELEA)
     dp = CACHE / f"{key}_depth.npy"
     if dp.exists():
         d = np.load(dp)
@@ -94,6 +95,9 @@ class Particles:
         elif kind == "dust":
             self.v = np.stack([r.uniform(-12, 12, n), r.uniform(-18, -4, n)], 1)
             self.size = r.uniform(1.5, 4.5, n); self.ph = r.uniform(0, 6.28, n)
+        elif kind == "bokeh":
+            self.v = np.stack([r.uniform(-6, 6, n), r.uniform(-10, -2, n)], 1)
+            self.size = r.uniform(10, 34, n); self.ph = r.uniform(0, 6.28, n)
         elif kind == "stars":
             self.v = np.zeros((n, 2)); self.size = r.uniform(5, 13, n); self.ph = r.uniform(0, 6.28, n); self.fr = r.uniform(2, 5, n)
         self.seed = seed
@@ -117,6 +121,13 @@ class Particles:
                 cv2.circle(a, (int(x), int(y)), int(self.size[k] + 2), 0.75 * tw, -1, cv2.LINE_AA)
                 cv2.circle(ov, (int(x), int(y)), int(self.size[k] + 2), (150, 220, 255), -1, cv2.LINE_AA)
             a = cv2.GaussianBlur(a, (0, 0), 2.2); ov = cv2.GaussianBlur(ov, (0, 0), 2.2)
+        elif self.kind == "bokeh":
+            for k in range(self.n):
+                x = (self.p[k, 0] + self.v[k, 0] * t) % W; y = (self.p[k, 1] + self.v[k, 1] * t) % H
+                tw = 0.35 + 0.65 * (0.5 + 0.5 * math.sin(1.3 * t + self.ph[k]))
+                cv2.circle(a, (int(x), int(y)), int(self.size[k]), 0.32 * tw, -1, cv2.LINE_AA)
+                cv2.circle(ov, (int(x), int(y)), int(self.size[k]), (120, 200, 255), -1, cv2.LINE_AA)
+            a = cv2.GaussianBlur(a, (0, 0), 6); ov = cv2.GaussianBlur(ov, (0, 0), 6)
         elif self.kind == "stars":
             for k in range(self.n):
                 x, y = int(self.p[k, 0]), int(self.p[k, 1])
@@ -130,7 +141,7 @@ class Particles:
         a = np.clip(a * alpha, 0, 1)[..., None]
         return frame * (1 - a) + ov * a
 
-FONT_DEV = str(Path(__file__).resolve().parents[2] / "code_scenes" / "fonts" / "NotoSansDevanagari_700Bold.ttf")
+FONT_DEV = str(Path(__import__("os").environ.get("REEL_FONTS", str(Path(__file__).resolve().parents[2] / "code_scenes" / "fonts"))) / "NotoSansDevanagari_700Bold.ttf")
 
 def strip_image(text, seed, size=46):
     """A torn strip of white paper with one lyric line (RGBA, with its soft shadow)."""
@@ -183,6 +194,41 @@ for j, s in enumerate(cfg.get("strips", [])):
     strips.append(dict(s, img_=strip_image(s["text"], 50 + j, s.get("size", 46))))
 vig = None
 
+HEART_UNIT = [(16 * math.sin(a) ** 3, -(13 * math.cos(a) - 5 * math.cos(2 * a) - 2 * math.cos(3 * a) - math.cos(4 * a)))
+              for a in np.linspace(0, 2 * math.pi, 34, endpoint=False)]
+def heart_cloud(f, lt, ov):
+    """A fluffy cloud that drifts together into a heart (screen space): two loose cloud groups meet over ov['form'] s."""
+    k = ease(min(1.0, max(0.0, lt / ov.get("form", 1.6))), "inout")
+    x0, y0, sz = ov["x"], ov["y"], ov["size"] / 32.0
+    rr = np.random.default_rng(7)
+    pts = list(HEART_UNIT)
+    poly = np.array(HEART_UNIT, np.float32)
+    for gy in np.arange(-11, 16, 2.4):                    # fill the inside densely (no holes)
+        for gx in np.arange(-14, 15, 2.4):
+            if cv2.pointPolygonTest(poly, (float(gx), float(gy)), True) > 1.0: pts.append((gx + rr.uniform(-.5, .5), gy + rr.uniform(-.5, .5)))
+    ds = 4                                                # draw small, blur, scale up: soft painted edges
+    a_ = np.zeros((H // ds, W // ds), np.float32); lit = np.zeros_like(a_); shade = np.zeros_like(a_)
+    for i, (hx, hy) in enumerate(pts):
+        side = -1 if hx < 0 else 1
+        sx, sy = x0 + side * (380 + (i % 6) * 30) + hx * sz * 0.6, y0 + 60 + hy * sz * 0.5
+        px, py = (sx + (x0 + hx * sz - sx) * k) / ds, (sy + (y0 + hy * sz - sy) * k) / ds
+        r = ((2.6 + rr.uniform(0, 1.4)) if i < len(HEART_UNIT) else (2.3 + rr.uniform(0, 0.6))) * sz / ds
+        cv2.circle(a_, (int(px), int(py)), int(r * 1.15), 1.0, -1, cv2.LINE_AA)
+        cv2.circle(shade, (int(px), int(py + r * 0.35)), int(r), 1.0, -1, cv2.LINE_AA)
+        cv2.circle(lit, (int(px - r * 0.25), int(py - r * 0.3)), int(r * 0.75), 1.0, -1, cv2.LINE_AA)
+    a_, lit, shade = (cv2.GaussianBlur(m, (0, 0), 1.6 + 3 * (1 - k)) for m in (a_, lit, shade))
+    up = lambda m: cv2.resize(m, (W, H), interpolation=cv2.INTER_CUBIC)[..., None]
+    a_, lit = up(a_), up(lit)
+    # sunset-lit cloud colours (BGR): warm cream on top, pink-mauve underneath, puff highlights, a little paint texture
+    ys = np.where(a_[..., 0].max(1) > 0.2)[0]; y_top, y_bot = (ys.min(), ys.max()) if len(ys) else (0, H)
+    vk = np.clip((y_bot - np.arange(H, dtype=np.float32)) / max(1, y_bot - y_top), 0, 1)[:, None, None] ** 0.8
+    col = np.array([168, 150, 228], np.float32) * (1 - vk) + np.array([200, 220, 255], np.float32) * vk
+    col = col * (1 - 0.4 * lit) + np.array([222, 238, 255], np.float32) * 0.4 * lit
+    tex = cv2.resize(rr.normal(0, 1, (H // 45, W // 45)).astype(np.float32), (W, H), interpolation=cv2.INTER_CUBIC)[..., None]
+    col = col * (1 + 0.03 * tex)
+    a = np.clip(a_ * ov.get("alpha", 0.93) * (0.55 + 0.45 * k), 0, 1)
+    return f * (1 - a) + col * a
+
 def shot_frame(k, t, extra_zoom=1.0, shift=(0.0, 0.0)):
     sh = shots[k]
     u = (t - sh["t0"]) / (sh["t1"] - sh["t0"])
@@ -195,7 +241,16 @@ def shot_frame(k, t, extra_zoom=1.0, shift=(0.0, 0.0)):
         rot += a_ * math.sin(2 * math.pi * (t - sh["t0"]) / per)
         c = (c[0] + 0.012 * math.sin(2 * math.pi * (t - sh["t0"]) / per + 0.6), c[1])
     par = sh.get("par", [0, 0]); par = (par[0] * e, par[1] * e)
+    # keep the view inside the painting (no mirrored edges): clamp the centre for this zoom, roll and parallax
+    hs, ws = sh["img_"].shape[:2]; s_ = max(W / ws, H / hs) * z
+    mg = 0.012 + 0.55 * abs(math.sin(math.radians(rot))) + (abs(par[0]) / W + abs(par[1]) / H) * 0.6
+    hx, hy = min(0.5, W / (2 * s_ * ws) + mg), min(0.5, H / (2 * s_ * hs) + mg)
+    c = (min(max(c[0], hx), 1 - hx), min(max(c[1], hy), 1 - hy))
     f = render_still(sh["img_"], sh["depth_"], z, c, rot, par, sh.get("dolly", 0.0) * e, sh.get("d0", 0.5), shift)
+    if sh.get("grade") == "night":                     # moonlit night: darker, cooler, blue lift in the shadows
+        f = f * np.array([1.0, 0.80, 0.64], np.float32) * 0.80 + np.array([16, 6, 0], np.float32)
+    for ov in sh.get("overlays", []):
+        if ov["kind"] == "heart": f = heart_cloud(f, t - sh["t0"], ov)
     for fx, spec in zip(sh["fx_"], sh.get("fx", [])):
         f = fx.draw(f, t - sh["t0"] + spec.get("t_off", 0.0), spec.get("alpha", 1.0))
     for s in strips:

@@ -40,6 +40,35 @@ both come back at 720p.
 Fonts (OFL): Poppins Light/Medium for the card and the screen, Noto Sans Devanagari Bold for the lyric strips, Yatra
 One for the song tile. `code_scenes/fonts` is not in git; `bash get_fonts.sh` fetches them there from npm.
 
+## Painted people with a local open-source painter (`local_painter/`), the version that matches the reference
+
+The reference reel's people never move: frame by frame, every shot is ONE still painting that stays identical while
+the camera drifts, zooms and rolls, with effects composited on top (a breath cloud, floating petals, a phone glow) and
+zoom-blur transitions. So the recipe is painted stills + this animator. Here the paintings come from SDXL-Turbo, an
+open-source model run on this machine's CPU (bfloat16; about 20 s per option at 896x512, 45 s per 1664x960 refine on
+4 Xeon cores with AMX); no Flow, no credits. Licence: sai-nc-community (non-commercial use; commercial use needs
+Stability AI's licence).
+
+1. `python3 local_painter/paint.py candidates local_painter/shots.json out/` paints 3 options per shot with a contact
+   sheet each (`HF_HUB_OFFLINE=1` if the model is cached). Prompts start with the style ("Digital painting, painterly
+   illustration, soft brush strokes, warm storybook colours:"), stay under CLIP's 77 tokens and say "alone" for
+   one-person shots (wide frames otherwise often show the person twice). Pick by eye: discard duplicated people,
+   broken hands and non-Indian settings. Without the style prefix the model paints photos.
+2. `python3 local_painter/paint.py refine local_painter/shots.json out/ hill:12 hillclose:23 heart:33 swing:41
+   window:101 daisy:62 bed:71 bed:72:bedcalm eye:81 dream:93 dream:92:dream2 box:116 bazaar:121 found:132
+   kterrace:163 nterrace:173 sunset:152` (the picks used for "Sochenge Tumhe Pyar") -> `out/final_<name>.png`.
+3. `python3 local_painter/build_painted.py out/ shots_full.json` (21 shots over 62.26 s: camera targets on the faces,
+   night grade for the bedroom and terraces, a cloud heart that forms in the sky, petals / bokeh / stars, lyric strips
+   where the words are sung), then `python3 render_mv.py shots_full.json out/mv.mp4` (about 10 min; depth maps
+   cached in `REEL_CACHE`).
+4. Intro on the code-drawn laptop (`code_drawn/laptop.html`; the model can't paint a flat green screen):
+   `python3 render_intro.py laptop.png out/mv.mp4 out/intro.mp4 local_painter/chat.json`, the card, then
+   `bash assemble_reel.sh out <song> 47.437 out/reel.mp4` -> 66.8 s, -14 LUFS.
+
+`render_mv.py` options added for this: `flow_mark: false` (no corner-mark repair), per-shot `grade: "night"`,
+`overlays: [{kind: "heart", x, y, size, form}]`, the `bokeh` effect, and the camera centre is clamped so a zoom or
+roll never shows the picture's edge.
+
 ## Claude-only version, drawn in code (`code_drawn/`)
 The same reel with no picture generator at all: every scene is drawn and animated with the 2D canvas (flat
 illustrated style), 1:07 long (song 47.4-114.2 s: the hook twice, "ये दिल बेक़रार", "ख़्वाबों में छुपाया तुमको, यादों में

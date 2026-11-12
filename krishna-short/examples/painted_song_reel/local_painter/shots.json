@@ -1,0 +1,129 @@
+{
+ "style": "Digital painting, painterly illustration, soft brush strokes, warm storybook colours:",
+ "cast": {
+  "K": "a young Indian man with thick wavy black hair, light stubble and a brown shirt",
+  "N": "a young Indian woman with long wavy black hair, a red bindi, gold jhumkas and a pink salwar kameez"
+ },
+ "shots": {
+  "hill": {
+   "prompt": "{K} lying alone on his back in tall golden grass at sunset, holding up a single white daisy above his smiling face",
+   "seeds": [
+    11,
+    12,
+    13
+   ]
+  },
+  "hillclose": {
+   "prompt": "close-up of {K} lying in golden grass at sunset, eyes closed, gentle smile, a white daisy beside his cheek",
+   "seeds": [
+    21,
+    22,
+    23
+   ]
+  },
+  "heart": {
+   "prompt": "a golden sunset sky with soft pink clouds, in the centre one fluffy cloud shaped like a heart, warm glowing light, no people",
+   "seeds": [
+    31,
+    32,
+    33
+   ]
+  },
+  "swing": {
+   "prompt": "{N} alone, laughing on a wooden swing hanging from an old banyan tree in a green field at golden hour, her pink dupatta flying",
+   "seeds": [
+    41,
+    42,
+    43
+   ]
+  },
+  "window": {
+   "prompt": "{N} alone, leaning on the sill of an open wooden window with pink bougainvillea, chin on her palm, dreamy shy smile, dusk light",
+   "seeds": [
+    101,
+    51,
+    52
+   ]
+  },
+  "daisy": {
+   "prompt": "close-up of a hand pulling a white petal from a daisy, a few loose white petals falling, golden grass softly blurred behind, sunset light",
+   "seeds": [
+    61,
+    62,
+    63
+   ]
+  },
+  "bed": {
+   "prompt": "top-down view of {K} lying awake alone in bed at night, smiling, hands on his chest, silver moonlight from a window across white sheets",
+   "seeds": [
+    71,
+    72,
+    73
+   ]
+  },
+  "eye": {
+   "prompt": "extreme close-up of one dark brown eye of a young Indian woman with kohl eyeliner and long lashes, warm skin, a soft sparkle of light",
+   "seeds": [
+    81,
+    82,
+    83
+   ]
+  },
+  "dream": {
+   "prompt": "{N} twirling alone in a dreamy night sky full of stars and glowing clouds, her long pink dupatta swirling around her, magical light",
+   "seeds": [
+    91,
+    92,
+    93
+   ]
+  },
+  "box": {
+   "prompt": "an open old wooden box full of folded love letters, a dried red rose and a small photograph, on a wooden table in warm lamp light, no people",
+   "seeds": [
+    114,
+    115,
+    116
+   ]
+  },
+  "bazaar": {
+   "prompt": "{N} standing alone in a crowded old Indian bazaar at dusk under strings of warm lights, looking around as if searching for someone",
+   "seeds": [
+    121,
+    122,
+    123
+   ]
+  },
+  "found": {
+   "prompt": "close-up of {N} in a crowded bazaar at dusk, warm string lights behind her, her face lighting up with a happy surprised smile",
+   "seeds": [
+    131,
+    132,
+    133
+   ]
+  },
+  "sunset": {
+   "prompt": "{K} offering a white daisy to a shy young Indian woman in a pink salwar kameez under a banyan tree at sunset, she smiles behind her pink dupatta",
+   "seeds": [
+    151,
+    152,
+    153
+   ]
+  },
+  "kterrace": {
+   "prompt": "{K} standing alone on the flat terrace of an old Indian house at night, leaning on the parapet and smiling across the lane, starry blue sky, warm windows below",
+   "seeds": [
+    161,
+    162,
+    163
+   ]
+  },
+  "nterrace": {
+   "prompt": "{N} standing alone on the flat terrace of an old Indian house at night, smiling shyly across the lane, starry blue sky, warm windows below",
+   "seeds": [
+    171,
+    172,
+    173
+   ]
+  }
+ }
+}
