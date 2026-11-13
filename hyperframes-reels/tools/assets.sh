@@ -20,6 +20,10 @@ put site3d click-soft whoosh whoosh-short whoosh-cinematic pop ping key-press sp
 put maze whoosh-short whoosh pop click-soft sparkle chime
 put tess whoosh-short whoosh-cinematic pop click-soft sparkle ping riser
 put eqd whoosh-short whoosh pop click-soft sparkle ping key-press impact-bass-1 typing
+put galton pop click-soft whoosh-short whoosh ping typing sparkle chime
+put fourier pop click-soft whoosh-short whoosh ping sparkle chime
+put golden pop click-soft whoosh-short whoosh ping sparkle chime key-press
+for p in galton fourier golden; do cp /usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf "$here/$p/assets/fonts/"; done  # φ, arrows, ↻ ↺
 echo "fonts and sfx in place; add assets/vo.wav and assets/bgm.wav per project"
 echo "site3d also needs assets/desk2quant-logo.png (from the site) and assets/page/t00-t12.jpg (tools/site_capture)"
 echo "eqd also needs assets/eqd-cover.webp (desk2quant.com/assets/images/covers/equity-derivatives-quant-notes-1200.webp)"

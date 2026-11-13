@@ -15,6 +15,9 @@ with a `SPEC.md` that gives the script, the palette and every shot as a number.
 | `maze/` | भूलभुलैया — one Truchet tile, random turns, a maze (card-flip waves, seamless two-colour rule) | 19.2 s | Manish | house style |
 | `tess/` | चौथा आयाम — point, line, square, cube, tesseract; 4D maths drawn every frame | 24.9 s | Manish | house style, axis colours |
 | `eqd/` | Equity Derivatives Quant Notes & Code — a one-take launch film over the product's real cover | 22.4 s | Manish | the product cover |
+| `galton/` | गैल्टन बोर्ड — one ball explained, then 1,000 seeded coin-flip paths stack into a bell curve | 23.7 s | Manish | house style |
+| `fourier/` | घूमते गोले — circles on circles (a DFT run in the page) draw a heart, then a rising chart | 22.1 s | Manish | house style, chart paper |
+| `golden/` | प्रकृति का गणित — Fibonacci sums, squares, the golden spiral, 600 seeds at 137.5° make a sunflower | 26.9 s | Manish | house style |
 
 The shape, recursion and site reels follow prompt-motion.com entries: shape morphing through UI states and the landing page 3D scroll
 (@twoclipping), and recursion explained in genres (@emollick). Their music beds are synthesised by `tools/bed_synth.py`
@@ -52,3 +55,10 @@ Round 3 (maze, tess, eqd) follows three more prompt-motion.com entries: the most
 wireframe cube, and the keynote-style launch film. Voice notes: this voice softens aspirated छ and भ and garbles very short lines,
 so "साधारण" replaces "छोटी", "साया" replaces "परछाईं", "डिस्काउंट" replaces "छूट", English product terms are written in Latin
 script, and "नया लॉन्च" is shown, not spoken. `tools/mkindex.py` writes a root index.html from a list of sound effects.
+
+Round 4 (galton, fourier, golden) is maths you can watch: each scene is one canvas redrawn from timeline time, with every
+state a pure function of that time (so a seek never reads a stale tween). `tools/patchW.py` patches the measured word onsets
+(`W`, `VO_END`) into a scene. The voice still softens aspirated sounds (ख, घ) and once said "बीज" as "बीस", so takes were picked
+per sentence and spliced (see each `vo_join.json`). A sound effect or a bright music bed on top of an aspirated word hides it:
+no whoosh on such a word, and the Fourier and golden beds are low-passed (3.5 and 4 kHz). The scenes also use
+`DejaVuSans-Bold.ttf` for φ, → ← and ↻ ↺, which the bundled fonts lack.

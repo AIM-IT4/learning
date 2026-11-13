@@ -1,0 +1,207 @@
+<template>
+  <style>
+    @font-face { font-family: "Yatra One"; src: url("assets/fonts/YatraOne.ttf"); }
+    @font-face { font-family: "Noto Sans Devanagari"; font-weight: 700; src: url("assets/fonts/NotoSansDevanagari_700Bold.ttf"); }
+    @font-face { font-family: "Poppins"; font-weight: 700; src: url("assets/fonts/Poppins_700Bold.ttf"); }
+    @font-face { font-family: "Sym"; font-weight: 700; src: url("assets/fonts/DejaVuSans-Bold.ttf"); }
+    #root { position: absolute; inset: 0; background: #f7f7f3; overflow: hidden; }
+    #f-cv { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #f-title { position: absolute; left: 70px; top: 232px; font-family: "Yatra One"; font-size: 104px; line-height: 1.1; color: #12221f; white-space: nowrap; }
+    #f-fs { position: absolute; left: 70px; top: 246px; white-space: nowrap; }
+    #f-fs span { display: inline-block; padding: 6px 30px 10px; background: #ffd23f; border: 5px solid #12221f; border-radius: 24px; font-family: "Poppins";
+                 font-weight: 700; font-size: 72px; line-height: 1.2; color: #12221f; box-shadow: 0 10px 0 #12221f; }
+    #f-sp { position: absolute; left: 0; top: 1188px; width: 1080px; text-align: center; white-space: nowrap; }
+    .f-chip { display: inline-block; margin: 0 14px; padding: 4px 26px 4px 18px; background: #ffffff; border: 4px solid #12221f; border-radius: 40px;
+              font-family: "Poppins"; font-weight: 700; font-size: 50px; line-height: 1.25; color: #12221f; }
+    .f-chip i { display: inline-block; width: 30px; height: 30px; border-radius: 50%; margin-right: 12px; vertical-align: 2px; }
+    .f-chip b { font-family: "Sym"; font-size: 40px; margin-left: 8px; }
+    #f-eq { position: absolute; left: 0; top: 1172px; width: 1080px; text-align: center; white-space: nowrap; }
+    #f-eq span { display: inline-block; padding: 6px 34px 12px; background: #ffffff; border: 4px solid #12221f; border-radius: 22px; font-family: "Poppins";
+                 font-weight: 700; font-size: 62px; line-height: 1.25; color: #12221f; }
+    #f-eq sub { font-size: 36px; vertical-align: -10px; }
+    #f-eq sup { font-size: 36px; vertical-align: 28px; color: #0b7f79; }
+    .f-cap { position: absolute; left: 60px; top: 1330px; width: 960px; text-align: center; font-family: "Noto Sans Devanagari"; font-weight: 700; font-size: 46px;
+             line-height: 1.3; color: #12221f; text-wrap: balance; }
+    .f-cap span { display: inline-block; padding: 0 8px; margin: 0 1px; border-radius: 8px; opacity: 0.4; }
+    .f-cap .lat { font-family: "Poppins"; }
+  </style>
+  <div id="root" data-composition-id="fourier" data-width="1080" data-height="1920">
+    <canvas id="f-cv" width="1080" height="1920"></canvas>
+    <div id="f-title">घूमते गोले</div>
+    <div id="f-fs"><span>Fourier series</span></div>
+    <div id="f-sp">
+      <span id="f-s1" class="f-chip"><i style="background: #0b7f79"></i>1×<b>↻</b></span><span id="f-s2" class="f-chip"><i style="background: #a07812"></i>3×<b>↻</b></span><span id="f-s3" class="f-chip"><i style="background: #12221f"></i>2×<b>↺</b></span>
+    </div>
+    <div id="f-eq"><span>f(t) = ∑ c<sub>n</sub> · e<sup>i n t</sup></span></div>
+
+    <div id="f-c1" class="f-cap"><span>एक</span><span>गोला,</span><span>जो</span><span>घूम</span><span>रहा</span><span>है।</span></div>
+    <div id="f-c2" class="f-cap"><span>उसके</span><span>किनारे</span><span>पर</span><span>एक</span><span>और</span><span>गोला,</span></div>
+    <div id="f-c3" class="f-cap"><span>और</span><span>उस</span><span>पर</span><span>एक</span><span>और।</span></div>
+    <div id="f-c4" class="f-cap"><span>हर</span><span>गोले</span><span>की</span><span>अपनी</span><span>रफ़्तार।</span></div>
+    <div id="f-c5" class="f-cap"><span>अब</span><span>आख़िरी</span><span>गोले</span><span>की</span><span>नोक</span><span>से</span><span>एक</span><span>लकीर</span><span>खींचिए…</span></div>
+    <div id="f-c6" class="f-cap"><span>और</span><span>देखिए,</span><span>ये</span><span>दिल</span><span>बना</span><span>रहा</span><span>है!</span></div>
+    <div id="f-c7" class="f-cap"><span>सही</span><span>गोले</span><span>चुनिए,</span><span>तो</span><span>ये</span><span>कुछ</span><span>भी</span><span>बना</span><span>सकते</span><span>हैं।</span></div>
+    <div id="f-c8" class="f-cap"><span>इसे</span><span>कहते</span><span>हैं,</span><span class="lat">Fourier</span><span class="lat">series।</span></div>
+  </div>
+  <script>
+    (function () {
+      const V = 0.3;
+      // word onsets on the voice (patched after measuring); 53 words, captions in 8 groups
+      const W = [0.0, 0.18, 1.4, 1.56, 1.84, 2.06, 3.05, 3.26, 3.6, 3.76, 3.96, 4.1, 5.35, 5.54, 5.76, 5.94, 6.12, 6.95, 7.1, 7.34, 7.46, 7.66, 8.627, 8.787, 9.047, 9.287, 9.387, 9.567, 9.727, 9.967, 10.247, 11.627, 11.807, 12.107, 12.327, 12.487, 12.727, 12.887, 13.577, 13.807, 14.027, 15.077, 15.247, 15.347, 15.507, 15.607, 15.787, 16.047, 17.027, 17.207, 17.467, 18.327, 18.607];
+      const VO_END = 19.2;
+      const GROUPS = [6, 6, 5, 5, 9, 7, 10, 5];
+      const t = (i) => W[i] + V;
+      const END = VO_END + V + 2.6;
+      const TAU = Math.PI * 2;
+      const EZ = { o2: gsap.parseEase("power2.out"), io2: gsap.parseEase("power2.inOut"), back: gsap.parseEase("back.out(1.7)") };
+      const pr = (tt, t0, d, ez) => { const p = Math.min(1, Math.max(0, (tt - t0) / d)); return ez ? ez(p) : p; };
+
+      // ---- the discrete Fourier transform of a closed curve: every term is one circle (radius |c|, k turns per loop)
+      const dft = (pts) => {
+        const M = pts.length, out = [];
+        for (let k = -M / 2; k < M / 2; k++) {
+          let re = 0, im = 0;
+          for (let n = 0; n < M; n++) { const a = (-TAU * k * n) / M, x = pts[n][0], y = pts[n][1]; re += x * Math.cos(a) - y * Math.sin(a); im += x * Math.sin(a) + y * Math.cos(a); }
+          out.push({ k, re: re / M, im: im / M, r: Math.hypot(re, im) / M });
+        }
+        return out;
+      };
+      const bySize = (a, b) => Math.round((b.r - a.r) * 1e6) || a.k - b.k;
+      // heart: x = 16 sin³θ, y = 13cosθ − 5cos2θ − 2cos3θ − cos4θ (screen y points down) — exactly eight circles
+      const hs = [];
+      for (let n = 0; n < 256; n++) { const a = (TAU * n) / 256; hs.push([16 * Math.sin(a) ** 3, -(13 * Math.cos(a) - 5 * Math.cos(2 * a) - 2 * Math.cos(3 * a) - Math.cos(4 * a))]); }
+      const HT = dft(hs).filter((c) => c.k !== 0 && c.r > 1e-6).sort(bySize);
+      const HS = 20, HX = 540, HY = 780;
+      // the rising-chart line with its arrowhead, walked there and back as one closed loop, sampled by arc length
+      const loop = [[14, 44], [25.5, 33.5], [35.5, 37.5], [50, 21], [42.5, 21], [50, 21], [50, 28.5], [50, 21], [35.5, 37.5], [25.5, 33.5], [14, 44]];
+      const cum = [0];
+      for (let i = 1; i < loop.length; i++) cum.push(cum[i - 1] + Math.hypot(loop[i][0] - loop[i - 1][0], loop[i][1] - loop[i - 1][1]));
+      const LEN = cum[cum.length - 1], FWD = cum[7] / LEN, as = [];
+      for (let n = 0; n < 512; n++) {
+        const s = (LEN * n) / 512; let i = 1; while (cum[i] < s) i++;
+        const f = (s - cum[i - 1]) / (cum[i] - cum[i - 1]);
+        as.push([loop[i - 1][0] + (loop[i][0] - loop[i - 1][0]) * f, loop[i - 1][1] + (loop[i][1] - loop[i - 1][1]) * f]);
+      }
+      const AD = dft(as), A0 = AD.find((c) => c.k === 0);
+      const AT = AD.filter((c) => c.k !== 0).sort(bySize).slice(0, 60);
+      const AS = 21, AX = 540 + (A0.re - 32) * AS, AY = 815 + (A0.im - 32.5) * AS;
+
+      const term = (c, th, a) => { const g = c.k * th; return [a * (c.re * Math.cos(g) - c.im * Math.sin(g)), a * (c.re * Math.sin(g) + c.im * Math.cos(g))]; };
+      const curve = (T, ox, oy, S, n) => {
+        const out = [];
+        for (let i = 0; i <= n; i++) { const th = (TAU * i) / n; let x = 0, y = 0; for (const c of T) { const d = term(c, th, 1); x += d[0]; y += d[1]; } out.push([ox + S * x, oy + S * y]); }
+        return out;
+      };
+      const HP = curve(HT, HX, HY, HS, 720), AP = curve(AT, AX, AY, AS, 1600);
+
+      // ---- timing (everything below is a pure function of timeline time)
+      const TS_H = () => t(29), T_H = () => t(37) + 0.1 - t(29);
+      const TS_A = () => t(41) + 0.1, T_A = () => (t(50) - t(41) - 0.1) / FWD;
+      const hAmp = (tt, j) => {
+        if (j === 0) return pr(tt, t(0) - 0.12, 0.6, EZ.back);
+        if (j === 1) return pr(tt, t(9) - 0.05, 0.45, EZ.back);
+        if (j === 2) return pr(tt, t(15) - 0.05, 0.45, EZ.back);
+        return pr(tt, t(23) + 0.09 * (j - 3), 0.35, EZ.back);
+      };
+      const aAmp = (tt, j) => pr(tt, t(39) + 0.15 + 0.012 * j, 0.3, EZ.back);
+      const COL = ["#0b7f79", "#a07812", "#12221f"];
+
+      const cv = document.getElementById("f-cv"), cx = cv.getContext("2d");
+      const path = (pts, upto) => {
+        cx.beginPath(); cx.moveTo(pts[0][0], pts[0][1]);
+        const n = Math.floor(upto);
+        for (let i = 1; i <= n; i++) cx.lineTo(pts[i][0], pts[i][1]);
+        if (upto > n && n + 1 < pts.length) { const f = upto - n, a = pts[n], b = pts[n + 1]; cx.lineTo(a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f); }
+      };
+      const chain = (T, amp, th, ox, oy, S, alpha, demo, ghost) => {
+        let x = ox, y = oy; const joints = [[x, y]];
+        T.forEach((c, j) => { const a = amp(j); const d = term(c, th, a); x += S * d[0]; y += S * d[1]; joints.push([x, y]); });
+        cx.globalAlpha = alpha;
+        T.forEach((c, j) => {                                   // circles
+          const a = amp(j), r = Math.max(0, a) * c.r * S; if (r < 1.2) return;
+          const lead = demo && j < 3;
+          cx.strokeStyle = lead ? COL[j] : "rgba(18,34,31,0.3)"; cx.lineWidth = lead ? 4 : 2;
+          cx.globalAlpha = alpha * (lead ? 1 : ghost);
+          cx.beginPath(); cx.arc(joints[j][0], joints[j][1], r, 0, TAU); cx.stroke();
+        });
+        cx.globalAlpha = alpha * Math.max(ghost, 0.55);
+        cx.strokeStyle = "#12221f"; cx.lineWidth = 3; cx.lineJoin = "round"; cx.lineCap = "round";
+        cx.beginPath(); cx.moveTo(joints[0][0], joints[0][1]); for (let j = 1; j < joints.length; j++) cx.lineTo(joints[j][0], joints[j][1]); cx.stroke();
+        cx.fillStyle = "#12221f";
+        for (let j = 0; j < joints.length - 1; j++) { if (T[j] && T[j].r * S < 6 && j > 3) continue; cx.beginPath(); cx.arc(joints[j][0], joints[j][1], 4.5, 0, TAU); cx.fill(); }
+        cx.globalAlpha = 1;
+        return joints[joints.length - 1];
+      };
+      const pen = (p, s) => {
+        if (s <= 0) return;
+        cx.fillStyle = "#ffd23f"; cx.strokeStyle = "#12221f"; cx.lineWidth = 4;
+        cx.beginPath(); cx.arc(p[0], p[1], 13 * s, 0, TAU); cx.fill(); cx.stroke();
+      };
+
+      const P = { time: 0 };
+      const draw = () => {
+        const tt = P.time;
+        cx.clearRect(0, 0, 1080, 1920);
+        const hA = 1 - pr(tt, t(39) - 0.1, 0.35), aA = pr(tt, t(39) + 0.05, 0.3);
+        // faint axes through the first circle's centre, then chart paper behind the second drawing
+        if (hA > 0) {
+          cx.globalAlpha = 0.14 * hA; cx.strokeStyle = "#12221f"; cx.lineWidth = 2; cx.setLineDash([10, 12]);
+          cx.beginPath(); cx.moveTo(90, HY); cx.lineTo(990, HY); cx.moveTo(HX, 420); cx.lineTo(HX, 1160); cx.stroke(); cx.setLineDash([]); cx.globalAlpha = 1;
+        }
+        if (aA > 0) {
+          cx.globalAlpha = 0.09 * aA; cx.strokeStyle = "#0b7f79"; cx.lineWidth = 2;
+          cx.beginPath();
+          for (let x = 108; x <= 972; x += 72) { cx.moveTo(x, 420); cx.lineTo(x, 1140); }
+          for (let y = 420; y <= 1140; y += 72) { cx.moveTo(108, y); cx.lineTo(972, y); }
+          cx.stroke(); cx.globalAlpha = 1;
+        }
+        // phase 1: the heart
+        if (hA > 0) {
+          const th = (TAU * (tt - TS_H())) / T_H();
+          if (th > 0) {
+            const done = pr(tt, TS_H() + T_H(), 0.45, EZ.o2);
+            if (done > 0) { cx.globalAlpha = 0.24 * done * hA; cx.fillStyle = "#c4553a"; path(HP, HP.length - 1); cx.closePath(); cx.fill(); cx.globalAlpha = 1; }
+            cx.globalAlpha = hA; cx.strokeStyle = "#c4553a"; cx.lineWidth = 9; cx.lineJoin = "round"; cx.lineCap = "round";
+            path(HP, Math.min(1, th / TAU) * (HP.length - 1)); cx.stroke(); cx.globalAlpha = 1;
+          }
+          if (tt < t(0) - 0.12) { cx.fillStyle = "#12221f"; cx.beginPath(); cx.arc(HX, HY, 7, 0, TAU); cx.fill(); }
+          const tip = chain(HT, (j) => hAmp(tt, j), th, HX, HY, HS, hA, true, 1);
+          pen(tip, pr(tt, t(26) - 0.05, 0.3, EZ.back) * hA);
+        }
+        // phase 2: the same machine with sixty circles draws a rising chart
+        if (aA > 0) {
+          const th = (TAU * (tt - TS_A())) / T_A();
+          if (th > 0) { cx.strokeStyle = "#0b7f79"; cx.lineWidth = 10; cx.lineJoin = "round"; cx.lineCap = "round"; path(AP, Math.min(1, th / TAU) * (AP.length - 1)); cx.stroke(); }
+          const ghost = 1 - 0.7 * pr(tt, t(48), 0.5);
+          const tip = chain(AT, (j) => aAmp(tt, j), th, AX, AY, AS, aA, false, ghost);
+          pen(tip, pr(tt, t(41) - 0.05, 0.3, EZ.back));
+        }
+      };
+      draw();
+
+      const tl = gsap.timeline({ paused: true });
+      tl.to(P, { time: END, duration: END, ease: "none", onUpdate: draw }, 0);
+      gsap.set(["#f-fs", "#f-s1", "#f-s2", "#f-s3", "#f-eq", ".f-cap"], { opacity: 0 });
+      ["#f-s1", "#f-s2", "#f-s3"].forEach((id, k) => tl.fromTo(id, { opacity: 0, y: 24, scale: 0.7 }, { opacity: 1, y: 0, scale: 1, duration: 0.3, ease: "back.out(2.2)" }, t(18) + 0.14 * k));
+      tl.to(["#f-s1", "#f-s2", "#f-s3"], { opacity: 0, y: 16, duration: 0.2 }, t(22) - 0.2);
+      tl.to("#f-title", { opacity: 0, y: -24, duration: 0.25, ease: "power2.in" }, t(51) - 0.25);
+      tl.fromTo("#f-fs", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2)", transformOrigin: "0% 50%" }, t(51));
+      tl.fromTo("#f-eq", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.35, ease: "expo.out" }, t(52) + 0.15);
+
+      // captions
+      let i0 = 0;
+      GROUPS.forEach((n, g) => {
+        const id = "#f-c" + (g + 1), spans = document.querySelectorAll(id + " span");
+        tl.fromTo(id, { opacity: 0 }, { opacity: 1, duration: 0.1 }, t(i0) - 0.1);
+        tl.to(id, { opacity: 0, duration: 0.07 }, g < GROUPS.length - 1 ? t(i0 + n) - 0.19 : VO_END + V + 0.4);
+        for (let k = 0; k < n; k++) {
+          tl.set(spans[k], { opacity: 1, backgroundColor: "rgba(255,210,63,1)" }, t(i0 + k));
+          if (k > 0) tl.set(spans[k - 1], { backgroundColor: "rgba(255,210,63,0)" }, t(i0 + k));
+        }
+        i0 += n;
+      });
+
+      window.__timelines["fourier"] = tl;
+    })();
+  </script>
+</template>

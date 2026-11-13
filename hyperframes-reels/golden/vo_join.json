@@ -1,0 +1,24 @@
+{
+ "parts": [
+  [
+   "takes/s1_s14.wav",
+   0,
+   null
+  ],
+  [
+   "takes/s2_s11.wav",
+   0,
+   4.95
+  ],
+  [
+   "takes/s2_s14x.wav",
+   6.3,
+   null
+  ]
+ ],
+ "gaps": [
+  0.6,
+  0.55
+ ],
+ "prep": "takes/s2_s14x.wav is takes/s2_s14.wav with 6.97-7.19 s cut out (10 ms crossfade): a silence inside सूरज|मुखी"
+}

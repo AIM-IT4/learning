@@ -1,0 +1,179 @@
+<template>
+  <style>
+    @font-face { font-family: "Yatra One"; src: url("assets/fonts/YatraOne.ttf"); }
+    @font-face { font-family: "Noto Sans Devanagari"; font-weight: 700; src: url("assets/fonts/NotoSansDevanagari_700Bold.ttf"); }
+    @font-face { font-family: "Poppins"; font-weight: 700; src: url("assets/fonts/Poppins_700Bold.ttf"); }
+    @font-face { font-family: "Sym"; font-weight: 700; src: url("assets/fonts/DejaVuSans-Bold.ttf"); }
+    #root { position: absolute; inset: 0; background: #f7f7f3; overflow: hidden; }
+    #g-cv { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #g-title { position: absolute; left: 70px; top: 232px; font-family: "Yatra One"; font-size: 104px; line-height: 1.1; color: #12221f; white-space: nowrap; }
+    #g-count { position: absolute; left: 640px; top: 250px; width: 370px; text-align: right; white-space: nowrap; }
+    #g-count .n { font-family: "Poppins"; font-weight: 700; font-size: 84px; line-height: 1; color: #0b7f79; font-variant-numeric: tabular-nums; }
+    #g-count .l { display: block; font-family: "Noto Sans Devanagari"; font-weight: 700; font-size: 38px; color: #4b5b58; }
+    .g-lr { position: absolute; top: 0; left: 0; font-family: "Noto Sans Devanagari"; font-weight: 700; font-size: 46px; color: #12221f; background: #ffd23f;
+            border: 4px solid #12221f; border-radius: 16px; padding: 0 16px; white-space: nowrap; }
+    .g-lr b { font-family: "Sym"; font-size: 38px; vertical-align: 2px; }
+    #g-q { position: absolute; left: 0; top: 1040px; width: 1080px; text-align: center; font-family: "Poppins"; font-weight: 700; font-size: 200px; line-height: 1;
+           color: #c4553a; }
+    #g-nd { position: absolute; left: 0; top: 650px; width: 1080px; text-align: center; }
+    #g-nd span { display: inline-block; padding: 8px 30px; background: #ffffff; border: 4px solid #12221f; border-radius: 22px; font-family: "Poppins"; font-weight: 700;
+                 font-size: 54px; color: #12221f; box-shadow: 0 10px 0 #12221f; }
+    #g-end { position: absolute; left: 0; top: 520px; width: 1080px; text-align: center; font-family: "Noto Sans Devanagari"; font-weight: 700; font-size: 60px;
+             line-height: 1.4; color: #12221f; }
+    #g-end em { font-style: normal; background: #ffd23f; padding: 0 12px; }
+    .g-cap { position: absolute; left: 60px; top: 1330px; width: 960px; text-align: center; font-family: "Noto Sans Devanagari"; font-weight: 700; font-size: 46px;
+             line-height: 1.3; color: #12221f; text-wrap: balance; }
+    .g-cap span { display: inline-block; padding: 0 8px; margin: 0 1px; border-radius: 8px; opacity: 0.4; }
+  </style>
+  <div id="root" data-composition-id="galton" data-width="1080" data-height="1920">
+    <canvas id="g-cv" width="1080" height="1920"></canvas>
+    <div id="g-title">गैल्टन बोर्ड</div>
+    <div id="g-count"><span id="g-n" class="n">0</span><span class="l">गेंदें</span></div>
+    <div id="g-r" class="g-lr">दाएँ <b>→</b></div>
+    <div id="g-l" class="g-lr"><b>←</b> बाएँ</div>
+    <div id="g-q">?</div>
+    <div id="g-nd"><span>Normal distribution</span></div>
+    <div id="g-end">बेतरतीबी में भी,<br /><em>एक नियम</em> होता है।</div>
+
+    <div id="g-c1" class="g-cap"><span>ऊपर</span><span>से</span><span>एक</span><span>गेंद</span><span>गिराइए।</span></div>
+    <div id="g-c2" class="g-cap"><span>हर</span><span>कील</span><span>पर,</span><span>वो</span><span>या</span><span>तो</span><span>दाएँ</span><span>जाएगी,</span><span>या</span><span>बाएँ।</span></div>
+    <div id="g-c3" class="g-cap"><span>पचास-पचास</span><span>का</span><span>खेल।</span></div>
+    <div id="g-c4" class="g-cap"><span>एक</span><span>गेंद</span><span>कहाँ</span><span>गिरेगी,</span><span>कोई</span><span>नहीं</span><span>जानता।</span></div>
+    <div id="g-c5" class="g-cap"><span>पर</span><span>हज़ार</span><span>गेंदें</span><span>गिराइए…</span></div>
+    <div id="g-c6" class="g-cap"><span>और</span><span>देखिए,</span><span>एक</span><span>घंटी</span><span>जैसा</span><span>आकार</span><span>बन</span><span>जाता</span><span>है।</span></div>
+    <div id="g-c7" class="g-cap"><span>इसे</span><span>कहते</span><span>हैं,</span><span>normal</span><span>distribution।</span></div>
+    <div id="g-c8" class="g-cap"><span>बेतरतीबी</span><span>में</span><span>भी,</span><span>एक</span><span>नियम</span><span>होता</span><span>है।</span></div>
+  </div>
+  <script>
+    (function () {
+      const V = 0.3;
+      // word onsets on the voice (patched after measuring); 50 words, captions in 8 groups
+      const W = [0.0, 0.22, 0.32, 0.5, 0.76, 1.3, 1.46, 1.68, 2.85, 2.98, 3.12, 3.22, 3.46, 4.1, 4.28, 5.45, 6.1, 6.22, 7.15, 7.36, 7.58, 7.8, 8.95, 9.12, 9.32, 10.349, 10.469, 10.789, 11.049, 11.699, 11.869, 12.899, 13.109, 13.429, 13.709, 14.029, 14.169, 14.449, 15.499, 15.689, 15.969, 16.849, 17.189, 18.699, 19.149, 19.269, 19.999, 20.189, 20.429, 20.689];
+      const VO_END = 20.84;
+      const GROUPS = [5, 10, 3, 7, 4, 9, 5, 7];
+      const t = (i) => W[i] + V;
+      const END = VO_END + V + 2.6;
+
+      // ---- the board: 12 rows of pegs, 13 bins. Every ball's path is fixed by a seeded generator.
+      const ROWS = 12, CX = 540, DX = 68, DY = 46, Y0 = 470, BIN_TOP = Y0 + ROWS * DY, FLOOR = 1300, BR = 3.7, PER = 8, SL = 8;
+      let seed = 1888;
+      const rnd = () => { seed |= 0; seed = (seed + 0x6d2b79f5) | 0; let x = Math.imul(seed ^ (seed >>> 15), 1 | seed); x = (x + Math.imul(x ^ (x >>> 7), 61 | x)) ^ x; return ((x ^ (x >>> 14)) >>> 0) / 4294967296; };
+      const path = () => { const d = []; for (let r = 0; r < ROWS; r++) d.push(rnd() < 0.5 ? 0 : 1); return d; };
+      // demo balls: big, slow, explained; then the stream of a thousand small ones
+      const balls = [];
+      const demo = (start, hop, steps) => balls.push({ start, hop, d: steps, r: 15, demo: true });
+      const N = 1000;
+      const P = { time: 0 };
+
+      const build = () => {
+        balls.length = 0; seed = 1888;
+        const hop = (t(18) - t(4)) / (ROWS + 1), dd = [1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1];  // the explained one: right on "दाएँ", left on "बाएँ"
+        const rR = Math.floor((t(11) - t(4)) / hop), rL = Math.floor((t(14) - t(4)) / hop);
+        if (rR >= 0 && rR < ROWS) dd[rR] = 1;
+        if (rL >= 0 && rL < ROWS) dd[rL] = 0;
+        demo(t(4), hop, dd);
+        demo(t(19), 0.16, path()); demo(t(20) + 0.1, 0.16, path()); demo(t(21) + 0.15, 0.16, path());
+        const s0 = t(26), s1 = t(37);                                                       // the thousand: launches accelerate over the line
+        for (let k = 0; k < N; k++) { const u = k / (N - 1); balls.push({ start: s0 + (s1 - s0) * Math.pow(u, 0.6), hop: 0.085, d: path(), r: BR }); }
+        // where each ball lands, and its slot in that bin's stack (by landing order)
+        const counts = new Array(ROWS + 1).fill(0);
+        balls.forEach((b) => { b.k = b.d.reduce((a, c) => a + c, 0); b.land = b.start + (ROWS + 1) * b.hop; });
+        balls.filter((b) => !b.demo).sort((a, b) => a.land - b.land).forEach((b) => { b.slot = counts[b.k]++; });
+      };
+      build();
+      const cv = document.getElementById("g-cv"), cx = cv.getContext("2d");
+      const pegX = (r, i) => CX + (i - r / 2) * DX, pegY = (r) => Y0 + r * DY;
+      const binX = (k) => CX + (k - ROWS / 2) * DX;
+      const stackPos = (b) => { const row = Math.floor(b.slot / PER), col = b.slot % PER; return [binX(b.k) + (col - (PER - 1) / 2) * SL, FLOOR - 7 - row * SL]; };
+      const pos = (b, tt) => {                                 // the ball rides peg to peg in small hops, then drops into its bin
+        const u = (tt - b.start) / b.hop;
+        if (u < 0) return null;
+        if (u < ROWS) {
+          const r = Math.floor(u), f = u - r, k0 = b.d.slice(0, r).reduce((a, c) => a + c, 0), k1 = k0 + b.d[r];
+          const x0 = r === 0 ? CX : pegX(r, k0), x1 = pegX(r + 1 > ROWS - 1 ? ROWS - 1 : r + 1, k1);
+          const y0 = pegY(r) - b.r - 6, y1 = pegY(r + 1) - b.r - 6;
+          const xa = r === 0 ? CX : x0, xb = r + 1 <= ROWS - 1 ? x1 : binX(k1);
+          return [xa + (xb - xa) * f, y0 + (y1 - y0) * f - 22 * Math.sin(Math.PI * f), r];
+        }
+        const f = Math.min(1, u - ROWS), x = binX(b.k);
+        if (b.demo) return [x, BIN_TOP - b.r + (FLOOR - 8 - b.r - BIN_TOP + b.r) * f * f, ROWS];
+        const [sx, sy] = stackPos(b);
+        return [x + (sx - x) * f, BIN_TOP + (sy - BIN_TOP) * f * f, ROWS];
+      };
+      const EZ = { io2: gsap.parseEase("power2.inOut") };
+      const pr = (tt, t0, d, ez) => { const p = Math.min(1, Math.max(0, (tt - t0) / d)); return ez ? ez(p) : p; };
+      const nEl = document.getElementById("g-n");
+      const draw = () => {
+        const tt = P.time;
+        cx.clearRect(0, 0, 1080, 1920);
+        const demoA = 1 - pr(tt, t(25) + 0.2, 0.4), ndP = pr(tt, t(41) - 0.3, 1.0, EZ.io2), pegA = 1 - 0.75 * pr(tt, t(43) - 0.3, 0.5);
+        // funnel, pegs, bins
+        cx.strokeStyle = "#12221f"; cx.lineWidth = 6; cx.lineCap = "round";
+        cx.beginPath(); cx.moveTo(CX - 120, Y0 - 120); cx.lineTo(CX - 26, Y0 - 50); cx.moveTo(CX + 120, Y0 - 120); cx.lineTo(CX + 26, Y0 - 50); cx.stroke();
+        cx.fillStyle = "#12221f"; cx.globalAlpha = pegA;
+        for (let r = 0; r < ROWS; r++) for (let i = 0; i <= r; i++) { cx.beginPath(); cx.arc(pegX(r, i), pegY(r), 6, 0, Math.PI * 2); cx.fill(); }
+        cx.globalAlpha = 1;
+        cx.lineWidth = 4;
+        for (let k = 0; k <= ROWS + 1; k++) { const x = binX(k) - DX / 2; cx.beginPath(); cx.moveTo(x, BIN_TOP + 4); cx.lineTo(x, FLOOR); cx.stroke(); }
+        cx.lineWidth = 7; cx.beginPath(); cx.moveTo(binX(0) - DX / 2 - 10, FLOOR + 3); cx.lineTo(binX(ROWS) + DX / 2 + 10, FLOOR + 3); cx.stroke();
+        // balls
+        let landed = 0;
+        for (const b of balls) {
+          const p = pos(b, tt);
+          if (!p) continue;
+          if (b.demo) {
+            const alpha = demoA; if (alpha <= 0.01) continue;
+            cx.globalAlpha = alpha; cx.fillStyle = "#ffd23f"; cx.strokeStyle = "#12221f"; cx.lineWidth = 4;
+            cx.beginPath(); cx.arc(p[0], p[1], b.r, 0, Math.PI * 2); cx.fill(); cx.stroke(); cx.globalAlpha = 1;
+            continue;
+          }
+          if (tt >= b.land) landed++;
+          cx.fillStyle = tt >= b.land ? "#0b7f79" : "#12221f";
+          cx.beginPath(); cx.arc(p[0], p[1], b.r, 0, Math.PI * 2); cx.fill();
+        }
+        nEl.textContent = landed;
+        // the normal curve the stacks grow into (expected heights), drawn left to right
+        if (ndP > 0) {
+          const mu = ROWS / 2, sd = Math.sqrt(ROWS) / 2, scale = N / sd / Math.sqrt(2 * Math.PI) / PER * SL;
+          cx.strokeStyle = "#ffd23f"; cx.lineWidth = 9; cx.beginPath();
+          const xs = -0.6, xe = ROWS + 0.6, xm = xs + (xe - xs) * ndP;
+          for (let x = xs; x <= xm; x += 0.05) { const h = scale * Math.exp(-0.5 * ((x - mu) / sd) ** 2), X = binX(x), Y = FLOOR - 4 - h; if (x === xs) cx.moveTo(X, Y); else cx.lineTo(X, Y); }
+          cx.stroke();
+          cx.strokeStyle = "#12221f"; cx.lineWidth = 3; cx.stroke();
+        }
+      };
+      draw();
+
+      const tl = gsap.timeline({ paused: true });
+      tl.to(P, { time: END, duration: END, ease: "none", onUpdate: draw }, 0);
+      gsap.set(["#g-r", "#g-l", "#g-q", "#g-nd", "#g-end", ".g-cap"], { opacity: 0 });
+      // the explained ball: "दाएँ" and "बाएँ" tags appear beside it
+      const pR = pos(balls[0], t(11)), pL = pos(balls[0], t(14));         // each tag pops beside the ball as it is named
+      tl.fromTo("#g-r", { opacity: 0, x: pR[0] + 30, y: pR[1] - 112, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.25, ease: "back.out(2.5)" }, t(11));
+      tl.fromTo("#g-l", { opacity: 0, x: pL[0] - 30, xPercent: -100, y: pL[1] - 112, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.25, ease: "back.out(2.5)" }, t(14));
+      tl.to("#g-r", { opacity: 0, duration: 0.2 }, Math.min(t(14) - 0.1, t(11) + 1.4));
+      tl.to("#g-l", { opacity: 0, duration: 0.2 }, Math.min(t(18) - 0.2, t(14) + 1.4));
+      tl.fromTo("#g-q", { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2.5)" }, t(22));
+      tl.to("#g-q", { opacity: 0, duration: 0.2 }, t(25) + 0.3);
+      // "normal distribution": the curve draws over the stacks
+            tl.fromTo("#g-nd", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.3, ease: "back.out(2)" }, t(41));
+      tl.to("#g-nd", { opacity: 0, y: -20, duration: 0.2 }, t(43) - 0.25);
+      tl.fromTo("#g-end", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.35, ease: "expo.out" }, t(43));
+
+      // captions
+      let i0 = 0;
+      GROUPS.forEach((n, g) => {
+        const id = "#g-c" + (g + 1), spans = document.querySelectorAll(id + " span");
+        tl.fromTo(id, { opacity: 0 }, { opacity: 1, duration: 0.1 }, t(i0) - 0.1);
+        tl.to(id, { opacity: 0, duration: 0.07 }, g < GROUPS.length - 1 ? t(i0 + n) - 0.19 : VO_END + V + 0.4);
+        for (let k = 0; k < n; k++) {
+          tl.set(spans[k], { opacity: 1, backgroundColor: "rgba(255,210,63,1)" }, t(i0 + k));
+          if (k > 0) tl.set(spans[k - 1], { backgroundColor: "rgba(255,210,63,0)" }, t(i0 + k));
+        }
+        i0 += n;
+      });
+
+      window.__timelines["galton"] = tl;
+    })();
+  </script>
+</template>
