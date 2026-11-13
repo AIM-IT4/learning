@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="hi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #04050b; }
+      #root { position: relative; width: 100%; height: 100%; background: #04050b; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="26.87" data-width="1080" data-height="1920">
+      <div id="neon" data-composition-id="neon" data-composition-src="compositions/neon.html" data-start="0" data-duration="26.87"
+           data-track-index="1" data-track-kind="graphics" data-width="1080" data-height="1920"></div>
+      <audio id="vo" class="clip" src="assets/vo.wav" data-start="0.3" data-track-index="2" data-volume="1"></audio>
+      <audio id="bgm" class="clip" src="assets/bgm.wav" data-start="0" data-duration="26.87" data-track-index="3"
+             data-timeline-role="music" data-volume="1" data-fade-in="0.3" data-fade-out="1.5"></audio>
+      <audio id="e-b1" class="clip" src="assets/sfx/click.mp3" data-start="0.2" data-duration="0.36" data-track-index="4" data-volume="0.3"></audio>
+      <audio id="e-b2" class="clip" src="assets/sfx/click.mp3" data-start="2.02" data-duration="0.36" data-track-index="5" data-volume="0.3"></audio>
+      <audio id="e-lift" class="clip" src="assets/sfx/whoosh.mp3" data-start="3.28" data-duration="0.57" data-track-index="6" data-volume="0.22"></audio>
+      <audio id="e-go" class="clip" src="assets/sfx/whoosh-short.mp3" data-start="4.99" data-duration="0.57" data-track-index="7" data-volume="0.24"></audio>
+      <audio id="e-100" class="clip" src="assets/sfx/impact-bass-2.mp3" data-start="8.47" data-duration="1.4" data-track-index="8" data-volume="0.22"></audio>
+      <audio id="e-tag" class="clip" src="assets/sfx/click-soft.mp3" data-start="8.83" data-duration="0.36" data-track-index="9" data-volume="0.3"></audio>
+      <audio id="e-eps" class="clip" src="assets/sfx/click-soft.mp3" data-start="10.71" data-duration="0.36" data-track-index="10" data-volume="0.3"></audio>
+      <audio id="e-close" class="clip" src="assets/sfx/sparkle.mp3" data-start="11.13" data-duration="1.8" data-track-index="11" data-volume="0.2"></audio>
+      <audio id="e-go2" class="clip" src="assets/sfx/whoosh-short.mp3" data-start="13.37" data-duration="0.57" data-track-index="12" data-volume="0.24"></audio>
+      <audio id="e-sign" class="clip" src="assets/sfx/glitch-1.mp3" data-start="19.73" data-duration="1.2" data-track-index="13" data-volume="0.24"></audio>
+    </div>
+    <script>
+      window.__timelines["main"] = gsap.timeline({ paused: true });
+    </script>
+  </body>
+</html>

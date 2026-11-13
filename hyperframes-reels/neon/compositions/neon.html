@@ -1,0 +1,185 @@
+<template>
+  <style>
+    @font-face { font-family: "Teko"; font-weight: 300 700; src: url("assets/fonts/Teko.ttf"); }
+    @font-face { font-family: "Sym"; font-weight: 700; src: url("assets/fonts/DejaVuSans-Bold.ttf"); }
+    #root { position: absolute; inset: 0; background: #04050b; overflow: hidden; }
+    #e-cv { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #e-title { position: absolute; left: 0; top: 214px; width: 1080px; text-align: center; font-family: "Teko"; font-weight: 500; font-size: 118px; line-height: 1;
+               color: #eafaff; letter-spacing: 2px; text-shadow: 0 0 8px #2de2ff, 0 0 26px #2de2ff, 0 0 60px rgba(45, 226, 255, 0.55); white-space: nowrap; }
+    #e-chaos { position: absolute; left: 0; top: 178px; width: 1080px; text-align: center; font-family: "Teko"; font-weight: 700; font-size: 230px; line-height: 1;
+               letter-spacing: 14px; color: #fff2fe; text-shadow: 0 0 10px #ff3df2, 0 0 30px #ff3df2, 0 0 70px #ff3df2, 0 0 120px rgba(255, 61, 242, 0.6); white-space: nowrap; }
+    .e-tag { position: absolute; left: 0; top: 0; padding: 0 22px; border: 3px solid #ff3df2; border-radius: 14px; font-family: "Teko"; font-weight: 600; font-size: 60px;
+             line-height: 1.25; color: #ffe9fd; white-space: nowrap; box-shadow: 0 0 14px #ff3df2, inset 0 0 12px rgba(255, 61, 242, 0.6);
+             text-shadow: 0 0 10px #ff3df2; }
+    .e-tag b { font-family: "Sym"; font-size: 44px; }
+    .e-cap { position: absolute; left: 50px; top: 1302px; width: 980px; text-align: center; font-family: "Teko"; font-weight: 500; font-size: 68px; line-height: 1.12;
+             color: #5d6890; text-wrap: balance; }
+    .e-cap span { display: inline-block; margin: 0 7px; }
+  </style>
+  <div id="root" data-composition-id="neon" data-width="1080" data-height="1920">
+    <canvas id="e-cv" width="1080" height="1920"></canvas>
+    <div id="e-title">दोहरा pendulum</div>
+    <div id="e-chaos">CHAOS</div>
+    <div id="e-100" class="e-tag"><b>×</b> 100</div>
+    <div id="e-eps" class="e-tag">+0.001<b>°</b> हर एक</div>
+
+    <div id="e-c1" class="e-cap"><span>एक</span><span>pendulum,</span><span>और</span><span>उसके</span><span>नीचे</span><span>एक</span><span>और।</span></div>
+    <div id="e-c2" class="e-cap"><span>इसे</span><span>ऊपर</span><span>ले</span><span>जाइए,</span><span>और</span><span>जाने</span><span>दीजिए…</span></div>
+    <div id="e-c3" class="e-cap"><span>देखिए,</span><span>ये</span><span>कैसे</span><span>नाचता</span><span>है।</span></div>
+    <div id="e-c4" class="e-cap"><span>अब</span><span>ऐसे</span><span>सौ</span><span>pendulum</span><span>लीजिए।</span></div>
+    <div id="e-c5" class="e-cap"><span>हर</span><span>एक</span><span>में</span><span>बस</span><span>एक</span><span>डिग्री</span><span>के</span><span>हज़ारवें</span><span>हिस्से</span><span>का</span><span>फ़र्क़।</span></div>
+    <div id="e-c6" class="e-cap"><span>शुरू</span><span>में</span><span>सब</span><span>एक</span><span>जैसे</span><span>चलते</span><span>हैं…</span></div>
+    <div id="e-c7" class="e-cap"><span>पर</span><span>जल्द</span><span>ही,</span><span>रास्ते</span><span>अलग</span><span>हो</span><span>जाते</span><span>हैं।</span></div>
+    <div id="e-c8" class="e-cap"><span>इसे</span><span>कहते</span><span>हैं,</span><span>chaos।</span></div>
+    <div id="e-c9" class="e-cap"><span>नियम</span><span>तय</span><span>हैं,</span><span>पर</span><span>आगे</span><span>का</span><span>अंदाज़ा</span><span>लगाना</span><span>नामुमकिन।</span></div>
+  </div>
+  <script>
+    (function () {
+      const V = 0.3;
+      // word onsets on the voice (patched after measuring); 63 words, captions in 9 groups
+      const W = [0.0, 0.16, 1.25, 1.38, 1.58, 1.82, 2.02, 2.85, 3.08, 3.3, 3.46, 4.35, 4.5, 4.74, 5.95, 6.65, 6.8, 7.06, 7.38, 8.17, 8.33, 8.53, 8.75, 9.09, 9.82, 10.01, 10.13, 10.23, 10.41, 10.65, 10.89, 11.03, 11.43, 11.73, 11.89, 13.12, 13.39, 13.53, 13.73, 13.85, 14.03, 14.37, 15.132, 15.272, 15.572, 16.282, 16.612, 16.852, 16.972, 17.212, 18.082, 18.332, 18.612, 19.432, 20.832, 21.082, 21.212, 22.132, 22.272, 22.472, 22.572, 22.852, 23.212];
+      const VO_END = 23.77;
+      const GROUPS = [7, 7, 5, 5, 11, 7, 8, 4, 9];
+      const t = (i) => W[i] + V;
+      const END = VO_END + V + 2.8;
+      const TAU = Math.PI * 2, G = 9.81, DEG = Math.PI / 180;
+      const EZ = { o2: gsap.parseEase("power2.out"), io2: gsap.parseEase("power2.inOut"), back: gsap.parseEase("back.out(1.8)") };
+      const pr = (tt, t0, d, ez) => { const p = Math.min(1, Math.max(0, (tt - t0) / d)); return ez ? ez(p) : p; };
+      let seed = 9;
+      const rnd = () => { seed |= 0; seed = (seed + 0x6d2b79f5) | 0; let x = Math.imul(seed ^ (seed >>> 15), 1 | seed); x = (x + Math.imul(x ^ (x >>> 7), 61 | x)) ^ x; return ((x ^ (x >>> 14)) >>> 0) / 4294967296; };
+
+      // ---- a double pendulum: two 1 m rods, two equal masses, no friction; RK4 at 1/600 s, kept every 1/120 s
+      const TH1 = 2.4, TH2 = 2.0, EPS = 0.001 * DEG, NP = 100;
+      const acc = (a1, a2, w1, w2) => {
+        const d = a1 - a2, den = 3 - Math.cos(2 * d);
+        return [(-3 * G * Math.sin(a1) - G * Math.sin(a1 - 2 * a2) - 2 * Math.sin(d) * (w2 * w2 + w1 * w1 * Math.cos(d))) / den,
+                (2 * Math.sin(d) * (2 * w1 * w1 + 2 * G * Math.cos(a1) + w2 * w2 * Math.cos(d))) / den];
+      };
+      const simulate = (a1, a2, seconds) => {
+        const dt = 1 / 600, keep = 5, n = Math.ceil(seconds * 600), out = new Float32Array(2 * (Math.floor(n / keep) + 2));
+        let w1 = 0, w2 = 0, j = 0;
+        for (let i = 0; i <= n; i++) {
+          if (i % keep === 0) { out[j++] = a1; out[j++] = a2; }
+          const k1 = acc(a1, a2, w1, w2);
+          const b1 = a1 + (dt / 2) * w1, b2 = a2 + (dt / 2) * w2, v1 = w1 + (dt / 2) * k1[0], v2 = w2 + (dt / 2) * k1[1], k2 = acc(b1, b2, v1, v2);
+          const c1 = a1 + (dt / 2) * v1, c2 = a2 + (dt / 2) * v2, u1 = w1 + (dt / 2) * k2[0], u2 = w2 + (dt / 2) * k2[1], k3 = acc(c1, c2, u1, u2);
+          const d1 = a1 + dt * u1, d2 = a2 + dt * u2, x1 = w1 + dt * k3[0], x2 = w2 + dt * k3[1], k4 = acc(d1, d2, x1, x2);
+          a1 += (dt / 6) * (w1 + 2 * v1 + 2 * u1 + x1); a2 += (dt / 6) * (w2 + 2 * v2 + 2 * u2 + x2);
+          w1 += (dt / 6) * (k1[0] + 2 * k2[0] + 2 * k3[0] + k4[0]); w2 += (dt / 6) * (k1[1] + 2 * k2[1] + 2 * k3[1] + k4[1]);
+        }
+        return out;
+      };
+      const at = (S, s) => { const f = Math.max(0, s) * 120, i = Math.min(Math.floor(f), S.length / 2 - 2), u = Math.min(1, f - i); return [S[2 * i] + (S[2 * i + 2] - S[2 * i]) * u, S[2 * i + 1] + (S[2 * i + 3] - S[2 * i + 1]) * u]; };
+
+      // ---- timing
+      const LIFT = () => t(8) - 0.1, R1 = () => t(13) - 0.05, SW1 = () => t(19) - 0.1, R2 = () => t(35) - 0.05;
+      const ONE = simulate(TH1, TH2, SW1() - R1() + 1);
+      const MANY = []; for (let k = 0; k < NP; k++) MANY.push(simulate(TH1 + k * EPS, TH2, END - R2() + 0.5));
+
+      const PX = 540, PY = 790, L = 210;
+      const tip = (a1, a2) => { const x1 = PX + L * Math.sin(a1), y1 = PY + L * Math.cos(a1); return [x1, y1, x1 + L * Math.sin(a2), y1 + L * Math.cos(a2)]; };
+      const hex = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+      const STOPS = ["#2de2ff", "#8a5cff", "#ff3df2", "#ffb84d"].map(hex);
+      const COL = []; for (let k = 0; k < NP; k++) { const u = (k / (NP - 1)) * 3, i = Math.min(2, Math.floor(u)), f = u - i; COL.push(STOPS[i].map((v, j) => Math.round(v + (STOPS[i + 1][j] - v) * f))); }
+      const rgba = (c, a) => `rgba(${c[0]},${c[1]},${c[2]},${a})`;
+
+      // ---- the night: a few stars, a haze behind the pivot, a synthwave grid floor (drawn once)
+      const night = document.createElement("canvas"); night.width = 1080; night.height = 1920;
+      (() => {
+        const b = night.getContext("2d");
+        b.fillStyle = "#04050b"; b.fillRect(0, 0, 1080, 1920);
+        for (let i = 0; i < 220; i++) { b.fillStyle = `rgba(200,220,255,${(0.15 + rnd() * 0.5).toFixed(2)})`; const r = rnd() < 0.9 ? 1 : 2; b.fillRect(rnd() * 1080, rnd() * 1180, r, r); }
+        const hz = b.createRadialGradient(PX, PY, 0, PX, PY, 560); hz.addColorStop(0, "rgba(60,40,140,0.32)"); hz.addColorStop(1, "rgba(60,40,140,0)"); b.fillStyle = hz; b.fillRect(0, 200, 1080, 1200);
+        const HY = 1262, VPX = 540;
+        const sky = b.createLinearGradient(0, HY - 140, 0, HY); sky.addColorStop(0, "rgba(255,61,242,0)"); sky.addColorStop(1, "rgba(255,61,242,0.22)"); b.fillStyle = sky; b.fillRect(0, HY - 140, 1080, 140);
+        b.fillStyle = "#07040f"; b.fillRect(0, HY, 1080, 1920 - HY);
+        b.globalCompositeOperation = "lighter";
+        const glowLine = (x0, y0, x1, y1, a) => { for (const [w, al] of [[10, 0.05], [4, 0.14], [1.6, 0.6]]) { b.strokeStyle = `rgba(255,61,242,${(al * a).toFixed(3)})`; b.lineWidth = w; b.beginPath(); b.moveTo(x0, y0); b.lineTo(x1, y1); b.stroke(); } };
+        for (let k = -14; k <= 14; k++) glowLine(VPX, HY, VPX + k * 150, 1920, 0.8);
+        for (let k = 0; k < 14; k++) { const y = HY + 10 * k * k + 14 * k; if (y > 1920) break; glowLine(0, y, 1080, y, 0.5 + k * 0.05); }
+        glowLine(0, HY, 1080, HY, 1.6);
+        b.globalCompositeOperation = "source-over";
+        const band = b.createLinearGradient(0, 1278, 0, 1470); band.addColorStop(0, "rgba(4,5,11,0)"); band.addColorStop(0.25, "rgba(4,5,11,0.78)");
+        band.addColorStop(0.75, "rgba(4,5,11,0.78)"); band.addColorStop(1, "rgba(4,5,11,0)"); b.fillStyle = band; b.fillRect(0, 1278, 1080, 192);       // a quiet strip for the captions
+      })();
+
+      const cx = document.getElementById("e-cv").getContext("2d");
+      const tube = (pts, c, core = 2.6, a = 1) => {                     // a neon tube: wide faint glow, then a bright core
+        for (const [w, al] of [[18, 0.05], [8, 0.16], [core, 0.95]]) {
+          cx.strokeStyle = rgba(c, (al * a).toFixed(3)); cx.lineWidth = w; cx.beginPath(); cx.moveTo(pts[0], pts[1]);
+          for (let i = 2; i < pts.length; i += 2) cx.lineTo(pts[i], pts[i + 1]); cx.stroke();
+        }
+      };
+      const orb = (x, y, r, c, a = 1) => { const g = cx.createRadialGradient(x, y, 0, x, y, r * 3.2); g.addColorStop(0, rgba([255, 255, 255], 0.95 * a)); g.addColorStop(0.25, rgba(c, 0.9 * a)); g.addColorStop(1, rgba(c, 0)); cx.fillStyle = g; cx.beginPath(); cx.arc(x, y, r * 3.2, 0, TAU); cx.fill(); };
+      const P = { time: 0 };
+      const draw = () => {
+        const tt = P.time;
+        cx.globalCompositeOperation = "source-over"; cx.globalAlpha = 1; cx.drawImage(night, 0, 0);
+        cx.globalCompositeOperation = "lighter"; cx.lineCap = "round"; cx.lineJoin = "round";
+        tube([PX - 80, PY, PX + 80, PY], [45, 226, 255], 3, pr(tt, 0, 0.4));
+        const oneA = 1 - pr(tt, SW1(), 0.35);
+        if (oneA > 0) {
+          const g1 = pr(tt, t(0) - 0.1, 0.35, EZ.back), g2 = pr(tt, t(5) - 0.1, 0.35, EZ.back), lift = pr(tt, LIFT(), 0.9, EZ.io2);
+          let a1 = TH1 * lift, a2 = TH2 * lift; const s = tt - R1();
+          if (s > 0) [a1, a2] = at(ONE, s);
+          const [x1, y1, x2, y2] = tip(a1, a2);
+          if (s > 0) {                                                   // light painting: the last 2.5 s of the lower bob
+            for (let q = 0; q < 150; q++) {
+              const sb = s - q / 60, sa = s - (q + 1) / 60; if (sb <= 0) break;
+              const pa = at(ONE, Math.max(0, sa)), pb = at(ONE, sb), A = tip(pa[0], pa[1]), Bq = tip(pb[0], pb[1]), f = 1 - q / 150;
+              const c = [Math.round(255 - 120 * (1 - f)), Math.round(61 + 30 * (1 - f)), 242];
+              for (const [w, al] of [[14, 0.05], [3.5, 0.75]]) { cx.strokeStyle = rgba(c, (al * f * oneA).toFixed(3)); cx.lineWidth = w; cx.beginPath(); cx.moveTo(A[2], A[3]); cx.lineTo(Bq[2], Bq[3]); cx.stroke(); }
+            }
+          }
+          if (g1 > 0) tube([PX, PY, PX + (x1 - PX) * g1, PY + (y1 - PY) * g1], [45, 226, 255], 3, oneA);
+          if (g2 > 0) tube([x1, y1, x1 + (x2 - x1) * g2, y1 + (y2 - y1) * g2], [45, 226, 255], 3, oneA);
+          if (g1 > 0) orb(x1, y1, 13 * g1, [255, 184, 77], oneA);
+          if (g2 > 0) orb(x2, y2, 13 * g2, [255, 61, 242], oneA);
+        }
+        const manyA = pr(tt, SW1() + 0.1, 0.4, EZ.o2);
+        if (manyA > 0) {
+          // introduced fanned out (0.5° apart), closed to their true 0.001° spacing before they are let go
+          const fan = 0.5 * DEG * (1 - pr(tt, t(31) - 0.2, 0.9, EZ.io2)), s = tt - R2();
+          for (let k = 0; k < NP; k++) {
+            let a1 = TH1 + k * (fan + EPS) - 49.5 * fan, a2 = TH2;
+            if (s > 0) [a1, a2] = at(MANY[k], s);
+            const [x1, y1, x2, y2] = tip(a1, a2), c = COL[k];
+            if (s > 0) {                                                 // short trails, so the spread reads as streaks of light
+              let prev = [x2, y2];
+              for (let q = 1; q <= 14; q++) { const p = at(MANY[k], Math.max(0, s - q / 40)), T = tip(p[0], p[1]); cx.strokeStyle = rgba(c, (0.5 * (1 - q / 15) * manyA).toFixed(3)); cx.lineWidth = 2.2; cx.beginPath(); cx.moveTo(prev[0], prev[1]); cx.lineTo(T[2], T[3]); cx.stroke(); prev = [T[2], T[3]]; }
+            }
+            for (const [w, al] of [[7, 0.06], [2, 0.5]]) { cx.strokeStyle = rgba(c, (al * manyA).toFixed(3)); cx.lineWidth = w; cx.beginPath(); cx.moveTo(PX, PY); cx.lineTo(x1, y1); cx.lineTo(x2, y2); cx.stroke(); }
+            cx.fillStyle = rgba(c, (0.55 * manyA).toFixed(3)); cx.beginPath(); cx.arc(x2, y2, 5, 0, TAU); cx.fill();
+          }
+        }
+        cx.globalCompositeOperation = "source-over";
+      };
+      draw();
+
+      const tl = gsap.timeline({ paused: true });
+      tl.to(P, { time: END, duration: END, ease: "none", onUpdate: draw }, 0);
+      gsap.set(["#e-chaos", "#e-100", "#e-eps", ".e-cap"], { opacity: 0 });
+      tl.fromTo("#e-100", { opacity: 0, x: 640, y: 352, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2.5)" }, t(21));
+      tl.fromTo("#e-eps", { opacity: 0, x: 520, y: 446, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2.5)" }, t(28));
+      tl.to(["#e-100", "#e-eps"], { opacity: 0, duration: 0.25 }, R2() + 0.4);
+      // the sign switches on like a neon tube: a stutter, then steady
+      tl.to("#e-title", { opacity: 0, duration: 0.15 }, t(53) - 0.2);
+      [[0, 1], [0.06, 0.15], [0.12, 1], [0.2, 0.35], [0.27, 1], [0.42, 0.7], [0.48, 1]].forEach(([d, o]) => tl.set("#e-chaos", { opacity: o }, t(53) + d));
+
+      // captions, neon style: unspoken words dim, spoken words white, the word being said lit magenta
+      let i0 = 0;
+      GROUPS.forEach((n, g) => {
+        const id = "#e-c" + (g + 1), spans = document.querySelectorAll(id + " span");
+        tl.fromTo(id, { opacity: 0 }, { opacity: 1, duration: 0.1 }, t(i0) - 0.1);
+        tl.to(id, { opacity: 0, duration: 0.07 }, g < GROUPS.length - 1 ? t(i0 + n) - 0.19 : VO_END + V + 0.5);
+        for (let k = 0; k < n; k++) {
+          tl.set(spans[k], { color: "#fff2fe", textShadow: "0 0 10px #ff3df2, 0 0 28px #ff3df2" }, t(i0 + k));
+          if (k > 0) tl.set(spans[k - 1], { color: "#e6f8ff", textShadow: "0 0 8px rgba(45,226,255,0.8)" }, t(i0 + k));
+        }
+        i0 += n;
+      });
+
+      window.__timelines["neon"] = tl;
+    })();
+  </script>
+</template>

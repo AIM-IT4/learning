@@ -1,0 +1,188 @@
+<template>
+  <style>
+    @font-face { font-family: "Rozha One"; src: url("assets/fonts/RozhaOne-Regular.ttf"); }
+    @font-face { font-family: "Tiro Devanagari Hindi"; src: url("assets/fonts/TiroDevanagariHindi-Regular.ttf"); }
+    @font-face { font-family: "UnifrakturMaguntia"; src: url("assets/fonts/UnifrakturMaguntia-Book.ttf"); }
+    @font-face { font-family: "Playfair Display"; font-weight: 400 900; src: url("assets/fonts/PlayfairDisplay.ttf"); }
+    #root { position: absolute; inset: 0; background: #15120d; overflow: hidden; }
+    #n-page { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; background: #ece4d2; }
+    #n-cv { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #n-mast { position: absolute; left: 0; top: 118px; width: 1080px; text-align: center; font-family: "Rozha One"; font-size: 126px; line-height: 1.15; color: #16130e; }
+    .n-date { position: absolute; top: 302px; font-family: "Tiro Devanagari Hindi"; font-size: 30px; color: #2a251c; white-space: nowrap; }
+    #n-en { position: absolute; left: 0; top: 296px; width: 1080px; text-align: center; font-family: "UnifrakturMaguntia"; font-size: 40px; color: #16130e; }
+    #n-head { position: absolute; left: 0; top: 372px; width: 1080px; text-align: center; font-family: "Rozha One"; font-size: 176px; line-height: 1.12; color: #16130e; }
+    #n-deck { position: absolute; left: 0; top: 584px; width: 1080px; text-align: center; font-family: "Tiro Devanagari Hindi"; font-size: 54px; color: #2a251c; }
+    #n-strip { position: absolute; left: 110px; top: 700px; width: 860px; height: 128px; background: #f7f1e3; box-shadow: 0 10px 0 rgba(30, 22, 10, 0.28);
+               clip-path: polygon(0% 6%, 3% 0%, 7% 5%, 12% 1%, 18% 6%, 25% 0%, 31% 4%, 38% 0%, 46% 5%, 53% 1%, 60% 6%, 67% 0%, 74% 5%, 81% 1%, 88% 6%, 94% 0%, 100% 5%,
+                                  98% 52%, 100% 96%, 95% 100%, 88% 95%, 81% 100%, 73% 96%, 66% 100%, 58% 95%, 50% 100%, 42% 95%, 35% 100%, 27% 96%, 20% 100%, 12% 95%, 5% 100%, 0% 95%, 2% 50%);
+               text-align: center; font-family: "Rozha One"; font-size: 80px; line-height: 128px; color: #16130e; }
+    #n-strip em { font-style: normal; color: #b3261e; }
+    #n-chartT { position: absolute; left: 84px; top: 1016px; font-family: "Tiro Devanagari Hindi"; font-size: 32px; color: #2a251c; white-space: nowrap; }
+    .n-bl { position: absolute; left: 84px; font-family: "Rozha One"; font-size: 40px; line-height: 1; color: #16130e; }
+    .n-bv { position: absolute; left: 0; font-family: "Rozha One"; font-size: 40px; line-height: 1; color: #16130e; white-space: nowrap; }
+    #n-fact { position: absolute; left: 70px; top: 1196px; width: 940px; height: 104px; background: #f7f1e3; border: 4px solid #16130e; box-sizing: border-box; }
+    #n-fact .h { position: absolute; left: 0; top: 0; height: 96px; width: 150px; background: #16130e; color: #f7f1e3; font-family: "Rozha One"; font-size: 44px;
+                 line-height: 96px; text-align: center; }
+    #n-fact .b { position: absolute; left: 174px; top: 10px; font-family: "Tiro Devanagari Hindi"; font-size: 36px; line-height: 1.25; color: #16130e; white-space: nowrap; }
+    #n-fact .b b { font-family: "Rozha One"; font-weight: 400; color: #b3261e; }
+    #n-tick { position: absolute; left: 0; top: 1318px; width: 1080px; height: 150px; background: #16130e; border-top: 6px solid #b3261e; }
+    .n-cap { position: absolute; left: 50px; top: 1336px; width: 980px; text-align: center; font-family: "Tiro Devanagari Hindi"; font-size: 50px; line-height: 1.32;
+             color: #f3ecdc; text-wrap: balance; }
+    .n-cap span { display: inline-block; margin: 0 5px; padding: 0 2px; }
+    .n-cap .lat { font-family: "Playfair Display"; font-weight: 700; }
+  </style>
+  <div id="root" data-composition-id="paper" data-width="1080" data-height="1920">
+    <div id="n-page" data-layout-allow-overflow data-layout-allow-overlap>
+      <canvas id="n-cv" width="1080" height="1920"></canvas>
+      <div id="n-mast">दैनिक ब्याज</div>
+      <div class="n-date" style="left: 70px">शुक्रवार, 13 नवंबर 2026</div>
+      <div id="n-en">The Daily Compound</div>
+      <div class="n-date" style="right: 70px">अंक 72 · ₹2</div>
+      <div id="n-head">72 का नियम</div>
+      <div id="n-deck">पैसा कितने साल में दोगुना होगा?</div>
+      <div id="n-strip">72 ÷ <em>ब्याज दर</em> = साल</div>
+      <div id="n-chartT">दोगुना होने में कितने साल?</div>
+      <div id="n-b8" class="n-bl" style="top: 1068px">8%</div>
+      <div id="n-b3" class="n-bl" style="top: 1130px">3%</div>
+      <div id="n-v8" class="n-bv" style="top: 1068px">9 साल</div>
+      <div id="n-v3" class="n-bv" style="top: 1130px">24 साल</div>
+      <div id="n-fact"><div class="h">जाँच</div><div class="b">8% पर: नियम 9 साल, <span id="n-f1">असली <b>9.01</b> साल</span><br /><span id="n-f2">3% पर: नियम 24 साल, असली <b>23.45</b> साल</span></div></div>
+    </div>
+    <div id="n-tick"></div>
+
+    <div id="n-c1" class="n-cap"><span>आपका</span><span>पैसा,</span><span>कितने</span><span>साल</span><span>में</span><span>दोगुना</span><span>होगा?</span></div>
+    <div id="n-c2" class="n-cap"><span>एक</span><span>आसान</span><span>नियम</span><span>है:</span></div>
+    <div id="n-c3" class="n-cap"><span>बहत्तर</span><span>को,</span><span>ब्याज</span><span>दर</span><span>से</span><span>बाँटिए।</span></div>
+    <div id="n-c4" class="n-cap"><span>आठ</span><span>प्रतिशत</span><span>पर,</span><span>बहत्तर</span><span>बटा</span><span>आठ,</span><span>यानी</span><span>नौ</span><span>साल।</span></div>
+    <div id="n-c5" class="n-cap"><span>तीन</span><span>प्रतिशत</span><span>पर,</span><span>बहत्तर</span><span>बटा</span><span>तीन,</span><span>चौबीस</span><span>साल।</span></div>
+    <div id="n-c6" class="n-cap"><span>ये</span><span>तरीक़ा</span><span>सटीक</span><span>नहीं,</span><span>पर</span><span>बहुत</span><span>क़रीब</span><span>है।</span></div>
+    <div id="n-c7" class="n-cap"><span>आठ</span><span>प्रतिशत</span><span>पर,</span><span>असली</span><span>जवाब,</span><span>नौ</span><span>दशमलव</span><span>शून्य</span><span>एक</span><span>साल।</span></div>
+    <div id="n-c8" class="n-cap"><span>इसे</span><span>कहते</span><span>हैं,</span><span class="lat">Rule</span><span class="lat">of</span><span class="lat">72।</span></div>
+  </div>
+  <script>
+    (function () {
+      const V = 0.3;
+      // word onsets on the voice (patched after measuring); 58 words, captions in 8 groups
+      const W = [0.0, 0.28, 1.35, 1.64, 1.84, 1.96, 2.26, 3.35, 3.58, 3.84, 4.06, 4.8, 5.16, 5.75, 5.98, 6.2, 6.32, 7.284, 7.444, 7.784, 8.684, 8.924, 9.324, 9.984, 10.244, 10.434, 11.534, 11.734, 12.044, 12.834, 13.064, 13.484, 14.184, 14.404, 15.639, 15.799, 16.059, 16.399, 17.389, 17.499, 17.759, 18.039, 18.839, 19.019, 19.399, 20.139, 20.459, 20.719, 21.359, 21.999, 22.279, 22.439, 23.539, 23.759, 24.059, 24.739, 24.919, 25.059];
+      const VO_END = 25.67;
+      const GROUPS = [7, 4, 6, 9, 8, 8, 10, 6];
+      const t = (i) => W[i] + V;
+      const END = VO_END + V + 4.0;
+      const TAU = Math.PI * 2;
+      const EZ = { o2: gsap.parseEase("power2.out"), o3: gsap.parseEase("power3.out"), io2: gsap.parseEase("power2.inOut") };
+      const pr = (tt, t0, d, ez) => { const p = Math.min(1, Math.max(0, (tt - t0) / d)); return ez ? ez(p) : p; };
+      let seed = 72;
+      const rnd = () => { seed |= 0; seed = (seed + 0x6d2b79f5) | 0; let x = Math.imul(seed ^ (seed >>> 15), 1 | seed); x = (x + Math.imul(x ^ (x >>> 7), 61 | x)) ^ x; return ((x ^ (x >>> 14)) >>> 0) / 4294967296; };
+
+      // ---- the newsprint itself: fibres, foxing, a fold, double rules, two columns of type (drawn once)
+      const sheet = document.createElement("canvas"); sheet.width = 1080; sheet.height = 1920;
+      (() => {
+        const b = sheet.getContext("2d");
+        b.fillStyle = "#ece4d2"; b.fillRect(0, 0, 1080, 1920);
+        for (let i = 0; i < 2600; i++) { b.strokeStyle = `rgba(90,70,40,${(0.03 + rnd() * 0.05).toFixed(3)})`; b.lineWidth = 0.8; const x = rnd() * 1080, y = rnd() * 1920, a = rnd() * TAU, l = 4 + rnd() * 14;
+          b.beginPath(); b.moveTo(x, y); b.lineTo(x + l * Math.cos(a), y + l * Math.sin(a)); b.stroke(); }
+        for (let i = 0; i < 40; i++) { const x = rnd() * 1080, y = rnd() * 1920, r = 10 + rnd() * 50, g = b.createRadialGradient(x, y, 0, x, y, r);
+          g.addColorStop(0, "rgba(150,110,50,0.06)"); g.addColorStop(1, "rgba(150,110,50,0)"); b.fillStyle = g; b.fillRect(x - r, y - r, 2 * r, 2 * r); }
+        const v = b.createRadialGradient(540, 900, 300, 540, 900, 1250); v.addColorStop(0, "rgba(120,90,40,0)"); v.addColorStop(1, "rgba(120,90,40,0.22)"); b.fillStyle = v; b.fillRect(0, 0, 1080, 1920);
+        const fold = b.createLinearGradient(0, 948, 0, 972); fold.addColorStop(0, "rgba(60,45,20,0)"); fold.addColorStop(0.5, "rgba(60,45,20,0.12)"); fold.addColorStop(1, "rgba(255,250,235,0.18)");
+        b.fillStyle = fold; b.fillRect(0, 948, 1080, 24);
+        b.fillStyle = "#16130e";
+        [[288, 4], [296, 1.5], [350, 1.5], [356, 4], [668, 2]].forEach(([y, h]) => b.fillRect(60, y, 960, h));
+        b.fillRect(538, 690, 2, 600);
+        for (const [x0, x1] of [[60, 520], [560, 1020]]) {
+          for (let y = 700; y < 1300; y += 24) { const end = rnd() < 0.12 ? x0 + (x1 - x0) * (0.3 + rnd() * 0.5) : x1; b.fillStyle = "rgba(60,52,40,0.32)";
+            for (let x = x0; x < end - 10;) { const w = 18 + rnd() * 70; b.fillRect(x, y, Math.min(w, end - x), 8); x += w + 8; } }
+        }
+      })();
+      const main = document.getElementById("n-cv").getContext("2d");
+      const ink = document.createElement("canvas"); ink.width = 1080; ink.height = 1920;
+      let cx = main;                                                     // stamps are inked on their own layer, then pressed onto the paper
+      // a rubber stamp: ink with gaps where the rubber did not touch the paper
+      const stampNoise = []; for (let i = 0; i < 420; i++) stampNoise.push([rnd(), rnd(), 0.7 + rnd() * 2.2]);
+      const stamp = (lines, x, y, w, h, rot, col, p) => {
+        if (p <= 0) return;
+        const s = 1 + 0.5 * (1 - EZ.o3(Math.min(1, p))), a = Math.min(1, p * 2.5) * 0.9;
+        cx.save(); cx.translate(x, y); cx.rotate(rot); cx.scale(s, s); cx.globalAlpha = a;
+        cx.strokeStyle = col; cx.lineWidth = 7; cx.beginPath(); cx.roundRect(-w / 2, -h / 2, w, h, 16); cx.stroke();
+        cx.lineWidth = 2.5; cx.beginPath(); cx.roundRect(-w / 2 + 12, -h / 2 + 12, w - 24, h - 24, 10); cx.stroke();
+        cx.fillStyle = col; cx.textAlign = "center"; cx.textBaseline = "middle";
+        lines.forEach(([txt, size, dy]) => { cx.font = `${size}px "Rozha One"`; cx.fillText(txt, 0, dy); });
+        cx.globalAlpha = 1;
+        cx.globalCompositeOperation = "destination-out";
+        stampNoise.forEach(([u, v, r]) => { cx.beginPath(); cx.arc(-w / 2 + u * w, -h / 2 + v * h, r, 0, TAU); cx.fill(); });
+        cx.restore();
+      };
+      const seal = (x, y, rot, p) => {
+        if (p <= 0) return;
+        const s = 1 + 0.6 * (1 - EZ.o3(Math.min(1, p)));
+        cx.save(); cx.translate(x, y); cx.rotate(rot); cx.scale(s, s); cx.globalAlpha = Math.min(1, p * 2.5) * 0.92;
+        cx.strokeStyle = "#b3261e"; cx.fillStyle = "#b3261e"; cx.lineWidth = 7; cx.beginPath(); cx.arc(0, 0, 104, 0, TAU); cx.stroke();
+        cx.lineWidth = 2.5; cx.beginPath(); cx.arc(0, 0, 90, 0, TAU); cx.stroke();
+        cx.textAlign = "center"; cx.textBaseline = "middle"; cx.font = '900 40px "Playfair Display"'; cx.fillText("RULE", 0, -34); cx.fillText("OF", 0, 4);
+        cx.font = '900 64px "Playfair Display"'; cx.fillText("72", 0, 52);
+        cx.globalCompositeOperation = "destination-out";
+        stampNoise.forEach(([u, v, r], i) => { if (i % 2) { cx.beginPath(); cx.arc(-104 + u * 208, -104 + v * 208, r, 0, TAU); cx.fill(); } });
+        cx.restore();
+      };
+      // halftone bars: dots on a 12 px grid, laid down left to right
+      const BAR = { x: 170, w8: 9 * 28, w3: 24 * 28 };
+      const halftone = (x, y, w, h, p, col) => {
+        cx.fillStyle = col;
+        for (let gx = 0; gx < w * p; gx += 12) for (let gy = 0; gy < h; gy += 12) { const r = 4.6 - 1.2 * Math.abs((gy + 6) / h - 0.5); cx.beginPath(); cx.arc(x + gx + 6, y + gy + 6, r, 0, TAU); cx.fill(); }
+      };
+
+      const P = { time: 0 };
+      const draw = () => {
+        const tt = P.time;
+        cx = main; cx.globalAlpha = 1; cx.globalCompositeOperation = "source-over"; cx.drawImage(sheet, 0, 0);
+        // the chart panel
+        const ch = pr(tt, t(17) - 0.3, 0.3);
+        if (ch > 0) {
+          cx.globalAlpha = ch; cx.fillStyle = "#f7f1e3"; cx.fillRect(70, 1008, 940, 178); cx.strokeStyle = "#16130e"; cx.lineWidth = 3; cx.strokeRect(70, 1008, 940, 178); cx.globalAlpha = 1;
+          halftone(BAR.x, 1062, BAR.w8, 48, pr(tt, t(19), t(25) - t(19), EZ.io2), "#16130e");
+          halftone(BAR.x, 1124, BAR.w3, 48, pr(tt, t(28), t(33) - t(28), EZ.io2), "#16130e");
+        }
+        const ic = ink.getContext("2d"); ic.setTransform(1, 0, 0, 1, 0, 0); ic.globalCompositeOperation = "source-over"; ic.globalAlpha = 1; ic.clearRect(0, 0, 1080, 1920);
+        cx = ic;
+        stamp([["72 ÷ 8 = 9", 80, -12], ["साल", 40, 44]], 290, 932, 390, 136, -0.1, "#b3261e", pr(tt, t(24) - 0.2, 0.16));
+        stamp([["72 ÷ 3 = 24", 76, -12], ["साल", 40, 44]], 800, 932, 420, 136, 0.08, "#1f4e8c", pr(tt, t(32) - 0.2, 0.16));
+        seal(948, 522, 0.22, pr(tt, t(55) - 0.06, 0.16));
+        cx = main; main.globalAlpha = 1; main.globalCompositeOperation = "multiply"; main.drawImage(ink, 0, 0); main.globalCompositeOperation = "source-over";
+      };
+      draw();
+
+      const tl = gsap.timeline({ paused: true });
+      tl.to(P, { time: END, duration: END, ease: "none", onUpdate: draw }, 0);
+      gsap.set(["#n-strip", "#n-chartT", "#n-b8", "#n-b3", "#n-v8", "#n-v3", "#n-fact", "#n-f1", "#n-f2", "#n-tick", ".n-cap"], { opacity: 0 });
+      // the newsreel spin: the front page whirls in from the dark and lands
+      tl.fromTo("#n-page", { rotation: -600, scale: 0.06 }, { rotation: 0, scale: 1, duration: 1.15, ease: "power3.out", transformOrigin: "50% 42%" }, 0);
+      tl.fromTo("#n-tick", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, 1.0);
+      // the rule, pasted in as a clipping
+      tl.fromTo("#n-strip", { opacity: 0, scale: 1.25, rotation: -6 }, { opacity: 1, scale: 1, rotation: -2, duration: 0.3, ease: "back.out(1.6)" }, t(11) - 0.1);
+      tl.fromTo("#n-chartT", { opacity: 0 }, { opacity: 1, duration: 0.25 }, t(17) - 0.2);
+      tl.fromTo("#n-b8", { opacity: 0 }, { opacity: 1, duration: 0.2 }, t(17));
+      tl.fromTo("#n-v8", { opacity: 0, x: BAR.x + BAR.w8 + 18 }, { opacity: 1, duration: 0.2 }, t(25));
+      tl.fromTo("#n-b3", { opacity: 0 }, { opacity: 1, duration: 0.2 }, t(26));
+      tl.fromTo("#n-v3", { opacity: 0, x: BAR.x + BAR.w3 + 18 }, { opacity: 1, duration: 0.2 }, t(33));
+      // the check: close, not exact
+      tl.fromTo("#n-fact", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, t(34));
+      tl.fromTo("#n-f1", { opacity: 0 }, { opacity: 1, duration: 0.25 }, t(47));
+      tl.fromTo("#n-f2", { opacity: 0 }, { opacity: 1, duration: 0.3 }, t(51) + 0.2);
+
+      // ticker captions: the line in newsprint white, the spoken word underlined in red
+      let i0 = 0;
+      GROUPS.forEach((n, g) => {
+        const id = "#n-c" + (g + 1), spans = document.querySelectorAll(id + " span");
+        tl.fromTo(id, { opacity: 0 }, { opacity: 1, duration: 0.1 }, Math.max(1.1, t(i0) - 0.1));
+        tl.to(id, { opacity: 0, duration: 0.07 }, g < GROUPS.length - 1 ? t(i0 + n) - 0.19 : VO_END + V + 0.4);
+        for (let k = 0; k < n; k++) {
+          tl.set(spans[k], { boxShadow: "inset 0 -8px 0 #b3261e" }, t(i0 + k));
+          if (k > 0) tl.set(spans[k - 1], { boxShadow: "inset 0 0 0 rgba(179,38,30,0)" }, t(i0 + k));
+        }
+        i0 += n;
+      });
+
+      window.__timelines["paper"] = tl;
+    })();
+  </script>
+</template>

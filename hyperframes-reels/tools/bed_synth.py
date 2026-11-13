@@ -2,6 +2,9 @@
 usage: python3 bed_synth.py <style> <seconds> <out.wav> [--hit SECONDS]
 styles: pop (UI, 112 bpm, C major) | marimba (curious ostinato, 96 bpm, D dorian) | pulse (confident, 100 bpm, A minor)
         | space (slow pads, 76 bpm, E minor) | tiles (bouncy marimba groove, 104 bpm, F major)
+        | synthwave (pumping saw pad, arp with echoes, gated snare, 92 bpm, A minor)
+        | lofi (Rhodes 9th chords, swung soft drums, vinyl crackle, 78 bpm, D dorian)
+        | newsreel (stride/ragtime piano and brushes through an old-radio band-pass, 116 bpm, C major)
 --hit puts a riser into a final hit at that time (the end card), then a soft tail."""
 import argparse
 import numpy as np
@@ -91,6 +94,49 @@ def impact(g=1.0):
     return g * s
 
 
+def saw(m, dur, g=1.0, cut=2500, dec=None):
+    n = int(dur * SR); t = t_(n); s = np.zeros(n)
+    for c in (-9, 0, 9):
+        f = hz(m) * 2 ** (c / 1200); s += 2 * (((f * t + rng.uniform(0, 1)) % 1.0) - 0.5)
+    env = np.minimum(1, t / 0.005) * np.minimum(1, np.maximum(0, dur - t) / 0.03)
+    if dec: env = env * np.exp(-t * dec)
+    return g * lp(s / 3, cut) * env
+
+
+def square(m, dur, g=1.0, cut=3200):
+    n = int(dur * SR); t = t_(n); f = hz(m); x = np.sin(2 * np.pi * f * t)
+    return g * lp(0.6 * np.sign(x) + 0.4 * x, cut) * np.exp(-t * 7) * np.minimum(1, t / 0.003)
+
+
+def snare(g=1.0):
+    n = int(0.32 * SR); t = t_(n)
+    s = bp(rng.standard_normal(n), 1500, 7000) * np.exp(-t * 16) + 0.5 * np.sin(2 * np.pi * 185 * t) * np.exp(-t * 26)
+    return g * 0.6 * s
+
+
+def brush(g=1.0):
+    n = int(0.22 * SR); t = t_(n); return g * 0.35 * bp(rng.standard_normal(n), 2000, 9000) * np.exp(-t * 14) * np.minimum(1, t / 0.02)
+
+
+def epiano(m, dur, g=1.0):
+    n = int(dur * SR); t = t_(n); f = hz(m)
+    s = np.sin(2 * np.pi * f * t) * np.exp(-t * 1.5) + 0.25 * np.sin(2 * np.pi * f * 2 * t) * np.exp(-t * 3) + 0.16 * np.sin(2 * np.pi * f * 7.1 * t) * np.exp(-t * 14)
+    return g * s * (1 + 0.12 * np.sin(2 * np.pi * 4.5 * t)) * np.minimum(1, t / 0.004) * np.minimum(1, np.maximum(0, dur - t) / 0.08)
+
+
+def piano(m, dur, g=1.0):
+    n = int(dur * SR); t = t_(n); f = hz(m); s = np.zeros(n)
+    for h in range(1, 9):
+        s += (0.78 ** h) * np.sin(2 * np.pi * f * h * np.sqrt(1 + 0.0004 * h * h) * t + rng.uniform(0, 6.28)) * np.exp(-t * (1.4 + 0.9 * h))
+    s += 0.12 * hp(rng.standard_normal(n), 2000) * np.exp(-t * 60)
+    return g * s * np.minimum(1, t / 0.002) * np.minimum(1, np.maximum(0, dur - t) / 0.05)
+
+
+def crackle(n, g=1.0):
+    x = np.zeros(n); k = rng.integers(0, n, int(n / SR * 16)); x[k] = rng.uniform(-1, 1, len(k)) * rng.uniform(0.2, 1, len(k))
+    return g * (0.5 * hp(x, 1000) + 0.02 * bp(rng.standard_normal(n), 800, 6000))
+
+
 def reverb(x, sec=1.8, mix=0.22):
     n = int(sec * SR); ir = rng.standard_normal(n) * np.exp(-t_(n) * 4.2); ir = lp(ir, 5000); ir /= np.sqrt(np.sum(ir ** 2))
     wet = fftconvolve(x, ir)[: len(x)]
@@ -110,6 +156,15 @@ def build(style, seconds, hit):
         arp = [0, 2, 1, 2]
     elif style == "tiles":
         bpm, prog = 104, [(41, (65, 69, 72)), (38, (62, 65, 69)), (46, (62, 65, 70)), (48, (64, 67, 72))]  # F Dm Bb C
+        arp = [0, 1, 2, 1]
+    elif style == "synthwave":
+        bpm, prog = 92, [(45, (57, 60, 64)), (41, (57, 60, 65)), (48, (60, 64, 67)), (43, (59, 62, 67))]   # Am F C G
+        arp = [0, 1, 2, 1]
+    elif style == "lofi":
+        bpm, prog = 78, [(38, (60, 65, 69, 72)), (43, (59, 64, 65, 69)), (36, (59, 62, 64, 67)), (45, (60, 64, 67, 71))]  # Dm9 G13 Cmaj9 Am9
+        arp = [0, 1, 2, 3]
+    elif style == "newsreel":
+        bpm, prog = 116, [(48, (64, 67, 72)), (45, (61, 64, 67)), (50, (60, 66, 69)), (43, (59, 65, 67))]   # C A7 D7 G7
         arp = [0, 1, 2, 1]
     else:
         bpm, prog = 100, [(45, (57, 60, 64)), (41, (57, 60, 65)), (48, (60, 64, 67)), (43, (59, 62, 67))]   # Am F C G
@@ -161,6 +216,38 @@ def build(style, seconds, hit):
             if b >= 1:
                 place(dry, kick(0.3), t0); place(dry, kick(0.3), t0 + 2 * beat)
             if b >= 2: place(wet_in, clap(0.28), t0 + 3 * beat)
+        elif style == "synthwave":
+            p = pad(chord, bar + 0.1, 0.16, 2600); tp = t_(len(p))
+            place(wet_in, p * (1 - 0.65 * np.exp(-((tp % beat) / 0.12))), t0)          # pumps on every beat
+            for k in range(8): place(dry, saw(root - 12, beat / 2 * 0.9, 0.13, 700, 2.0), t0 + k * beat / 2)
+            if b >= 1:
+                for k in range(16):
+                    m = chord[arp[k % 4]] + (24 if (k // 4) % 2 else 12); at = t0 + k * beat / 4
+                    place(wet_in, square(m, 0.22, 0.07), at); place(wet_in, square(m, 0.22, 0.03), at + 0.75 * beat); place(wet_in, square(m, 0.22, 0.012), at + 1.5 * beat)
+            for k in range(4):
+                if b >= 1 and not build_up: place(dry, kick(0.34), t0 + k * beat)
+                if b >= 1 and k in (1, 3) and not build_up: place(wet_in, snare(0.42), t0 + k * beat)
+            for k in range(8):
+                if b >= 1: place(dry, hat(0.32 if k % 2 else 0.12, 60), t0 + k * beat / 2)
+        elif style == "lofi":
+            sw = beat / 2 * 0.62                                                     # swung eighths
+            for j, m in enumerate(chord): place(wet_in, epiano(m, bar * 0.95, 0.07), t0 + 0.025 * j)
+            for j, m in enumerate(chord[1:]): place(wet_in, epiano(m + 12, beat * 1.2, 0.035), t0 + 2 * beat + sw + 0.02 * j)
+            place(dry, sub(root - 12, beat * 1.6, 0.12), t0); place(dry, sub(root - 12, beat * 0.8, 0.09), t0 + beat + sw)
+            if b >= 1:
+                place(dry, kick(0.26), t0); place(dry, kick(0.2), t0 + 2 * beat + sw)
+                for k in (1, 3): place(wet_in, snare(0.16), t0 + k * beat)
+                for k in range(4): place(dry, hat(0.16, 120), t0 + k * beat); place(dry, hat(0.09, 120), t0 + k * beat + sw)
+        elif style == "newsreel":
+            fifth = root + 7
+            for k in range(4):
+                if k % 2 == 0: place(dry, piano((root if k == 0 else fifth) - 12, beat * 0.9, 0.16), t0 + k * beat)
+                else:
+                    for m in chord: place(dry, piano(m - 12, beat * 0.5, 0.06), t0 + k * beat)
+                place(dry, brush(0.5 if k % 2 else 0.25), t0 + k * beat)
+            rhythm = [1, 0, 1, 1, 0, 1, 0, 1]
+            for k in range(8):
+                if rhythm[k] and b >= 1: place(dry, piano(chord[(k + b) % 3] + 12, beat * 0.45, 0.08), t0 + k * beat / 2)
         else:
             place(wet_in, pad(chord, bar + 0.4, 0.11, 2200), t0)
             for k in range(8):
@@ -176,6 +263,8 @@ def build(style, seconds, hit):
         root, chord = prog[0]
         place(wet_in, pad(chord, 3.2, 0.12, 2500), hit)
     mix = dry + reverb(wet_in)
+    if style == "lofi": mix = lp(mix, 3600) + crackle(len(mix), 0.05)
+    if style == "newsreel": mix = bp(mix, 260, 3800) * 1.6 + crackle(len(mix), 0.07)
     mix = mix[: int(seconds * SR)]
     f = int(1.2 * SR); mix[-f:] *= np.linspace(1, 0, f) ** 1.5
     return 0.89 * mix / (np.abs(mix).max() + 1e-9)

@@ -1,0 +1,204 @@
+<template>
+  <style>
+    @font-face { font-family: "Yatra One"; src: url("assets/fonts/YatraOne.ttf"); }
+    @font-face { font-family: "Noto Sans Devanagari"; font-weight: 700; src: url("assets/fonts/NotoSansDevanagari_700Bold.ttf"); }
+    @font-face { font-family: "Poppins"; font-weight: 700; src: url("assets/fonts/Poppins_700Bold.ttf"); }
+    @font-face { font-family: "Poppins"; font-weight: 600; src: url("assets/fonts/Poppins_600SemiBold.ttf"); }
+    #root { position: absolute; inset: 0; background: #f7f7f3; overflow: hidden; }
+    #r-cv { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #r-title { position: absolute; left: 70px; top: 232px; font-family: "Yatra One"; font-size: 104px; line-height: 1.1; color: #12221f; white-space: nowrap; }
+    .r-row { position: absolute; left: 150px; width: 780px; height: 64px; white-space: nowrap; font-family: "Noto Sans Devanagari"; font-weight: 700; font-size: 44px;
+             line-height: 64px; color: #12221f; }
+    .r-row i { display: inline-block; width: 30px; height: 30px; border-radius: 50%; border: 4px solid #12221f; margin-right: 18px; vertical-align: -2px; }
+    .r-row .lat { font-family: "Poppins"; }
+    .r-row b { position: absolute; right: 0; top: 0; font-family: "Poppins"; font-weight: 700; font-variant-numeric: tabular-nums; }
+    #r-w { background: #ffd23f; border-radius: 14px; }
+    #r-w b { right: 18px; }
+    #r-note { position: absolute; left: 0; top: 1258px; width: 1080px; text-align: center; font-family: "Noto Sans Devanagari"; font-weight: 700; font-size: 30px;
+              color: #4b5b58; white-space: nowrap; }
+    .r-tag { position: absolute; left: 0; top: 0; padding: 0 16px; background: #ffffff; border: 4px solid #12221f; border-radius: 16px; font-family: "Noto Sans Devanagari";
+             font-weight: 700; font-size: 40px; line-height: 1.35; color: #12221f; white-space: nowrap; }
+    #r-clock { position: absolute; left: 0; top: 1010px; width: 1080px; text-align: center; white-space: nowrap; }
+    #r-clock span { display: inline-block; padding: 4px 32px 8px; background: #ffffff; border: 5px solid #12221f; border-radius: 22px; font-family: "Poppins";
+                    font-weight: 700; font-size: 66px; line-height: 1.2; color: #12221f; font-variant-numeric: tabular-nums; }
+    .r-cap { position: absolute; left: 60px; top: 1330px; width: 960px; text-align: center; font-family: "Noto Sans Devanagari"; font-weight: 700; font-size: 46px;
+             line-height: 1.3; color: #12221f; text-wrap: balance; }
+    .r-cap span { display: inline-block; padding: 0 8px; margin: 0 1px; border-radius: 8px; opacity: 0.4; }
+    .r-cap .lat { font-family: "Poppins"; }
+  </style>
+  <div id="root" data-composition-id="brachisto" data-width="1080" data-height="1920">
+    <canvas id="r-cv" width="1080" height="1920"></canvas>
+    <div id="r-title">सबसे तेज़ रास्ता</div>
+    <div id="r-short" class="r-tag">सबसे कम दूरी</div>
+    <div id="r-w" class="r-row" style="top: 1040px"><i style="background: #0b7f79"></i><span class="lat">cycloid</span> <b id="r-t0">0.00 s</b></div>
+    <div id="r-r2" class="r-row" style="top: 1110px"><i style="background: #a07812"></i>गोल चाप <b id="r-t1">0.00 s</b></div>
+    <div id="r-r3" class="r-row" style="top: 1180px"><i style="background: #c4553a"></i>सरल रेखा <b id="r-t2">0.00 s</b></div>
+    <div id="r-note">10 m चौड़ा, 4 m गहरा, बिना घर्षण</div>
+    <div id="r-clock"><span id="r-ct">0.00 s</span></div>
+
+    <div id="r-c1" class="r-cap"><span>ऊपर</span><span>से</span><span>नीचे</span><span>तक,</span><span>सबसे</span><span>तेज़</span><span>रास्ता</span><span>कौन</span><span>सा</span><span>है?</span></div>
+    <div id="r-c2" class="r-cap"><span>सरल</span><span>रेखा?</span><span>उसमें</span><span>दूरी</span><span>तो</span><span>सबसे</span><span>कम</span><span>है।</span></div>
+    <div id="r-c3" class="r-cap"><span>पर</span><span>दौड़</span><span>कराइए…</span></div>
+    <div id="r-c4" class="r-cap"><span>और</span><span>ये</span><span>मुड़ा</span><span>हुआ</span><span>रास्ता</span><span>जीत</span><span>जाता</span><span>है!</span></div>
+    <div id="r-c5" class="r-cap"><span>शुरू</span><span>में</span><span>तेज़ी</span><span>से</span><span>गिरिए,</span><span>तो</span><span>रफ़्तार</span><span>जल्दी</span><span>बनती</span><span>है।</span></div>
+    <div id="r-c6" class="r-cap"><span>इसे</span><span>कहते</span><span>हैं,</span><span class="lat">cycloid।</span></div>
+    <div id="r-c7" class="r-cap"><span>और</span><span>कमाल</span><span>देखिए:</span></div>
+    <div id="r-c8" class="r-cap"><span>इस</span><span>रास्ते</span><span>पर,</span><span>गेंदें</span><span>कहीं</span><span>से</span><span>भी</span><span>चलें,</span></div>
+    <div id="r-c9" class="r-cap"><span>नीचे</span><span>एक</span><span>ही</span><span>पल</span><span>में</span><span>पहुँचती</span><span>हैं!</span></div>
+  </div>
+  <script>
+    (function () {
+      const V = 0.3;
+      // word onsets on the voice (patched after measuring); 61 words, captions in 9 groups
+      const W = [0.0, 0.2, 0.34, 0.58, 1.9, 2.24, 2.46, 2.82, 3.06, 3.24, 4.2, 4.48, 5.75, 6.02, 6.26, 6.36, 6.62, 6.8, 7.512, 7.632, 7.852, 8.762, 8.872, 8.972, 9.232, 9.392, 9.732, 9.912, 10.232, 10.812, 11.112, 11.252, 11.512, 11.652, 12.412, 12.532, 12.852, 13.112, 13.392, 14.362, 14.572, 14.832, 15.212, 16.379, 16.499, 16.779, 17.629, 17.819, 18.139, 18.929, 19.259, 19.429, 19.579, 19.729, 20.629, 20.939, 21.159, 21.239, 21.399, 21.519, 21.939];
+      const VO_END = 22.14;
+      const GROUPS = [10, 8, 3, 8, 10, 4, 3, 8, 7];
+      const t = (i) => W[i] + V;
+      const END = VO_END + V + 3.2;
+      const TAU = Math.PI * 2, G = 9.81;
+      const EZ = { o2: gsap.parseEase("power2.out"), io2: gsap.parseEase("power2.inOut"), back: gsap.parseEase("back.out(2)") };
+      const pr = (tt, t0, d, ez) => { const p = Math.min(1, Math.max(0, (tt - t0) / d)); return ez ? ez(p) : p; };
+
+      // ---- the race: A to B is 10 m across and 4 m down, frictionless; times come from the physics, not from a stopwatch prop
+      const DX = 10, DY = 4, S = 88, AX = 100, AY = 480;
+      const scr = (x, y) => [AX + S * x, AY + S * y];
+      // cycloid through A and B: x = r(θ − sin θ), y = r(1 − cos θ); solve for θ_B, then θ(t) = t·√(g/r)
+      let lo = 0.5, hi = 6.2;
+      for (let i = 0; i < 80; i++) { const m = (lo + hi) / 2, f = (m - Math.sin(m)) / (1 - Math.cos(m)) - DX / DY; if (f > 0) hi = m; else lo = m; }
+      const THB = (lo + hi) / 2, RC = DY / (1 - Math.cos(THB)), T_CY = THB * Math.sqrt(RC / G);
+      // straight line: s = ½ g sinα t²
+      const LEN = Math.hypot(DX, DY), SINA = DY / LEN, T_LN = Math.sqrt((2 * LEN) / (G * SINA));
+      // circular arc starting straight down at A (centre on A's level): time table by integrating ds / √(2gy)
+      const RA = (DX * DX + DY * DY) / (2 * DX), PHB = Math.atan2(DY, RA - DX) < 0 ? Math.atan2(DY, RA - DX) + TAU : Math.PI - Math.atan2(DY, DX - RA);
+      const ARC = [], AT = [0];
+      for (let i = 0; i <= 4000; i++) { const u = i / 4000, ph = PHB * u * u; ARC.push([RA - RA * Math.cos(ph), RA * Math.sin(ph)]); }
+      for (let i = 1; i <= 4000; i++) { const a = ARC[i - 1], b = ARC[i], ym = (a[1] + b[1]) / 2; AT.push(AT[i - 1] + Math.hypot(b[0] - a[0], b[1] - a[1]) / Math.sqrt(2 * G * ym)); }
+      const T_AR = AT[4000];
+      const posLine = (tt) => { const s = Math.min(LEN, 0.5 * G * SINA * tt * tt); return scr((DX * s) / LEN, (DY * s) / LEN); };
+      const posCyc = (tt) => { const th = Math.min(THB, tt * Math.sqrt(G / RC)); return scr(RC * (th - Math.sin(th)), RC * (1 - Math.cos(th))); };
+      const posArc = (tt) => {
+        if (tt >= T_AR) return scr(DX, DY);
+        let l = 0, h = 4000; while (h - l > 1) { const m = (l + h) >> 1; if (AT[m] <= tt) l = m; else h = m; }
+        const f = (tt - AT[l]) / (AT[h] - AT[l] || 1), a = ARC[l], b = ARC[h]; return scr(a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f);
+      };
+      const TRACK = [
+        { col: "#0b7f79", T: T_CY, pos: posCyc, path: () => { const p = []; for (let i = 0; i <= 200; i++) { const th = (THB * i) / 200; p.push(scr(RC * (th - Math.sin(th)), RC * (1 - Math.cos(th)))); } return p; } },
+        { col: "#a07812", T: T_AR, pos: posArc, path: () => ARC.filter((_, i) => i % 20 === 0).concat([[DX, DY]]).map(([x, y]) => scr(x, y)) },
+        { col: "#c4553a", T: T_LN, pos: posLine, path: () => [scr(0, 0), scr(DX, DY)] },
+      ];
+      TRACK.forEach((k) => (k.pts = k.path()));
+      ["#r-t0", "#r-t1", "#r-t2"].forEach((id, i) => (document.querySelector(id).textContent = TRACK[i].T.toFixed(2) + " s"));
+
+      // ---- the twist: on a cycloid bowl (same r), every ball reaches the bottom after π·√(r/g), wherever it starts
+      const SB = 64, BX = 540, BY = 900, OM = Math.sqrt(G / (4 * RC)), T_TAU = Math.PI / (2 * OM);
+      const bowl = (ph) => [BX + SB * RC * (ph + Math.sin(ph)), BY - SB * RC * (1 - Math.cos(ph))];
+      const START = [-2.75, -2.05, -1.35, -0.65], BCOL = ["#0b7f79", "#a07812", "#c4553a", "#12221f"];
+
+      // ---- timing
+      const RACE = () => t(26) - T_CY;          // the cycloid ball crosses B on "जीत"
+      const STROBE = () => t(29) - 0.1, SLOW = 0.75;
+      const ROLL = () => t(39) - 0.15, ROLL_D = 1.7;
+      const SCN2 = () => t(43) - 0.1;
+      const REL = () => t(56) - T_TAU;          // the four balls reach the bottom on "ही"
+
+      const cv = document.getElementById("r-cv"), cx = cv.getContext("2d");
+      const ct = document.getElementById("r-ct");
+      const ball = (p, col, s) => { if (s <= 0) return; cx.fillStyle = col; cx.strokeStyle = "#12221f"; cx.lineWidth = 4; cx.beginPath(); cx.arc(p[0], p[1], 17 * s, 0, TAU); cx.fill(); cx.stroke(); };
+      const poly = (pts, upto) => { cx.beginPath(); cx.moveTo(pts[0][0], pts[0][1]); const n = Math.floor(upto); for (let i = 1; i <= n && i < pts.length; i++) cx.lineTo(pts[i][0], pts[i][1]);
+        if (upto > n && n + 1 < pts.length) { const a = pts[n], b = pts[n + 1], f = upto - n; cx.lineTo(a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f); } };
+      const P = { time: 0 };
+      const draw = () => {
+        const tt = P.time;
+        cx.clearRect(0, 0, 1080, 1920);
+        const s1 = 1 - pr(tt, SCN2(), 0.35);
+        if (s1 > 0) {
+          cx.globalAlpha = s1;
+          // tracks: the line first, then the arc and the cycloid when the race is called
+          const reveal = [pr(tt, t(17) + 0.2, 0.45, EZ.io2), pr(tt, t(17) + 0.05, 0.45, EZ.io2), pr(tt, t(10) - 0.1, 0.45, EZ.io2)];
+          TRACK.forEach((k, i) => { if (reveal[i] <= 0) return; cx.strokeStyle = k.col; cx.lineWidth = 7; cx.lineCap = "round"; cx.lineJoin = "round"; poly(k.pts, reveal[i] * (k.pts.length - 1)); cx.stroke(); });
+          // A and B
+          const a = pr(tt, t(0) - 0.1, 0.3, EZ.back), b = pr(tt, t(2) - 0.1, 0.3, EZ.back);
+          cx.font = "700 46px Poppins"; cx.textAlign = "center"; cx.textBaseline = "middle";
+          if (a > 0) { cx.fillStyle = "#12221f"; cx.beginPath(); cx.arc(AX, AY, 12 * a, 0, TAU); cx.fill(); cx.fillText("A", AX, AY - 50 * a); cx.fillRect(AX - 46, AY - 3, 46 * a, 6); }
+          if (b > 0) { const [x, y] = scr(DX, DY); cx.fillStyle = "#12221f"; cx.beginPath(); cx.arc(x, y, 12 * b, 0, TAU); cx.fill(); cx.fillText("B", x + 6, y - 50 * b); cx.fillRect(x, y - 3, 46 * b, 6); }
+          // stroboscopic replay: where each ball was every 0.15 s, at a little over half speed
+          const sr = (tt - STROBE()) * SLOW, sA = 1 - pr(tt, ROLL() - 0.3, 0.3);
+          if (sr > 0 && sA > 0) {
+            TRACK.forEach((k) => { for (let q = 0; q <= Math.min(sr, k.T) + 1e-6; q += 0.15) { const p = k.pos(q); cx.globalAlpha = s1 * sA * 0.85; cx.fillStyle = k.col; cx.beginPath(); cx.arc(p[0], p[1], 10, 0, TAU); cx.fill(); } });
+            cx.globalAlpha = s1;
+          }
+          // the race itself (balls sit at A until the start, then roll; after the replay they rest at B)
+          const rt = tt - RACE(), showBalls = pr(tt, t(18) - 0.1, 0.3, EZ.back);
+          if (sr <= 0 || sA <= 0) TRACK.forEach((k) => ball(k.pos(Math.max(0, rt)), k.col, showBalls));
+          else TRACK.forEach((k) => ball(k.pos(Math.min(sr, k.T)), k.col, 1));
+          // the wheel: a point on a rolling circle traces the cycloid
+          const rp = pr(tt, ROLL(), ROLL_D, EZ.io2), rA = 1 - pr(tt, SCN2() - 0.4, 0.3);
+          if (rp > 0 && rA > 0) {
+            const th = THB * rp, cxw = AX + S * RC * th, cyw = AY + S * RC, px = AX + S * RC * (th - Math.sin(th)), py = AY + S * RC * (1 - Math.cos(th));
+            cx.globalAlpha = s1 * rA;
+            cx.setLineDash([14, 12]); cx.strokeStyle = "#12221f"; cx.lineWidth = 3; cx.beginPath(); cx.moveTo(AX, AY); cx.lineTo(1040, AY); cx.stroke(); cx.setLineDash([]);
+            cx.strokeStyle = "#12221f"; cx.lineWidth = 4; cx.beginPath(); cx.arc(cxw, cyw, S * RC, 0, TAU); cx.stroke();
+            cx.beginPath(); cx.moveTo(cxw, cyw); cx.lineTo(px, py); cx.stroke();
+            cx.strokeStyle = "#ffd23f"; cx.lineWidth = 12; cx.beginPath();
+            for (let i = 0; i <= 120; i++) { const q = (th * i) / 120, x = AX + S * RC * (q - Math.sin(q)), y = AY + S * RC * (1 - Math.cos(q)); if (i === 0) cx.moveTo(x, y); else cx.lineTo(x, y); }
+            cx.stroke();
+            ball([px, py], "#ffd23f", 0.75);
+            cx.globalAlpha = 1;
+          }
+          cx.globalAlpha = 1;
+        }
+        // scene two: the cycloid bowl
+        const s2 = pr(tt, SCN2() + 0.2, 0.5, EZ.io2);
+        if (s2 > 0) {
+          cx.strokeStyle = "#0b7f79"; cx.lineWidth = 8; cx.lineCap = "round"; cx.beginPath();
+          const n = Math.round(240 * s2);
+          for (let i = 0; i <= n; i++) { const ph = -Math.PI + (TAU * i) / 240, p = bowl(ph); if (i === 0) cx.moveTo(p[0], p[1]); else cx.lineTo(p[0], p[1]); }
+          cx.stroke();
+          const rel = tt - REL(), arrive = pr(tt, REL() + T_TAU, 0.6, EZ.o2);
+          for (const k of [1, 3]) { const a = pr(tt, REL() + k * T_TAU, 0.6, EZ.o2); if (a > 0 && a < 1) { const p = bowl(0); cx.strokeStyle = "#ffd23f"; cx.lineWidth = 10 * (1 - a); cx.beginPath(); cx.arc(p[0], p[1], 20 + 90 * a, 0, TAU); cx.stroke(); } }
+          if (false) { const p = bowl(0); cx.strokeStyle = "#ffd23f"; cx.lineWidth = 10 * (1 - arrive); cx.beginPath(); cx.arc(p[0], p[1], 20 + 90 * arrive, 0, TAU); cx.stroke(); }
+          START.forEach((ph0, i) => {
+            const pop = pr(tt, t(47 + i) - 0.1, 0.3, EZ.back); if (pop <= 0) return;
+            const s0 = 4 * RC * Math.sin(ph0 / 2), s = rel > 0 ? s0 * Math.cos(OM * rel) : s0, ph = 2 * Math.asin(Math.max(-1, Math.min(1, s / (4 * RC))));
+            ball(bowl(ph), BCOL[i], pop);
+          });
+          const shown = Math.max(0, Math.min(T_TAU, rel));
+          ct.textContent = shown.toFixed(2) + " s";
+        }
+      };
+      draw();
+
+      const tl = gsap.timeline({ paused: true });
+      tl.to(P, { time: END, duration: END, ease: "none", onUpdate: draw }, 0);
+      gsap.set(["#r-short", "#r-w", "#r-r2", "#r-r3", "#r-note", "#r-clock", ".r-cap"], { opacity: 0 });
+      // "सबसे कम दूरी" sits on the straight line
+      const mid = scr(DX * 0.55, DY * 0.55);
+      tl.fromTo("#r-short", { opacity: 0, x: mid[0] + 20, y: mid[1] - 110, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.25, ease: "back.out(2.5)" }, t(13));
+      tl.to("#r-short", { opacity: 0, duration: 0.2 }, t(18) - 0.1);
+      // each result row pops when its ball crosses B
+      [["#r-w", 0], ["#r-r2", 1], ["#r-r3", 2]].forEach(([id, i]) => tl.fromTo(id, { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.25, ease: "back.out(2)" }, RACE() + TRACK[i].T));
+      tl.fromTo("#r-note", { opacity: 0 }, { opacity: 1, duration: 0.3 }, RACE() + T_LN + 0.3);
+      tl.to(["#r-w", "#r-r2", "#r-r3", "#r-note"], { opacity: 0, duration: 0.3 }, SCN2());
+      // the name, beside the traced curve
+      tl.to("#r-w", { scale: 1.08, duration: 0.18, ease: "power2.out", transformOrigin: "50% 50%" }, t(42));
+      tl.to("#r-w", { scale: 1, duration: 0.3, ease: "power2.inOut" }, t(42) + 0.25);
+      tl.fromTo("#r-clock", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.3, ease: "back.out(2)" }, REL() - 0.4);
+      tl.fromTo("#r-ct", { backgroundColor: "#ffffff" }, { backgroundColor: "#ffd23f", duration: 0.2 }, REL() + T_TAU);
+
+      // captions
+      let i0 = 0;
+      GROUPS.forEach((n, g) => {
+        const id = "#r-c" + (g + 1), spans = document.querySelectorAll(id + " span");
+        tl.fromTo(id, { opacity: 0 }, { opacity: 1, duration: 0.1 }, t(i0) - 0.1);
+        tl.to(id, { opacity: 0, duration: 0.07 }, g < GROUPS.length - 1 ? t(i0 + n) - 0.19 : VO_END + V + 0.4);
+        for (let k = 0; k < n; k++) {
+          tl.set(spans[k], { opacity: 1, backgroundColor: "rgba(255,210,63,1)" }, t(i0 + k));
+          if (k > 0) tl.set(spans[k - 1], { backgroundColor: "rgba(255,210,63,0)" }, t(i0 + k));
+        }
+        i0 += n;
+      });
+
+      window.__timelines["brachisto"] = tl;
+    })();
+  </script>
+</template>

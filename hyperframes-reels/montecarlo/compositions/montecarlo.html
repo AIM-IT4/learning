@@ -1,0 +1,176 @@
+<template>
+  <style>
+    @font-face { font-family: "Yatra One"; src: url("assets/fonts/YatraOne.ttf"); }
+    @font-face { font-family: "Noto Sans Devanagari"; font-weight: 700; src: url("assets/fonts/NotoSansDevanagari_700Bold.ttf"); }
+    @font-face { font-family: "Poppins"; font-weight: 700; src: url("assets/fonts/Poppins_700Bold.ttf"); }
+    @font-face { font-family: "Poppins"; font-weight: 600; src: url("assets/fonts/Poppins_600SemiBold.ttf"); }
+    #root { position: absolute; inset: 0; background: #f7f7f3; overflow: hidden; }
+    #m-cv { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #m-title { position: absolute; left: 70px; top: 232px; font-family: "Yatra One"; font-size: 104px; line-height: 1.1; color: #12221f; white-space: nowrap; }
+    #m-mc { position: absolute; left: 70px; top: 246px; white-space: nowrap; }
+    #m-mc span { display: inline-block; padding: 6px 30px 10px; background: #ffd23f; border: 5px solid #12221f; border-radius: 24px; font-family: "Poppins";
+                 font-weight: 700; font-size: 72px; line-height: 1.2; color: #12221f; box-shadow: 0 10px 0 #12221f; }
+    .m-tag { position: absolute; left: 0; top: 0; padding: 0 16px; border: 4px solid #12221f; border-radius: 16px; font-family: "Noto Sans Devanagari";
+             font-weight: 700; font-size: 44px; line-height: 1.35; color: #ffffff; white-space: nowrap; }
+    #m-in { background: #0b7f79; }
+    #m-out { background: #c4553a; }
+    #m-f { position: absolute; left: 0; top: 1044px; width: 1080px; text-align: center; white-space: nowrap; font-family: "Poppins"; font-weight: 700;
+           font-size: 54px; line-height: 1.3; color: #12221f; font-variant-numeric: tabular-nums; }
+    #m-f span { display: inline-block; opacity: 0; }
+    #m-f .in { color: #0b7f79; }
+    #m-f .est { padding: 0 14px; border-radius: 12px; }
+    #m-sim { position: absolute; left: 770px; top: 1070px; font-family: "Poppins"; font-weight: 600; font-size: 28px; color: #4b5b58; }
+    .m-cap { position: absolute; left: 60px; top: 1330px; width: 960px; text-align: center; font-family: "Noto Sans Devanagari"; font-weight: 700; font-size: 46px;
+             line-height: 1.3; color: #12221f; text-wrap: balance; }
+    .m-cap span { display: inline-block; padding: 0 8px; margin: 0 1px; border-radius: 8px; opacity: 0.4; }
+    .m-cap .lat { font-family: "Poppins"; }
+  </style>
+  <div id="root" data-composition-id="montecarlo" data-width="1080" data-height="1920">
+    <canvas id="m-cv" width="1080" height="1920"></canvas>
+    <div id="m-title">बिंदुओं से π</div>
+    <div id="m-mc"><span>Monte Carlo</span></div>
+    <div id="m-in" class="m-tag">अंदर</div>
+    <div id="m-out" class="m-tag">बाहर</div>
+    <div id="m-f"><span id="m-f0">π ≈ 4 ×</span> <span id="m-f1" class="in">0</span> <span id="m-f2">÷</span> <span id="m-f3">0</span> <span id="m-f4">=</span> <span id="m-f5" class="est">0</span></div>
+    <div id="m-sim">simulated</div>
+
+    <div id="m-c1" class="m-cap"><span>एक</span><span>वर्ग,</span><span>और</span><span>उसके</span><span>अंदर</span><span>एक</span><span>गोला।</span></div>
+    <div id="m-c2" class="m-cap"><span>अब</span><span>इस</span><span>पर,</span><span>बिना</span><span>निशाना</span><span>लगाए,</span><span>बिंदु</span><span>बरसाइए।</span></div>
+    <div id="m-c3" class="m-cap"><span>कोई</span><span>अंदर</span><span>गिरेगा,</span><span>कोई</span><span>बाहर।</span></div>
+    <div id="m-c4" class="m-cap"><span>अंदर</span><span>वाले</span><span>बिंदु</span><span>गिनिए,</span></div>
+    <div id="m-c5" class="m-cap"><span>कुल</span><span>से</span><span>बाँटिए,</span><span>और</span><span>चार</span><span>से</span><span>गुणा</span><span>कीजिए…</span></div>
+    <div id="m-c6" class="m-cap"><span>जितने</span><span>ज़्यादा</span><span>बिंदु,</span><span>उतना</span><span>सटीक</span><span>पाई!</span></div>
+    <div id="m-c7" class="m-cap"><span>इसे</span><span>कहते</span><span>हैं,</span><span class="lat">Monte</span><span class="lat">Carlo।</span></div>
+    <div id="m-c8" class="m-cap"><span>कई</span><span class="lat">options</span><span>की</span><span>कीमत</span><span>भी,</span><span>इसी</span><span>तरह</span><span>निकाली</span><span>जाती</span><span>है।</span></div>
+  </div>
+  <script>
+    (function () {
+      const V = 0.3;
+      // word onsets on the voice (patched after measuring); 53 words, captions in 8 groups
+      const W = [0.0, 0.2, 1.1, 1.24, 1.48, 1.74, 1.98, 3, 3.14, 3.24, 4.15, 4.38, 4.74, 5.4, 5.74, 6.8, 6.94, 7.18, 8.1, 8.24, 9.24, 9.46, 9.66, 9.94, 10.64, 10.76, 10.88, 11.69, 11.82, 12.02, 12.14, 12.36, 13.74, 14.04, 14.36, 15.14, 15.42, 15.74, 16.94, 17.16, 17.42, 18.14, 18.44, 19.39, 19.54, 19.78, 20.04, 20.34, 21.04, 21.24, 21.4, 21.76, 22.04];
+      const VO_END = 22.2;
+      const GROUPS = [7, 8, 5, 4, 8, 6, 5, 10];
+      const t = (i) => W[i] + V;
+      const END = VO_END + V + 2.6;
+      const TAU = Math.PI * 2;
+      const EZ = { o2: gsap.parseEase("power2.out"), io2: gsap.parseEase("power2.inOut"), back: gsap.parseEase("back.out(2)") };
+      const pr = (tt, t0, d, ez) => { const p = Math.min(1, Math.max(0, (tt - t0) / d)); return ez ? ez(p) : p; };
+      const fmt = (n) => Math.round(n).toLocaleString("en-IN");
+
+      // ---- 50,000 seeded points in the square [-1, 1]²; a point is inside when x² + y² ≤ 1
+      const N = 50000, SX = 210, SY = 372, SW = 660, CXc = SX + SW / 2, CYc = SY + SW / 2;
+      let seed = 8;
+      const rnd = () => { seed |= 0; seed = (seed + 0x6d2b79f5) | 0; let x = Math.imul(seed ^ (seed >>> 15), 1 | seed); x = (x + Math.imul(x ^ (x >>> 7), 61 | x)) ^ x; return ((x ^ (x >>> 14)) >>> 0) / 4294967296; };
+      const PX = new Float32Array(N), PY = new Float32Array(N), IN = new Uint8Array(N), CUM = new Int32Array(N + 1);
+      for (let k = 0; k < N; k++) { const x = rnd() * 2 - 1, y = rnd() * 2 - 1; PX[k] = CXc + x * SW / 2; PY[k] = CYc + y * SW / 2; IN[k] = x * x + y * y <= 1 ? 1 : 0; CUM[k + 1] = CUM[k] + IN[k]; }
+      // when each point lands: twelve one by one, then to forty, a hold while we count, then a rush to 50,000
+      const A0 = () => t(14) - 0.05, A1 = () => t(19) + 0.2, B1 = () => t(20) - 0.15, C0 = () => t(32) - 0.1, C1 = () => t(37) + 0.3;
+      const birth = (k) => {
+        if (k < 12) return A0() + (k * (A1() - A0())) / 11;
+        if (k < 40) return A1() + 0.15 + ((k - 12) * (B1() - A1() - 0.15)) / 27;
+        return C0() + (C1() - C0()) * (Math.log((k + 1) / 40) / Math.log(N / 40));
+      };
+      const B = new Float64Array(N); for (let k = 0; k < N; k++) B[k] = birth(k);
+      const count = (tt) => { if (tt < B[0]) return 0; let lo = 0, hi = N - 1; if (tt >= B[hi]) return N; while (hi - lo > 1) { const m = (lo + hi) >> 1; if (B[m] <= tt) lo = m; else hi = m; } return lo + 1; };
+      const firstIn = IN.indexOf(1), firstOut = IN.indexOf(0);
+
+      // ---- thirty simulated price paths (geometric Brownian motion), coloured by where they end against the strike
+      const PATHS = [], STEPS = 60;
+      seed = 2026;
+      const gauss = () => { const u = Math.max(1e-9, rnd()), v = rnd(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(TAU * v); };
+      for (let p = 0; p < 30; p++) { const s = [1]; for (let i = 1; i <= STEPS; i++) s.push(s[i - 1] * Math.exp(-0.5 * 0.3 * 0.3 / STEPS + (0.3 / Math.sqrt(STEPS)) * gauss())); PATHS.push(s); }
+
+      const cv = document.getElementById("m-cv"), cx = cv.getContext("2d");
+      const f1 = document.getElementById("m-f1"), f3 = document.getElementById("m-f3"), f5 = document.getElementById("m-f5");
+      const CH = { x0: 140, x1: 940, y0: 1134, y1: 1288, lo: 2.8, hi: 3.5 };
+      const chX = (n) => CH.x0 + (CH.x1 - CH.x0) * (Math.log10(n) - 1) / (Math.log10(N) - 1);
+      const chY = (v) => CH.y1 - (CH.y1 - CH.y0) * (Math.min(CH.hi, Math.max(CH.lo, v)) - CH.lo) / (CH.hi - CH.lo);
+      const P = { time: 0 };
+      const draw = () => {
+        const tt = P.time;
+        cx.clearRect(0, 0, 1080, 1920);
+        // points
+        const n = count(tt), r = Math.max(1.15, Math.min(11, 11 * Math.pow(40 / Math.max(n, 40), 0.33)));
+        for (let k = 0; k < n; k++) {
+          cx.fillStyle = IN[k] ? "#0b7f79" : "#c4553a";
+          if (k < 40) { const s = pr(tt, B[k], 0.25, EZ.back) * r; cx.beginPath(); cx.arc(PX[k], PY[k], s, 0, TAU); cx.fill(); }
+          else if (r >= 2.5) { cx.beginPath(); cx.arc(PX[k], PY[k], r, 0, TAU); cx.fill(); }
+          else cx.fillRect(PX[k] - r, PY[k] - r, 2 * r, 2 * r);
+        }
+        // the square and its circle draw themselves (over the points)
+        const sq = pr(tt, t(0) - 0.1, 0.55, EZ.io2), ci = pr(tt, t(5) - 0.1, 0.55, EZ.io2);
+        cx.lineWidth = 6; cx.strokeStyle = "#12221f"; cx.lineCap = "round";
+        if (sq > 0) {
+          const L = 4 * SW * sq, pts = [[SX, SY], [SX + SW, SY], [SX + SW, SY + SW], [SX, SY + SW], [SX, SY]];
+          cx.beginPath(); cx.moveTo(SX, SY); let left = L;
+          for (let i = 1; i < 5 && left > 0; i++) { const d = Math.min(SW, left), a = pts[i - 1], b = pts[i]; cx.lineTo(a[0] + (b[0] - a[0]) * d / SW, a[1] + (b[1] - a[1]) * d / SW); left -= d; }
+          cx.stroke();
+        }
+        if (ci > 0) { cx.lineWidth = 6; cx.strokeStyle = "#12221f"; cx.beginPath(); cx.arc(CXc, CYc, SW / 2, -Math.PI / 2, -Math.PI / 2 + TAU * ci); cx.stroke(); }
+        // the count and the estimate
+        const inN = CUM[n], est = n ? (4 * inN) / n : 0;
+        f1.textContent = fmt(inN); f3.textContent = fmt(n); f5.textContent = n ? est.toFixed(n >= 1000 ? 3 : 2) : "0";
+        // convergence: the estimate against the number of points (log scale), with π dashed
+        const chA = pr(tt, t(32) - 0.3, 0.3) * (1 - pr(tt, t(43) - 0.2, 0.3));
+        if (chA > 0) {
+          cx.globalAlpha = chA;
+          cx.setLineDash([12, 10]); cx.strokeStyle = "#a07812"; cx.lineWidth = 3; cx.beginPath(); cx.moveTo(CH.x0, chY(Math.PI)); cx.lineTo(CH.x1, chY(Math.PI)); cx.stroke(); cx.setLineDash([]);
+          cx.font = "600 28px Poppins"; cx.fillStyle = "#a07812"; cx.textAlign = "right"; cx.textBaseline = "bottom"; cx.fillText("π = 3.14159…", CH.x1, chY(Math.PI) - 8);
+          cx.strokeStyle = "#12221f"; cx.lineWidth = 3; cx.lineJoin = "round"; cx.beginPath();
+          let first = true;
+          for (let i = 0; i <= 260; i++) { const m = Math.round(Math.pow(10, 1 + (Math.log10(N) - 1) * i / 260)); if (m > n) break; const x = chX(m), y = chY((4 * CUM[m]) / m); if (first) { cx.moveTo(x, y); first = false; } else cx.lineTo(x, y); }
+          cx.stroke();
+          cx.strokeStyle = "rgba(18,34,31,0.35)"; cx.lineWidth = 2; cx.beginPath(); cx.moveTo(CH.x0, CH.y1); cx.lineTo(CH.x1, CH.y1); cx.stroke();
+          cx.font = "600 26px Poppins"; cx.fillStyle = "#4b5b58"; cx.textAlign = "left"; cx.textBaseline = "bottom";
+          cx.fillText("10 बिंदु", CH.x0, CH.y1 - 6); cx.textAlign = "right"; cx.fillText("50,000 बिंदु", CH.x1, CH.y1 - 6);
+          cx.globalAlpha = 1;
+        }
+        // options: thirty simulated price paths against a strike
+        const op = pr(tt, t(43) - 0.1, t(51) - t(43) + 0.2, EZ.io2);
+        if (op > 0) {
+          const X0 = 140, X1 = 880, Y0 = 1124, Y1 = 1298, lo = 0.6, hi = 1.6, py = (v) => Y1 - (Y1 - Y0) * (Math.log(Math.min(hi, Math.max(lo, v))) - Math.log(lo)) / (Math.log(hi) - Math.log(lo));
+          cx.setLineDash([10, 9]); cx.strokeStyle = "#12221f"; cx.lineWidth = 2.5; cx.beginPath(); cx.moveTo(X0, py(1)); cx.lineTo(X1, py(1)); cx.stroke(); cx.setLineDash([]);
+          cx.font = "600 28px Poppins"; cx.fillStyle = "#12221f"; cx.textAlign = "left"; cx.textBaseline = "middle"; cx.fillText("strike", X1 + 14, py(1));
+          const upto = op * STEPS;
+          PATHS.forEach((s) => {
+            cx.strokeStyle = s[STEPS] > 1 ? "rgba(11,127,121,0.85)" : "rgba(196,85,58,0.75)"; cx.lineWidth = 2.5; cx.beginPath();
+            for (let i = 0; i <= Math.floor(upto); i++) { const x = X0 + (X1 - X0) * i / STEPS; if (i === 0) cx.moveTo(x, py(s[i])); else cx.lineTo(x, py(s[i])); }
+            cx.stroke();
+          });
+        }
+      };
+      draw();
+
+      const tl = gsap.timeline({ paused: true });
+      tl.to(P, { time: END, duration: END, ease: "none", onUpdate: draw }, 0);
+      gsap.set(["#m-mc", "#m-in", "#m-out", "#m-sim", ".m-cap"], { opacity: 0 });
+      // "अंदर" / "बाहर" pop beside the first point that lands inside and the first that lands outside
+      tl.fromTo("#m-in", { opacity: 0, x: PX[firstIn] + 24, y: PY[firstIn] - 92, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.25, ease: "back.out(2.5)" }, Math.max(t(16), B[firstIn] + 0.1));
+      tl.fromTo("#m-out", { opacity: 0, x: PX[firstOut] + 24, y: PY[firstOut] - 92, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.25, ease: "back.out(2.5)" }, Math.max(t(19), B[firstOut] + 0.1));
+      tl.to(["#m-in", "#m-out"], { opacity: 0, duration: 0.2 }, t(20) - 0.2);
+      // the formula assembles as it is said
+      [["#m-f0", t(20) - 0.1], ["#m-f1", t(23) - 0.1], ["#m-f2", t(24)], ["#m-f3", t(26)], ["#m-f4", t(30)], ["#m-f5", t(31)]].forEach(([id, at]) =>
+        tl.fromTo(id, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.22, ease: "back.out(2)" }, at));
+      tl.fromTo("#m-f5", { backgroundColor: "rgba(255,210,63,0)" }, { backgroundColor: "rgba(255,210,63,1)", duration: 0.2 }, t(37));
+      tl.to("#m-f", { opacity: 0, y: -16, duration: 0.25 }, t(43) - 0.3);
+      tl.to("#m-title", { opacity: 0, y: -24, duration: 0.25, ease: "power2.in" }, t(41) - 0.25);
+      tl.fromTo("#m-mc", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2)", transformOrigin: "0% 50%" }, t(41));
+      tl.fromTo("#m-sim", { opacity: 0 }, { opacity: 1, duration: 0.3 }, t(43));
+
+      // captions
+      let i0 = 0;
+      GROUPS.forEach((n, g) => {
+        const id = "#m-c" + (g + 1), spans = document.querySelectorAll(id + " span");
+        tl.fromTo(id, { opacity: 0 }, { opacity: 1, duration: 0.1 }, t(i0) - 0.1);
+        tl.to(id, { opacity: 0, duration: 0.07 }, g < GROUPS.length - 1 ? t(i0 + n) - 0.19 : VO_END + V + 0.4);
+        for (let k = 0; k < n; k++) {
+          tl.set(spans[k], { opacity: 1, backgroundColor: "rgba(255,210,63,1)" }, t(i0 + k));
+          if (k > 0) tl.set(spans[k - 1], { backgroundColor: "rgba(255,210,63,0)" }, t(i0 + k));
+        }
+        i0 += n;
+      });
+
+      window.__timelines["montecarlo"] = tl;
+    })();
+  </script>
+</template>

@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="hi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #f7f7f3; }
+      #root { position: relative; width: 100%; height: 100%; background: #f7f7f3; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="25.64" data-width="1080" data-height="1920">
+      <div id="brachisto" data-composition-id="brachisto" data-composition-src="compositions/brachisto.html" data-start="0" data-duration="25.64"
+           data-track-index="1" data-track-kind="graphics" data-width="1080" data-height="1920"></div>
+      <audio id="vo" class="clip" src="assets/vo.wav" data-start="0.3" data-track-index="2" data-volume="1"></audio>
+      <audio id="bgm" class="clip" src="assets/bgm.wav" data-start="0" data-duration="25.64" data-track-index="3"
+             data-timeline-role="music" data-volume="1" data-fade-in="0.3" data-fade-out="1.5"></audio>
+      <audio id="r-a" class="clip" src="assets/sfx/pop.mp3" data-start="0.2" data-duration="0.72" data-track-index="4" data-volume="0.2"></audio>
+      <audio id="r-b" class="clip" src="assets/sfx/pop.mp3" data-start="0.54" data-duration="0.72" data-track-index="5" data-volume="0.2"></audio>
+      <audio id="r-line" class="clip" src="assets/sfx/whoosh-short.mp3" data-start="4.4" data-duration="0.57" data-track-index="6" data-volume="0.2"></audio>
+      <audio id="r-tag" class="clip" src="assets/sfx/click-soft.mp3" data-start="6.32" data-duration="0.36" data-track-index="7" data-volume="0.3"></audio>
+      <audio id="r-tracks" class="clip" src="assets/sfx/whoosh-short.mp3" data-start="7.15" data-duration="0.57" data-track-index="8" data-volume="0.2"></audio>
+      <audio id="r-go" class="clip" src="assets/sfx/click.mp3" data-start="8.2" data-duration="0.36" data-track-index="9" data-volume="0.35"></audio>
+      <audio id="r-roll" class="clip" src="assets/sfx/whoosh.mp3" data-start="8.25" data-duration="0.57" data-track-index="10" data-volume="0.22"></audio>
+      <audio id="r-f1" class="clip" src="assets/sfx/ping.mp3" data-start="10.03" data-duration="1.32" data-track-index="11" data-volume="0.28"></audio>
+      <audio id="r-f2" class="clip" src="assets/sfx/click-soft.mp3" data-start="10.1" data-duration="0.36" data-track-index="12" data-volume="0.3"></audio>
+      <audio id="r-f3" class="clip" src="assets/sfx/click-soft.mp3" data-start="10.63" data-duration="0.36" data-track-index="13" data-volume="0.3"></audio>
+      <audio id="r-strobe" class="clip" src="assets/sfx/sparkle.mp3" data-start="11.01" data-duration="1.8" data-track-index="14" data-volume="0.2"></audio>
+      <audio id="r-wheel" class="clip" src="assets/sfx/whoosh.mp3" data-start="14.51" data-duration="0.57" data-track-index="15" data-volume="0.22"></audio>
+      <audio id="r-name" class="clip" src="assets/sfx/pop.mp3" data-start="15.51" data-duration="0.72" data-track-index="16" data-volume="0.3"></audio>
+      <audio id="r-b0" class="clip" src="assets/sfx/pop.mp3" data-start="18.02" data-duration="0.72" data-track-index="17" data-volume="0.18"></audio>
+      <audio id="r-b1" class="clip" src="assets/sfx/pop.mp3" data-start="18.34" data-duration="0.72" data-track-index="18" data-volume="0.18"></audio>
+      <audio id="r-b2" class="clip" src="assets/sfx/pop.mp3" data-start="19.13" data-duration="0.72" data-track-index="19" data-volume="0.18"></audio>
+      <audio id="r-b3" class="clip" src="assets/sfx/pop.mp3" data-start="19.46" data-duration="0.72" data-track-index="20" data-volume="0.18"></audio>
+      <audio id="r-rel" class="clip" src="assets/sfx/click.mp3" data-start="19.95" data-duration="0.36" data-track-index="21" data-volume="0.35"></audio>
+      <audio id="r-arrive" class="clip" src="assets/sfx/chime.mp3" data-start="21.46" data-duration="2.54" data-track-index="22" data-volume="0.3"></audio>
+      <audio id="r-again" class="clip" src="assets/sfx/ping.mp3" data-start="24.47" data-duration="1.1" data-track-index="23" data-volume="0.2"></audio>
+    </div>
+    <script>
+      window.__timelines["main"] = gsap.timeline({ paused: true });
+    </script>
+  </body>
+</html>

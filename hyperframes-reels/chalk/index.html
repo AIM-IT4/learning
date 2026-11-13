@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="hi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #22392f; }
+      #root { position: relative; width: 100%; height: 100%; background: #22392f; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="29.46" data-width="1080" data-height="1920">
+      <div id="chalk" data-composition-id="chalk" data-composition-src="compositions/chalk.html" data-start="0" data-duration="29.46"
+           data-track-index="1" data-track-kind="graphics" data-width="1080" data-height="1920"></div>
+      <audio id="vo" class="clip" src="assets/vo.wav" data-start="0.3" data-track-index="2" data-volume="1"></audio>
+      <audio id="bgm" class="clip" src="assets/bgm.wav" data-start="0" data-duration="29.46" data-track-index="3"
+             data-timeline-role="music" data-volume="1" data-fade-in="0.3" data-fade-out="1.5"></audio>
+      <audio id="k-title" class="clip" src="assets/sfx/chalk-write.mp3" data-start="0.05" data-duration="1.0" data-track-index="4" data-volume="0.12"></audio>
+      <audio id="k-tri" class="clip" src="assets/sfx/chalk-line.mp3" data-start="0.2" data-duration="0.7" data-track-index="5" data-volume="0.14"></audio>
+      <audio id="k-a" class="clip" src="assets/sfx/chalk-tap.mp3" data-start="2.15" data-duration="0.12" data-track-index="6" data-volume="0.3"></audio>
+      <audio id="k-b" class="clip" src="assets/sfx/chalk-tap.mp3" data-start="2.48" data-duration="0.12" data-track-index="7" data-volume="0.3"></audio>
+      <audio id="k-c" class="clip" src="assets/sfx/chalk-tap.mp3" data-start="4.5" data-duration="0.12" data-track-index="8" data-volume="0.3"></audio>
+      <audio id="k-sq" class="clip" src="assets/sfx/chalk-line.mp3" data-start="6.4" data-duration="0.7" data-track-index="9" data-volume="0.13"></audio>
+      <audio id="k-fill" class="clip" src="assets/sfx/chalk-scribble.mp3" data-start="7.1" data-duration="0.9" data-track-index="10" data-volume="0.1"></audio>
+      <audio id="k-cfill" class="clip" src="assets/sfx/chalk-scribble.mp3" data-start="8.66" data-duration="0.9" data-track-index="11" data-volume="0.1"></audio>
+      <audio id="k-c2" class="clip" src="assets/sfx/chalk-tap.mp3" data-start="9.51" data-duration="0.12" data-track-index="12" data-volume="0.3"></audio>
+      <audio id="k-s1" class="clip" src="assets/sfx/whoosh-short.mp3" data-start="11.76" data-duration="0.57" data-track-index="13" data-volume="0.14"></audio>
+      <audio id="k-s2" class="clip" src="assets/sfx/whoosh-short.mp3" data-start="11.89" data-duration="0.57" data-track-index="14" data-volume="0.12"></audio>
+      <audio id="k-s3" class="clip" src="assets/sfx/whoosh-short.mp3" data-start="12.08" data-duration="0.57" data-track-index="15" data-volume="0.12"></audio>
+      <audio id="k-afill" class="clip" src="assets/sfx/chalk-scribble.mp3" data-start="14.06" data-duration="0.9" data-track-index="16" data-volume="0.1"></audio>
+      <audio id="k-bfill" class="clip" src="assets/sfx/chalk-scribble.mp3" data-start="15.12" data-duration="0.9" data-track-index="17" data-volume="0.1"></audio>
+      <audio id="k-ghost" class="clip" src="assets/sfx/chalk-line.mp3" data-start="18.21" data-duration="0.7" data-track-index="18" data-volume="0.12"></audio>
+      <audio id="k-eq1" class="clip" src="assets/sfx/chalk-write.mp3" data-start="19.71" data-duration="0.45" data-track-index="19" data-volume="0.1"></audio>
+      <audio id="k-eq2" class="clip" src="assets/sfx/chalk-write.mp3" data-start="21.0" data-duration="0.45" data-track-index="20" data-volume="0.1"></audio>
+      <audio id="k-eq3" class="clip" src="assets/sfx/chalk-write.mp3" data-start="22.44" data-duration="0.45" data-track-index="21" data-volume="0.1"></audio>
+      <audio id="k-ul" class="clip" src="assets/sfx/chalk-line.mp3" data-start="22.83" data-duration="0.7" data-track-index="22" data-volume="0.13"></audio>
+      <audio id="k-ring" class="clip" src="assets/sfx/chalk-line.mp3" data-start="23.56" data-duration="0.7" data-track-index="23" data-volume="0.13"></audio>
+      <audio id="k-name" class="clip" src="assets/sfx/chalk-write.mp3" data-start="23.67" data-duration="0.8" data-track-index="24" data-volume="0.1"></audio>
+    </div>
+    <script>
+      window.__timelines["main"] = gsap.timeline({ paused: true });
+    </script>
+  </body>
+</html>

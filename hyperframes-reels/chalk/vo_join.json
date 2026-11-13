@@ -1,0 +1,1 @@
+{"parts": [["takes/p1_s11t.wav", 0, null], ["takes/p2_s12t.wav", 0, null], ["takes/p3_s11t.wav", 0, null], ["takes/p4_s13t.wav", 0, null]], "gaps": [0.5, 0.5, 0.45], "prep": "each part is the take with pauses over 0.5 s cut to 0.36 s (tighten.py); p3 cut at 8.80 s first"}

@@ -18,6 +18,11 @@ with a `SPEC.md` that gives the script, the palette and every shot as a number.
 | `galton/` | गैल्टन बोर्ड — one ball explained, then 1,000 seeded coin-flip paths stack into a bell curve | 23.7 s | Manish | house style |
 | `fourier/` | घूमते गोले — circles on circles (a DFT run in the page) draw a heart, then a rising chart | 22.1 s | Manish | house style, chart paper |
 | `golden/` | प्रकृति का गणित — Fibonacci sums, squares, the golden spiral, 600 seeds at 137.5° make a sunflower | 26.9 s | Manish | house style |
+| `montecarlo/` | बिंदुओं से π — 50,000 seeded dots in a square, a live count, π ≈ 3.139, simulated option paths | 25.1 s | Manish | house style |
+| `brachisto/` | सबसे तेज़ रास्ता — line vs arc vs cycloid with real times, a rolling wheel, the tautochrone | 25.6 s | Manish | house style |
+| `neon/` | दोहरा pendulum → CHAOS — 100 double pendulums 0.001° apart split on "अलग" | 26.9 s | Manish | **neon / synthwave** |
+| `chalk/` | त्रिकोण का जादू — a² + b² = c² by sliding four triangles | 29.5 s | Manish | **chalkboard** |
+| `paper/` | 72 का नियम — rule vs exact doubling times on a spinning front page | 30.0 s | Manish | **newspaper print** |
 
 The shape, recursion and site reels follow prompt-motion.com entries: shape morphing through UI states and the landing page 3D scroll
 (@twoclipping), and recursion explained in genres (@emollick). Their music beds are synthesised by `tools/bed_synth.py`
@@ -62,3 +67,10 @@ state a pure function of that time (so a seek never reads a stale tween). `tools
 per sentence and spliced (see each `vo_join.json`). A sound effect or a bright music bed on top of an aspirated word hides it:
 no whoosh on such a word, and the Fourier and golden beds are low-passed (3.5 and 4 kHz). The scenes also use
 `DejaVuSans-Bold.ttf` for φ, → ← and ↻ ↺, which the bundled fonts lack.
+
+From round 6 on, every reel gets its own style: background, type, palette, caption treatment and music, never the house style
+again. Neon (Teko, additive glow, synthwave grid, `bed_synth.py synthwave`), chalkboard (Kalam, speckle chalk and hatching,
+synthesised chalk sounds, `lofi`), newspaper (Rozha One, Tiro Devanagari Hindi, UnifrakturMaguntia, Playfair Display, rubber
+stamps on an ink layer, `newsreel`). The style fonts are Google Fonts (OFL), fetched by `tools/assets.sh`. `tools/tighten.py`
+cuts pauses over 0.5 s down to 0.36 s and prints the cuts so measured word times can be remapped. Ideas not used yet: blueprint,
+watercolour storybook, pixel-art game, paper cut-out, retro terminal, 3D product film.

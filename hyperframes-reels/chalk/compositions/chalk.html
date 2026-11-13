@@ -1,0 +1,195 @@
+<template>
+  <style>
+    @font-face { font-family: "Kalam"; font-weight: 700; src: url("assets/fonts/Kalam-Bold.ttf"); }
+    @font-face { font-family: "Kalam"; font-weight: 400; src: url("assets/fonts/Kalam-Regular.ttf"); }
+    #root { position: absolute; inset: 0; background: #22392f; overflow: hidden; }
+    #k-cv { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    .k-cap { position: absolute; left: 70px; top: 1316px; width: 940px; text-align: center; font-family: "Kalam"; font-weight: 700; font-size: 54px;
+             line-height: 1.25; color: rgba(243, 241, 234, 0.5); text-wrap: balance; text-shadow: 0 0 2px rgba(243, 241, 234, 0.35); }
+    .k-cap span { display: inline-block; margin: 0 6px; }
+  </style>
+  <div id="root" data-composition-id="chalk" data-width="1080" data-height="1920">
+    <canvas id="k-cv" width="1080" height="1920"></canvas>
+
+    <div id="k-c1" class="k-cap"><span>एक</span><span>समकोण</span><span>त्रिकोण।</span></div>
+    <div id="k-c2" class="k-cap"><span>दो</span><span>साइड,</span><span>a</span><span>और</span><span>b,</span><span>और</span><span>सबसे</span><span>लंबी</span><span>साइड,</span><span>c।</span></div>
+    <div id="k-c3" class="k-cap"><span>अब</span><span>ऐसे</span><span>चार</span><span>त्रिकोण,</span><span>एक</span><span>बड़े</span><span>वर्ग</span><span>में</span><span>सजाइए।</span></div>
+    <div id="k-c4" class="k-cap"><span>बीच</span><span>में</span><span>बची</span><span>जगह?</span><span>c</span><span>का</span><span>वर्ग।</span></div>
+    <div id="k-c5" class="k-cap"><span>अब</span><span>इन्हीं</span><span>त्रिकोणों</span><span>को,</span><span>नए</span><span>तरीक़े</span><span>से</span><span>जमाइए…</span></div>
+    <div id="k-c6" class="k-cap"><span>अब</span><span>बची</span><span>जगह</span><span>है,</span><span>a</span><span>का</span><span>वर्ग,</span><span>और</span><span>b</span><span>का</span><span>वर्ग।</span></div>
+    <div id="k-c7" class="k-cap"><span>बड़ा</span><span>वर्ग</span><span>वही,</span><span>त्रिकोण</span><span>वही…</span></div>
+    <div id="k-c8" class="k-cap"><span>तो</span><span>बची</span><span>जगह</span><span>भी</span><span>बराबर!</span></div>
+    <div id="k-c9" class="k-cap"><span>a</span><span>का</span><span>वर्ग,</span><span>जोड़</span><span>b</span><span>का</span><span>वर्ग,</span><span>बराबर</span><span>c</span><span>का</span><span>वर्ग।</span></div>
+    <div id="k-c10" class="k-cap"><span>ये</span><span>प्रमेय,</span><span>हज़ारों</span><span>साल</span><span>पुराना</span><span>है,</span></div>
+    <div id="k-c11" class="k-cap"><span>और</span><span>आज</span><span>भी</span><span>उतना</span><span>ही</span><span>सच।</span></div>
+  </div>
+  <script>
+    (function () {
+      const V = 0.3;
+      // word onsets on the voice (patched after measuring); 81 words, captions in 11 groups
+      const W = [0.0, 0.16, 0.5, 1.1, 1.32, 1.9, 2.03, 2.23, 2.95, 3.09, 3.39, 3.65, 4.25, 4.85, 4.98, 5.18, 5.38, 6.3, 6.5, 6.72, 6.9, 7, 8.059, 8.319, 8.459, 8.699, 9.259, 9.429, 9.649, 10.159, 10.329, 10.489, 10.949, 11.459, 11.639, 11.879, 12.019, 12.759, 12.929, 13.149, 13.349, 13.859, 13.999, 14.199, 14.709, 14.919, 15.039, 15.219, 16.008, 16.248, 16.448, 17.008, 17.318, 18.008, 18.118, 18.358, 18.598, 18.718, 19.458, 19.568, 19.768, 20.508, 20.748, 20.888, 21.068, 21.808, 22.188, 22.348, 22.528, 23.258, 23.418, 24.058, 24.428, 24.648, 25.028, 25.458, 25.648, 25.808, 25.928, 26.168, 26.248];
+      const VO_END = 26.555;
+      const GROUPS = [3, 10, 9, 7, 8, 11, 5, 5, 11, 6, 6];
+      const t = (i) => W[i] + V;
+      const END = VO_END + V + 2.6;
+      const TAU = Math.PI * 2;
+      const EZ = { o2: gsap.parseEase("power2.out"), io2: gsap.parseEase("power2.inOut"), io3: gsap.parseEase("power3.inOut") };
+      const pr = (tt, t0, d, ez) => { const p = Math.min(1, Math.max(0, (tt - t0) / d)); return ez ? ez(p) : p; };
+      let seed = 31;
+      const rnd = () => { seed |= 0; seed = (seed + 0x6d2b79f5) | 0; let x = Math.imul(seed ^ (seed >>> 15), 1 | seed); x = (x + Math.imul(x ^ (x >>> 7), 61 | x)) ^ x; return ((x ^ (x >>> 14)) >>> 0) / 4294967296; };
+
+      // ---- the board: slate with smudges and old eraser marks, a wooden frame, a chalk tray (drawn once)
+      const board = document.createElement("canvas"); board.width = 1080; board.height = 1920;
+      (() => {
+        const b = board.getContext("2d");
+        b.fillStyle = "#22392f"; b.fillRect(0, 0, 1080, 1920);
+        for (let i = 0; i < 260; i++) {
+          const x = rnd() * 1080, y = rnd() * 1920, r = 40 + rnd() * 220, light = rnd() < 0.55, g = b.createRadialGradient(x, y, 0, x, y, r);
+          g.addColorStop(0, light ? "rgba(214,232,220,0.035)" : "rgba(8,20,14,0.06)"); g.addColorStop(1, "rgba(0,0,0,0)");
+          b.fillStyle = g; b.beginPath(); b.arc(x, y, r, 0, TAU); b.fill();
+        }
+        b.lineCap = "round";
+        for (let i = 0; i < 22; i++) {                                    // half-erased swipes: broken, uneven, faint
+          let x = 60 + rnd() * 900, y = 260 + rnd() * 1400; const n = 3 + Math.floor(rnd() * 5);
+          for (let k = 0; k < n; k++) {
+            const w = 50 + rnd() * 160, dy = (rnd() - 0.5) * 50;
+            b.strokeStyle = `rgba(225,235,228,${(0.012 + rnd() * 0.02).toFixed(3)})`; b.lineWidth = 18 + rnd() * 60;
+            b.beginPath(); b.moveTo(x, y); b.quadraticCurveTo(x + w / 2, y + dy, x + w, y + (rnd() - 0.5) * 30); b.stroke();
+            x += w * (0.5 + rnd() * 0.6); y += (rnd() - 0.5) * 40;
+          }
+        }
+        for (let i = 0; i < 9000; i++) { b.fillStyle = `rgba(230,240,232,${(0.02 + rnd() * 0.05).toFixed(3)})`; b.fillRect(rnd() * 1080, rnd() * 1920, 1.5, 1.5); }
+        const wood = (x, y, w, h) => { const g = b.createLinearGradient(x, y, x + (w > h ? 0 : w), y + (w > h ? h : 0));
+          g.addColorStop(0, "#5a3b22"); g.addColorStop(0.5, "#7a5232"); g.addColorStop(1, "#4a2f1a"); b.fillStyle = g; b.fillRect(x, y, w, h);
+          b.strokeStyle = "rgba(40,24,12,0.35)"; b.lineWidth = 1.5;
+          for (let k = 0; k < 6; k++) { b.beginPath(); if (w > h) { const yy = y + 4 + rnd() * (h - 8); b.moveTo(x, yy); b.bezierCurveTo(x + w / 3, yy + 3, x + 2 * w / 3, yy - 3, x + w, yy); }
+            else { const xx = x + 4 + rnd() * (w - 8); b.moveTo(xx, y); b.bezierCurveTo(xx + 3, y + h / 3, xx - 3, y + 2 * h / 3, xx, y + h); } b.stroke(); } };
+        wood(0, 0, 1080, 26); wood(0, 1894, 1080, 26); wood(0, 0, 26, 1920); wood(1054, 0, 26, 1920);
+        b.fillStyle = "#4a2f1a"; b.fillRect(26, 1846, 1028, 48); b.fillStyle = "#6e4a2c"; b.fillRect(26, 1846, 1028, 10);
+        [[300, "#f3f1ea"], [380, "#ffe27a"], [700, "#ff9fb2"], [780, "#8fd3ff"]].forEach(([x, c]) => { b.fillStyle = c; b.save(); b.translate(x, 1838); b.rotate((rnd() - 0.5) * 0.3); b.fillRect(-34, -9, 68, 18); b.restore(); });
+      })();
+
+      // ---- chalk: every stroke is a fixed cloud of speckles along a slightly wobbly line, so it never flickers between frames
+      const stroke = (pts, col, w, per = 2) => {
+        const dots = [], ph = rnd() * 10;
+        for (let i = 1; i < pts.length; i++) {
+          const [x0, y0] = pts[i - 1], [x1, y1] = pts[i], L = Math.hypot(x1 - x0, y1 - y0), nx = -(y1 - y0) / (L || 1), ny = (x1 - x0) / (L || 1);
+          for (let s = 0; s < L; s += 2.2) {
+            const f = s / L, wob = 1.6 * Math.sin(ph + (dots.length / 60)) + 0.8 * Math.sin(ph * 2 + dots.length / 23);
+            for (let k = 0; k < per; k++) { const j = (rnd() - 0.5) * w; if (rnd() < 0.12) continue;
+              dots.push([x0 + (x1 - x0) * f + nx * (wob + j), y0 + (y1 - y0) * f + ny * (wob + j), 1.4 + rnd() * 1.6, 0.35 + rnd() * 0.6]); }
+          }
+        }
+        return { dots, col };
+      };
+      const hatch = (poly, col, gap = 15) => {                         // 45° chalk hatching clipped to a polygon
+        const xs = poly.map((p) => p[0]), ys = poly.map((p) => p[1]), x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys), lines = [];
+        for (let c = x0 + y0 - (y1 - y0); c < x1 + y1; c += gap) lines.push(stroke([[c - y0, y0], [c - y1, y1]], col, 3, 1));
+        return { poly, lines, col };
+      };
+      const cx = document.getElementById("k-cv").getContext("2d");
+      const drawStroke = (st, p, ox = 0, oy = 0, a = 1, dash = 0) => {
+        if (p <= 0 || a <= 0) return; const n = Math.floor(st.dots.length * Math.min(1, p)); cx.fillStyle = st.col;
+        for (let i = 0; i < n; i++) { if (dash && Math.floor(i / dash) % 2) continue; const d = st.dots[i]; cx.globalAlpha = d[3] * a; cx.fillRect(d[0] + ox - d[2] / 2, d[1] + oy - d[2] / 2, d[2], d[2]); }
+        cx.globalAlpha = 1;
+      };
+      const drawHatch = (h, p, ox = 0, oy = 0, a = 1) => {
+        if (p <= 0 || a <= 0) return;
+        cx.save(); cx.beginPath(); h.poly.forEach(([x, y], i) => (i ? cx.lineTo(x + ox, y + oy) : cx.moveTo(x + ox, y + oy))); cx.closePath(); cx.clip();
+        const n = h.lines.length * Math.min(1, p); h.lines.forEach((l, i) => { if (i < n) drawStroke(l, Math.min(1, n - i), ox, oy, a * 0.8); }); cx.restore();
+      };
+      const chalkText = (txt, x, y, size, col, p = 1, a = 1, font = "Kalam") => {    // written left to right, with chalk speckle knocked out
+        if (p <= 0 || a <= 0) return;
+        cx.save(); cx.font = `700 ${size}px ${font}`; cx.textAlign = "center"; cx.textBaseline = "middle";
+        const w = cx.measureText(txt).width + 20; cx.beginPath(); cx.rect(x - w / 2, y - size, w * Math.min(1, p), size * 2); cx.clip();
+        cx.globalAlpha = 0.92 * a; cx.fillStyle = col; cx.fillText(txt, x, y); cx.restore();
+      };
+
+      // ---- geometry: legs a = 3, b = 4 (so c = 5) in a 7 × 7 square, 600 px across
+      const U = 600 / 7, A = 3 * U, B = 4 * U, SQ = 7 * U, SX = 240, SY = 380;
+      // each triangle: right-angle corner, b-leg direction (all four are the same triangle turned by 90°)
+      const DIRS = [[1, 0], [0, 1], [-1, 0], [0, -1]];
+      const triPts = (rx, ry, k) => { const [bx, by] = DIRS[k], ax = -by, ay = bx; return [[rx, ry], [rx + bx * B, ry + by * B], [rx + ax * A, ry + ay * A]]; };
+      const PA = [[SX, SY, 0], [SX + SQ, SY, 1], [SX + SQ, SY + SQ, 2], [SX, SY + SQ, 3]];                   // around a tilted c² hole
+      const PB = [[SX + A, SY, 0], [SX + A, SY + A, 1], [SX + SQ, SY + A, 2], [SX, SY + SQ, 3]];              // two a×b rectangles: only slides
+      const TRI = PA.map(([x, y, k]) => { const pts = triPts(0, 0, k); return { k, out: stroke(pts.concat([pts[0]]), "#f3f1ea", 3.2), fill: hatch(pts, "#f3f1ea", 18) }; });
+      const BIG = stroke([[SX, SY], [SX + SQ, SY], [SX + SQ, SY + SQ], [SX, SY + SQ], [SX, SY]], "#f3f1ea", 3.6);
+      const CSQ = [[SX + B, SY], [SX + SQ, SY + B], [SX + A, SY + SQ], [SX, SY + A]];
+      const CF = hatch(CSQ, "#ffe27a", 14), CG = stroke(CSQ.concat([CSQ[0]]), "#ffe27a", 3);
+      const AF = hatch([[SX, SY], [SX + A, SY], [SX + A, SY + A], [SX, SY + A]], "#ff9fb2", 14);
+      const BF = hatch([[SX + A, SY + A], [SX + SQ, SY + A], [SX + SQ, SY + SQ], [SX + A, SY + SQ]], "#8fd3ff", 14);
+      // the first triangle, drawn big in the middle before it joins the square
+      const T0 = { x: 540 - B / 2, y: 690 - A / 2 };
+      const RAM = stroke([[22, 0], [22, 22], [0, 22]], "#f3f1ea", 2.5);
+      const UL1 = stroke([[300, 1196], [780, 1196]], "#ffe27a", 4), UL2 = stroke([[320, 1214], [760, 1214]], "#ffe27a", 4);
+      const RING = (() => { const p = []; for (let i = 0; i <= 90; i++) { const a = -2.2 + (TAU + 0.5) * i / 90; p.push([540 + 330 * Math.cos(a), 1128 + 112 * Math.sin(a)]); } return stroke(p, "#ffe27a", 3.5); })();
+
+      const P = { time: 0 };
+      const draw = () => {
+        const tt = P.time;
+        cx.globalAlpha = 1; cx.drawImage(board, 0, 0);
+        chalkText("त्रिकोण का जादू", 540, 262, 92, "#f3f1ea", pr(tt, 0.05, 0.9));
+        // the first triangle: b, then a, then c, the right-angle mark, the three letters
+        const into = pr(tt, t(14), 0.8, EZ.io3);                           // it slides into the top-left corner of the square
+        const ox0 = T0.x + (SX - T0.x) * into, oy0 = T0.y + (SY - T0.y) * into;
+        const t1 = TRI[0], e = pr(tt, t(0) - 0.1, 1.1);
+        const slide = (i) => [pr(tt, t(33), 0.75, EZ.io3), pr(tt, t(35) - 0.1, 0.75, EZ.io3), pr(tt, t(34) - 0.05, 0.75, EZ.io3), 0][i];
+        const posT = (i) => { if (i === 0 && into < 1) return [ox0, oy0]; const s = slide(i); return [PA[i][0] + (PB[i][0] - PA[i][0]) * s, PA[i][1] + (PB[i][1] - PA[i][1]) * s]; };
+        // fills first (under the outlines)
+        const fillOn = pr(tt, t(21) - 0.2, 0.7), flash = 1 + 0.6 * Math.max(0, 1 - Math.abs(tt - t(51) - 0.25) / 0.35);
+        TRI.forEach((T, i) => { const [x, y] = posT(i); drawHatch(T.fill, fillOn, x, y, Math.min(1, 0.55 * flash)); });
+        const cOn = pr(tt, t(24) - 0.1, 0.8) * (1 - pr(tt, t(30) - 0.2, 0.4));
+        drawHatch(CF, cOn > 0 ? 1 : 0, 0, 0, cOn);
+        drawHatch(AF, pr(tt, t(41) - 0.1, 0.8)); drawHatch(BF, pr(tt, t(45) - 0.1, 0.8));
+        // outlines
+        drawStroke(BIG, pr(tt, t(17) - 0.2, 0.9), 0, 0, 1);
+        if (tt > t(48) - 0.05 && tt < t(48) + 0.8) drawStroke(BIG, 1, 0, 0, 0.8 * (1 - pr(tt, t(48) + 0.3, 0.5)));
+        TRI.forEach((T, i) => {
+          const [x, y] = posT(i);
+          if (i === 0) drawStroke(T.out, e, x, y);
+          else drawStroke(T.out, pr(tt, t(15) + 0.22 * (i - 1) - 0.1, 0.45), x, y);
+        });
+        const ra = pr(tt, t(2), 0.3) * (1 - pr(tt, t(17), 0.3)); if (ra > 0) drawStroke(RAM, 1, ox0, oy0, ra);
+        // letters on the first triangle (they leave when the square is built)
+        const la = 1 - pr(tt, t(17) - 0.2, 0.3);
+        if (la > 0) {
+          chalkText("a", ox0 - 34, oy0 + A / 2, 70, "#ff9fb2", pr(tt, t(5) - 0.05, 0.3), la);
+          chalkText("b", ox0 + B / 2, oy0 - 40, 70, "#8fd3ff", pr(tt, t(7) - 0.05, 0.3), la);
+          chalkText("c", ox0 + B / 2 + 34, oy0 + A / 2 + 30, 70, "#ffe27a", pr(tt, t(12) - 0.05, 0.3), la);
+        }
+        // square names
+        chalkText("c²", SX + SQ / 2, SY + SQ / 2, 96, "#ffe27a", pr(tt, t(26) - 0.05, 0.35), 1 - pr(tt, t(30) - 0.2, 0.3));
+        chalkText("a²", SX + A / 2, SY + A / 2, 84, "#ff9fb2", pr(tt, t(41), 0.35));
+        chalkText("b²", SX + A + B / 2, SY + A + B / 2, 96, "#8fd3ff", pr(tt, t(45), 0.35));
+        // "बराबर!": the c² outline comes back, dashed over the new picture
+        const gh = pr(tt, t(53) - 0.1, 1.0);
+        if (gh > 0) drawStroke(CG, gh, 0, 0, 0.95, 14);
+        // the equation, piece by piece, then underlined and ringed
+        const EQ = [["a²", 300, "#ff9fb2", 58], ["+", 410, "#f3f1ea", 61], ["b²", 520, "#8fd3ff", 62], ["=", 640, "#f3f1ea", 65], ["c²", 760, "#ffe27a", 66]];
+        EQ.forEach(([s, x, c, i]) => chalkText(s, x, 1120, 124, c, pr(tt, t(i) - 0.05, 0.35)));
+        drawStroke(UL1, pr(tt, t(68), 0.4)); drawStroke(UL2, pr(tt, t(68) + 0.25, 0.4));
+        drawStroke(RING, pr(tt, t(69), 0.9, EZ.o2));
+        chalkText("— Pythagoras", 700, 1270, 52, "#f3f1ea", pr(tt, t(70) - 0.05, 0.7));
+      };
+      draw();
+
+      const tl = gsap.timeline({ paused: true });
+      tl.to(P, { time: END, duration: END, ease: "none", onUpdate: draw }, 0);
+      gsap.set(".k-cap", { opacity: 0 });
+      // captions, chalk style: the line appears dim, the spoken word turns yellow
+      let i0 = 0;
+      GROUPS.forEach((n, g) => {
+        const id = "#k-c" + (g + 1), spans = document.querySelectorAll(id + " span");
+        tl.fromTo(id, { opacity: 0 }, { opacity: 1, duration: 0.12 }, t(i0) - 0.12);
+        tl.to(id, { opacity: 0, duration: 0.08 }, g < GROUPS.length - 1 ? t(i0 + n) - 0.2 : VO_END + V + 1.1);
+        for (let k = 0; k < n; k++) {
+          tl.set(spans[k], { color: "#ffe27a" }, t(i0 + k));
+          if (k > 0) tl.set(spans[k - 1], { color: "rgba(243,241,234,0.92)" }, t(i0 + k));
+        }
+        i0 += n;
+      });
+
+      window.__timelines["chalk"] = tl;
+    })();
+  </script>
+</template>
