@@ -1,0 +1,70 @@
+{% comment %}
+The shell every page slots into. Django templates: {% ... %} are tags (logic),
+{{ ... }} prints a value. Child pages fill the {% block %}s below.
+CSS is inline here to keep the project to two dependencies and zero build step.
+{% endcomment %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title|default:"mini-instagram" }}</title>
+  <style>
+    :root{--bg:#fafafa;--card:#fff;--ink:#111;--muted:#8e8e8e;--line:#dbdbdb;
+      --grad:linear-gradient(115deg,#833AB4,#FD1D69 55%,#FCAF45)}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);
+      font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+    a{color:inherit;text-decoration:none}
+    header{position:sticky;top:0;z-index:10;background:var(--card);border-bottom:1px solid var(--line)}
+    nav{max-width:640px;margin:0 auto;display:flex;align-items:center;gap:18px;padding:12px 16px}
+    .logo{font:700 20px "Segoe UI",sans-serif;background:var(--grad);
+      -webkit-background-clip:text;background-clip:text;color:transparent}
+    nav .sp{flex:1}
+    nav a,nav form button{font-size:14px;color:var(--ink);background:none;border:0;cursor:pointer;font-family:inherit}
+    main{max-width:640px;margin:0 auto;padding:18px 16px 60px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:10px;margin-bottom:18px;overflow:hidden}
+    .card .top{display:flex;align-items:center;gap:10px;padding:10px 12px;font-weight:600}
+    .card .top .av{width:30px;height:30px;border-radius:50%;background:var(--grad);flex:none}
+    .card img.photo{display:block;width:100%;aspect-ratio:1;object-fit:cover;background:#eee}
+    .card .body{padding:10px 12px}
+    .likebtn{border:0;background:none;cursor:pointer;font-size:20px;padding:0 6px 0 0}
+    .count{color:var(--muted);font-size:13px}
+    .btn{display:inline-block;background:var(--grad);color:#fff;border:0;border-radius:8px;
+      padding:9px 16px;font-weight:600;cursor:pointer;font-size:14px}
+    .btn.ghost{background:#efefef;color:#111}
+    input[type=text],input[type=password],input[type=file],textarea{
+      width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;font:inherit;background:#fff;margin:6px 0}
+    .msg{background:#fff3cd;border:1px solid #ffe69c;padding:8px 12px;border-radius:8px;margin-bottom:12px;font-size:13px}
+    .muted{color:var(--muted)}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}
+    .grid img{width:100%;aspect-ratio:1;object-fit:cover;background:#eee}
+    .phead{display:flex;gap:20px;align-items:center;margin-bottom:18px}
+    .phead .av{width:76px;height:76px;border-radius:50%;background:var(--grad);flex:none}
+    .stats{display:flex;gap:18px;font-size:14px;margin:6px 0}
+    .stats b{display:block}
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <a class="logo" href="{% url 'feed' %}">mini·gram</a>
+      <span class="sp"></span>
+      {% if user.is_authenticated %}
+        <a href="{% url 'feed' %}">Home</a>
+        <a href="{% url 'explore' %}">Explore</a>
+        <a href="{% url 'upload' %}">+ New</a>
+        <a href="{% url 'profile' user.username %}">@{{ user.username }}</a>
+        <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button type="submit">Log out</button></form>
+      {% else %}
+        <a href="{% url 'login' %}">Log in</a>
+        <a href="{% url 'signup' %}">Sign up</a>
+      {% endif %}
+    </nav>
+  </header>
+  <main>
+    {% if messages %}{% for m in messages %}<div class="msg">{{ m }}</div>{% endfor %}{% endif %}
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="phead">
+    <div class="av"></div>
+    <div>
+      <div style="display:flex;gap:14px;align-items:center">
+        <h2 style="margin:0">@{{ person.username }}</h2>
+        {% if not is_me %}
+          <button class="btn {% if i_follow %}ghost{% endif %}" id="followbtn"
+                  data-user="{{ person.username }}">
+            {% if i_follow %}Following{% else %}Follow{% endif %}
+          </button>
+        {% endif %}
+      </div>
+      <div class="stats">
+        <span><b>{{ post_count }}</b> posts</span>
+        <span><b id="followers">{{ follower_count }}</b> followers</span>
+        <span><b>{{ following_count }}</b> following</span>
+      </div>
+      <div class="muted">{{ person.profile.bio }}</div>
+    </div>
+  </div>
+
+  <div class="grid">
+    {% for post in posts %}
+      <img src="{{ post.image.url }}" alt="post" title="{{ post.caption }}">
+    {% empty %}
+      <p class="muted">No posts yet.</p>
+    {% endfor %}
+  </div>
+
+  <script>
+    function getCookie(name){return document.cookie.split('; ').find(c=>c.startsWith(name+'='))?.split('=')[1];}
+    const fb = document.getElementById('followbtn');
+    if (fb) fb.addEventListener('click', async () => {
+      const r = await fetch(`/users/${fb.dataset.user}/follow/`, {
+        method:'POST', headers:{'X-CSRFToken':getCookie('csrftoken')}
+      });
+      if(!r.ok) return;
+      const d = await r.json();
+      fb.textContent = d.following ? 'Following' : 'Follow';
+      fb.classList.toggle('ghost', d.following);
+      document.getElementById('followers').textContent = d.follower_count;
+    });
+  </script>
+{% endblock %}

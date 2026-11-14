@@ -1,0 +1,5 @@
+# mini-instagram dependencies — deliberately tiny so it runs on any laptop.
+#   Django : the web framework Instagram itself is built on.
+#   Pillow : image handling for the Post.image field (the "media pipeline" in miniature).
+Django==5.1.4
+Pillow==11.0.0

@@ -1,0 +1,7 @@
+# Don't commit the local database, uploaded media, caches, or the virtualenv.
+db.sqlite3
+media/
+__pycache__/
+*.pyc
+.venv/
+venv/

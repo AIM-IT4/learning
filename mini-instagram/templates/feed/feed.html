@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% comment %}The home/explore timeline. `posts` comes from feed_service.{% endcomment %}
+{% block content %}
+  <h2 style="margin:4px 0 16px">{{ title }}</h2>
+
+  {% for post in posts %}
+    <article class="card">
+      <div class="top">
+        <a class="av" href="{% url 'profile' post.author.username %}"></a>
+        <a href="{% url 'profile' post.author.username %}">{{ post.author.username }}</a>
+      </div>
+      <img class="photo" src="{{ post.image.url }}" alt="post by {{ post.author.username }}">
+      <div class="body">
+        {# The like button POSTs to toggle_like and updates from the JSON reply. #}
+        <button class="likebtn" data-post="{{ post.id }}" aria-label="like">
+          {% if post.liked_by_me %}❤️{% else %}🤍{% endif %}
+        </button>
+        <span class="count" id="likes-{{ post.id }}">{{ post.like_count }} likes</span>
+        <div style="margin-top:6px">
+          <b>{{ post.author.username }}</b> {{ post.caption }}
+        </div>
+        <div class="count" style="margin-top:4px">{{ post.comment_count }} comments</div>
+        <form method="post" action="{% url 'add_comment' post.id %}" style="display:flex;gap:8px;margin-top:8px">
+          {% csrf_token %}
+          <input type="text" name="text" placeholder="Add a comment…" maxlength="2200">
+          <button class="btn ghost" type="submit">Post</button>
+        </form>
+      </div>
+    </article>
+  {% empty %}
+    <p class="muted">Nothing here yet. Visit <a href="{% url 'explore' %}">Explore</a>,
+      follow some people, or <a href="{% url 'upload' %}">post something</a>.</p>
+  {% endfor %}
+
+  <script>
+    // Progressive enhancement: the page works without JS (the comment form is a
+    // normal POST). JS only makes liking instant, the way the real app does.
+    function getCookie(name) {
+      return document.cookie.split('; ').find(c => c.startsWith(name + '='))?.split('=')[1];
+    }
+    document.querySelectorAll('.likebtn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const id = btn.dataset.post;
+        const r = await fetch(`/posts/${id}/like/`, {
+          method: 'POST',
+          headers: { 'X-CSRFToken': getCookie('csrftoken') },
+        });
+        if (!r.ok) return;
+        const data = await r.json();
+        btn.textContent = data.liked ? '❤️' : '🤍';
+        document.getElementById('likes-' + id).textContent = data.like_count + ' likes';
+      });
+    });
+  </script>
+{% endblock %}

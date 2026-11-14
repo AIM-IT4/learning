@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>New post</h2>
+  {# enctype is required so the browser actually uploads the file bytes. #}
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <label>Photo<input type="file" name="image" accept="image/*" required></label>
+    <label>Caption<textarea name="caption" rows="3" placeholder="Say something…"></textarea></label>
+    <button class="btn" type="submit">Share</button>
+  </form>
+  <p class="muted" style="margin-top:14px">
+    When you share, the file is written under <code>media/posts/</code> and a
+    <code>Post</code> row points at it. That is the toy version of Instagram's
+    upload → blob storage → CDN pipeline.
+  </p>
+{% endblock %}
