@@ -1,13 +1,61 @@
 {% extends "base.html" %}
-{% comment %}The home/explore timeline. `posts` comes from feed_service.{% endcomment %}
+{% comment %}
+Home ("For you" / "Latest") and Explore share this template.
+`posts` comes from recsys.py (ranked / recommended) or feed_service.py (latest).
+{% endcomment %}
 {% block content %}
-  <h2 style="margin:4px 0 16px">{{ title }}</h2>
+  <div class="headrow">
+    <h2>{{ title }}</h2>
+    {% if is_home %}
+      <div class="tabs">
+        <a href="?mode=for_you" class="{% if mode == 'for_you' %}on{% endif %}">For you</a>
+        <a href="?mode=latest" class="{% if mode == 'latest' %}on{% endif %}">Latest</a>
+      </div>
+    {% endif %}
+  </div>
+
+  {% if is_home and mode == "for_you" %}
+    {% if ranked %}
+      <p class="note">Ranked by a model that predicts how likely you are to like each post.
+        <a href="{% url 'model_card' %}"><b>See how it works →</b></a></p>
+    {% else %}
+      <p class="note warn">The ranking model isn't trained yet, so this is newest-first.
+        Run <code>python manage.py train_models</code>.</p>
+    {% endif %}
+  {% elif is_home %}
+    <p class="note">Newest first: no model involved.</p>
+  {% endif %}
+  {% if is_explore %}
+    <p class="note">Posts from accounts you don't follow, picked by
+      "people who liked what you liked also liked…" (collaborative filtering).</p>
+  {% endif %}
+
+  {% if suggestions %}
+    <section class="sugg">
+      <div class="sugg-h">Suggested for you</div>
+      <div class="sugg-row">
+        {% for s in suggestions %}
+          <div class="sugg-card">
+            <a class="av" href="{% url 'profile' s.user.username %}"></a>
+            <a href="{% url 'profile' s.user.username %}"><b>{{ s.user.username }}</b></a>
+            <span class="muted small">{{ s.reason }}</span>
+            <button class="btn small followbtn" type="button" data-user="{{ s.user.username }}">Follow</button>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
 
   {% for post in posts %}
     <article class="card">
       <div class="top">
         <a class="av" href="{% url 'profile' post.author.username %}"></a>
         <a href="{% url 'profile' post.author.username %}">{{ post.author.username }}</a>
+        {% if post.score %}
+          <span class="chip" title="The model's predicted chance that you'll like this post">{% widthratio post.score 1 100 %}% match</span>
+        {% elif post.reason %}
+          <span class="chip">{{ post.reason }}</span>
+        {% endif %}
       </div>
       <img class="photo" src="{{ post.image.url }}" alt="post by {{ post.author.username }}">
       <div class="body">
@@ -19,7 +67,18 @@
         <div style="margin-top:6px">
           <b>{{ post.author.username }}</b> {{ post.caption }}
         </div>
-        <div class="count" style="margin-top:4px">{{ post.comment_count }} comments</div>
+
+        {% for c in post.visible_comments|slice:"-3:" %}
+          <div class="cm"><b>{{ c.author.username }}</b> {{ c.text }}</div>
+        {% endfor %}
+        {% if post.comment_count > 3 %}
+          <div class="count" style="margin-top:4px">View all {{ post.comment_count }} comments</div>
+        {% endif %}
+        {% if post.author == user and post.hidden_comment_count %}
+          <div class="shield">🛡️ {{ post.hidden_comment_count }} comment{{ post.hidden_comment_count|pluralize }}
+            hidden by the spam/abuse filter (only you can see this note)</div>
+        {% endif %}
+
         <form method="post" action="{% url 'add_comment' post.id %}" style="display:flex;gap:8px;margin-top:8px">
           {% csrf_token %}
           <input type="text" name="text" placeholder="Add a comment…" maxlength="2200">
@@ -33,22 +92,29 @@
   {% endfor %}
 
   <script>
-    // Progressive enhancement: the page works without JS (the comment form is a
-    // normal POST). JS only makes liking instant, the way the real app does.
+    // Progressive enhancement: the page works without JS (comments are a normal
+    // form POST). JS only makes liking and following instant, like the real app.
     function getCookie(name) {
       return document.cookie.split('; ').find(c => c.startsWith(name + '='))?.split('=')[1];
     }
+    async function post(url) {
+      const r = await fetch(url, { method: 'POST', headers: { 'X-CSRFToken': getCookie('csrftoken') } });
+      return r.ok ? r.json() : null;
+    }
     document.querySelectorAll('.likebtn').forEach(btn => {
       btn.addEventListener('click', async () => {
-        const id = btn.dataset.post;
-        const r = await fetch(`/posts/${id}/like/`, {
-          method: 'POST',
-          headers: { 'X-CSRFToken': getCookie('csrftoken') },
-        });
-        if (!r.ok) return;
-        const data = await r.json();
+        const data = await post(`/posts/${btn.dataset.post}/like/`);
+        if (!data) return;
         btn.textContent = data.liked ? '❤️' : '🤍';
-        document.getElementById('likes-' + id).textContent = data.like_count + ' likes';
+        document.getElementById('likes-' + btn.dataset.post).textContent = data.like_count + ' likes';
+      });
+    });
+    document.querySelectorAll('.followbtn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const data = await post(`/users/${btn.dataset.user}/follow/`);
+        if (!data) return;
+        btn.textContent = data.following ? 'Following' : 'Follow';
+        btn.classList.toggle('ghost', data.following);
       });
     });
   </script>

@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% comment %}
+"How the models work": a model card for each ML piece. Everything shown here is
+read from the trained artifacts in ml/artifacts/ or measured on the fly.
+{% endcomment %}
+{% block content %}
+  <h2 style="margin:4px 0 6px">How the models work</h2>
+  <p class="muted" style="margin:0 0 16px">Four small models, written from scratch in <code>ml/</code>.
+    Real Instagram uses far bigger versions of the same ideas.</p>
+
+  <section class="card pad">
+    <h3>1 · Feed ranker <span class="muted small">a classifier: logistic regression</span></h3>
+    <p style="margin:0">Predicts the chance you'll like a post, then the "For you" feed sorts by it.</p>
+    {% if ranker %}
+      <p class="small muted">Trained on {{ ranker.examples }} viewer–post pairs ({{ ranker.positive_pct }}% were liked).
+        Measured with {{ ranker.folds }}-fold cross-validation: every pair is scored by a model that never saw it.</p>
+
+      <b class="small">How well does it rank? (AUC: 0.5 = coin flip, 1.0 = perfect)</b>
+      <div class="rows">
+        {% for r in ranker.auc_rows %}
+          <span class="lbl">{% if r.strong %}<b>{{ r.name }}</b>{% else %}{{ r.name }}{% endif %}</span>
+          <span style="display:flex;align-items:center">
+            <span class="bar" style="flex:1"><i style="width:{{ r.pct }}%"{% if not r.strong %} class="neg"{% endif %}></i></span>
+            <span class="val">{{ r.auc|floatformat:2 }}</span>
+          </span>
+        {% endfor %}
+      </div>
+
+      <b class="small">What it learned (weight on each feature; bigger pushes a post higher)</b>
+      <div class="rows">
+        {% for w in ranker.weights %}
+          <span class="lbl"><code>{{ w.name }}</code><small>{{ w.help }}</small></span>
+          <span style="display:flex;align-items:center">
+            <span class="bar" style="flex:1"><i style="width:{{ w.pct }}%"{% if not w.positive %} class="neg"{% endif %}></i></span>
+            <span class="val">{% if w.positive %}+{% endif %}{{ w.weight|floatformat:2 }}</span>
+          </span>
+        {% endfor %}
+      </div>
+      <p class="small muted" style="margin:0">Weights are on standardised features, so you can compare them directly.
+        Each weight is the feature's effect <i>with the others held fixed</i>, so a feature that overlaps with
+        the others can end up near zero, or even negative, although it helps a little on its own.
+        Retrain any time with <code>python manage.py train_models</code>.</p>
+    {% else %}
+      <p class="note warn" style="margin-top:10px">Not trained yet. Run <code>python manage.py train_models</code>,
+        then refresh this page.</p>
+    {% endif %}
+  </section>
+
+  <section class="card pad">
+    <h3>2 · Comment filter <span class="muted small">a classifier: Naive Bayes</span></h3>
+    <p style="margin:0">Labels each new comment <b>ok</b>, <b>spam</b> or <b>abuse</b>. A comment is hidden when
+      P(spam) + P(abuse) ≥ {{ threshold_pct }}%. Only the post's owner sees that something was hidden.</p>
+
+    <form method="get" style="display:flex;gap:8px;margin:12px 0 4px">
+      <input type="text" name="text" placeholder="Try it: type a comment…" value="{{ tried.text|default:'' }}" maxlength="500">
+      <button class="btn" type="submit">Classify</button>
+    </form>
+    {% if tried %}
+      <div class="rows">
+        {% for p in tried.probs %}
+          <span class="lbl">{{ p.label }}</span>
+          <span style="display:flex;align-items:center">
+            <span class="bar" style="flex:1"><i style="width:{{ p.pct }}%"{% if p.label == "ok" %} class="neg"{% endif %}></i></span>
+            <span class="val">{{ p.pct }}%</span>
+          </span>
+        {% endfor %}
+      </div>
+      <p class="small" style="margin:0 0 8px">Verdict: <b>{{ tried.label }}</b> ·
+        {% if tried.hidden %}🛡️ would be <b>hidden</b>{% else %}would be <b>shown</b>{% endif %}
+        ({{ tried.flagged_pct }}% spam-or-abuse)</p>
+    {% endif %}
+
+    <p class="small muted">Trained on {{ moderation.examples }} hand-labelled comments. On {{ moderation.test }} it
+      never saw: <b>{{ moderation.accuracy_pct }}% accuracy</b>.</p>
+    <table class="mt">
+      <tr><th>Label</th><th>Precision <span class="muted">(when it says this, is it right?)</span></th><th>Recall <span class="muted">(how many it catches)</span></th></tr>
+      {% for r in moderation.rows %}
+        <tr><td><b>{{ r.label }}</b></td><td>{{ r.precision_pct }}%</td><td>{{ r.recall_pct }}%</td></tr>
+      {% endfor %}
+    </table>
+    <b class="small">Words that most suggest spam</b>
+    <div class="words">{% for w in moderation.top_words.spam %}<span>{{ w }}</span>{% endfor %}</div>
+    <b class="small">Words that most suggest abuse</b>
+    <div class="words">{% for w in moderation.top_words.abuse %}<span>{{ w }}</span>{% endfor %}</div>
+    {% if moderation.misses %}
+      <b class="small">What it got wrong on the unseen comments</b>
+      <ul class="small" style="margin:6px 0 0;padding-left:18px">
+        {% for m in moderation.misses %}<li>“{{ m.text }}”: really <b>{{ m.true }}</b>, guessed <b>{{ m.pred }}</b></li>{% endfor %}
+      </ul>
+    {% endif %}
+  </section>
+
+  <section class="card pad">
+    <h3>3 · Suggested for you <span class="muted small">a recommender: friends of friends</span></h3>
+    <p style="margin:0">If several people you follow all follow someone, you probably know them.
+      No training: just counting over the follow graph. Brand-new users get the most-followed accounts instead.</p>
+  </section>
+
+  <section class="card pad">
+    <h3>4 · Explore <span class="muted small">a recommender: item-item collaborative filtering</span></h3>
+    <p style="margin:0">Two posts are "similar" when the same people liked them. Explore shows posts from accounts
+      you don't follow that are most similar to what you already liked.</p>
+  </section>
+
+  <section class="card pad">
+    <h3>How this compares with the real Instagram</h3>
+    <table class="mt">
+      <tr><th>Here</th><th>At Instagram's scale</th></tr>
+      <tr><td>Logistic regression, 4 features</td><td>Deep neural networks, thousands of signals, many predicted actions</td></tr>
+      <tr><td>Candidates = recent posts you follow</td><td>Several retrieval sources, including embedding search</td></tr>
+      <tr><td>Item-item similarity matrix</td><td>Learned embeddings + approximate nearest-neighbour search</td></tr>
+      <tr><td>Naive Bayes on 90 comments</td><td>Large text/image/behaviour models on huge labelled sets</td></tr>
+      <tr><td><code>train_models</code> by hand</td><td>Continuous training pipelines and A/B tests</td></tr>
+    </table>
+  </section>
+{% endblock %}

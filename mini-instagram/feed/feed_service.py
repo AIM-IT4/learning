@@ -20,27 +20,33 @@ TWO WAYS TO BUILD A FEED
 We use approach 1 because it is easy to read and correct for a small database.
 The comments mark where Instagram would reach for Cassandra and Memcached.
 """
-from django.contrib.auth.models import User
-from django.db.models import Count, Exists, OuterRef
+from django.db.models import Count, Exists, OuterRef, Prefetch, Q
 
-from .models import Follow, Like, Post
+from .models import Comment, Follow, Like, Post
 
 
-def _annotate_for_viewer(queryset, viewer):
+def annotate_for_viewer(queryset, viewer):
     """Attach the numbers the UI needs to each post in one query.
 
     Without this you'd run extra queries per post (the classic 'N+1' problem).
     `annotate` pushes the counting into the database so the whole page is a
     couple of queries, not hundreds. At scale these counts would be cached in
     Memcached rather than counted every time.
+
+    Comments hidden by the moderation filter are left out of `comment_count`
+    and `visible_comments`; `hidden_comment_count` tells the post's owner how
+    many the filter caught.
     """
     liked = Like.objects.filter(post=OuterRef("pk"), user=viewer)
+    visible = Comment.objects.filter(is_hidden=False).select_related("author")
     return (
         queryset
         .select_related("author")                    # join the author in one query
+        .prefetch_related(Prefetch("comments", queryset=visible, to_attr="visible_comments"))
         .annotate(
             like_count=Count("likes", distinct=True),
-            comment_count=Count("comments", distinct=True),
+            comment_count=Count("comments", filter=Q(comments__is_hidden=False), distinct=True),
+            hidden_comment_count=Count("comments", filter=Q(comments__is_hidden=True), distinct=True),
             liked_by_me=Exists(liked),
         )
     )
@@ -59,18 +65,14 @@ def home_feed(viewer, limit=20, before_id=None):
     posts = Post.objects.filter(author_id__in=authors)
     if before_id:
         posts = posts.filter(id__lt=before_id)
-    return _annotate_for_viewer(posts, viewer)[:limit]
-
-
-def explore_feed(viewer, limit=30):
-    """A naive 'explore': the most recent posts from everyone.
-
-    The real Explore tab is a heavy machine-learning ranking problem. This is
-    just 'newest globally' so you can see posts before you follow anyone.
-    """
-    return _annotate_for_viewer(Post.objects.all(), viewer)[:limit]
+    # Explicit order_by is required: Django ignores the model's Meta.ordering
+    # in queries with aggregations (the Count()s in annotate_for_viewer).
+    return annotate_for_viewer(posts, viewer).order_by("-created_at", "-id")[:limit]
 
 
 def user_posts(profile_user, viewer, limit=30):
     """All posts by one user, for their profile grid."""
-    return _annotate_for_viewer(Post.objects.filter(author=profile_user), viewer)[:limit]
+    posts = Post.objects.filter(author=profile_user)
+    return annotate_for_viewer(posts, viewer).order_by("-created_at", "-id")[:limit]
+
+# The ranked "For you" feed and the Explore recommender live in recsys.py.

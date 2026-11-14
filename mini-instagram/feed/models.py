@@ -84,11 +84,19 @@ class Like(models.Model):
 
 
 class Comment(models.Model):
-    """A comment on a post."""
+    """A comment on a post.
+
+    The three moderation fields are filled in by feed/moderation.py, which runs
+    every new comment through a spam/abuse classifier. Hidden comments are kept
+    (never deleted) but only the post's owner is told they exist.
+    """
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="comments")
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="comments")
     text = models.CharField(max_length=2200)
     created_at = models.DateTimeField(auto_now_add=True)
+    is_hidden = models.BooleanField(default=False)
+    moderation_label = models.CharField(max_length=16, default="ok")   # ok / spam / abuse
+    moderation_score = models.FloatField(default=0.0)                   # P(spam) + P(abuse)
 
     class Meta:
         ordering = ["created_at"]

@@ -16,6 +16,9 @@ urlpatterns = [
     # A JSON version of the feed — the "API" a phone app would hit.
     path("api/feed/", views.api_feed, name="api_feed"),
 
+    # What the ML models learned, plus a box to try the comment filter.
+    path("models/", views.model_card, name="model_card"),
+
     # Keep the profile route last: it matches a bare /<username>.
     path("<str:username>/", views.profile, name="profile"),
 ]

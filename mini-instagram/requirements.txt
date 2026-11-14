@@ -1,5 +1,8 @@
 # mini-instagram dependencies — deliberately tiny so it runs on any laptop.
 #   Django : the web framework Instagram itself is built on.
 #   Pillow : image handling for the Post.image field (the "media pipeline" in miniature).
-Django==5.1.4
-Pillow==11.0.0
+#   numpy  : the maths behind the ML models in ml/ (everything else is written by hand).
+# Version ranges (not exact pins) so pip picks builds that exist for your Python version.
+Django>=5.1,<6.0
+Pillow>=11.0
+numpy>=2.0

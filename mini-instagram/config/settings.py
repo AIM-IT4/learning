@@ -92,6 +92,11 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# -- Machine learning ---------------------------------------------------------
+# Trained models are saved here as readable JSON by `python manage.py train_models`.
+# (At scale, model files live in a model registry and are rolled out like code.)
+ML_ARTIFACT_DIR = BASE_DIR / "ml" / "artifacts"
+
 # Where login/logout send you.
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "feed"

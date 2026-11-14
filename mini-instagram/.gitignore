@@ -1,7 +1,9 @@
-# Don't commit the local database, uploaded media, caches, or the virtualenv.
+# Don't commit the local database, uploaded media, caches, the virtualenv,
+# or trained model files (they're rebuilt from your own data by `train_models`).
 db.sqlite3
 media/
 __pycache__/
 *.pyc
 .venv/
 venv/
+ml/artifacts/*.json
