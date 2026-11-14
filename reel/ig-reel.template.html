@@ -1,0 +1,572 @@
+<title>Inside Instagram in 60s</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<script>if (/[?&]export\b/.test(location.search)) document.documentElement.classList.add('export');</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap">
+<style>
+/* A vertical 9:16 reel. The stage is a fixed 405x720 canvas, scaled to fit the
+   screen; every animation is a pure function of one clock (the voiceover's
+   playback time), so voice, captions and visuals stay in sync and exact video
+   frames can be rendered. Deliberately one dark visual world. */
+:root{
+  --bg:#07080F; --ink:#F5F7FF; --muted:#99A2C4; --line:#222844; --card:#12172f;
+  --g1:#833AB4; --g2:#FD1D69; --g3:#FCAF45;
+  --grad:linear-gradient(115deg,var(--g1),var(--g2) 55%,var(--g3));
+  --glow:rgba(253,29,105,.55);
+  --f-d:"Space Grotesk",system-ui,sans-serif;
+  --f-b:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--f-b);
+  display:flex;flex-direction:column;align-items:center;gap:12px;padding-block:18px 28px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+.viewport{position:relative;width:min(100%,420px,calc((88vh - 90px) * 9 / 16));aspect-ratio:9/16;
+  border-radius:26px;overflow:hidden;border:1px solid var(--line);
+  box-shadow:0 30px 80px -30px #000,0 0 0 1px #ffffff09 inset;cursor:pointer;user-select:none}
+.stage{position:absolute;top:0;left:0;width:405px;height:720px;transform-origin:0 0;overflow:hidden;
+  background:radial-gradient(130% 90% at 50% 0%,#141833 0%,#0B0D18 55%,#06070E 100%)}
+html.export body{padding:0;display:block;background:#000}
+html.export .viewport{width:405px;height:720px;border:0;border-radius:0;box-shadow:none;aspect-ratio:auto}
+html.export .controls,html.export .note,html.export .startbtn,html.export .snd,
+html.export .pausehint,html.export .replay{display:none!important}
+
+.fx{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.blob{position:absolute;border-radius:50%;filter:blur(46px);opacity:.5;mix-blend-mode:screen}
+.blob.a{width:250px;height:250px;background:var(--g1);top:-80px;left:-60px}
+.blob.b{width:240px;height:240px;background:var(--g2);bottom:20px;right:-70px}
+.blob.c{width:190px;height:190px;background:var(--g3);top:300px;left:120px;opacity:.28}
+.grid{position:absolute;inset:0;opacity:.13;
+  background-image:linear-gradient(#ffffff22 1px,transparent 1px),linear-gradient(90deg,#ffffff22 1px,transparent 1px);
+  background-size:30px 30px;mask:radial-gradient(90% 70% at 50% 45%,#000,transparent 85%)}
+
+.bars{position:absolute;top:13px;left:13px;right:13px;display:flex;gap:4px;z-index:6}
+.bars i{flex:1;height:3.5px;border-radius:3px;background:#ffffff28;overflow:hidden}
+.bars i b{display:block;height:100%;width:0;background:var(--grad)}
+.brand{position:absolute;top:27px;left:16px;right:16px;z-index:6;display:flex;align-items:center;gap:8px;
+  font:600 12.5px var(--f-b);color:#ffffffd6}
+.brand .dot{width:22px;height:22px;border-radius:7px;background:var(--grad);box-shadow:0 0 16px var(--glow);flex:none}
+.brand small{margin-left:auto;color:var(--muted);font-weight:500;font-variant-numeric:tabular-nums}
+
+.scene{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;gap:12px;
+  padding:92px 24px 0;text-align:center;opacity:0;visibility:hidden}
+.badge{font:700 11.5px var(--f-d);letter-spacing:2.2px;text-transform:uppercase;color:#fff;
+  padding:5px 13px;border-radius:999px;background:#ffffff18;border:1px solid #ffffff26}
+.title{font:700 33px/1.05 var(--f-d);letter-spacing:-.6px;max-width:12ch;margin:0;
+  background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.title.big{font-size:38px;max-width:11ch}
+.art{height:236px;width:100%;display:flex;align-items:center;justify-content:center;margin-top:2px}
+svg{overflow:visible}
+svg [data-in],svg [data-loop]{transform-box:fill-box;transform-origin:center}
+.node{fill:#121734;stroke:#ffffff33;stroke-width:1.5}
+.node.hot{stroke:var(--g2)}
+.lbl{fill:#d4dbf7;font:600 12px var(--f-b);text-anchor:middle}
+.lbl.sm{font-size:10.5px;fill:#a3acd0}
+.py{fill:#fff;font:700 24px var(--f-d)}
+.flow{stroke:var(--g2);stroke-width:2.6;stroke-linecap:round;fill:none;stroke-dasharray:7 9}
+.pkt{fill:#fff;filter:drop-shadow(0 0 7px var(--glow))}
+.ring{fill:none;stroke:#fff;stroke-width:2}
+.chip{fill:#1a2047;stroke:#ffffff40}
+.chiptxt{fill:#fff;font:700 11px var(--f-b);text-anchor:middle}
+
+.rank{position:relative;width:286px;height:182px}
+.rc{position:absolute;left:0;right:0;top:0;height:52px;display:flex;align-items:center;gap:10px;padding:0 12px;
+  border-radius:12px;background:var(--card);border:1px solid #ffffff22}
+.rc .av{width:30px;height:30px;border-radius:9px;flex:none}
+.rc .meta{flex:1;display:flex;flex-direction:column;gap:6px;align-items:flex-start;min-width:0}
+.rc .bar{height:7px;width:100%;background:#ffffff14;border-radius:4px;overflow:hidden;display:block}
+.rc .bar b{display:block;height:100%;width:0;background:var(--grad)}
+.rc .tag{font:600 11px var(--f-b);color:#aab3d6}
+.rc .num{font:700 17px var(--f-d);font-variant-numeric:tabular-nums;width:46px;text-align:right}
+.sublbl{margin:0;font:600 11.5px var(--f-b);color:#a3acd0;letter-spacing:.3px}
+
+.chain{font:600 13px/1.6 var(--f-b);color:#d4dbf7;max-width:30ch}
+.pill{font:700 14px var(--f-b);padding:9px 16px;border-radius:999px;background:#ffffff14;border:1px solid #ffffff2a}
+.replay{position:absolute;left:50%;top:430px;transform:translateX(-50%);font:600 15px var(--f-b);color:#fff;
+  background:var(--grad);border:0;border-radius:12px;padding:11px 22px;cursor:pointer;box-shadow:0 10px 30px -8px var(--glow);
+  visibility:hidden}
+
+/* kinetic captions, reel style */
+/* Sits around 72% height: clear of the bottom ~18% where Instagram overlays its own UI. */
+.cap{position:absolute;left:30px;right:30px;bottom:170px;z-index:5;display:flex;justify-content:center;
+  text-align:center;font:700 25px/1.5 var(--f-d);letter-spacing:-.2px;color:#fff;pointer-events:none}
+.cap .box{background:rgba(6,7,16,.66);padding:3px 12px;border-radius:12px;text-wrap:balance;
+  -webkit-box-decoration-break:clone;box-decoration-break:clone}
+.cap .hl{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+.foot{position:absolute;left:16px;right:16px;bottom:14px;z-index:6;display:flex;align-items:center;gap:10px;
+  font-size:10.5px;color:#8b93b8}
+.foot .tag{flex:1;line-height:1.3}
+.snd{flex:none;width:38px;height:38px;border-radius:11px;border:1px solid #ffffff24;background:#ffffff12;
+  color:#fff;cursor:pointer;display:grid;place-items:center;font-size:16px}
+.startbtn{position:absolute;inset:0;z-index:8;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+  background:rgba(6,7,14,.55);cursor:pointer;border:0;color:#fff;font:600 16px var(--f-b);width:100%}
+.startbtn .circle{width:86px;height:86px;border-radius:50%;background:var(--grad);display:grid;place-items:center;
+  box-shadow:0 14px 40px -8px var(--glow)}
+.startbtn .circle::after{content:"";margin-left:7px;border-style:solid;border-width:16px 0 16px 26px;border-color:transparent transparent transparent #fff}
+.pausehint{position:absolute;inset:0;z-index:7;display:none;place-items:center;pointer-events:none}
+.pausehint i{width:64px;height:64px;border-radius:50%;background:#000a;border:1px solid #fff6;display:grid;place-items:center}
+.pausehint i::after{content:"";margin-left:5px;border-style:solid;border-width:11px 0 11px 18px;border-color:transparent transparent transparent #fff}
+.viewport.paused .pausehint{display:grid}
+
+.controls{display:flex;gap:9px;flex-wrap:wrap;justify-content:center}
+.btn{font:600 13px var(--f-b);color:var(--ink);background:#12162c;border:1px solid var(--line);border-radius:10px;padding:9px 15px;cursor:pointer}
+.btn:hover{border-color:#ffffff44}
+.btn.g{background:var(--grad);border:0;color:#fff}
+.note{color:var(--muted);font-size:12px;max-width:min(100%,420px);text-align:center;line-height:1.5;margin:0}
+:focus-visible{outline:2px solid var(--g3);outline-offset:3px}
+</style>
+
+<div class="viewport" id="vp" role="button" tabindex="0" aria-label="Instagram architecture reel. Tap to play or pause.">
+  <div class="stage" id="stage">
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+      <linearGradient id="gr" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#833AB4"/><stop offset=".55" stop-color="#FD1D69"/><stop offset="1" stop-color="#FCAF45"/>
+      </linearGradient></defs></svg>
+    <div class="fx"><div class="blob a"></div><div class="blob b"></div><div class="blob c"></div><div class="grid"></div></div>
+    <div class="bars" id="bars" aria-hidden="true"></div>
+    <div class="brand"><span class="dot"></span><span>How Instagram works</span><small id="clock">0:00</small></div>
+
+    <!-- 0 · hook -->
+    <section class="scene">
+      <h1 class="title big" data-in="rise" data-d="60">You tapped a&nbsp;Reel</h1>
+      <div class="art">
+        <svg width="240" height="236" viewBox="0 0 240 236" aria-hidden="true">
+          <g data-in="pop" data-d="160">
+            <rect x="72" y="16" width="96" height="188" rx="19" class="node"/>
+            <rect x="82" y="36" width="76" height="134" rx="6" fill="#0c1026"/>
+            <polygon points="106,80 106,124 140,102" fill="url(#gr)"/>
+            <circle cx="120" cy="188" r="5" fill="#fff"/>
+          </g>
+          <circle class="ring" data-loop="ring" data-p="1800" cx="148" cy="150" r="14"/>
+          <circle class="ring" data-loop="ring" data-p="1800" data-o="900" cx="148" cy="150" r="14"/>
+          <circle data-in="pop" data-d="520" cx="148" cy="150" r="8" fill="#fff"/>
+        </svg>
+      </div>
+    </section>
+
+    <!-- 1 · CDN -->
+    <section class="scene">
+      <span class="badge" data-in="pop">Step 1</span>
+      <h2 class="title" data-in="rise" data-d="80">The nearest door</h2>
+      <div class="art">
+        <svg width="330" height="236" viewBox="0 0 330 236" aria-hidden="true">
+          <g data-in="pop" data-d="120">
+            <rect x="16" y="80" width="48" height="82" rx="10" class="node hot"/>
+            <rect x="23" y="90" width="34" height="56" rx="3" fill="#0c1026"/>
+          </g>
+          <path class="flow" data-loop="flow" d="M70 121 H172"/>
+          <circle class="pkt" data-loop="packet" data-p="2200" data-dx="96" cx="74" cy="121" r="6"/>
+          <g data-in="pop" data-d="260">
+            <circle cx="242" cy="121" r="66" class="node"/>
+            <ellipse cx="242" cy="121" rx="66" ry="25" fill="none" stroke="#ffffff22"/>
+            <ellipse cx="242" cy="121" rx="25" ry="66" fill="none" stroke="#ffffff22"/>
+            <line x1="176" y1="121" x2="308" y2="121" stroke="#ffffff22"/>
+          </g>
+          <circle data-loop="pulse" cx="216" cy="86" r="6" fill="#FCAF45"/>
+          <circle data-loop="pulse" data-o="500" cx="274" cy="98" r="6" fill="#FD1D69"/>
+          <circle data-loop="pulse" data-o="1000" cx="264" cy="160" r="6" fill="#833AB4"/>
+          <circle data-loop="pulse" data-o="250" cx="184" cy="121" r="7" fill="#fff"/>
+          <text class="lbl" x="40" y="182">you</text>
+          <text class="lbl" x="242" y="210">nearest CDN edge</text>
+        </svg>
+      </div>
+    </section>
+
+    <!-- 2 · load balancer -->
+    <section class="scene">
+      <span class="badge" data-in="pop">Step 2</span>
+      <h2 class="title" data-in="rise" data-d="80">Traffic cop</h2>
+      <div class="art">
+        <svg width="334" height="236" viewBox="0 0 334 236" aria-hidden="true">
+          <g data-in="pop" data-d="120">
+            <rect x="10" y="96" width="82" height="48" rx="10" class="node hot"/>
+            <text class="lbl sm" x="51" y="124">balancer</text>
+          </g>
+          <path class="flow" data-loop="flow" d="M92 120 L148 54"/>
+          <path class="flow" data-loop="flow" data-o="200" d="M92 120 L148 120"/>
+          <path class="flow" data-loop="flow" data-o="400" d="M92 120 L148 186"/>
+          <g id="servers" data-in="fade" data-d="300"></g>
+          <text class="lbl sm" x="240" y="226">app servers × thousands</text>
+        </svg>
+      </div>
+    </section>
+
+    <!-- 3 · Django -->
+    <section class="scene">
+      <span class="badge" data-in="pop">Step 3</span>
+      <h2 class="title" data-in="rise" data-d="80">The brain</h2>
+      <div class="art">
+        <svg width="300" height="236" viewBox="0 0 300 236" aria-hidden="true">
+          <g transform="translate(150 108)">
+            <g data-loop="spin" data-p="7000">
+              <circle r="80" fill="none" stroke="#ffffff28" stroke-width="1.6" stroke-dasharray="4 11"/>
+              <circle cx="80" cy="0" r="5" fill="#FCAF45"/>
+              <circle cx="-57" cy="56" r="4" fill="#FD1D69"/>
+              <circle cx="-40" cy="-69" r="3.5" fill="#833AB4"/>
+            </g>
+          </g>
+          <g data-in="pop" data-d="120"><g data-loop="bob" data-p="2600">
+            <rect x="100" y="58" width="100" height="100" rx="20" class="node hot"/>
+            <circle cx="150" cy="108" r="33" fill="none" stroke="url(#gr)" stroke-width="4"/>
+            <text x="150" y="116" text-anchor="middle" class="py">py</text>
+          </g></g>
+          <text class="lbl" x="150" y="218">Python · Django fleet</text>
+        </svg>
+      </div>
+    </section>
+
+    <!-- 4 · data stores -->
+    <section class="scene">
+      <span class="badge" data-in="pop">Step 4</span>
+      <h2 class="title" data-in="rise" data-d="80">Memory banks</h2>
+      <div class="art">
+        <svg width="340" height="236" viewBox="0 0 340 236" aria-hidden="true">
+          <g data-in="lite" data-cue="Postgres" data-dur="380">
+            <path d="M24 44 V126 a38 12 0 0 0 76 0 V44" class="node hot"/>
+            <ellipse cx="62" cy="44" rx="38" ry="12" fill="#1a2047" stroke="#ffffff44"/>
+            <text class="lbl" x="62" y="164">Postgres</text>
+            <text class="lbl sm" x="62" y="181">who follows whom</text>
+          </g>
+          <g data-in="lite" data-cue="Cassandra" data-dur="380">
+            <path d="M132 44 V126 a38 12 0 0 0 76 0 V44" class="node hot"/>
+            <ellipse cx="170" cy="44" rx="38" ry="12" fill="#1a2047" stroke="#ffffff44"/>
+            <text class="lbl" x="170" y="164">Cassandra</text>
+            <text class="lbl sm" x="170" y="181">feeds &amp; activity</text>
+          </g>
+          <g data-in="lite" data-cue="Memcached" data-dur="380">
+            <path d="M240 44 V126 a38 12 0 0 0 76 0 V44" class="node hot"/>
+            <ellipse cx="278" cy="44" rx="38" ry="12" fill="#1a2047" stroke="#ffffff44"/>
+            <text class="lbl" x="278" y="164">Memcached</text>
+            <text class="lbl sm" x="278" y="181">makes it instant</text>
+          </g>
+        </svg>
+      </div>
+    </section>
+
+    <!-- 5 · media -->
+    <section class="scene">
+      <span class="badge" data-in="pop">Step 5</span>
+      <h2 class="title" data-in="rise" data-d="80">The media vault</h2>
+      <div class="art">
+        <svg width="340" height="236" viewBox="0 0 340 236" aria-hidden="true">
+          <g data-in="pop" data-d="120">
+            <rect x="118" y="46" width="106" height="88" rx="14" class="node hot"/>
+            <rect x="130" y="60" width="38" height="28" rx="4" fill="#833AB4"/>
+            <rect x="174" y="60" width="38" height="28" rx="4" fill="#FD1D69"/>
+            <rect x="130" y="94" width="38" height="28" rx="4" fill="#FCAF45"/>
+            <rect x="174" y="94" width="38" height="28" rx="4" fill="#3a8dde"/>
+            <polygon points="188,100 188,116 201,108" fill="#07080F"/>
+          </g>
+          <text class="lbl" x="171" y="154">blob storage</text>
+          <path class="flow" data-loop="flow" d="M224 74 H290"/>
+          <path class="flow" data-loop="flow" data-o="250" d="M224 106 H290"/>
+          <text class="lbl sm" x="310" y="94">CDN</text>
+          <path class="flow" data-loop="flow" data-o="400" d="M118 90 H86"/>
+          <g transform="translate(62 90)"><g data-loop="spin" data-p="2600">
+            <path d="M0 -14 3 -3 14 0 3 3 0 14 -3 3 -14 0 -3 -3Z" fill="#FCAF45"/>
+          </g></g>
+          <text class="lbl sm" x="62" y="122">workers</text>
+          <g data-in="pop" data-cue="transcode">
+            <rect x="40" y="176" width="70" height="28" rx="14" class="chip"/><text class="chiptxt" x="75" y="194">1080p</text>
+          </g>
+          <g data-in="pop" data-cue="transcode" data-plus="160">
+            <rect x="135" y="176" width="70" height="28" rx="14" class="chip"/><text class="chiptxt" x="170" y="194">720p</text>
+          </g>
+          <g data-in="pop" data-cue="transcode" data-plus="320">
+            <rect x="230" y="176" width="70" height="28" rx="14" class="chip"/><text class="chiptxt" x="265" y="194">480p</text>
+          </g>
+        </svg>
+      </div>
+    </section>
+
+    <!-- 6 · machine learning -->
+    <section class="scene" id="rankScene">
+      <span class="badge" data-in="pop">Step 6</span>
+      <h2 class="title" data-in="rise" data-d="80">Machine learning</h2>
+      <div class="art" style="flex-direction:column;gap:12px">
+        <div class="rank" data-in="fade" data-d="200">
+          <div class="rc" data-score="0.34"><i class="av" style="background:#3a8dde"></i>
+            <span class="meta"><span class="bar"><b></b></span><span class="tag">#travel · someone you follow</span></span><span class="num">0.00</span></div>
+          <div class="rc" data-score="0.91"><i class="av" style="background:linear-gradient(115deg,#833AB4,#FD1D69 55%,#FCAF45)"></i>
+            <span class="meta"><span class="bar"><b></b></span><span class="tag">#food · you liked 6 like it</span></span><span class="num">0.00</span></div>
+          <div class="rc" data-score="0.58"><i class="av" style="background:#FCAF45"></i>
+            <span class="meta"><span class="bar"><b></b></span><span class="tag">#design · trending now</span></span><span class="num">0.00</span></div>
+        </div>
+        <p class="sublbl" data-in="fade" data-d="300">ranking model · P(you'll watch it)</p>
+      </div>
+    </section>
+
+    <!-- 7 · end card -->
+    <section class="scene">
+      <h2 class="title big" data-in="rise" data-d="60" style="margin-top:40px">That's Instagram, in&nbsp;60&nbsp;seconds.</h2>
+      <div class="chain" data-in="fade" data-d="450">tap → edge → balancer → Django → data + media → ML → you</div>
+      <div class="pill" data-in="pop" data-d="1100">Save this for later 🔖</div>
+    </section>
+
+    <div class="cap" id="cap" aria-live="off"></div>
+    <button class="replay" id="replay" type="button">↺ Replay</button>
+    <div class="pausehint"><i></i></div>
+    <div class="foot">
+      <span class="tag">Simplified from public engineering talks · not affiliated with Instagram</span>
+      <button class="snd" id="snd" type="button" aria-label="Turn narration on" title="Narrate with your device's voice">🔇</button>
+    </div>
+    <button class="startbtn" id="start" type="button"><span class="circle"></span><span id="startlbl">Play</span></button>
+  </div>
+</div>
+
+<div class="controls">
+  <button class="btn g" id="play" type="button">▶ Play</button>
+  <button class="btn" id="restart" type="button">↺ Restart</button>
+</div>
+<p class="note" id="note"></p>
+
+<script>
+(() => {
+  const EXPORT = document.documentElement.classList.contains('export');
+  const VOICE = /*VOICE*/null;      // data: URI of the voiceover, filled in by the build
+  const TIMING = /*TIMING*/null;    // scene timings measured from that voiceover
+  // One line of narration per scene. "|" marks where the on-screen caption
+  // changes; *starred* words are highlighted. The voice reads it without either.
+  const VO = [
+    "You just tapped a *Reel*. | Here's what happens | inside *Instagram*, | in under a minute.",
+    "First, your request | doesn't cross the planet. | It hits the nearest | *CDN edge server*, | often just a few miles away.",
+    "A *load balancer* routes you | to one of *thousands* | of app servers.",
+    "Those run Instagram's huge | *Python* and *Django* fleet, | the brain of the app.",
+    "To answer, | it reads three memory banks: | *Postgres* for who follows whom, | *Cassandra* for feeds and activity, | and *Memcached* | to make it all instant.",
+    "Your photos and videos | live in giant *blob stores*, | served by the CDN, | while background workers | *transcode* every upload.",
+    "Then *machine learning* takes over. | A *ranking model* | scores thousands of posts | and picks the one | you'll most likely watch next.",
+    "And you never felt | the *ten thousand kilometres*.",
+  ];
+
+  const $ = s => document.querySelector(s);
+  const clamp = x => Math.max(0, Math.min(1, x));
+  const ease = x => 1 - Math.pow(1 - x, 3);
+  const easeBack = x => { const c = 1.6; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+  const plain = s => s.replace(/[*|]/g, '').replace(/\s+/g, ' ').trim();
+  const scenes = [...document.querySelectorAll('.scene')];
+  const LAST = scenes.length - 1;
+
+  // ---- timeline: when each scene starts and when its narration is spoken ----
+  function estimatedTiming() {             // ~2.6 words a second, a short breath between lines
+    let t = 450; const out = [];
+    VO.forEach(text => {
+      const speech = plain(text).split(/\s+/).length / 2.6 * 1000;
+      out.push({ start: Math.max(0, t - 300), speechStart: t, speechEnd: t + speech });
+      t += speech + 480;
+    });
+    return { scenes: out, total: Math.round(out[LAST].speechEnd + 2600) };
+  }
+  const TL = TIMING || estimatedTiming();
+  const S = TL.scenes, TOTAL = TL.total;
+  const sceneEnd = k => (k < LAST ? S[k + 1].start : TOTAL);
+
+  // ---- captions: the hand-marked chunks, spread over each scene's speech by length ----
+  const CAPS = [];
+  S.forEach((sc, k) => {
+    const parts = VO[k].split('|').map(p => p.trim());
+    const weights = parts.map(p => plain(p).length + 6);
+    const sum = weights.reduce((a, b) => a + b, 0);
+    let t = sc.speechStart;
+    parts.forEach((p, j) => {
+      const d = (sc.speechEnd - sc.speechStart) * weights[j] / sum;
+      CAPS.push({ scene: k, start: t, text: plain(p), html: p.replace(/\*([^*]+)\*/g, '<span class="hl">$1</span>') });
+      t += d;
+    });
+  });
+
+  // Elements with data-cue animate when the narration reaches that word.
+  scenes.forEach((s, k) => s.querySelectorAll('[data-cue]').forEach(el => {
+    const c = CAPS.find(c => c.scene === k && c.text.toLowerCase().includes(el.dataset.cue.toLowerCase()));
+    if (c) el.dataset.d = Math.round(c.start - S[k].start + (+el.dataset.plus || 0));
+  }));
+  const rankScene = scenes.indexOf($('#rankScene'));
+  const cueAt = (k, word) => {
+    const c = CAPS.find(c => c.scene === k && c.text.toLowerCase().includes(word));
+    return c ? c.start - S[k].start : 1500;
+  };
+  const RANK_SCORE = cueAt(rankScene, 'scores'), RANK_PICK = cueAt(rankScene, 'picks');
+
+  // ---- build the server grid and progress bars ----
+  const servers = $('#servers');
+  let html = '';
+  for (let r = 0; r < 3; r++) for (let c = 0; c < 4; c++) {
+    const x = 154 + c * 44, y = 42 + r * 66;
+    html += `<rect x="${x}" y="${y}" width="38" height="24" rx="5" class="node"/>` +
+            `<circle data-loop="pulse" data-o="${(r * 4 + c) * 230}" data-p="1400" cx="${x + 9}" cy="${y + 12}" r="3.2" fill="#FCAF45"/>`;
+  }
+  servers.innerHTML = html;
+  $('#bars').innerHTML = scenes.map(() => '<i><b></b></i>').join('');
+  const fills = [...document.querySelectorAll('#bars b')];
+  const blobs = [...document.querySelectorAll('.blob')];
+  const rankCards = [...document.querySelectorAll('.rc')];
+  const rankOrder = rankCards.map((c, i) => [i, +c.dataset.score]).sort((a, b) => b[1] - a[1]).map(x => x[0]);
+  const cap = $('#cap'), clock = $('#clock'), replay = $('#replay');
+  const REDUCE = !EXPORT && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const fmt = ms => '0:' + String(Math.min(59, Math.floor(ms / 1000))).padStart(2, '0');
+
+  // ---- render one frame for time t (ms). Everything on screen comes from here. ----
+  function animate(s, k, lt, t) {
+    s.querySelectorAll('[data-in]').forEach(el => {
+      const p = clamp((lt - (+el.dataset.d || 0)) / (+el.dataset.dur || 520));
+      switch (el.dataset.in) {
+        case 'rise': el.style.opacity = ease(p); el.style.transform = `translateY(${(1 - ease(p)) * 18}px)`; break;
+        case 'pop': el.style.opacity = ease(p); el.style.transform = `scale(${0.6 + 0.4 * easeBack(p)})`; break;
+        case 'fade': el.style.opacity = ease(p); break;
+        case 'lite':
+          el.style.opacity = 0.28 + 0.72 * ease(p);
+          el.style.filter = p > 0 ? `drop-shadow(0 0 ${12 * ease(p)}px rgba(253,29,105,.75))` : 'none';
+          break;
+      }
+    });
+    if (!REDUCE) s.querySelectorAll('[data-loop]').forEach(el => {
+      const per = +el.dataset.p || (el.dataset.loop === 'flow' ? 600 : 1600);
+      const ph = ((((t + (+el.dataset.o || 0)) % per) + per) % per) / per;
+      switch (el.dataset.loop) {
+        case 'pulse': el.style.opacity = 0.3 + 0.7 * (0.5 - 0.5 * Math.cos(2 * Math.PI * ph)); break;
+        case 'spin': el.style.transform = `rotate(${ph * 360}deg)`; break;
+        case 'bob': el.style.transform = `translateY(${-7 * Math.sin(2 * Math.PI * ph)}px)`; break;
+        case 'flow': el.style.strokeDashoffset = (-16 * ph).toFixed(2); break;
+        case 'ring': el.style.opacity = 0.85 * (1 - ph); el.style.transform = `scale(${0.4 + 1.8 * ph})`; break;
+        case 'packet': {
+          el.style.transform = `translateX(${(ease(clamp(ph / 0.7)) * +el.dataset.dx).toFixed(1)}px)`;
+          el.style.opacity = ph > 0.85 ? 1 - (ph - 0.85) / 0.15 : 1;
+          break;
+        }
+      }
+    });
+    if (k === rankScene) {
+      const fill = ease(clamp((lt - RANK_SCORE) / 1100)), move = ease(clamp((lt - RANK_PICK) / 650));
+      rankCards.forEach((c, i) => {
+        const score = +c.dataset.score, to = rankOrder.indexOf(i);
+        c.style.transform = `translateY(${(i + (to - i) * move) * 64}px)`;
+        c.querySelector('b').style.width = fill * score * 100 + '%';
+        c.querySelector('.num').textContent = (fill * score).toFixed(2);
+        const win = to === 0 ? move : 0;
+        c.style.boxShadow = win ? `0 0 ${26 * win}px rgba(253,29,105,${0.65 * win})` : 'none';
+        c.style.borderColor = win ? `rgba(253,29,105,${0.35 + 0.65 * win})` : '';
+      });
+    }
+  }
+
+  let capShown = -2;
+  function render(t) {
+    blobs.forEach((b, i) => {
+      const a = (t / 14000 + i * 0.37) * 2 * Math.PI;
+      b.style.transform = REDUCE ? '' : `translate(${Math.sin(a) * 14}px, ${Math.cos(a) * -12}px) scale(${1 + 0.12 * Math.sin(a)})`;
+    });
+    scenes.forEach((s, k) => {
+      const st = S[k].start, en = sceneEnd(k);
+      const fin = k === 0 && t >= 0 && st === 0 ? clamp(t / 320) : clamp((t - st) / 320);
+      const fout = k === LAST ? 1 : 1 - clamp((t - en) / 320);
+      const o = t < st ? 0 : fin * fout;
+      if (o <= 0) { if (s.style.visibility !== 'hidden') { s.style.visibility = 'hidden'; s.style.opacity = 0; } return; }
+      s.style.visibility = 'visible';
+      s.style.opacity = o;
+      s.style.transform = `translateY(${((1 - ease(fin)) * 16 - (1 - fout) * 16).toFixed(1)}px)`;
+      animate(s, k, t - st, t);
+    });
+    fills.forEach((b, k) => { b.style.width = clamp((t - S[k].start) / (sceneEnd(k) - S[k].start)) * 100 + '%'; });
+    clock.textContent = fmt(t);
+
+    let ci = -1;
+    for (let j = 0; j < CAPS.length && CAPS[j].start <= t; j++) ci = j;
+    if (ci >= 0 && t >= sceneEnd(CAPS[ci].scene) - 60) ci = -1;
+    if (ci !== capShown) { cap.innerHTML = ci >= 0 ? `<span class="box">${CAPS[ci].html}</span>` : ''; capShown = ci; }
+    if (ci >= 0) {
+      const p = clamp((t - CAPS[ci].start) / 170);
+      cap.style.opacity = p;
+      cap.style.transform = `translateY(${(1 - p) * 8}px) scale(${0.9 + 0.1 * easeBack(p)})`;
+    }
+    const endShown = !EXPORT && t >= S[LAST].start + 1400;
+    replay.style.visibility = endShown ? 'visible' : 'hidden';
+  }
+
+  window.__render = render;        // used by the video renderer
+  window.__total = TOTAL;
+  window.__timeline = { scenes: S, captions: CAPS };
+  if (EXPORT) { render(0); return; }
+
+  // ---- interactive playback: the voiceover's clock drives everything ----
+  const vp = $('#vp'), stage = $('#stage'), playBtn = $('#play');
+  const fit = () => { stage.style.transform = `scale(${vp.clientWidth / 405})`; };
+  new ResizeObserver(fit).observe(vp); fit();
+
+  const audio = VOICE ? new Audio(VOICE) : null;
+  let playing = false, started = false, offset = 0, since = 0, spokenScene = -1, deviceVoice = false;
+  $('#startlbl').textContent = audio ? 'Play with sound' : 'Play';
+  $('#note').textContent = audio
+    ? 'A 1-minute reel with voiceover. Tap the reel to pause.'
+    : 'Voiceover track not added yet. 🔇 reads the captions with your device\'s voice in the meantime.';
+  if (audio) $('#snd').style.display = 'none';
+  if (audio) audio.addEventListener('ended', () => { offset = audio.duration * 1000; since = performance.now(); });
+
+  function now() {
+    if (!playing) return offset;
+    if (audio && !audio.paused && !audio.ended) return audio.currentTime * 1000;
+    return offset + (performance.now() - since);
+  }
+  function play() {
+    if (offset >= TOTAL) { offset = 0; spokenScene = -1; }
+    started = true; playing = true; since = performance.now();
+    $('#start').style.display = 'none';
+    vp.classList.remove('paused');
+    playBtn.textContent = '⏸ Pause';
+    if (audio && offset / 1000 < (audio.duration || Infinity)) {
+      audio.currentTime = offset / 1000;
+      audio.play().catch(() => {});
+    }
+    if (deviceVoice) try { speechSynthesis.resume(); } catch (e) {}
+  }
+  function pause() {
+    offset = now(); playing = false;
+    if (audio) audio.pause();
+    try { speechSynthesis.pause(); } catch (e) {}
+    vp.classList.toggle('paused', offset < TOTAL);
+    playBtn.textContent = offset >= TOTAL ? '↺ Replay' : '▶ Play';
+  }
+  function restart() { offset = 0; spokenScene = -1; try { speechSynthesis.cancel(); } catch (e) {} pause(); play(); }
+
+  // Device voice: reads each scene's line when it starts (only when no voiceover track).
+  function speakScene(k) {
+    if (!deviceVoice || !('speechSynthesis' in window)) return;
+    try {
+      speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(plain(VO[k]));
+      const voices = speechSynthesis.getVoices();
+      u.voice = voices.find(v => /en-?IN/i.test(v.lang)) || voices.find(v => /^en/i.test(v.lang)) || null;
+      u.rate = 1.05;
+      speechSynthesis.speak(u);
+    } catch (e) {}
+  }
+
+  function frame() {
+    let t = now();
+    if (playing && t >= TOTAL) { t = TOTAL; offset = TOTAL; pause(); }
+    render(started ? t : 1300);               // before the first play, show the hook fully drawn
+    if (playing && !audio) {
+      let k = 0; for (let j = 0; j < S.length; j++) if (t >= S[j].speechStart) k = j;
+      if (k !== spokenScene && t >= S[k].speechStart) { spokenScene = k; speakScene(k); }
+    }
+    requestAnimationFrame(frame);
+  }
+
+  $('#start').addEventListener('click', e => { e.stopPropagation(); play(); });
+  vp.addEventListener('click', () => { if (started) (playing ? pause() : play()); else play(); });
+  vp.addEventListener('keydown', e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); playing ? pause() : play(); } });
+  playBtn.addEventListener('click', () => (playing ? pause() : play()));
+  $('#restart').addEventListener('click', restart);
+  replay.addEventListener('click', e => { e.stopPropagation(); restart(); });
+  $('#snd').addEventListener('click', e => {
+    e.stopPropagation();
+    deviceVoice = !deviceVoice;
+    $('#snd').textContent = deviceVoice ? '🔊' : '🔇';
+    $('#snd').setAttribute('aria-label', deviceVoice ? 'Turn narration off' : 'Turn narration on');
+    if (!deviceVoice) try { speechSynthesis.cancel(); } catch (e) {}
+    else spokenScene = -1;
+  });
+  requestAnimationFrame(frame);
+})();
+</script>

@@ -1,0 +1,7 @@
+# Generated: built page, rendered frames, videos, audio
+build/
+frames/
+*.mp4
+*.mp3
+*.wav
+__pycache__/
