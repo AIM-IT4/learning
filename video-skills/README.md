@@ -1,6 +1,6 @@
 # Video skills for Claude Code (code-drawn animation)
 
-This repo's `painted-song-reel` skill (below) plus 39 open-source Claude Code skills that make animated videos and music videos **entirely in code** (no image or video
+This repo's `painted-song-reel` skill (below) plus 40 open-source Claude Code skills that make animated videos and music videos **entirely in code** (no image or video
 generator): Claude writes the drawing code, a headless Chrome renders every frame, ffmpeg encodes the MP4.
 
 | skill | look | source |
@@ -14,9 +14,16 @@ generator): Claude writes the drawing code, a headless Chrome renders every fram
 | `kinetic-reel` | bold kinetic-typography showreels | [tuzhechen2005/painted-animation](https://github.com/tuzhechen2005/painted-animation) |
 | `music-video-reimagined` | remake a music video as a hand-painted Clawd cartoon | [am-will/music-video-reimagined](https://github.com/am-will/music-video-reimagined) |
 | `animate` | cut paper, crosshatch ink, riso, sketchbook, pixel, isometric, math | [cth9191/animate](https://github.com/cth9191/animate) |
+| `cinecode` | one sentence → a short film, ad or music video with sound (Quick: one HTML file; Film: six gated steps, three.js); 3D, 2D, ink, paper, clay, pixel | [sarpstar/cinecode](https://github.com/sarpstar/cinecode) |
 
 All MIT. Pinned to the commits reviewed on 2026-11-12 (scripts read for remote-code execution and data leaks: none;
 the bundled media tools' telemetry is switched off by the installer with `DO_NOT_TRACK=1`).
+cinecode is pinned to c8a3e75, reviewed on 2026-11-14: its SKILL.md registers hooks (one on every message, others on
+tool use and stop) that run its local `guard.py` only while the skill is in use, to keep a film's approval gates; the
+guard makes no network calls. Its scripts fetch from public asset, font and sound sources (Wikipedia, NASA, iNaturalist,
+Pixabay with a key, Kenney, Fontsource) and narrate with Gemini or ElevenLabs only on the user's own key, kept in
+`~/.cinecode/keys.env` (owner-only); `usage.py` reads the local Claude logs to count tokens and sends nothing. Its own
+test suite passes here (231 tests). The README images (`docs/media`) are left out of the install.
 
 ## HyperFrames and Vox-style explainers
 - **HyperFrames** (`heygen-com/hyperframes`, Apache-2.0; the current official skills): `hyperframes` (read first:

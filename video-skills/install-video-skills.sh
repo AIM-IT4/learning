@@ -14,6 +14,8 @@
 #   tuzhechen2005/painted-animation MIT  kinetic-reel (its painted-animation is the same engine as reelmimic's)
 #   am-will/music-video-reimagined  MIT  music-video-reimagined (remake a music video as a hand-painted cartoon)
 #   cth9191/animate                 MIT  animate (procedural animation: cut paper, ink, riso, sketchbook, pixel, ...)
+#   sarpstar/cinecode               MIT  cinecode (one sentence -> a short film, ad or music video with sound; its own
+#                                         hooks run its local guard only while the skill is in use)
 #   ./painted-song-reel (this repo)       painted-song-reel (painted music-video reel for any song, local painter)
 #
 # Not installed: reelmimic's .claude/settings.json hooks (they drive its own app) and Joker-chichi/claude-mv-skill
@@ -36,6 +38,7 @@ fetch CK42BB/vox-explainer-skill      7003225dc3ed1dee9e2ef8b91b05b82c04691aa9 v
 fetch tuzhechen2005/painted-animation 59744a69c7b916cfbe4c4ec84006b0c2f5e2fde1 painted
 fetch am-will/music-video-reimagined  7d6b7b22caf08c6e330e1abb869953d8e4f2cc1a reimagined
 fetch cth9191/animate                 7e5eb56feb2dd573f890e1b7b34748af43d58263 animate
+fetch sarpstar/cinecode               c8a3e7552699360a2b0142c9620882af2069eedb cinecode '/*' '!/docs/media/'
 
 mkdir -p "$DEST"
 put() { rm -rf "$DEST/$2"; cp -r "$1" "$DEST/$2"; rm -rf "$DEST/$2/.git"; }
@@ -63,6 +66,7 @@ rm -rf "$DEST/vox-explainer" && mkdir -p "$DEST/vox-explainer" && cp -r "$TMP"/v
 put "$TMP/painted/skills/kinetic-reel" kinetic-reel
 put "$TMP/reimagined/skills/music-video-reimagined" music-video-reimagined
 put "$TMP/animate/plugins/animate/skills/animate" animate
+put "$TMP/cinecode" cinecode   # one sentence -> a film with sound (reviewed 2026-11-14 at c8a3e75)
 # this repo's own skill: painted-song-reel (a painted music-video reel for any song; see painted-song-reel/SKILL.md)
 HERE="$(cd "$(dirname "$0")" && pwd)"
 if [ -d "$HERE/painted-song-reel" ]; then put "$HERE/painted-song-reel" painted-song-reel; fi
