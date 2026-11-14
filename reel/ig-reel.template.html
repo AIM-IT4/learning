@@ -34,10 +34,14 @@ html.export .controls,html.export .note,html.export .startbtn,html.export .snd,
 html.export .pausehint,html.export .replay{display:none!important}
 
 .fx{position:absolute;inset:0;overflow:hidden;pointer-events:none}
-.blob{position:absolute;border-radius:50%;filter:blur(46px);opacity:.5;mix-blend-mode:screen}
-.blob.a{width:250px;height:250px;background:var(--g1);top:-80px;left:-60px}
-.blob.b{width:240px;height:240px;background:var(--g2);bottom:20px;right:-70px}
-.blob.c{width:190px;height:190px;background:var(--g3);top:300px;left:120px;opacity:.28}
+.blob{position:absolute;border-radius:50%;filter:blur(46px);opacity:.62;mix-blend-mode:screen}
+.blob.a{width:270px;height:270px;background:var(--g1);top:-80px;left:-60px}
+.blob.b{width:260px;height:260px;background:var(--g2);bottom:20px;right:-70px}
+.blob.c{width:210px;height:210px;background:var(--g3);top:300px;left:110px;opacity:.32}
+.particles{position:absolute;inset:0}
+.particles i{position:absolute;left:0;top:0;border-radius:50%;background:#fff;box-shadow:0 0 6px 1px rgba(253,29,105,.75)}
+.sweep{position:absolute;top:-25%;bottom:-25%;left:0;width:55%;mix-blend-mode:screen;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.04) 42%,rgba(255,255,255,.09) 50%,rgba(255,255,255,.04) 58%,transparent)}
 .grid{position:absolute;inset:0;opacity:.13;
   background-image:linear-gradient(#ffffff22 1px,transparent 1px),linear-gradient(90deg,#ffffff22 1px,transparent 1px);
   background-size:30px 30px;mask:radial-gradient(90% 70% at 50% 45%,#000,transparent 85%)}
@@ -125,7 +129,8 @@ svg [data-in],svg [data-loop]{transform-box:fill-box;transform-origin:center}
       <linearGradient id="gr" x1="0" y1="0" x2="1" y2="1">
         <stop offset="0" stop-color="#833AB4"/><stop offset=".55" stop-color="#FD1D69"/><stop offset="1" stop-color="#FCAF45"/>
       </linearGradient></defs></svg>
-    <div class="fx"><div class="blob a"></div><div class="blob b"></div><div class="blob c"></div><div class="grid"></div></div>
+    <div class="fx"><div class="blob a"></div><div class="blob b"></div><div class="blob c"></div><div class="grid"></div>
+      <div class="particles" id="particles"></div><div class="sweep" id="sweep"></div></div>
     <div class="bars" id="bars" aria-hidden="true"></div>
     <div class="brand"><span class="dot"></span><span>How Instagram works</span><small id="clock">0:00</small></div>
 
@@ -401,6 +406,17 @@ svg [data-in],svg [data-loop]{transform-box:fill-box;transform-origin:center}
   $('#bars').innerHTML = scenes.map(() => '<i><b></b></i>').join('');
   const fills = [...document.querySelectorAll('#bars b')];
   const blobs = [...document.querySelectorAll('.blob')];
+  // Drifting glow particles: positions come from a seeded random, so every render is identical.
+  let seed = 1234567;
+  const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const particles = [];
+  for (let i = 0; i < 30; i++) {
+    const el = document.createElement('i'), size = 1.5 + rnd() * 2.8;
+    el.style.width = el.style.height = size.toFixed(1) + 'px';
+    $('#particles').appendChild(el);
+    particles.push({ el, x: rnd() * 405, y: rnd() * 760, v: 8 + rnd() * 24, w: 0.4 + rnd() * 0.9, ph: rnd() * 6.283, o: 0.25 + rnd() * 0.5 });
+  }
+  const sweep = $('#sweep');
   const rankCards = [...document.querySelectorAll('.rc')];
   const rankOrder = rankCards.map((c, i) => [i, +c.dataset.score]).sort((a, b) => b[1] - a[1]).map(x => x[0]);
   const cap = $('#cap'), clock = $('#clock'), replay = $('#replay');
@@ -454,9 +470,17 @@ svg [data-in],svg [data-loop]{transform-box:fill-box;transform-origin:center}
   let capShown = -2;
   function render(t) {
     blobs.forEach((b, i) => {
-      const a = (t / 14000 + i * 0.37) * 2 * Math.PI;
-      b.style.transform = REDUCE ? '' : `translate(${Math.sin(a) * 14}px, ${Math.cos(a) * -12}px) scale(${1 + 0.12 * Math.sin(a)})`;
+      const a = (t / 12000 + i * 0.37) * 2 * Math.PI;
+      b.style.transform = REDUCE ? '' : `translate(${Math.sin(a) * 26}px, ${Math.cos(a) * -22}px) scale(${1 + 0.14 * Math.sin(a)})`;
     });
+    const sec = REDUCE ? 0 : t / 1000;
+    particles.forEach(p => {
+      const y = ((p.y - sec * p.v) % 760 + 760) % 760 - 20;
+      const x = p.x + Math.sin(sec * p.w + p.ph) * 10;
+      p.el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)`;
+      p.el.style.opacity = (p.o * (0.55 + 0.45 * Math.sin(sec * 2 * p.w + p.ph))).toFixed(3);
+    });
+    sweep.style.transform = REDUCE ? 'translateX(-300px)' : `translateX(${((((t / 7000) % 1) * 1.9 - 0.65) * 405).toFixed(1)}px) skewX(-12deg)`;
     scenes.forEach((s, k) => {
       const st = S[k].start, en = sceneEnd(k);
       const fin = k === 0 && t >= 0 && st === 0 ? clamp(t / 320) : clamp((t - st) / 320);
@@ -498,7 +522,7 @@ svg [data-in],svg [data-loop]{transform-box:fill-box;transform-origin:center}
   let playing = false, started = false, offset = 0, since = 0, spokenScene = -1, deviceVoice = false;
   $('#startlbl').textContent = audio ? 'Play with sound' : 'Play';
   $('#note').textContent = audio
-    ? 'A 1-minute reel with voiceover. Tap the reel to pause.'
+    ? 'A 1-minute reel with voiceover and music. Tap the reel to pause.'
     : 'Voiceover track not added yet. 🔇 reads the captions with your device\'s voice in the meantime.';
   if (audio) $('#snd').style.display = 'none';
   if (audio) audio.addEventListener('ended', () => { offset = audio.duration * 1000; since = performance.now(); });

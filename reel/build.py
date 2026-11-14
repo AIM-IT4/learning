@@ -124,15 +124,21 @@ def measure(voice):
     return {"scenes": scenes, "total": total}, dur, len(gaps)
 
 
-def build(voice=None, out=OUT):
+def build(voice=None, out=OUT, audio=None):
+    """Time the reel to `voice`; embed `audio` (default: the voice itself, or e.g. the voice+music mix)."""
     out = Path(out)
     out.parent.mkdir(parents=True, exist_ok=True)
     html = TEMPLATE.read_text()
     timing, voice_uri = None, None
     if voice:
         timing, dur, n_gaps = measure(voice)
-        voice_uri = "data:audio/mpeg;base64," + base64.b64encode(Path(voice).read_bytes()).decode()
-        print(f"voice {dur / 1000:.1f}s, {n_gaps} pauses found, reel {timing['total'] / 1000:.1f}s")
+        embed = Path(audio or voice)
+        voice_uri = "data:audio/mpeg;base64," + base64.b64encode(embed.read_bytes()).decode()
+        timing_file = HERE / "build" / "timing.json"
+        timing_file.parent.mkdir(parents=True, exist_ok=True)
+        timing_file.write_text(json.dumps(timing, indent=1))
+        print(f"voice {dur / 1000:.1f}s, {n_gaps} pauses found, reel {timing['total'] / 1000:.1f}s "
+              f"(timing saved to {timing_file}; embedded {embed.name})")
         for k, s in enumerate(timing["scenes"]):
             print(f"  scene {k}: shows {s['start'] / 1000:5.2f}s  speech {s['speechStart'] / 1000:5.2f}-{s['speechEnd'] / 1000:5.2f}s")
     html = html.replace("/*VOICE*/null", json.dumps(voice_uri))
@@ -143,11 +149,12 @@ def build(voice=None, out=OUT):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("--voice")
+    ap.add_argument("--voice", help="the voiceover; scenes are timed to its pauses")
+    ap.add_argument("--audio", help="audio to embed instead of the bare voice (e.g. build/mix.mp3)")
     ap.add_argument("--out", default=str(OUT))
     ap.add_argument("--print-script", action="store_true")
     a = ap.parse_args()
     if a.print_script:
         print(" ".join(narration_lines()))
         sys.exit()
-    build(a.voice, a.out)
+    build(a.voice, a.out, a.audio)
