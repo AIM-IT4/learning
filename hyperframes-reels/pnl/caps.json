@@ -1,0 +1,12 @@
+{"b01": "[Six=6] p.m. on the trading desk. | The head of desk has one question.",
+ "b02": "We made [one and a half million dollars=$1.5 million] today. Why?",
+ "b03": "Every desk has to answer that, every single day. | It's called [P and L=P&L] explain.",
+ "b04": "Start with delta. | The market fell [two percent,=2%,] and we were short, | so delta made [nine hundred thousand.=$900k.]",
+ "b05": "Then gamma. We were long options, | so the big move paid extra: | another [three hundred thousand.=$300k.]",
+ "b06": "Volatility jumped [one=1] point, | and our vega added [six hundred thousand.=$600k.]",
+ "b07": "But a day went by, | and options lose value with time, | so theta cost us [three hundred and fifty thousand.=$350k.]",
+ "b08": "Add it up: [one point four five million.=$1.45 million.]",
+ "b09": "The last [fifty thousand=$50k] is unexplained, | and that small gap is where the real questions begin.",
+ "b10": "A model problem? A missing risk? | A booking error?",
+ "b11": "If you can explain your [P and L,=P&L,] | you understand your book.",
+ "b12": "That's chapter [twenty-six=26] of | Quantitative Finance for Absolute Beginners, | on [Desk to Quant.=Desk2Quant.]"}

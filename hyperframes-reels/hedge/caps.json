@@ -1,0 +1,11 @@
+{"a01": "You just sold a call option. | If the stock rallies, you lose money.",
+ "a02": "So how does a trading desk sleep at night? | Delta hedging.",
+ "a03": "Delta tells you how much the option moves | when the stock moves by [one rupee.=₹1.]",
+ "a04": "Here, delta is about [zero point five,=0.5,] | so for every option you sold, | you buy half a share.",
+ "a05": "Now if the stock ticks up, | you lose on the option, | but you gain on the shares. | The two almost cancel out.",
+ "a06": "But delta keeps changing as the stock moves, | so the hedge has to be adjusted, | again and again. That's rebalancing.",
+ "a07": "Watch one simulated path. | Rebalance [five=5] times, and the hedge drifts.",
+ "a08": "[Twenty=20] times, it's much closer. | [Two hundred=200] times, the error almost disappears.",
+ "a09": "The rule of thumb: | rebalance [four=4] times as often, | and the error roughly halves.",
+ "a10": "But every trade costs money, | so finding that balance | is the real job on the desk.",
+ "a11": "Try it yourself | in the Stochastic Calculus Visual Lab, | on [Desk to Quant.=Desk2Quant.]"}

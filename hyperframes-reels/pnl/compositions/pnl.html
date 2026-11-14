@@ -1,0 +1,287 @@
+<template>
+  <style>
+    @font-face { font-family: "Inter"; font-weight: 100 900; src: url("assets/fonts/Inter.ttf"); }
+    @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
+    #root { position: absolute; inset: 0; overflow: hidden; background-color: #eef3f8;
+            background-image: radial-gradient(circle at 1.5px 1.5px, #d3dce8 1.5px, transparent 2px); background-size: 36px 36px; }
+    .pn { position: absolute; background: #ffffff; border: 2px solid #d6dfeb; border-radius: 20px; box-shadow: 0 8px 22px rgba(6, 39, 91, 0.08); }
+    #p-top { left: 40px; top: 228px; width: 1000px; height: 84px; }
+    #p-logo { position: absolute; left: 22px; top: 14px; width: 52px; height: 52px; }
+    #p-brand { position: absolute; left: 88px; top: 0; font: 700 34px/80px Inter, sans-serif; color: #06275b; }
+    #p-desk { position: absolute; left: 430px; top: 0; font: 600 22px/80px "JetBrains Mono", Inter, monospace; color: #60708a; letter-spacing: 2px; }
+    #p-hero { left: 40px; top: 332px; width: 1000px; height: 236px; }
+    .lab { position: absolute; font: 600 24px/1 "JetBrains Mono", Inter, monospace; color: #60708a; letter-spacing: 2px; white-space: nowrap; }
+    #p-ill { position: absolute; right: 30px; top: 22px; height: 40px; padding: 0 16px; border: 2px solid #f59e0b; border-radius: 20px;
+             font: 700 22px/36px "JetBrains Mono", Inter, monospace; color: #92400e; letter-spacing: 1px; background: #fffbeb; }
+    #p-why { position: absolute; left: 858px; top: 452px; height: 72px; padding: 0 22px; background: #f59e0b; border-radius: 18px;
+             font: 800 46px/72px Inter, sans-serif; color: #06275b; }
+    #p-day { left: 40px; top: 600px; width: 1000px; height: 440px; }
+    #p-chat { left: 40px; top: 1060px; width: 1000px; height: 236px; }
+    #p-av { position: absolute; left: 30px; top: 28px; width: 76px; height: 76px; border-radius: 38px; background: #06275b;
+            font: 700 30px/76px Inter, sans-serif; color: #ffffff; text-align: center; }
+    #p-who { position: absolute; left: 126px; top: 34px; font: 700 32px/1 Inter, sans-serif; color: #06275b; }
+    #p-when { position: absolute; right: 34px; top: 40px; font: 500 24px/1 "JetBrains Mono", Inter, monospace; color: #60708a; }
+    #p-bub { position: absolute; left: 126px; top: 86px; width: 840px; height: 122px; background: #eef3f8; border-radius: 8px 28px 28px 28px; }
+    #p-msg { position: absolute; left: 30px; top: 0; width: 790px; font: 700 46px/122px Inter, sans-serif; color: #06275b; white-space: nowrap; }
+    .tile { position: absolute; top: 600px; width: 326px; height: 120px; }
+    .tile .lab { left: 22px; top: 20px; font-size: 20px; }
+    .chip { position: absolute; top: 612px; height: 96px; padding: 0 24px; background: #fffbeb; border: 3px solid #f59e0b; border-radius: 22px;
+            font: 700 33px/90px Inter, sans-serif; color: #06275b; white-space: nowrap; }
+    #p-banner { position: absolute; left: 40px; top: 600px; width: 1000px; height: 120px; background: #06275b; border-radius: 20px;
+                font: 700 40px/120px Inter, sans-serif; color: #ffffff; text-align: center; }
+    #p-banner em { font-style: normal; color: #5eead4; }
+    #p-wf { left: 40px; top: 740px; width: 1000px; height: 556px; }
+    #p-cv { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #p-ch { position: absolute; left: 72px; top: 368px; }
+    #p-cht { position: absolute; left: 72px; top: 412px; width: 940px; font: 800 58px/1.1 Inter, sans-serif; color: #06275b; }
+    #p-chs { position: absolute; left: 72px; top: 492px; width: 940px; font: 600 29px/1.2 Inter, sans-serif; color: #60708a; }
+    #p-cover { position: absolute; left: 290px; top: 596px; width: 500px; height: 500px; border-radius: 18px; border: 2px solid #d6dfeb;
+               box-shadow: 0 18px 40px rgba(6, 39, 91, 0.22); }
+    #p-facts { position: absolute; left: 40px; top: 1124px; width: 1000px; text-align: center; font: 600 28px/1 "JetBrains Mono", Inter, monospace; color: #06275b; }
+    #p-url { position: absolute; left: 330px; top: 1176px; width: 420px; height: 76px; background: #08a9a2; border-radius: 38px;
+             font: 800 40px/76px Inter, sans-serif; color: #ffffff; text-align: center; }
+    #p-capband { position: absolute; left: 40px; top: 1316px; width: 1000px; height: 134px; background: #06275b; border-radius: 22px; }
+    .cap { position: absolute; left: 60px; top: 1322px; width: 960px; height: 122px; display: flex; align-items: center; justify-content: center;
+           flex-wrap: wrap; align-content: center; text-align: center; font: 600 44px/58px Inter, sans-serif; color: #ffffff; }
+    .cap span { display: inline-block; margin: 0 2px; padding: 0 7px; border-radius: 9px; }
+    #p-foot { position: absolute; left: 40px; top: 1468px; width: 1000px; text-align: center; font: 500 25px/32px "JetBrains Mono", Inter, monospace; color: #60708a; }
+  </style>
+  <div id="root" data-composition-id="pnl" data-width="1080" data-height="1920">
+    <div id="p-top" class="pn">
+      <img id="p-logo" src="assets/desk2quant-logo.png" alt="Desk2Quant logo" />
+      <div id="p-brand">Desk2Quant</div>
+      <div id="p-desk">EQ VOL DESK</div>
+    </div>
+    <div id="p-hero" class="pn"><div id="p-hl" class="lab" style="left: 32px; top: 36px">TODAY'S P&amp;L</div><div id="p-ill">ILLUSTRATIVE BOOK</div></div>
+    <div id="p-day" class="pn"><div class="lab" style="left: 32px; top: 30px">INTRADAY P&amp;L</div></div>
+    <div id="p-chat" class="pn">
+      <div id="p-av">HD</div><div id="p-who">Head of desk</div><div id="p-when">18:00</div>
+      <div id="p-bub"><div id="p-msg">We made $1.5M today. Why?</div></div>
+    </div>
+    <div id="p-t1" class="tile pn" style="left: 40px"><div class="lab">MARKET</div></div>
+    <div id="p-t2" class="tile pn" style="left: 377px"><div class="lab">IMPLIED VOL</div></div>
+    <div id="p-t3" class="tile pn" style="left: 714px"><div class="lab">TIME</div></div>
+    <div id="p-q1" class="chip" style="left: 40px">Model problem?</div>
+    <div id="p-q2" class="chip" style="left: 382px">Missing risk?</div>
+    <div id="p-q3" class="chip" style="left: 706px">Booking error?</div>
+    <div id="p-banner">Explain the P&amp;L <em>→</em> know the book</div>
+    <div id="p-wf" class="pn"></div>
+    <div id="p-ch" class="lab">CHAPTER 26</div>
+    <div id="p-cht">P&amp;L Thinking and Desk Intuition</div>
+    <div id="p-chs">in Quantitative Finance for Absolute Beginners</div>
+    <img id="p-cover" src="assets/cover.jpg" alt="Quant Finance for Absolute Beginners cover" />
+    <div id="p-facts">28 chapters · 28 Python scripts</div>
+    <div id="p-url">desk2quant.com</div>
+    <canvas id="p-cv" width="1080" height="1920"></canvas>
+    <div id="p-why">Why?</div>
+    <div id="p-capband"></div>
+    <!--CAPS-->
+    <div id="cap-1" class="cap"><span data-w="0">6</span><span data-w="1">p.m.</span><span data-w="2">on</span><span data-w="3">the</span><span data-w="4">trading</span><span data-w="5">desk.</span></div>
+    <div id="cap-2" class="cap"><span data-w="6">The</span><span data-w="7">head</span><span data-w="8">of</span><span data-w="9">desk</span><span data-w="10">has</span><span data-w="11">one</span><span data-w="12">question.</span></div>
+    <div id="cap-3" class="cap"><span data-w="13">We</span><span data-w="14">made</span><span data-w="15">$1.5 million</span><span data-w="21">today.</span><span data-w="22">Why?</span></div>
+    <div id="cap-4" class="cap"><span data-w="23">Every</span><span data-w="24">desk</span><span data-w="25">has</span><span data-w="26">to</span><span data-w="27">answer</span><span data-w="28">that,</span><span data-w="29">every</span><span data-w="30">single</span><span data-w="31">day.</span></div>
+    <div id="cap-5" class="cap"><span data-w="32">It's</span><span data-w="33">called</span><span data-w="34">P&amp;L</span><span data-w="37">explain.</span></div>
+    <div id="cap-6" class="cap"><span data-w="38">Start</span><span data-w="39">with</span><span data-w="40">delta.</span></div>
+    <div id="cap-7" class="cap"><span data-w="41">The</span><span data-w="42">market</span><span data-w="43">fell</span><span data-w="44">2%,</span><span data-w="46">and</span><span data-w="47">we</span><span data-w="48">were</span><span data-w="49">short,</span></div>
+    <div id="cap-8" class="cap"><span data-w="50">so</span><span data-w="51">delta</span><span data-w="52">made</span><span data-w="53">$900k.</span></div>
+    <div id="cap-9" class="cap"><span data-w="56">Then</span><span data-w="57">gamma.</span><span data-w="58">We</span><span data-w="59">were</span><span data-w="60">long</span><span data-w="61">options,</span></div>
+    <div id="cap-10" class="cap"><span data-w="62">so</span><span data-w="63">the</span><span data-w="64">big</span><span data-w="65">move</span><span data-w="66">paid</span><span data-w="67">extra:</span></div>
+    <div id="cap-11" class="cap"><span data-w="68">another</span><span data-w="69">$300k.</span></div>
+    <div id="cap-12" class="cap"><span data-w="72">Volatility</span><span data-w="73">jumped</span><span data-w="74">1</span><span data-w="75">point,</span></div>
+    <div id="cap-13" class="cap"><span data-w="76">and</span><span data-w="77">our</span><span data-w="78">vega</span><span data-w="79">added</span><span data-w="80">$600k.</span></div>
+    <div id="cap-14" class="cap"><span data-w="83">But</span><span data-w="84">a</span><span data-w="85">day</span><span data-w="86">went</span><span data-w="87">by,</span></div>
+    <div id="cap-15" class="cap"><span data-w="88">and</span><span data-w="89">options</span><span data-w="90">lose</span><span data-w="91">value</span><span data-w="92">with</span><span data-w="93">time,</span></div>
+    <div id="cap-16" class="cap"><span data-w="94">so</span><span data-w="95">theta</span><span data-w="96">cost</span><span data-w="97">us</span><span data-w="98">$350k.</span></div>
+    <div id="cap-17" class="cap"><span data-w="103">Add</span><span data-w="104">it</span><span data-w="105">up:</span><span data-w="106">$1.45 million.</span></div>
+    <div id="cap-18" class="cap"><span data-w="111">The</span><span data-w="112">last</span><span data-w="113">$50k</span><span data-w="115">is</span><span data-w="116">unexplained,</span></div>
+    <div id="cap-19" class="cap"><span data-w="117">and</span><span data-w="118">that</span><span data-w="119">small</span><span data-w="120">gap</span><span data-w="121">is</span><span data-w="122">where</span><span data-w="123">the</span><span data-w="124">real</span><span data-w="125">questions</span><span data-w="126">begin.</span></div>
+    <div id="cap-20" class="cap"><span data-w="127">A</span><span data-w="128">model</span><span data-w="129">problem?</span><span data-w="130">A</span><span data-w="131">missing</span><span data-w="132">risk?</span></div>
+    <div id="cap-21" class="cap"><span data-w="133">A</span><span data-w="134">booking</span><span data-w="135">error?</span></div>
+    <div id="cap-22" class="cap"><span data-w="136">If</span><span data-w="137">you</span><span data-w="138">can</span><span data-w="139">explain</span><span data-w="140">your</span><span data-w="141">P&amp;L,</span></div>
+    <div id="cap-23" class="cap"><span data-w="144">you</span><span data-w="145">understand</span><span data-w="146">your</span><span data-w="147">book.</span></div>
+    <div id="cap-24" class="cap"><span data-w="148">That's</span><span data-w="149">chapter</span><span data-w="150">26</span><span data-w="151">of</span></div>
+    <div id="cap-25" class="cap"><span data-w="152">Quantitative</span><span data-w="153">Finance</span><span data-w="154">for</span><span data-w="155">Absolute</span><span data-w="156">Beginners,</span></div>
+    <div id="cap-26" class="cap"><span data-w="157">on</span><span data-w="158">Desk2Quant.</span></div>
+    <!--/CAPS-->
+    <div id="p-foot">Illustrative book · Educational content, not trading advice</div>
+  </div>
+  <script>
+    (function () {
+      const V = 0.4;
+      /*CUES*/
+      const LS = {"b01": 0, "b02": 13, "b03": 23, "b04": 38, "b05": 56, "b06": 72, "b07": 83, "b08": 103, "b09": 111, "b10": 127, "b11": 136, "b12": 148};
+      const W = [0.00, 0.52, 1.16, 1.28, 1.42, 1.64, 2.35, 2.52, 2.66, 2.82, 3.08, 3.44, 3.72, 4.78, 4.90, 5.12, 5.28, 5.40, 5.48, 5.66, 5.94, 6.68, 7.28, 8.27, 8.51, 8.77, 9.09, 9.23, 9.57, 9.81, 10.37, 10.61, 11.31, 11.37, 11.59, 11.87, 12.03, 12.25, 13.43, 13.77, 14.01, 14.68, 14.79, 15.07, 15.31, 15.58, 16.18, 16.35, 16.55, 16.69, 17.28, 17.49, 17.77, 18.13, 18.32, 18.63, 19.60, 19.84, 20.16, 20.66, 20.78, 21.02, 21.50, 22.14, 22.32, 22.48, 22.76, 23.04, 23.44, 24.08, 24.30, 24.59, 25.54, 26.04, 26.48, 26.80, 27.14, 27.64, 27.84, 28.14, 28.54, 28.70, 29.03, 30.05, 30.55, 30.69, 30.81, 31.01, 31.65, 31.81, 32.25, 32.51, 32.93, 33.17, 33.90, 34.07, 34.35, 34.69, 35.25, 35.49, 35.69, 35.95, 36.15, 37.20, 37.42, 37.52, 37.95, 38.21, 38.60, 38.93, 39.26, 40.40, 40.58, 40.88, 41.15, 41.56, 42.14, 42.78, 43.28, 43.46, 43.78, 44.12, 44.56, 44.80, 44.96, 45.18, 45.68, 46.65, 46.77, 46.97, 47.69, 47.85, 48.09, 48.80, 48.89, 49.11, 50.16, 50.30, 50.36, 50.50, 50.90, 51.16, 51.50, 51.70, 52.12, 52.36, 52.78, 53.06, 53.95, 54.21, 54.67, 55.15, 55.95, 56.35, 56.97, 57.57, 58.05, 58.90, 59.03, 59.29, 59.45];
+      const VO_END = 59.751;
+      /*END CUES*/
+      const t = (i) => W[i] + V;
+      const T = (line, k) => t(LS[line] + k);
+      const END = VO_END + V + 2.6;
+      const TAU = Math.PI * 2;
+      const EZ = { o2: gsap.parseEase("power2.out"), o3: gsap.parseEase("power3.out"), io2: gsap.parseEase("power2.inOut"), b: gsap.parseEase("back.out(1.6)") };
+      const pr = (tt, t0, d, ez) => { const p = Math.min(1, Math.max(0, (tt - t0) / d)); return ez ? ez(p) : p; };
+      const C = { navy: "#06275b", muted: "#60708a", teal: "#08a9a2", tealD: "#067a75", rose: "#e11d48", roseF: "#f43f5e", amber: "#f59e0b", line: "#e3e9f1", grid: "#d6dfeb" };
+      const FI = "Inter, sans-serif", FM = '"JetBrains Mono", Inter, monospace';
+      const X = document.getElementById("p-cv").getContext("2d");
+      const txt = (s, x, y, f, col, al = "left", bl = "alphabetic") => { X.font = f; X.fillStyle = col; X.textAlign = al; X.textBaseline = bl; X.fillText(s, x, y); };
+      const money = (v) => (v < 0 ? "−$" : "+$") + Math.round(Math.abs(v)).toLocaleString("en-US");
+      const k$ = (v) => (v < 0 ? "−$" : "+$") + (Math.abs(v) >= 1e6 ? (Math.abs(v) / 1e6).toFixed(2).replace(/0$/, "") + "M" : Math.round(Math.abs(v) / 1e3) + "k");
+
+      // the illustrative book's day: a long-options book, market down 2%, implied vol up 1 point, one day of decay
+      const LEGS = [["Delta", "Δ·ΔS", 900e3], ["Gamma", "½Γ·ΔS²", 300e3], ["Vega", "ν·Δσ", 600e3], ["Theta", "Θ·Δt", -350e3]];
+      const EXPLAINED = 1450e3, ACTUAL = 1500e3;
+      const XS = [120, 260, 400, 540, 680, 820, 960], BW = 92, BASE = 1196, KS = 376 / 1.8e6, yv = (v) => BASE - v * KS;
+      // an illustrative intraday P&L: a seeded random walk tied to end at the day's actual P&L (every 5 minutes, 09:00-18:00)
+      let sd = 26; const rnd = () => { sd |= 0; sd = (sd + 0x6d2b79f5) | 0; let x = Math.imul(sd ^ (sd >>> 15), 1 | sd); x = (x + Math.imul(x ^ (x >>> 7), 61 | x)) ^ x; return ((x ^ (x >>> 14)) >>> 0) / 4294967296; };
+      const gauss = () => { let u = 0; while (u === 0) u = rnd(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(TAU * rnd()); };
+      const NDAY = 109, DAY = [0]; for (let i = 1; i < NDAY; i++) DAY.push(DAY[i - 1] + gauss() * 55e3);
+      const drift = ACTUAL - DAY[NDAY - 1]; for (let i = 0; i < NDAY; i++) DAY[i] += drift * i / (NDAY - 1);
+
+      const P = { time: 0 };
+      const draw = () => {
+        const tt = P.time;
+        X.setTransform(1, 0, 0, 1, 0, 0); X.globalAlpha = 1; X.clearRect(0, 0, 1080, 1920);
+        // the desk clock reaches 18:00:00 on "Six"
+        const s = Math.floor(tt - T("b01", 0) + 1e-6), tot = 18 * 3600 + s, two = (v) => String(v).padStart(2, "0");
+        txt(`${Math.floor(tot / 3600)}:${two(Math.floor((tot % 3600) / 60))}:${two(tot % 60)}`, 1012, 271, `700 36px ${FM}`, C.navy, "right", "middle");
+        X.globalAlpha = 0.55 + 0.45 * Math.cos(tt * TAU * 0.8); X.beginPath(); X.arc(408, 270, 8, 0, TAU); X.fillStyle = C.teal; X.fill(); X.globalAlpha = 1;
+        // today's P&L counts up as the screen comes on, and pulses on the question
+        const cta = pr(tt, T("b12", 0) - 0.3, 0.3);
+        const dp = pr(tt, -1.22, 1.22 + T("b01", 1) + 0.2), fi = dp * (NDAY - 1), i0 = Math.floor(fi), now = i0 >= NDAY - 1 ? DAY[NDAY - 1] : DAY[i0] + (DAY[i0 + 1] - DAY[i0]) * (fi - i0);
+        const pulse = 1 + 0.05 * Math.sin(Math.PI * pr(tt, T("b02", 2), 0.5));
+        X.save(); X.globalAlpha = 1 - cta; X.translate(72, 512); X.scale(pulse, pulse);
+        txt(money(now), 0, 0, `800 112px ${FM}`, C.tealD); X.restore();
+        // the day so far: an illustrative intraday P&L line, 09:00 to 18:00
+        const dayA = 1 - pr(tt, T("b03", 0) - 0.3, 0.3);
+        if (dayA > 0) {
+          X.globalAlpha = dayA; const lo = Math.min(0, ...DAY), hi = Math.max(...DAY), dx = (i) => 100 + i / (NDAY - 1) * 880, dy = (v) => 990 - (v - lo) / (hi - lo) * 300;
+          txt("illustrative", 1008, 652, `500 21px ${FM}`, C.muted, "right");
+          X.fillStyle = C.line; X.fillRect(100, dy(0), 880, 2);
+          ["09:00", "12:00", "15:00", "18:00"].forEach((h, k) => txt(h, 100 + k * 880 / 3, 1024, `500 21px ${FM}`, C.muted, k ? (k === 3 ? "right" : "center") : "left"));
+          const n = Math.max(1, Math.floor(fi));
+          X.beginPath(); X.moveTo(dx(0), dy(DAY[0])); for (let i = 1; i <= Math.min(n, NDAY - 1); i++) X.lineTo(dx(i), dy(DAY[i])); X.lineTo(dx(Math.min(fi, NDAY - 1)), dy(now));
+          X.lineTo(dx(Math.min(fi, NDAY - 1)), dy(lo)); X.lineTo(dx(0), dy(lo)); X.closePath(); X.fillStyle = "rgba(8,169,162,0.12)"; X.fill();
+          X.beginPath(); X.moveTo(dx(0), dy(DAY[0])); for (let i = 1; i <= Math.min(n, NDAY - 1); i++) X.lineTo(dx(i), dy(DAY[i])); X.lineTo(dx(Math.min(fi, NDAY - 1)), dy(now));
+          X.strokeStyle = C.tealD; X.lineWidth = 5; X.lineJoin = "round"; X.stroke();
+          X.beginPath(); X.arc(dx(Math.min(fi, NDAY - 1)), dy(now), 10 + 3 * Math.sin(tt * TAU), 0, TAU); X.fillStyle = C.teal; X.fill();
+          X.globalAlpha = 1;
+        }
+        // typing dots before the message lands
+        const ty = pr(tt, 0.5, 0.25) * (1 - pr(tt, T("b02", 0) - 0.12, 0.08));
+        if (ty > 0) { X.globalAlpha = ty * (1 - pr(tt, T("b03", 0) - 0.3, 0.25));
+          for (let i = 0; i < 3; i++) { const b = Math.max(0, Math.sin((tt * 2.2 - i * 0.18) * TAU)); X.beginPath(); X.arc(206 + i * 30, 1207 - 10 * b, 9, 0, TAU); X.fillStyle = C.muted; X.fill(); }
+          X.globalAlpha = 1; }
+        // market tiles: what moved today
+        const tiles = [[40, T("b04", 4), "−2.0%", C.rose, [0, 0.1, -0.2, 0.15, -0.5, -0.9, -0.7, -1.3, -1.6, -2.0]],
+                       [377, T("b06", 0), "+1.0 pt", C.tealD, [0, -0.1, 0.1, 0.2, 0.15, 0.4, 0.55, 0.5, 0.8, 1.0]],
+                       [714, T("b07", 1), "−1 day", C.navy, null]];
+        const tilesOff = pr(tt, T("b10", 0) - 0.3, 0.25);
+        tiles.forEach(([x, at, val, col, sp]) => {
+          const p = pr(tt, at, 0.4, EZ.o3), on = pr(tt, T("b03", 0) + 0.1, 0.3) * (1 - tilesOff);
+          if (p <= 0) { if (on > 0) { X.globalAlpha = on; txt("—", x + 22, 690, `800 44px ${FI}`, C.grid); X.globalAlpha = 1; } return; }
+          X.globalAlpha = p * (1 - tilesOff);
+          txt(val, x + 22, 690, `800 44px ${FI}`, col);
+          if (sp) { const q = pr(tt, at, 0.9, EZ.io2), n = Math.max(1, Math.round(q * (sp.length - 1)));
+            X.beginPath(); for (let i = 0; i <= n; i++) { const px = x + 190 + i * 13, py = 660 - sp[i] * 22; i ? X.lineTo(px, py) : X.moveTo(px, py); }
+            X.strokeStyle = col; X.lineWidth = 4; X.lineJoin = "round"; X.stroke(); }
+          else { const q = pr(tt, at, 0.9, EZ.io2); X.beginPath(); X.arc(x + 262, 660, 30, 0, TAU); X.strokeStyle = C.grid; X.lineWidth = 6; X.stroke();
+            X.beginPath(); X.arc(x + 262, 660, 30, -Math.PI / 2, -Math.PI / 2 + TAU * q); X.strokeStyle = C.navy; X.stroke(); }
+          X.globalAlpha = 1;
+        });
+        // the P&L explain waterfall
+        const wf = pr(tt, T("b03", 0) - 0.1, 0.4) * (1 - cta);
+        if (wf > 0) {
+          X.globalAlpha = wf;
+          txt("P&L EXPLAIN", 72, 790, `800 28px ${FM}`, C.navy);
+          txt("illustrative · $", 1008, 790, `500 21px ${FM}`, C.muted, "right");
+          X.fillStyle = C.navy; X.fillRect(70, BASE, 950, 3);
+          const labs = ["Delta", "Gamma", "Vega", "Theta", "Explained", "Gap", "Actual"], fs = ["Δ·ΔS", "½Γ·ΔS²", "ν·Δσ", "Θ·Δt", "sum", "?", "P&L"];
+          labs.forEach((l, i) => { const a = pr(tt, T("b03", 9) + i * 0.08, 0.3); if (a <= 0) return; X.globalAlpha = wf * a;
+            txt(l, XS[i], 1236, `700 24px ${FI}`, C.navy, "center"); txt(fs[i], XS[i], 1272, `500 22px ${FM}`, C.muted, "center"); X.globalAlpha = wf; });
+          // each leg grows from the running total, with its number over it
+          const cue = [[T("b04", 13), T("b04", 15)], [T("b05", 8), T("b05", 13)], [T("b06", 6), T("b06", 8)], [T("b07", 12), T("b07", 15)]];
+          let run = 0;
+          LEGS.forEach(([name, f, v], i) => {
+            const g = pr(tt, cue[i][0], 0.6, EZ.o3), lv = pr(tt, cue[i][1], 0.3);
+            if (g > 0) {
+              const y0 = yv(run), y1 = yv(run + v * g), top = Math.min(y0, y1), h = Math.max(2, Math.abs(y1 - y0));
+              X.fillStyle = v > 0 ? C.teal : C.roseF; X.fillRect(XS[i] - BW / 2, top, BW, h);
+              X.strokeStyle = v > 0 ? C.tealD : C.rose; X.lineWidth = 3; X.strokeRect(XS[i] - BW / 2, top, BW, h);
+              if (i) { X.save(); X.setLineDash([6, 6]); X.strokeStyle = C.muted; X.lineWidth = 2; X.beginPath(); X.moveTo(XS[i - 1] + BW / 2, y0); X.lineTo(XS[i] - BW / 2, y0); X.stroke(); X.restore(); }
+              if (lv > 0) { X.globalAlpha = wf * lv; txt(k$(v), XS[i], v > 0 ? y1 - 14 : y1 + 34, `800 27px ${FM}`, v > 0 ? C.tealD : C.rose, "center"); X.globalAlpha = wf; }
+            }
+            // the formula of the leg being spoken lights up
+            const on = pr(tt, cue[i][0] - 0.6, 0.3) * (1 - pr(tt, cue[i][1] + 1.2, 0.4));
+            if (on > 0) { X.globalAlpha = wf * on; X.fillStyle = "rgba(245,158,11,0.22)"; X.beginPath(); X.roundRect(XS[i] - 66, 1250, 132, 34, 10); X.fill(); X.globalAlpha = wf; }
+            run += v * Math.min(1, Math.max(0, g));
+          });
+          // add it up: explained, then the actual P&L, and the gap between them
+          const e = pr(tt, T("b08", 0), 0.6, EZ.o3), el = pr(tt, T("b08", 3), 0.3);
+          if (e > 0) { X.fillStyle = C.navy; X.fillRect(XS[4] - BW / 2, yv(EXPLAINED * e), BW, BASE - yv(EXPLAINED * e));
+            X.save(); X.setLineDash([6, 6]); X.strokeStyle = C.muted; X.lineWidth = 2; X.beginPath(); X.moveTo(XS[3] + BW / 2, yv(EXPLAINED)); X.lineTo(XS[4] - BW / 2, yv(EXPLAINED)); X.stroke(); X.restore();
+            if (el > 0) { X.globalAlpha = wf * el; txt("$1.45M", XS[4], yv(EXPLAINED) - 14, `800 27px ${FM}`, C.navy, "center"); X.globalAlpha = wf; } }
+          const a = pr(tt, T("b09", 0), 0.6, EZ.o3), al = pr(tt, T("b09", 0) + 0.3, 0.3);
+          if (a > 0) { X.fillStyle = C.teal; X.fillRect(XS[6] - BW / 2, yv(ACTUAL * a), BW, BASE - yv(ACTUAL * a)); X.strokeStyle = C.tealD; X.lineWidth = 3; X.strokeRect(XS[6] - BW / 2, yv(ACTUAL * a), BW, BASE - yv(ACTUAL * a));
+            if (al > 0) { X.globalAlpha = wf * al; txt("$1.5M", XS[6], yv(ACTUAL) - 14, `800 27px ${FM}`, C.tealD, "center"); X.globalAlpha = wf; } }
+          const gp = pr(tt, T("b09", 2), 0.5, EZ.o3);
+          if (gp > 0) {
+            const y0 = yv(EXPLAINED), y1 = yv(EXPLAINED + (ACTUAL - EXPLAINED) * gp), beat = 1 + 0.5 * Math.sin(Math.PI * pr(tt, T("b09", 8), 0.7));
+            X.save(); X.setLineDash([6, 6]); X.strokeStyle = C.muted; X.lineWidth = 2; X.beginPath(); X.moveTo(XS[4] + BW / 2, y0); X.lineTo(XS[5] - BW / 2, y0); X.moveTo(XS[5] + BW / 2, y1); X.lineTo(XS[6] - BW / 2, y1); X.stroke(); X.restore();
+            X.fillStyle = C.amber; X.fillRect(XS[5] - BW / 2, y1, BW, y0 - y1);
+            X.save(); X.setLineDash([8, 6]); X.strokeStyle = C.amber; X.lineWidth = 3 * beat; X.beginPath(); X.roundRect(XS[5] - BW / 2 - 14, y1 - 20, BW + 28, y0 - y1 + 40, 14); X.stroke(); X.restore();
+            txt("+$50k", XS[5], y1 - 34, `800 27px ${FM}`, "#b45309", "center");
+            txt("?", XS[5], y0 + 70, `800 56px ${FI}`, C.amber, "center");
+          }
+          X.globalAlpha = 1;
+        }
+      };
+      draw();
+
+      const tl = gsap.timeline({ paused: true });
+      tl.to(P, { time: END, duration: END, ease: "none", onUpdate: draw }, 0);
+      gsap.set(["#p-msg", "#p-why", ".tile", ".chip", "#p-banner", "#p-wf", "#p-ch", "#p-cht", "#p-chs", "#p-cover", "#p-facts", "#p-url", ".cap"], { opacity: 0 });
+      // the screen comes on panel by panel
+      tl.fromTo("#p-top", { y: -12 }, { y: 0, duration: 0.35, ease: "power2.out" }, 0);
+      tl.fromTo("#p-hero", { y: 14 }, { y: 0, duration: 0.4, ease: "power3.out" }, 0);
+      tl.fromTo("#p-capband", { y: 12 }, { y: 0, duration: 0.3, ease: "power2.out" }, 0);
+      // the head of desk asks
+      tl.fromTo("#p-chat", { opacity: 1, y: 22 }, { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" }, 0);
+      tl.fromTo("#p-msg", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.25, ease: "power2.out" }, T("b02", 0) - 0.08);
+      tl.fromTo("#p-why", { opacity: 0, scale: 0.4, rotation: -8 }, { opacity: 1, scale: 1, rotation: -4, duration: 0.4, ease: "back.out(2.2)" }, T("b02", 9) - 0.05);
+      tl.fromTo("#p-day", { opacity: 1, y: 18 }, { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" }, 0);
+      tl.to(["#p-chat", "#p-day"], { opacity: 0, y: -30, duration: 0.3, ease: "power2.in" }, T("b03", 0) - 0.3);
+      tl.fromTo("#p-wf", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" }, T("b03", 0) - 0.1);
+      // what moved
+      ["#p-t1", "#p-t2", "#p-t3"].forEach((id, k) => tl.fromTo(id, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, T("b03", 0) + 0.05 + k * 0.08));
+      tl.to(".tile", { opacity: 0, duration: 0.25 }, T("b10", 0) - 0.3);
+      // three questions, then the point
+      [["#p-q1", 1], ["#p-q2", 4], ["#p-q3", 7]].forEach(([q, k]) => tl.fromTo(q, { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2)" }, T("b10", k) - 0.05));
+      tl.to(".chip", { opacity: 0, duration: 0.25 }, T("b11", 0) - 0.3);
+      tl.fromTo("#p-banner", { opacity: 0, scaleX: 0.85 }, { opacity: 1, scaleX: 1, duration: 0.4, ease: "power3.out" }, T("b11", 2));
+      // the end card: chapter 26 of the real book, its real cover
+      tl.to("#p-why", { opacity: 0, scale: 0.7, duration: 0.3, ease: "power2.in" }, T("b11", 2));
+      tl.to(["#p-banner", "#p-wf", "#p-hl", "#p-ill"], { opacity: 0, duration: 0.3 }, T("b12", 0) - 0.3);
+      tl.fromTo("#p-ch", { opacity: 0 }, { opacity: 1, duration: 0.3 }, T("b12", 1) - 0.1);
+      tl.fromTo("#p-cht", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, T("b12", 1));
+      tl.fromTo("#p-chs", { opacity: 0 }, { opacity: 1, duration: 0.35 }, T("b12", 4));
+      tl.fromTo("#p-cover", { opacity: 0, y: 70, scale: 0.92 }, { opacity: 1, y: 0, scale: 1, duration: 0.55, ease: "back.out(1.3)" }, T("b12", 3) - 0.1);
+      tl.fromTo("#p-facts", { opacity: 0 }, { opacity: 1, duration: 0.3 }, T("b12", 8));
+      tl.fromTo("#p-url", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(2)" }, T("b12", 10));
+
+      tl.to("#p-capband", { opacity: 0, duration: 0.3 }, VO_END + V + 0.85);
+      // captions on the navy band, the spoken word on teal
+      const caps = [...document.querySelectorAll("#root .cap")];
+      caps.forEach((g, gi) => {
+        const spans = [...g.querySelectorAll("span")], i0 = +spans[0].dataset.w;
+        const next = gi + 1 < caps.length ? +caps[gi + 1].querySelector("span").dataset.w : null;
+        tl.fromTo(g, { opacity: 0 }, { opacity: 1, duration: 0.08 }, Math.max(0.3, t(i0) - 0.12));
+        tl.to(g, { opacity: 0, duration: 0.06 }, next !== null ? t(next) - 0.14 : VO_END + V + 0.8);
+        spans.forEach((s, k) => {
+          tl.set(s, { backgroundColor: "#067a75" }, t(+s.dataset.w));
+          if (k + 1 < spans.length) tl.set(s, { backgroundColor: "rgba(6,122,117,0)" }, t(+spans[k + 1].dataset.w));
+        });
+      });
+
+      window.__timelines["pnl"] = tl;
+    })();
+  </script>
+</template>

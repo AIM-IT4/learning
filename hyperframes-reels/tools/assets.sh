@@ -37,6 +37,14 @@ cp "$sfx/whoosh-short.mp3" "$here/chalk/assets/sfx/"; python3 "$here/tools/chalk
 gf paper rozhaone/RozhaOne-Regular.ttf RozhaOne-Regular.ttf; gf paper tirodevanagarihindi/TiroDevanagariHindi-Regular.ttf TiroDevanagariHindi-Regular.ttf
 gf paper unifrakturmaguntia/UnifrakturMaguntia-Book.ttf UnifrakturMaguntia-Book.ttf; gf paper "playfairdisplay/PlayfairDisplay%5Bwght%5D.ttf" PlayfairDisplay.ttf
 for s in whoosh-cinematic impact-bass-1 whoosh-short typing pop click key-press impact-bass-2; do cp "$sfx/$s.mp3" "$here/paper/assets/sfx/"; done
+# round 7 (English, Desk2Quant): the site's own fonts (OFL), and the real logo and product covers from desk2quant.com
+for p in hedge pnl; do gf $p "inter/Inter%5Bopsz,wght%5D.ttf" Inter.ttf; gf $p "jetbrainsmono/JetBrainsMono%5Bwght%5D.ttf" JetBrainsMono.ttf
+  curl -sfL -o "$here/$p/assets/desk2quant-logo.png" "https://desk2quant.com/assets/images/desk2quant-logo.png?v=4"; done
+gf hedge "spacegrotesk/SpaceGrotesk%5Bwght%5D.ttf" SpaceGrotesk.ttf
+curl -sfL -o "$here/hedge/assets/cover.jpg" https://desk2quant.com/assets/images/covers/stochastic-calculus-visual-lab.jpg
+curl -sfL -o "$here/pnl/assets/cover.jpg" https://desk2quant.com/assets/images/covers/quant-finance-absolute-beginners.jpg
+for s in whoosh-short pop click-soft key-press ping chime sparkle; do cp "$sfx/$s.mp3" "$here/hedge/assets/sfx/"; done
+for s in whoosh-short pop click-soft key-press ping chime notification click; do cp "$sfx/$s.mp3" "$here/pnl/assets/sfx/"; done
 echo "fonts and sfx in place; add assets/vo.wav and assets/bgm.wav per project"
 echo "site3d also needs assets/desk2quant-logo.png (from the site) and assets/page/t00-t12.jpg (tools/site_capture)"
 echo "eqd also needs assets/eqd-cover.webp (desk2quant.com/assets/images/covers/equity-derivatives-quant-notes-1200.webp)"
