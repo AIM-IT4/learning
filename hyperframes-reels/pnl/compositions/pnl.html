@@ -35,12 +35,23 @@
     #p-ch { position: absolute; left: 72px; top: 182px; }
     #p-cht { position: absolute; left: 72px; top: 226px; width: 940px; font: 800 58px/1.1 Inter, sans-serif; color: #06275b; }
     #p-chs { position: absolute; left: 72px; top: 306px; width: 940px; font: 600 29px/1.2 Inter, sans-serif; color: #60708a; }
-    #p-cover { position: absolute; left: 160px; top: 424px; width: 760px; height: 760px; border-radius: 18px; border: 2px solid #d6dfeb;
+    #p-cover { position: absolute; left: 275px; top: 424px; width: 530px; height: 530px; border-radius: 18px; border: 2px solid #d6dfeb;
                box-shadow: 0 18px 40px rgba(6, 39, 91, 0.22); }
-    #p-facts { position: absolute; left: 40px; top: 1212px; width: 1000px; text-align: center; font: 600 32px/1 "JetBrains Mono", Inter, monospace; color: #06275b; }
+    #p-facts { position: absolute; left: 40px; top: 978px; width: 1000px; text-align: center; font: 600 32px/1 "JetBrains Mono", Inter, monospace; color: #06275b; }
     #p-sub2 { position: absolute; left: 40px; top: 1370px; width: 1000px; text-align: center; font: 600 36px/1.2 Inter, sans-serif; color: #60708a; }
-    #p-url { position: absolute; left: 310px; top: 1262px; width: 460px; height: 84px; background: #08a9a2; border-radius: 42px;
-             font: 800 44px/84px Inter, sans-serif; color: #ffffff; text-align: center; }
+    #p-cmt { left: 40px; top: 1124px; width: 1000px; height: 354px; }
+    #p-cmt .ic { position: absolute; left: 36px; top: 26px; }
+    #p-cmt .lb { position: absolute; left: 108px; top: 30px; font: 800 46px/56px Inter, sans-serif; color: #06275b; }
+    #p-kw { position: absolute; left: 36px; top: 108px; width: 924px; height: 120px; background: #eef3f8; border: 3px solid #08a9a2; border-radius: 60px; }
+    #p-kw .t { position: absolute; left: 44px; top: 0; font: 800 76px/114px "JetBrains Mono", Inter, monospace; color: #06275b; letter-spacing: 2px; white-space: nowrap; }
+    #p-kw .t span { display: none; }
+    #p-kw .cur { display: inline-block; width: 6px; height: 70px; margin-left: 6px; background: #06275b; vertical-align: -8px; }
+    #p-kw .go { position: absolute; right: 14px; top: 14px; width: 86px; height: 86px; border-radius: 43px; background: #08a9a2; }
+    #p-kw .go svg { position: absolute; left: 21px; top: 21px; }
+    #p-dm { position: absolute; left: 40px; top: 262px; font: 700 42px/58px Inter, sans-serif; color: #06275b; white-space: nowrap; }
+    #p-dm svg { vertical-align: -10px; margin-right: 12px; }
+    #p-url { position: absolute; left: 330px; top: 1028px; width: 420px; height: 74px; background: #067a75; border-radius: 37px;
+             font: 800 40px/74px Inter, sans-serif; color: #ffffff; text-align: center; }
     #p-capband { position: absolute; left: 40px; top: 1498px; width: 1000px; height: 172px; background: #06275b; border-radius: 22px; }
     .cap { position: absolute; left: 56px; top: 1504px; width: 968px; height: 160px; display: flex; align-items: center; justify-content: center;
            flex-wrap: wrap; align-content: center; text-align: center; font: 600 54px/70px Inter, sans-serif; color: #ffffff; }
@@ -79,8 +90,10 @@
     <div id="p-chs">in Quantitative Finance for Absolute Beginners</div>
     <img id="p-cover" src="assets/cover.jpg" alt="Quant Finance for Absolute Beginners cover" />
     <div id="p-facts">28 chapters · 28 Python scripts</div>
-    <div id="p-sub2">From desk to quant, step by step</div>
     <div id="p-url">desk2quant.com</div>
+    <div id="p-cmt" class="pn"><div class="ic"><svg viewBox="0 0 24 24" width="56" height="56"><path d="M4 5.5h16a1.5 1.5 0 0 1 1.5 1.5v9a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17.5H4A1.5 1.5 0 0 1 2.5 16V7A1.5 1.5 0 0 1 4 5.5Z" fill="#08a9a2" stroke="#06275b" stroke-width="1.6" stroke-linejoin="round"/></svg></div><div class="lb">Comment</div>
+      <div id="p-kw"><div class="t"><span>B</span><span>E</span><span>G</span><span>I</span><span>N</span><span>N</span><span>E</span><span>R</span><i class="cur"></i></div><div class="go"><svg viewBox="0 0 24 24" width="44" height="44"><path d="M3 11.5 21 3l-6.5 18-3.2-7.3L3 11.5Z M11.3 13.7 21 3" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linejoin="round"/></svg></div></div>
+      <div id="p-dm"><svg viewBox="0 0 24 24" width="44" height="44"><path d="M3 11.5 21 3l-6.5 18-3.2-7.3L3 11.5Z M11.3 13.7 21 3" fill="none" stroke="#06275b" stroke-width="2.2" stroke-linejoin="round"/></svg>and we'll DM you the link</div></div>
     <canvas id="p-cv" width="1080" height="1920"></canvas>
     <div id="p-why">Why?</div>
     <div id="p-capband"></div>
@@ -111,6 +124,8 @@
     <div id="cap-24" class="cap"><span data-w="148">That's</span><span data-w="149">chapter</span><span data-w="150">26</span><span data-w="151">of</span></div>
     <div id="cap-25" class="cap"><span data-w="152">Quantitative</span><span data-w="153">Finance</span><span data-w="154">for</span><span data-w="155">Absolute</span><span data-w="156">Beginners,</span></div>
     <div id="cap-26" class="cap"><span data-w="157">on</span><span data-w="158">Desk2Quant.</span></div>
+    <div id="cap-27" class="cap"><span data-w="161">Want</span><span data-w="162">the</span><span data-w="163">notes?</span></div>
+    <div id="cap-28" class="cap"><span data-w="164">Comment</span><span data-w="165">BEGINNER,</span><span data-w="166">and</span><span data-w="167">we'll</span><span data-w="168">DM</span><span data-w="170">you</span><span data-w="171">the</span><span data-w="172">link.</span></div>
     <!--/CAPS-->
     <div id="p-end"><span>Explain your P&amp;L. <em>Know your book.</em></span></div>
     <div id="p-risk" class="pn"><div class="lab">RISK</div><div class="rk" style="left: 130px">Δ −$450k <i>/ 1%</i></div><div class="rk" style="left: 400px">ν +$600k <i>/ vol pt</i></div><div class="rk" style="left: 690px">Θ −$350k <i>/ day</i></div></div>
@@ -120,9 +135,9 @@
     (function () {
       const V = 0.4;
       /*CUES*/
-      const LS = {"b01": 0, "b02": 13, "b03": 23, "b04": 38, "b05": 56, "b06": 72, "b07": 83, "b08": 103, "b09": 111, "b10": 127, "b11": 136, "b12": 148};
-      const W = [0.00, 0.24, 0.52, 0.82, 0.90, 1.12, 1.72, 1.84, 2.00, 2.12, 2.36, 2.62, 2.86, 3.76, 3.90, 4.12, 4.28, 4.38, 4.50, 4.66, 4.92, 5.22, 6.01, 6.97, 7.21, 7.43, 7.67, 7.79, 8.05, 8.53, 8.78, 9.04, 9.62, 9.79, 9.96, 10.03, 10.18, 10.62, 11.58, 11.82, 12.02, 12.58, 12.68, 12.96, 13.20, 13.47, 14.08, 14.16, 14.28, 14.40, 14.93, 15.08, 15.34, 15.58, 15.76, 16.05, 16.86, 17.02, 17.56, 17.68, 17.82, 18.04, 18.86, 18.96, 19.08, 19.26, 19.48, 19.72, 20.36, 20.64, 20.86, 21.14, 22.10, 22.58, 22.90, 23.14, 23.70, 23.84, 24.08, 24.75, 24.96, 25.12, 25.42, 26.34, 26.46, 26.56, 26.66, 26.84, 27.59, 27.72, 28.06, 28.34, 28.70, 28.88, 29.54, 29.70, 29.92, 30.26, 30.50, 30.73, 31.02, 31.17, 31.39, 32.33, 32.51, 32.61, 33.69, 33.84, 34.06, 34.24, 34.43, 35.42, 35.54, 35.80, 36.04, 36.40, 36.68, 37.57, 37.74, 37.88, 38.16, 38.82, 38.98, 39.16, 39.26, 39.46, 39.90, 40.63, 40.75, 40.95, 41.73, 41.89, 42.07, 42.68, 42.81, 43.03, 43.95, 44.09, 44.15, 44.29, 44.61, 44.81, 45.01, 45.21, 45.80, 45.91, 46.29, 46.53, 47.25, 47.49, 47.69, 48.70, 48.83, 49.33, 50.15, 50.29, 50.85, 51.70, 51.85, 52.09, 52.24];
-      const VO_END = 52.587;
+      const LS = {"b01": 0, "b02": 13, "b03": 23, "b04": 38, "b05": 56, "b06": 72, "b07": 83, "b08": 103, "b09": 111, "b10": 127, "b11": 136, "b12": 148, "b13": 161};
+      const W = [0.00, 0.24, 0.52, 0.82, 0.90, 1.12, 1.72, 1.84, 2.00, 2.12, 2.36, 2.62, 2.86, 3.76, 3.90, 4.12, 4.28, 4.38, 4.50, 4.66, 4.92, 5.22, 6.01, 6.97, 7.21, 7.43, 7.67, 7.79, 8.05, 8.53, 8.78, 9.04, 9.62, 9.79, 9.96, 10.03, 10.18, 10.62, 11.58, 11.82, 12.02, 12.58, 12.68, 12.96, 13.20, 13.47, 14.08, 14.16, 14.28, 14.40, 14.93, 15.08, 15.34, 15.58, 15.76, 16.05, 16.86, 17.02, 17.56, 17.68, 17.82, 18.04, 18.86, 18.96, 19.08, 19.26, 19.48, 19.72, 20.36, 20.64, 20.86, 21.14, 22.10, 22.58, 22.90, 23.14, 23.70, 23.84, 24.08, 24.75, 24.96, 25.12, 25.42, 26.34, 26.46, 26.56, 26.66, 26.84, 27.59, 27.72, 28.06, 28.34, 28.70, 28.88, 29.54, 29.70, 29.92, 30.26, 30.50, 30.73, 31.02, 31.17, 31.39, 32.33, 32.51, 32.61, 33.69, 33.84, 34.06, 34.24, 34.43, 35.42, 35.54, 35.80, 36.04, 36.40, 36.68, 37.57, 37.74, 37.88, 38.16, 38.82, 38.98, 39.16, 39.26, 39.46, 39.90, 40.63, 40.75, 40.95, 41.73, 41.89, 42.07, 42.68, 42.81, 43.03, 43.95, 44.09, 44.15, 44.29, 44.61, 44.81, 45.01, 45.21, 45.80, 45.91, 46.29, 46.53, 47.25, 47.49, 47.69, 48.70, 48.83, 49.33, 50.15, 50.29, 50.85, 51.70, 51.85, 52.09, 52.24, 53.19, 53.41, 53.51, 54.29, 54.53, 55.29, 55.41, 55.61, 55.73, 55.85, 56.03, 56.15];
+      const VO_END = 56.35;
       /*END CUES*/
       const t = (i) => W[i] + V;
       const T = (line, k) => t(LS[line] + k);
@@ -249,7 +264,7 @@
 
       const tl = gsap.timeline({ paused: true });
       tl.to(P, { time: END, duration: END, ease: "none", onUpdate: draw }, 0);
-      gsap.set(["#p-sub2", "#p-end", "#p-msg", "#p-why", ".tile", ".chip", "#p-banner", "#p-wf", "#p-ch", "#p-cht", "#p-chs", "#p-cover", "#p-facts", "#p-url", ".cap"], { opacity: 0 });
+      gsap.set(["#p-cmt", "#p-dm", "#p-end", "#p-msg", "#p-why", ".tile", ".chip", "#p-banner", "#p-wf", "#p-ch", "#p-cht", "#p-chs", "#p-cover", "#p-facts", "#p-url", ".cap"], { opacity: 0 });
       // the screen comes on panel by panel
       tl.fromTo("#p-top", { y: -12 }, { y: 0, duration: 0.35, ease: "power2.out" }, 0);
       tl.fromTo("#p-hero", { y: 14 }, { y: 0, duration: 0.4, ease: "power3.out" }, 0);
@@ -275,19 +290,23 @@
       tl.fromTo("#p-ch", { opacity: 0 }, { opacity: 1, duration: 0.3 }, T("b12", 1) - 0.1);
       tl.fromTo("#p-cht", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, T("b12", 1));
       tl.fromTo("#p-chs", { opacity: 0 }, { opacity: 1, duration: 0.35 }, T("b12", 4));
-      tl.fromTo("#p-cover", { opacity: 0, y: 70, scale: 0.92 }, { opacity: 1, y: 0, scale: 1, duration: 0.55, ease: "back.out(1.3)" }, T("b12", 3) - 0.1);
-      tl.fromTo("#p-facts", { opacity: 0 }, { opacity: 1, duration: 0.3 }, T("b12", 8));
-      tl.fromTo("#p-sub2", { opacity: 0 }, { opacity: 1, duration: 0.3 }, T("b12", 10) + 0.3);
-      tl.fromTo("#p-url", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(2)" }, T("b12", 10));
+      tl.fromTo("#p-cover", { opacity: 0, y: 70, scale: 0.92 }, { opacity: 1, y: 0, scale: 1, duration: 0.55, ease: "back.out(1.3)" }, T("b12", 0) + 0.1);
+      tl.fromTo("#p-facts", { opacity: 0 }, { opacity: 1, duration: 0.3 }, T("b12", 0) + 0.4);
+      // the ask: comment the keyword, the link comes by DM
+      tl.fromTo("#p-cmt", { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 0.45, ease: "back.out(1.4)" }, T("b12", 0) + 0.7);
+      document.querySelectorAll("#p-kw .t span").forEach((el, i) => tl.set(el, { display: "inline" }, T("b13", 4) - 0.12 + i * 0.06));
+      tl.fromTo("#p-kw .cur", { opacity: 1 }, { opacity: 0, duration: 0.01, repeat: 27, yoyo: true, repeatDelay: 0.4 }, T("b12", 0) + 0.7);
+      tl.fromTo("#p-dm", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.35, ease: "power2.out" }, T("b13", 6));
+      tl.fromTo("#p-kw .go", { scale: 1 }, { scale: 1.18, duration: 0.18, yoyo: true, repeat: 1, ease: "power2.out" }, T("b13", 11) + 0.35);
+      tl.fromTo("#p-url", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(2)" }, T("b12", 0) + 0.5);
 
-      tl.fromTo("#p-end", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, VO_END + V + 0.9);
       // captions on the navy band, the spoken word on teal
       const caps = [...document.querySelectorAll("#root .cap")];
       caps.forEach((g, gi) => {
         const spans = [...g.querySelectorAll("span")], i0 = +spans[0].dataset.w;
         const next = gi + 1 < caps.length ? +caps[gi + 1].querySelector("span").dataset.w : null;
         tl.fromTo(g, { opacity: 0 }, { opacity: 1, duration: 0.08 }, Math.max(0.3, t(i0) - 0.12));
-        tl.to(g, { opacity: 0, duration: 0.06 }, next !== null ? t(next) - 0.14 : VO_END + V + 0.8);
+        if (next !== null) tl.to(g, { opacity: 0, duration: 0.06 }, t(next) - 0.14);   // the ask stays on to the end
         spans.forEach((s, k) => {
           tl.set(s, { backgroundColor: "#067a75" }, t(+s.dataset.w));
           if (k + 1 < spans.length) tl.set(s, { backgroundColor: "rgba(6,122,117,0)" }, t(+spans[k + 1].dataset.w));

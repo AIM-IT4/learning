@@ -21,8 +21,9 @@ if proj == "hedge":
            ["x-s7", "click-soft", T("a09", 0) - 0.2, 0.3, 0.22]] + \
           [[f"x-bar{j}", "pop", round(T("a09", 4) + j * 0.32, 2), 0.5, 0.11] for j in range(4)] + \
           [["x-s8", "click-soft", T("a10", 0) - 0.2, 0.3, 0.22], ["x-bal", "chime", T("a10", 8) + 0.15, 1.5, 0.13],
-           ["x-cta", "whoosh-short", T("a11", 0) - 0.25, 0.6, 0.16], ["x-url", "pop", T("a11", 9), 0.5, 0.18],
-           ["x-end", "sparkle", round(VO_END + V + 0.3, 2), 1.5, 0.16]]
+           ["x-cta", "whoosh-short", T("a11", 0) - 0.25, 0.6, 0.16], ["x-url", "pop", T("a11", 0) + 0.45, 0.5, 0.14],
+           ["x-cmt", "pop", T("a11", 0) + 0.6, 0.5, 0.15], ["x-type", "typing", T("a12", 4) - 0.56, 1.1, 0.12],
+           ["x-send", "whoosh-short", T("a12", 11) + 0.35, 0.6, 0.14], ["x-end", "sparkle", round(VO_END + V + 0.3, 2), 1.5, 0.16]]
     bg = "#f7f8f3"
 else:
     sfx = [["p-on", "click-soft", 0.0, 0.3, 0.2], ["p-msg", "notification", T("b01", 6) - 0.2, 1.0, 0.28], ["p-why", "pop", T("b02", 9) + 0.35, 0.5, 0.18],
@@ -33,9 +34,10 @@ else:
            ["p-sum", "ping", T("b08", 0) + 0.2, 1.0, 0.16], ["p-gap", "click", T("b09", 2), 0.36, 0.2]] + \
           [[f"p-q{j}", "pop", round(T("b10", k) + 0.1, 2), 0.5, 0.14] for j, k in enumerate((1, 4, 7))] + \
           [["p-ban", "whoosh-short", T("b11", 2) - 0.1, 0.6, 0.14], ["p-cta", "whoosh-short", T("b12", 0) - 0.3, 0.6, 0.15],
-           ["p-cover", "pop", T("b12", 3), 0.5, 0.14], ["p-url", "pop", T("b12", 10), 0.5, 0.16], ["p-end", "chime", round(VO_END + V + 0.3, 2), 1.5, 0.16]]
+           ["p-cover", "pop", T("b12", 0) + 0.1, 0.5, 0.14], ["p-url", "pop", T("b12", 0) + 0.5, 0.5, 0.12], ["p-cmt", "pop", T("b12", 0) + 0.7, 0.5, 0.15], ["p-type", "typing", T("b13", 4) - 0.56, 1.1, 0.12],
+           ["p-send", "whoosh-short", T("b13", 11) + 0.35, 0.6, 0.14], ["p-end", "chime", round(VO_END + V + 0.3, 2), 1.5, 0.16]]
     bg = "#eef3f8"
 subprocess.run([sys.executable, os.path.join(os.path.dirname(os.path.abspath(__file__)), "mkindex.py"), proj, str(END), bg, json.dumps(sfx), str(V)], check=True)
 h = open(f"{proj}/index.html", encoding="utf-8").read().replace('lang="hi"', 'lang="en"')
 open(f"{proj}/index.html", "w", encoding="utf-8").write(h)
-print(json.dumps({"END": END, "cta": T("a11" if proj == "hedge" else "b12", 0)}))
+print(json.dumps({"END": END, "cta": T("a11" if proj == "hedge" else "b12", 0), "ask": T("a12" if proj == "hedge" else "b13", 0)}))

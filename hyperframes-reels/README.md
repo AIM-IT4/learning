@@ -23,8 +23,8 @@ with a `SPEC.md` that gives the script, the palette and every shot as a number.
 | `neon/` | दोहरा pendulum → CHAOS — 100 double pendulums 0.001° apart split on "अलग" | 26.9 s | Manish | **neon / synthwave** |
 | `chalk/` | त्रिकोण का जादू — a² + b² = c² by sliding four triangles | 29.5 s | Manish | **chalkboard** |
 | `paper/` | 72 का नियम — rule vs exact doubling times on a spinning front page | 30.0 s | Manish | **newspaper print** |
-| `hedge/` | Delta hedging in a minute (English) — short call, delta as a slope, one simulated path hedged 5/20/200 times, error halves per 4× trades | 55.3 s | Manish (English) | **Desk2Quant product covers, alive** |
-| `pnl/` | "We made $1.5 million today. Why?" (English) — P&L explain on a light desk screen: delta, gamma, vega, theta, the $50k gap | 56.2 s | Manish (English) | **light trading-desk screen** |
+| `hedge/` | Delta hedging in a minute (English) — short call, delta as a slope, one simulated path hedged 5/20/200 times, error halves per 4× trades | 59.1 s | Manish (English) | **Desk2Quant product covers, alive** |
+| `pnl/` | "We made $1.5 million today. Why?" (English) — P&L explain on a light desk screen: delta, gamma, vega, theta, the $50k gap | 60.0 s | Manish (English) | **light trading-desk screen** |
 
 The shape, recursion and site reels follow prompt-motion.com entries: shape morphing through UI states and the landing page 3D scroll
 (@twoclipping), and recursion explained in genres (@emollick). Their music beds are synthesised by `tools/bed_synth.py`
@@ -85,4 +85,5 @@ retaken: "drips" for "drifts", "explained" for "explain", and "Added up" after a
 `tools/en_vo.py <lines> <project>/vo_spec.json <out>` cuts pauses over 0.4 s to 0.3 s (a part can keep its pause), speeds up
 only if tempo is not 1, joins at −16 LUFS and writes timing.json; `tools/en_caps.py` writes the caption groups and the word
 cues into the scene, and `tools/mkroot_d2q.py` writes the root with every sound on its cue. The hedge numbers come from
-`tools/hedge_sim.py` (Black–Scholes, seeded GBM paths); the P&L book is illustrative and labelled so on screen.
+`tools/hedge_sim.py` (Black–Scholes, seeded GBM paths); the P&L book is illustrative and labelled so on screen. Each ends by asking for a comment (HEDGE, BEGINNER) that the
+auto-DM answers with the product link.

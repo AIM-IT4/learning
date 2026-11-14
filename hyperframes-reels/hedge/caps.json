@@ -1,4 +1,5 @@
-{"a01": "You just sold a call option. | If the stock rallies, you lose money.",
+{
+ "a01": "You just sold a call option. | If the stock rallies, you lose money.",
  "a02": "So how does a trading desk sleep at night? | Delta hedging.",
  "a03": "Delta tells you how much the option moves | when the stock moves by [one rupee.=₹1.]",
  "a04": "Here, delta is about [zero point five,=0.5,] | so for every option you sold, | you buy half a share.",
@@ -8,4 +9,6 @@
  "a08": "[Twenty=20] times, it's much closer. | [Two hundred=200] times, the error almost disappears.",
  "a09": "The rule of thumb: | rebalance [four=4] times as often, | and the error roughly halves.",
  "a10": "But every trade costs money, | so finding that balance | is the real job on the desk.",
- "a11": "Try it yourself | in the Stochastic Calculus Visual Lab, | on [Desk to Quant.=Desk2Quant.]"}
+ "a11": "Try it yourself | in the Stochastic Calculus Visual Lab, | on [Desk to Quant.=Desk2Quant.]",
+ "a12": "Want the notebooks? | Comment [hedge,=HEDGE,] and we'll [D M=DM] you the link."
+}

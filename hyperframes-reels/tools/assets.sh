@@ -43,8 +43,8 @@ for p in hedge pnl; do gf $p "inter/Inter%5Bopsz,wght%5D.ttf" Inter.ttf; gf $p "
 gf hedge "spacegrotesk/SpaceGrotesk%5Bwght%5D.ttf" SpaceGrotesk.ttf
 curl -sfL -o "$here/hedge/assets/cover.jpg" https://desk2quant.com/assets/images/covers/stochastic-calculus-visual-lab.jpg
 curl -sfL -o "$here/pnl/assets/cover.jpg" https://desk2quant.com/assets/images/covers/quant-finance-absolute-beginners.jpg
-for s in whoosh-short pop click-soft key-press ping chime sparkle; do cp "$sfx/$s.mp3" "$here/hedge/assets/sfx/"; done
-for s in whoosh-short pop click-soft key-press ping chime notification click; do cp "$sfx/$s.mp3" "$here/pnl/assets/sfx/"; done
+for s in whoosh-short pop click-soft key-press ping chime sparkle typing; do cp "$sfx/$s.mp3" "$here/hedge/assets/sfx/"; done
+for s in whoosh-short pop click-soft key-press ping chime notification click typing; do cp "$sfx/$s.mp3" "$here/pnl/assets/sfx/"; done
 echo "fonts and sfx in place; add assets/vo.wav and assets/bgm.wav per project"
 echo "site3d also needs assets/desk2quant-logo.png (from the site) and assets/page/t00-t12.jpg (tools/site_capture)"
 echo "eqd also needs assets/eqd-cover.webp (desk2quant.com/assets/images/covers/equity-derivatives-quant-notes-1200.webp)"

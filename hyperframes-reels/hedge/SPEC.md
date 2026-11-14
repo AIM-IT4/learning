@@ -1,6 +1,6 @@
 # Delta hedging in a minute — Desk2Quant explainer (English)
 
-1080×1920, 30 fps, 55.3 s (voice 51.8 s). Voice: Manish (saved, consented voice; Audio8 on CPU), speaking English from his
+1080×1920, 30 fps, 59.1 s (voice 55.7 s). Voice: Manish (saved, consented voice; Audio8 on CPU), speaking English from his
 Hindi reference, one take per line after a speech check (seed 11, except a07 seed 14: seed 11 said "the hedge drips"), long
 pauses cut to 0.3 s, natural speed, joined at −16 LUFS (vo_spec.json).
 Frame: filled top to bottom: header at y 44, two-line headlines at 116 px (y 136–368), the chart card y 452–1500 (charts drawn
@@ -19,7 +19,8 @@ you gain on the shares. The two almost cancel out. / But delta keeps changing as
 adjusted, again and again. That's rebalancing. / Watch one simulated path. Rebalance five times, and the hedge drifts. /
 Twenty times, it's much closer. Two hundred times, the error almost disappears. / The rule of thumb: rebalance four times as
 often, and the error roughly halves. / But every trade costs money, so finding that balance is the real job on the desk. /
-Try it yourself in the Stochastic Calculus Visual Lab, on Desk to Quant.
+Try it yourself in the Stochastic Calculus Visual Lab, on Desk to Quant. / Want the notebooks? Comment hedge, and we'll DM
+you the link.
 
 Numbers (tools/hedge_sim.py, Black–Scholes, S0 = K = ₹100, vol 20%, 3 months, r = 0):
 - premium ₹3.988, delta 0.5199, gamma 0.0398; a ₹1 rise moves the call to ₹4.528, so the short call loses ₹0.54, the 0.52
@@ -38,4 +39,6 @@ Shots: 1 the short call's P&L at expiry (hockey stick, profit teal, loss rose); 
 bars −₹0.54, +₹0.52, net −₹0.02 ≈ 0. 5 Δ against the stock price: the stock wanders 100 → 109 → 93 → 105, the shares held lag
 the curve (the gap in rose) until each "rebalance". 6 the simulated path with its rebalance dots, and the error lines for 5,
 20 and 200 rebalances drawn as each is spoken. 7 four bars of the error spread with ×4 and ÷2. 8 error spread vs trading cost
-(log axis), the balance shaded. 9 the real Stochastic Calculus Visual Lab cover, "Try it yourself", desk2quant.com.
+(log axis), the balance shaded. 9 the real Stochastic Calculus Visual Lab cover, "Try it yourself", desk2quant.com, and a comment card whose field waits
+with a blinking cursor, types HEDGE on "hedge", then "and we'll DM you the link". The post caption must say "Comment HEDGE": the
+auto-DM picks the keyword up from the caption, but only once "hedge" has a DM text in its keyword list.

@@ -1,23 +1,102 @@
-[["a01", "You just sold a call option. If the stock rallies, you lose money."],
- ["a02", "So how does a trading desk sleep at night? Delta hedging."],
- ["a03", "Delta tells you how much the option moves when the stock moves by one rupee."],
- ["a04", "Here, delta is about zero point five, so for every option you sold, you buy half a share."],
- ["a05", "Now if the stock ticks up, you lose on the option, but you gain on the shares. The two almost cancel out."],
- ["a06", "But delta keeps changing as the stock moves, so the hedge has to be adjusted, again and again. That's rebalancing."],
- ["a07", "Watch one simulated path. Rebalance five times, and the hedge drifts."],
- ["a08", "Twenty times, it's much closer. Two hundred times, the error almost disappears."],
- ["a09", "The rule of thumb: rebalance four times as often, and the error roughly halves."],
- ["a10", "But every trade costs money, so finding that balance is the real job on the desk."],
- ["a11", "Try it yourself in the Stochastic Calculus Visual Lab, on Desk to Quant."],
- ["b01", "Six p.m. on the trading desk. The head of desk has one question."],
- ["b02", "We made one and a half million dollars today. Why?"],
- ["b03", "Every desk has to answer that, every single day. It's called P and L explain."],
- ["b04", "Start with delta. The market fell two percent, and we were short, so delta made nine hundred thousand."],
- ["b05", "Then gamma. We were long options, so the big move paid extra: another three hundred thousand."],
- ["b06", "Volatility jumped one point, and our vega added six hundred thousand."],
- ["b07", "But a day went by, and options lose value with time, so theta cost us three hundred and fifty thousand."],
- ["b08", "Add it up: one point four five million."],
- ["b09", "The last fifty thousand is unexplained, and that small gap is where the real questions begin."],
- ["b10", "A model problem? A missing risk? A booking error?"],
- ["b11", "If you can explain your P and L, you understand your book."],
- ["b12", "That's chapter twenty-six of Quantitative Finance for Absolute Beginners, on Desk to Quant."]]
+[
+[
+"a01",
+"You just sold a call option. If the stock rallies, you lose money."
+],
+[
+"a02",
+"So how does a trading desk sleep at night? Delta hedging."
+],
+[
+"a03",
+"Delta tells you how much the option moves when the stock moves by one rupee."
+],
+[
+"a04",
+"Here, delta is about zero point five, so for every option you sold, you buy half a share."
+],
+[
+"a05",
+"Now if the stock ticks up, you lose on the option, but you gain on the shares. The two almost cancel out."
+],
+[
+"a06",
+"But delta keeps changing as the stock moves, so the hedge has to be adjusted, again and again. That's rebalancing."
+],
+[
+"a07",
+"Watch one simulated path. Rebalance five times, and the hedge drifts."
+],
+[
+"a08",
+"Twenty times, it's much closer. Two hundred times, the error almost disappears."
+],
+[
+"a09",
+"The rule of thumb: rebalance four times as often, and the error roughly halves."
+],
+[
+"a10",
+"But every trade costs money, so finding that balance is the real job on the desk."
+],
+[
+"a11",
+"Try it yourself in the Stochastic Calculus Visual Lab, on Desk to Quant."
+],
+[
+"a12",
+"Want the notebooks? Comment hedge, and we'll D M you the link."
+],
+[
+"b01",
+"Six p.m. on the trading desk. The head of desk has one question."
+],
+[
+"b02",
+"We made one and a half million dollars today. Why?"
+],
+[
+"b03",
+"Every desk has to answer that, every single day. It's called P and L explain."
+],
+[
+"b04",
+"Start with delta. The market fell two percent, and we were short, so delta made nine hundred thousand."
+],
+[
+"b05",
+"Then gamma. We were long options, so the big move paid extra: another three hundred thousand."
+],
+[
+"b06",
+"Volatility jumped one point, and our vega added six hundred thousand."
+],
+[
+"b07",
+"But a day went by, and options lose value with time, so theta cost us three hundred and fifty thousand."
+],
+[
+"b08",
+"Add it up: one point four five million."
+],
+[
+"b09",
+"The last fifty thousand is unexplained, and that small gap is where the real questions begin."
+],
+[
+"b10",
+"A model problem? A missing risk? A booking error?"
+],
+[
+"b11",
+"If you can explain your P and L, you understand your book."
+],
+[
+"b12",
+"That's chapter twenty-six of Quantitative Finance for Absolute Beginners, on Desk to Quant."
+],
+[
+"b13",
+"Want the notes? Comment beginner, and we'll D M you the link."
+]
+]

@@ -1,6 +1,6 @@
 # "We made $1.5 million today. Why?" — P&L explain on a desk screen (English)
 
-1080×1920, 30 fps, 56.2 s (voice 52.7 s). Voice: Manish (saved, consented voice; Audio8 on CPU), speaking English, one take per
+1080×1920, 30 fps, 60.0 s (voice 56.6 s). Voice: Manish (saved, consented voice; Audio8 on CPU), speaking English, one take per
 line after a speech check (seed 11, except b03 seed 12, which says "explain" clearly, and b08 seed 13, whose pause after "Add it
 up:" is kept; cutting it made "Added up"), pauses cut to 0.3 s, natural speed, −16 LUFS (vo_spec.json).
 Frame: filled top to bottom: top bar y 40, today's P&L y 144–406, the intraday chart and the head of desk's message (or the
@@ -27,11 +27,14 @@ paid extra: another three hundred thousand. / Volatility jumped one point, and o
 day went by, and options lose value with time, so theta cost us three hundred and fifty thousand. / Add it up: one point
 four five million. / The last fifty thousand is unexplained, and that small gap is where the real questions begin. / A model
 problem? A missing risk? A booking error? / If you can explain your P and L, you understand your book. / That's chapter
-twenty-six of Quantitative Finance for Absolute Beginners, on Desk to Quant.
+twenty-six of Quantitative Finance for Absolute Beginners, on Desk to Quant. / Want the notes? Comment beginner, and we'll
+DM you the link.
 
 Shots: 1 the desk screen: clock 17:59:59 → 18:00:00 on "Six", today's P&L counting with the intraday line to +$1,500,000.
 2 the head of desk's message (typing dots, then "We made $1.5M today. Why?"), an amber "Why?" tag on the number. 3 the P&L
 explain waterfall panel with seven columns (Delta Δ·ΔS, Gamma ½Γ·ΔS², Vega ν·Δσ, Theta Θ·Δt, Explained, Gap, Actual) and
 three market tiles. 4–7 each leg grows from the running total as it is spoken, its tile and formula lit (market −2.0%,
 implied vol +1.0 pt, time −1 day). 8 explained $1.45M (navy). 9 actual $1.5M and the +$50k gap, amber with a "?". 10 three
-question chips. 11 "Explain the P&L → know the book". 12 the real book cover, chapter 26, desk2quant.com.
+question chips. 11 "Explain the P&L → know the book". 12 the real book cover, chapter 26, desk2quant.com, and a comment card that types BEGINNER, then "and we'll DM you the
+link"; that caption stays to the end. The post caption must say "Comment BEGINNER" (a keyword the auto-DM already answers with
+the book's link).
