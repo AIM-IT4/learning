@@ -6,28 +6,32 @@
     #root { position: absolute; inset: 0; overflow: hidden; background-color: #f7f8f3;
             background-image: linear-gradient(#e8e9e4 2px, transparent 2px), linear-gradient(90deg, #e8e9e4 2px, transparent 2px);
             background-size: 48px 48px; background-position: 12px 12px; }
-    #h-top { position: absolute; left: 60px; top: 232px; width: 960px; height: 72px; }
+    #h-top { position: absolute; left: 60px; top: 44px; width: 960px; height: 72px; }
     #h-logo { position: absolute; left: 0; top: 4px; width: 64px; height: 64px; }
     #h-brand { position: absolute; left: 80px; top: 0; font: 700 44px/72px "Space Grotesk", Inter, sans-serif; color: #0b0b0b; }
     #h-tag { position: absolute; right: 0; top: 10px; height: 52px; padding: 0 22px; border: 3px solid #0b0b0b; border-radius: 26px;
              font: 700 24px/46px "JetBrains Mono", Inter, monospace; letter-spacing: 2px; color: #0b0b0b; background: #f7f8f3; }
-    .hd { position: absolute; left: 60px; bottom: 1396px; width: 960px; font: 700 84px/1.06 "Space Grotesk", Inter, sans-serif;
+    .hd { position: absolute; left: 60px; top: 136px; width: 960px; font: 700 116px/1.0 "Space Grotesk", Inter, sans-serif;
           color: #0b0b0b; letter-spacing: -1px; }
     .hl { position: relative; display: inline-block; padding: 0 12px; margin: 0 -4px; }
     .hl i { position: absolute; left: 0; top: 6px; bottom: 2px; width: 100%; background: #fdca38; border-radius: 10px; transform-origin: 0 50%; }
     .hl b { position: relative; font-weight: inherit; }
-    .sb { position: absolute; left: 60px; top: 534px; width: 960px; font: 500 30px/40px "JetBrains Mono", Inter, monospace; color: #34373c; white-space: nowrap; }
-    #h-card { position: absolute; left: 60px; top: 600px; width: 960px; height: 700px; background: #ffffff; border: 4px solid #0b0b0b;
+    .sb { position: absolute; left: 60px; top: 382px; width: 960px; font: 500 34px/44px "JetBrains Mono", Inter, monospace; color: #34373c; white-space: nowrap; }
+    #h-card { position: absolute; left: 60px; top: 452px; width: 960px; height: 1048px; background: #ffffff; border: 4px solid #0b0b0b;
               border-radius: 26px; box-shadow: 14px 14px 0 #0b0b0b; }
     #h-cv { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
-    #h-cover { position: absolute; left: 230px; top: 616px; width: 620px; height: 620px; border: 4px solid #0b0b0b; border-radius: 22px;
+    #h-cover { position: absolute; left: 160px; top: 474px; width: 760px; height: 760px; border: 4px solid #0b0b0b; border-radius: 22px;
                box-shadow: 14px 14px 0 #0b0b0b; }
-    #h-url { position: absolute; left: 300px; top: 1262px; width: 480px; height: 64px; background: #fdca38; border: 4px solid #0b0b0b; border-radius: 32px;
-             font: 700 38px/56px "Space Grotesk", Inter, sans-serif; color: #0b0b0b; text-align: center; }
-    .cap { position: absolute; left: 50px; top: 1338px; width: 980px; text-align: center; font: 600 46px/60px Inter, sans-serif; color: #0b0b0b;
+    #h-url { position: absolute; left: 280px; top: 1262px; width: 520px; height: 76px; background: #fdca38; border: 4px solid #0b0b0b; border-radius: 32px;
+             font: 700 44px/68px "Space Grotesk", Inter, sans-serif; color: #0b0b0b; text-align: center; }
+    .cap { position: absolute; left: 40px; top: 1528px; width: 1000px; text-align: center; font: 600 54px/70px Inter, sans-serif; color: #0b0b0b;
            text-wrap: balance; }
     .cap span { display: inline-block; margin: 0 2px; padding: 0 7px; border-radius: 9px; }
-    #h-foot { position: absolute; left: 60px; top: 1470px; width: 960px; text-align: center; font: 500 27px/34px "JetBrains Mono", Inter, monospace; color: #5b5f66; }
+    #h-foot { position: absolute; left: 60px; top: 1706px; width: 960px; text-align: center; font: 500 28px/36px "JetBrains Mono", Inter, monospace; color: #5b5f66; }
+    #h-end { position: absolute; left: 90px; top: 1366px; width: 900px; text-align: center; font: 600 36px/48px Inter, sans-serif; color: #0b0b0b; text-wrap: balance; }
+    #h-prog { position: absolute; left: 60px; top: 1760px; width: 960px; height: 56px; display: flex; gap: 10px; }
+    .pg { flex: 1; height: 56px; border: 3px solid #0b0b0b; border-radius: 24px; background: #f7f8f3; text-align: center;
+          font: 700 23px/50px "JetBrains Mono", Inter, monospace; color: #0b0b0b; }
   </style>
   <div id="root" data-composition-id="hedge" data-width="1080" data-height="1920">
     <div id="h-top">
@@ -36,16 +40,16 @@
       <div id="h-tag">EXPLAINER</div>
     </div>
 
-    <div id="h-h1" class="hd">You sold a <span class="hl"><i></i><b>call</b></span>.</div>
-    <div id="h-h2" class="hd">Delta <span class="hl"><i></i><b>hedging</b></span></div>
-    <div id="h-h3" class="hd">Buy <span class="hl"><i></i><b>half</b></span> a share</div>
-    <div id="h-h4" class="hd">They almost <span class="hl"><i></i><b>cancel</b></span></div>
-    <div id="h-h5" class="hd">Delta keeps <span class="hl"><i></i><b>moving</b></span></div>
-    <div id="h-h6" class="hd">That's <span class="hl"><i></i><b>rebalancing</b></span></div>
-    <div id="h-h7" class="hd">More trades, <span class="hl"><i></i><b>less drift</b></span></div>
-    <div id="h-h8" class="hd">4× trades → <span class="hl"><i></i><b>½ error</b></span></div>
-    <div id="h-h9" class="hd">Every trade <span class="hl"><i></i><b>costs</b></span></div>
-    <div id="h-h10" class="hd">Try it <span class="hl"><i></i><b>yourself</b></span></div>
+    <div id="h-h1" class="hd">You sold<br />a <span class="hl"><i></i><b>call</b></span>.</div>
+    <div id="h-h2" class="hd">Delta<br /><span class="hl"><i></i><b>hedging</b></span></div>
+    <div id="h-h3" class="hd">Buy <span class="hl"><i></i><b>half</b></span><br />a share</div>
+    <div id="h-h4" class="hd">They almost<br /><span class="hl"><i></i><b>cancel</b></span></div>
+    <div id="h-h5" class="hd">Delta keeps<br /><span class="hl"><i></i><b>moving</b></span></div>
+    <div id="h-h6" class="hd">That's<br /><span class="hl"><i></i><b>rebalancing</b></span></div>
+    <div id="h-h7" class="hd">More trades,<br /><span class="hl"><i></i><b>less drift</b></span></div>
+    <div id="h-h8" class="hd">4× trades →<br /><span class="hl"><i></i><b>½ error</b></span></div>
+    <div id="h-h9" class="hd">Every trade<br /><span class="hl"><i></i><b>costs</b></span></div>
+    <div id="h-h10" class="hd">Try it<br /><span class="hl"><i></i><b>yourself</b></span></div>
     <div id="h-s1" class="sb">and collected a ₹3.99 premium</div>
     <div id="h-s2" class="sb">so how does a desk sleep at night?</div>
     <div id="h-s2b" class="sb">Δ = option move per ₹1 stock move</div>
@@ -93,22 +97,24 @@
     <div id="cap-28" class="cap"><span data-w="155">in</span><span data-w="156">the</span><span data-w="157">Stochastic</span><span data-w="158">Calculus</span><span data-w="159">Visual</span><span data-w="160">Lab,</span></div>
     <div id="cap-29" class="cap"><span data-w="161">on</span><span data-w="162">Desk2Quant.</span></div>
     <!--/CAPS-->
+    <div id="h-end">Inside: the delta-hedging notebook. Slide from 5 to 200 rebalances.</div>
     <div id="h-foot">Simulated data · Educational content, not trading advice</div>
+    <div id="h-prog"><div id="pg1" class="pg">payoff</div><div id="pg2" class="pg">delta</div><div id="pg3" class="pg">hedge</div><div id="pg4" class="pg">rebalance</div><div id="pg5" class="pg">simulate</div><div id="pg6" class="pg">4× rule</div><div id="pg7" class="pg">cost</div></div>
   </div>
   <script>
     (function () {
       const V = 0.4;
       /*CUES*/
       const LS = {"a01": 0, "a02": 13, "a03": 24, "a04": 39, "a05": 57, "a06": 79, "a07": 99, "a08": 110, "a09": 122, "a10": 136, "a11": 152};
-      const W = [0.00, 0.12, 0.32, 0.58, 0.72, 0.92, 1.60, 1.76, 1.92, 2.18, 3.05, 3.14, 3.40, 4.24, 4.40, 4.62, 4.84, 4.96, 5.24, 5.89, 6.28, 6.78, 7.39, 7.72, 8.81, 9.17, 9.73, 9.97, 10.51, 10.75, 10.91, 11.17, 11.65, 12.13, 12.25, 12.55, 12.91, 13.19, 13.45, 14.46, 14.72, 15.38, 15.58, 15.84, 16.11, 16.43, 16.76, 17.30, 17.48, 17.70, 18.00, 18.20, 18.96, 19.06, 19.26, 19.58, 19.74, 20.52, 21.17, 21.32, 21.46, 21.70, 21.96, 22.47, 22.58, 22.84, 23.00, 23.10, 23.82, 23.96, 24.08, 24.34, 24.52, 24.62, 25.42, 25.54, 25.70, 26.18, 26.50, 27.51, 27.73, 28.01, 28.33, 28.71, 29.11, 29.27, 29.51, 30.07, 30.41, 30.55, 30.77, 31.03, 31.15, 31.27, 32.06, 32.25, 32.39, 33.01, 33.23, 34.58, 35.23, 35.42, 35.96, 36.73, 37.24, 37.54, 37.94, 38.44, 38.58, 38.80, 39.68, 39.92, 40.63, 40.80, 40.92, 41.68, 41.78, 41.98, 42.60, 42.88, 43.12, 43.54, 44.83, 45.01, 45.15, 45.31, 45.93, 46.39, 46.67, 46.95, 47.15, 47.47, 47.95, 48.09, 48.31, 48.67, 49.75, 49.89, 50.11, 50.35, 50.69, 51.21, 51.61, 51.93, 52.19, 52.59, 53.01, 53.13, 53.33, 54.10, 54.23, 54.35, 55.35, 55.51, 55.63, 55.95, 56.43, 56.55, 57.05, 57.45, 57.85, 58.19, 58.67, 58.93, 59.09];
-      const VO_END = 59.371;
+      const W = [0.00, 0.14, 0.36, 0.66, 0.82, 1.02, 1.70, 1.86, 1.98, 2.24, 3.10, 3.26, 3.52, 4.26, 4.40, 4.56, 4.74, 4.86, 5.06, 5.38, 5.76, 5.96, 6.56, 6.82, 7.68, 7.92, 8.22, 8.36, 8.52, 8.70, 8.84, 9.10, 9.78, 9.92, 10.04, 10.30, 10.62, 10.86, 11.10, 11.89, 12.49, 12.65, 12.85, 13.07, 13.38, 13.76, 14.14, 14.29, 14.47, 14.73, 15.03, 15.19, 15.89, 15.97, 16.15, 16.37, 16.51, 17.24, 17.44, 17.68, 17.80, 18.06, 18.26, 18.74, 18.84, 19.08, 19.22, 19.32, 19.99, 20.08, 20.20, 20.38, 20.52, 20.62, 21.39, 21.50, 21.64, 22.08, 22.42, 23.25, 23.39, 23.71, 23.99, 24.39, 24.59, 24.69, 24.93, 25.65, 25.79, 25.91, 26.13, 26.29, 26.39, 26.51, 27.20, 27.43, 27.57, 28.05, 28.31, 29.43, 29.67, 29.91, 30.33, 30.93, 31.41, 31.65, 32.38, 32.55, 32.67, 32.89, 33.67, 33.95, 34.67, 34.87, 35.07, 35.77, 35.88, 36.09, 36.95, 37.05, 37.31, 37.79, 38.92, 39.04, 39.22, 39.36, 39.98, 40.36, 40.64, 40.98, 41.14, 41.77, 41.90, 42.00, 42.24, 42.62, 43.58, 43.72, 43.94, 44.16, 44.48, 45.13, 45.28, 45.60, 45.82, 46.12, 46.32, 46.44, 46.64, 46.90, 47.06, 47.16, 48.09, 48.27, 48.39, 48.67, 48.87, 48.97, 49.45, 49.89, 50.17, 50.79, 50.93, 51.17, 51.32];
+      const VO_END = 51.666;
       /*END CUES*/
       /*DATA*/
       const D = {"S0":100.0,"K":100.0,"vol":0.2,"T":0.25,"C0":3.988,"delta0":0.5199,"gamma0":0.03984,"C_up1":4.528,"path":{"seed":330,"S":[100.0,100.86,101.17,101.42,101.79,102.18,101.75,101.74,102.18,102.22,102.14,102.2,102.73,102.22,102.57,102.16,101.7,102.22,101.85,102.91,102.81,103.17,103.98,104.39,104.67,106.29,105.41,105.55,105.18,105.28,105.58,105.27,104.6,104.44,104.78,104.16,103.23,102.86,102.94,103.59,103.91,104.38,105.06,105.9,105.49,105.71,105.31,105.52,105.75,105.98,105.4,105.79,105.56,105.43,105.81,106.15,106.93,107.44,107.45,107.68,107.82,108.58,107.92,108.12,108.08,107.62,107.99,108.18,107.91,108.11,108.29,107.97,108.39,108.13,109.38,109.53,109.91,110.87,111.07,111.04,112.05,112.1,112.64,112.11,112.61,112.85,113.5,113.74,113.62,114.12,114.67,114.69,115.9,115.61,116.98,116.87,118.31,117.04,116.79,117.18,116.55,116.11,116.52,116.27,116.52,116.17,116.94,117.13,117.03,116.84,116.11,115.85,116.04,116.3,116.91,116.64,116.41,116.23,117.67,116.96,117.01,116.29,115.75,114.93,115.25,114.01,113.67,114.14,113.43,113.34,113.92,114.61,114.0,115.07,115.44,116.11,116.1,116.91,117.05,117.56,117.97,118.22,119.2,119.28,118.33,118.02,116.52,116.5,117.63,117.59,117.46,116.52,117.16,117.24,117.2,117.2,117.41,116.68,117.79,117.09,117.21,117.14,117.82,117.98,119.43,119.65,119.32,118.44,118.1,117.82,116.6,117.46,117.96,118.21,118.84,118.9,119.49,118.83,119.29,119.21,119.07,118.88,118.47,118.62,119.08,120.47,119.63,119.62,119.03,119.1,117.7,116.67,116.51,117.42,117.93,117.7,117.7,118.13,119.08,119.81,119.02,119.73,120.29,120.4,120.06,119.6,119.97,121.01,121.15,121.02,121.6,121.42,121.7,122.0,122.95,123.02,122.85,122.72,122.56,122.05,122.84,123.41,123.37,124.17,123.56,123.58,124.07,124.11,124.65,124.7,123.9,124.86,124.55,125.05,125.0,126.28,124.69,124.66,123.8,122.95,122.91,122.29,122.72,121.64,121.07,121.63,121.03,120.5,119.39,118.9,119.7,118.96,117.53,117.89,116.68,116.65,115.47,114.74,115.12,115.52,115.1,114.44,113.57,114.34,113.38,114.18,114.02,113.85,114.4,115.12,114.02,113.69,113.69,112.6,112.37,112.49,112.17,111.58,111.09,111.89,112.95,112.98,112.66,112.63,111.94,112.76,113.58,113.34,113.39,113.84,114.66,114.2,113.41,113.26,113.61,113.77,113.56,113.55,113.56,113.2,113.28,113.45,113.27,113.79,113.45,114.59,115.31,115.36,116.01,117.0,117.62,116.65,116.51,117.34,118.3,118.15,118.1,118.13,117.99,118.15,117.86,117.43,116.83,116.73,116.17,116.29,115.7,115.94,115.74,116.03,115.66,114.65,114.06,115.61,115.49,115.3,115.54,115.11,114.32,115.12,114.03,115.28,114.73,114.74,114.21,113.72,113.03,113.74,113.99,112.68,113.75,113.69,114.06,113.3,113.97,114.62,114.91,115.1,114.71,114.27,114.92,114.46,114.7,114.83,114.88,115.04,115.54,115.11,114.7,114.73,114.59,114.05,113.87,113.77,113.38,114.55,114.04,114.96,114.43,114.55,114.41,114.05,113.69,113.71,113.41,113.53,113.61,113.95,114.32,114.22,113.92,113.86,114.52,114.87,115.52,115.71,115.35,115.02,115.26,115.36,115.49],"ST":115.49,"min":100.0,"max":126.28,"run5":[0.0,-0.01,-0.017,-0.025,-0.043,-0.068,-0.031,-0.025,-0.053,-0.052,-0.041,-0.041,-0.087,-0.032,-0.06,-0.017,0.023,-0.012,0.022,-0.072,-0.056,-0.093,-0.202,-0.261,-0.305,-0.633,-0.438,-0.463,-0.383,-0.397,-0.454,-0.387,-0.256,-0.223,-0.279,-0.167,-0.026,0.025,0.019,-0.06,-0.102,-0.174,-0.295,-0.465,-0.372,-0.414,-0.326,-0.364,-0.409,-0.456,-0.326,-0.404,-0.349,-0.318,-0.396,-0.469,-0.657,-0.789,-0.788,-0.849,-0.882,-1.104,-0.904,-0.957,-0.941,-0.806,-0.909,-0.961,-0.876,-0.932,-0.981,-0.884,-1.005,-0.923,-1.311,-1.356,-1.483,-1.82,-1.888,-1.875,-2.253,-2.251,-2.251,-2.245,-2.246,-2.247,-2.257,-2.261,-2.255,-2.268,-2.286,-2.285,-2.339,-2.323,-2.397,-2.389,-2.482,-2.397,-2.381,-2.403,-2.364,-2.337,-2.359,-2.343,-2.357,-2.335,-2.38,-2.391,-2.384,-2.37,-2.325,-2.308,-2.318,-2.332,-2.369,-2.35,-2.335,-2.323,-2.416,-2.366,-2.369,-2.321,-2.287,-2.241,-2.257,-2.195,-2.18,-2.197,-2.167,-2.162,-2.182,-2.212,-2.182,-2.233,-2.253,-2.292,-2.291,-2.344,-2.352,-2.388,-2.418,-2.436,-2.513,-2.519,-2.442,-2.417,-2.307,-2.305,-2.385,-2.382,-2.371,-2.301,-2.347,-2.352,-2.348,-2.347,-2.362,-2.307,-2.39,-2.335,-2.343,-2.342,-2.343,-2.343,-2.352,-2.353,-2.35,-2.342,-2.34,-2.338,-2.335,-2.335,-2.336,-2.337,-2.341,-2.341,-2.347,-2.34,-2.344,-2.342,-2.341,-2.338,-2.334,-2.335,-2.339,-2.355,-2.344,-2.344,-2.337,-2.337,-2.323,-2.317,-2.316,-2.32,-2.323,-2.321,-2.32,-2.323,-2.333,-2.342,-2.332,-2.341,-2.348,-2.349,-2.344,-2.338,-2.343,-2.358,-2.36,-2.358,-2.367,-2.364,-2.368,-2.373,-2.389,-2.39,-2.387,-2.385,-2.382,-2.373,-2.387,-2.397,-2.396,-2.41,-2.399,-2.4,-2.408,-2.409,-2.419,-2.419,-2.405,-2.422,-2.417,-2.426,-2.425,-2.448,-2.419,-2.419,-2.403,-2.388,-2.387,-2.387,-2.387,-2.387,-2.387,-2.387,-2.387,-2.387,-2.388,-2.389,-2.388,-2.388,-2.391,-2.39,-2.394,-2.394,-2.4,-2.405,-2.401,-2.398,-2.401,-2.406,-2.415,-2.405,-2.416,-2.406,-2.406,-2.408,-2.402,-2.396,-2.404,-2.406,-2.406,-2.419,-2.421,-2.418,-2.423,-2.433,-2.444,-2.425,-2.408,-2.406,-2.409,-2.409,-2.418,-2.406,-2.397,-2.399,-2.398,-2.394,-2.39,-2.391,-2.395,-2.396,-2.393,-2.392,-2.392,-2.392,-2.391,-2.393,-2.392,-2.391,-2.391,-2.389,-2.389,-2.386,-2.385,-2.384,-2.384,-2.384,-2.384,-2.384,-2.383,-2.384,-2.384,-2.384,-2.384,-2.384,-2.384,-2.384,-2.384,-2.384,-2.384,-2.384,-2.384,-2.384,-2.384,-2.384,-2.384,-2.383,-2.383,-2.384,-2.384,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383,-2.383],"err5":-2.38,"run20":[0.0,-0.01,-0.017,-0.025,-0.043,-0.068,-0.031,-0.025,-0.053,-0.052,-0.041,-0.041,-0.087,-0.032,-0.06,-0.017,0.023,-0.012,0.022,-0.072,-0.056,-0.054,-0.072,-0.087,-0.1,-0.249,-0.151,-0.16,-0.121,-0.125,-0.148,-0.115,-0.058,-0.043,-0.061,-0.018,0.02,0.029,0.034,0.026,0.019,0.02,0.005,-0.037,-0.007,-0.015,0.012,0.005,-0.004,-0.015,0.026,0.007,0.026,0.038,0.019,-0.002,-0.07,-0.123,-0.12,-0.145,-0.158,-0.162,-0.15,-0.147,-0.143,-0.138,-0.135,-0.132,-0.126,-0.124,-0.122,-0.114,-0.116,-0.108,-0.141,-0.144,-0.161,-0.223,-0.236,-0.23,-0.32,-0.317,-0.318,-0.312,-0.313,-0.313,-0.323,-0.327,-0.322,-0.334,-0.352,-0.352,-0.405,-0.389,-0.463,-0.456,-0.549,-0.463,-0.447,-0.47,-0.43,-0.43,-0.428,-0.426,-0.425,-0.424,-0.424,-0.423,-0.422,-0.42,-0.417,-0.416,-0.415,-0.413,-0.414,-0.412,-0.41,-0.408,-0.416,-0.409,-0.408,-0.408,-0.411,-0.419,-0.413,-0.435,-0.442,-0.428,-0.445,-0.446,-0.428,-0.412,-0.422,-0.402,-0.397,-0.392,-0.391,-0.39,-0.389,-0.391,-0.393,-0.393,-0.395,-0.395,-0.391,-0.389,-0.392,-0.391,-0.387,-0.386,-0.385,-0.387,-0.384,-0.383,-0.382,-0.381,-0.38,-0.38,-0.379,-0.378,-0.377,-0.376,-0.376,-0.376,-0.385,-0.387,-0.383,-0.376,-0.373,-0.371,-0.368,-0.368,-0.37,-0.371,-0.375,-0.375,-0.38,-0.373,-0.377,-0.376,-0.374,-0.373,-0.373,-0.373,-0.372,-0.375,-0.372,-0.372,-0.37,-0.37,-0.37,-0.374,-0.375,-0.369,-0.368,-0.368,-0.367,-0.366,-0.366,-0.368,-0.366,-0.366,-0.367,-0.367,-0.365,-0.364,-0.365,-0.368,-0.368,-0.367,-0.369,-0.369,-0.37,-0.371,-0.375,-0.376,-0.375,-0.374,-0.373,-0.37,-0.374,-0.374,-0.374,-0.375,-0.374,-0.374,-0.374,-0.374,-0.375,-0.375,-0.374,-0.375,-0.374,-0.375,-0.375,-0.376,-0.374,-0.374,-0.374,-0.373,-0.373,-0.373,-0.373,-0.373,-0.373,-0.373,-0.373,-0.373,-0.374,-0.375,-0.374,-0.375,-0.378,-0.376,-0.38,-0.38,-0.386,-0.392,-0.388,-0.384,-0.387,-0.387,-0.39,-0.386,-0.389,-0.385,-0.385,-0.384,-0.383,-0.382,-0.382,-0.382,-0.381,-0.386,-0.387,-0.385,-0.387,-0.393,-0.4,-0.387,-0.378,-0.377,-0.376,-0.375,-0.376,-0.374,-0.375,-0.373,-0.373,-0.375,-0.38,-0.376,-0.371,-0.369,-0.371,-0.371,-0.37,-0.369,-0.369,-0.366,-0.366,-0.365,-0.365,-0.365,-0.364,-0.367,-0.369,-0.37,-0.373,-0.378,-0.381,-0.376,-0.375,-0.379,-0.385,-0.384,-0.384,-0.384,-0.383,-0.384,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.381,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382,-0.382],"err20":-0.38,"run200":[0.0,-0.01,-0.017,-0.013,-0.015,-0.013,-0.005,0.0,0.002,0.007,0.012,0.017,0.015,0.015,0.024,0.026,0.02,0.02,0.03,0.013,0.022,0.025,0.006,0.008,0.008,-0.032,0.007,0.011,0.016,0.02,0.022,0.025,0.016,0.02,0.025,0.023,-0.008,-0.006,0.0,-0.002,-0.007,-0.006,-0.022,-0.029,-0.015,-0.012,-0.007,-0.003,-0.001,0.003,0.007,0.009,0.016,0.02,0.024,0.026,0.012,0.013,0.017,0.02,0.023,0.019,0.031,0.034,0.038,0.039,0.046,0.049,0.054,0.057,0.06,0.062,0.067,0.07,0.062,0.065,0.065,0.059,0.057,0.06,0.054,0.056,0.056,0.056,0.061,0.062,0.059,0.061,0.063,0.064,0.06,0.062,0.055,0.056,0.053,0.054,0.049,0.045,0.044,0.045,0.047,0.047,0.049,0.05,0.052,0.053,0.054,0.055,0.056,0.057,0.056,0.057,0.058,0.059,0.058,0.059,0.059,0.061,0.056,0.056,0.057,0.056,0.054,0.053,0.056,0.05,0.047,0.048,0.051,0.053,0.053,0.052,0.057,0.053,0.049,0.049,0.05,0.049,0.049,0.049,0.048,0.049,0.046,0.047,0.046,0.047,0.041,0.042,0.039,0.039,0.04,0.039,0.042,0.043,0.044,0.045,0.045,0.045,0.046,0.046,0.047,0.048,0.048,0.049,0.044,0.045,0.045,0.045,0.044,0.045,0.041,0.04,0.038,0.039,0.038,0.038,0.038,0.038,0.039,0.039,0.04,0.04,0.04,0.041,0.041,0.039,0.041,0.041,0.042,0.042,0.04,0.039,0.039,0.038,0.036,0.037,0.037,0.037,0.035,0.035,0.036,0.036,0.035,0.035,0.035,0.036,0.036,0.035,0.035,0.036,0.036,0.036,0.036,0.036,0.036,0.036,0.036,0.036,0.036,0.036,0.036,0.036,0.036,0.036,0.036,0.036,0.036,0.036,0.036,0.036,0.036,0.036,0.036,0.036,0.036,0.036,0.036,0.036,0.036,0.036,0.036,0.036,0.037,0.036,0.036,0.036,0.036,0.036,0.036,0.036,0.036,0.036,0.035,0.035,0.035,0.035,0.034,0.034,0.035,0.035,0.036,0.036,0.033,0.032,0.035,0.034,0.035,0.036,0.036,0.036,0.037,0.038,0.039,0.037,0.036,0.037,0.038,0.038,0.037,0.035,0.024,0.025,0.026,0.026,0.026,0.025,0.02,0.02,0.021,0.021,0.019,0.019,0.018,0.019,0.019,0.02,0.02,0.021,0.021,0.021,0.022,0.022,0.023,0.023,0.024,0.022,0.021,0.021,0.021,0.021,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02],"err200":0.02},"spread":{"paths":2000,"N":[5,10,20,40,80,160,320],"std":[1.446,1.035,0.75,0.544,0.387,0.278,0.201],"cost":[0.113,0.146,0.189,0.25,0.335,0.453,0.618]}};
       /*END DATA*/
       const t = (i) => W[i] + V;
       const T = (line, k) => t(LS[line] + k);
-      const END = VO_END + V + 2.6;
+      const END = VO_END + V + 3.2;
       const TAU = Math.PI * 2;
       const EZ = { o2: gsap.parseEase("power2.out"), o3: gsap.parseEase("power3.out"), io2: gsap.parseEase("power2.inOut"), b: gsap.parseEase("back.out(1.7)") };
       const pr = (tt, t0, d, ez) => { const p = Math.min(1, Math.max(0, (tt - t0) / d)); return ez ? ez(p) : p; };
@@ -126,7 +132,8 @@
       const rs = (v, d = 2) => (v < -0.0049 ? "−₹" : "+₹") + Math.abs(v).toFixed(d);
 
       const X = document.getElementById("h-cv").getContext("2d");
-      const txt = (s, x, y, f, col, al = "left", bl = "alphabetic") => { X.font = f; X.fillStyle = col; X.textAlign = al; X.textBaseline = bl; X.fillText(s, x, y); };
+      const SY = 1048 / 980, TY = 452 - 520 * SY;   // the card grew from 520-1500 to 452-1500: geometry stretches, text stays upright
+      const txt = (s, x, y, f, col, al = "left", bl = "alphabetic") => { X.font = f; X.fillStyle = col; X.textAlign = al; X.textBaseline = bl; X.save(); X.translate(x, y); X.scale(1, 1 / SY); X.fillText(s, 0, 0); X.restore(); };
       // a polyline drawn up to fraction p of its length (by point count), with the tip interpolated
       const poly = (pts, col, w, p = 1, dash) => {
         if (p <= 0 || pts.length < 2) return null;
@@ -165,86 +172,86 @@
 
       // 1 · the short call's P&L at expiry
       const s1 = (tt) => {
-        stat(100, 628, 262, 92, "₹3.99", "PREMIUM IN", C.yelL, 1);
-        stat(386, 628, 262, 92, "₹100", "STRIKE", C.tealL, 1);
-        stat(672, 628, 300, 92, "3 months", "TO EXPIRY", C.greyL, 1);
-        const px = (S) => 170 + (S - 70) / 60 * 780, py = (v) => 860 - v * 13.2, pnl = (S) => C0 - Math.max(S - 100, 0);
-        txt("Your P&L at expiry", 100, 778, `600 27px ${FI}`, "#34373c");
-        txt("short 1 call", 972, 778, `500 22px ${FM}`, C.grey, "right");
+        stat(100, 548, 262, 104, "₹3.99", "PREMIUM IN", C.yelL, 1);
+        stat(386, 548, 262, 104, "₹100", "STRIKE", C.tealL, 1);
+        stat(672, 548, 300, 104, "3 months", "TO EXPIRY", C.greyL, 1);
+        const px = (S) => 170 + (S - 70) / 60 * 780, py = (v) => 862 - v * 20.5, pnl = (S) => C0 - Math.max(S - 100, 0);
+        txt("Your P&L at expiry", 100, 716, `600 29px ${FI}`, "#34373c");
+        txt("short 1 call", 972, 716, `500 24px ${FM}`, C.grey, "right");
         hline(170, 950, py(0), C.ink, 2.5);
-        [[3.99, "+4"], [0, "0"], [-10, "−10"], [-20, "−20"]].forEach(([v, s]) => { txt(s, 156, py(v), `500 20px ${FM}`, C.grey, "right", "middle"); if (v) hline(170, 950, py(v), C.line, 1.5); });
-        [70, 85, 100, 115, 130].forEach((S) => txt("₹" + S, px(S), 1246, `500 21px ${FM}`, C.grey, "center"));
-        vline(px(100), 800, 1214, C.line, 2, [8, 8]);
+        [[3.99, "+4"], [0, "0"], [-10, "−10"], [-20, "−20"]].forEach(([v, s]) => { txt(s, 156, py(v), `500 22px ${FM}`, C.grey, "right", "middle"); if (v) hline(170, 950, py(v), C.line, 1.5); });
+        [70, 85, 100, 115, 130].forEach((S) => txt("₹" + S, px(S), 1452, `500 23px ${FM}`, C.grey, "center"));
+        vline(px(100), 760, 1412, C.line, 2, [8, 8]);
         const p = pr(tt, -0.5, 1.4, EZ.o2), pts = [];
         for (let S = 70; S <= 130.001; S += 0.5) pts.push([px(S), py(pnl(S))]);
         const k = Math.max(1, Math.round(p * (pts.length - 1)));
         if (p > 0) {
           const fill = (from, to, col) => { X.beginPath(); X.moveTo(pts[from][0], py(0)); for (let i = from; i <= to; i++) X.lineTo(pts[i][0], pts[i][1]); X.lineTo(pts[to][0], py(0)); X.closePath(); X.fillStyle = col; X.fill(); };
           const be = Math.round((100 + C0 - 70) / 0.5);
-          const flash = 1 + 1.4 * Math.sin(Math.PI * pr(tt, T("a02", 6), 0.9)) ;
+          const flash = 1 + 1.4 * Math.sin(Math.PI * pr(tt, T("a02", 6), 0.9));
           fill(0, Math.min(k, be), C.tealF);
           if (k > be) { X.save(); X.globalAlpha *= Math.min(1, 0.8 * flash); fill(be, k, C.roseF); X.restore(); }
         }
-        poly(pts, C.ink, 6, p);
+        poly(pts, C.ink, 7, p);
         // the stock rallies: a marker rides the line into the red
         const m = pr(tt, 0.85, 0.3);
         if (m > 0) {
           const S = 100 + 24 * pr(tt, T("a01", 9) - 0.1, 1.4, EZ.io2), v = pnl(S), x = px(S), y = py(v), a = X.globalAlpha;
           X.globalAlpha = a * m;
-          vline(x, y, 1214, v < 0 ? C.rose : C.teal, 3, [6, 6]);
+          vline(x, y, 1412, v < 0 ? C.rose : C.teal, 3, [6, 6]);
           const ring = pr(tt, T("a02", 6), 0.9);
-          if (ring > 0 && ring < 1) { X.beginPath(); X.arc(x, y, 14 + 40 * ring, 0, TAU); X.strokeStyle = `rgba(210,60,60,${1 - ring})`; X.lineWidth = 4; X.stroke(); }
-          dot(x, y, 13, v < 0 ? C.rose : C.teal, C.ink);
-          pill(`stock ₹${S.toFixed(0)} · P&L ${rs(v, 2)}`, Math.min(x, 700), v < 0 ? y - 52 : y + 58, `700 26px ${FM}`, v < 0 ? C.roseL : C.tealL, C.ink, "center");
+          if (ring > 0 && ring < 1) { X.beginPath(); X.arc(x, y, 15 + 44 * ring, 0, TAU); X.strokeStyle = `rgba(210,60,60,${1 - ring})`; X.lineWidth = 4; X.stroke(); }
+          dot(x, y, 15, v < 0 ? C.rose : C.teal, C.ink);
+          pill(`stock ₹${S.toFixed(0)} · P&L ${rs(v, 2)}`, Math.min(x, 690), v < 0 ? y - 58 : y + 64, `700 28px ${FM}`, v < 0 ? C.roseL : C.tealL, C.ink, "center");
           X.globalAlpha = a;
         }
       };
 
       // 2 · the option's value today, and its slope: delta
       const s2 = (tt) => {
-        const s0 = SC[1], px = (S) => 170 + (S - 85) / 30 * 780, py = (c) => 1205 - c * 24.5;
-        txt("Option value today · 3 months left", 100, 668, `600 27px ${FI}`, "#34373c");
+        const s0 = SC[1], px = (S) => 170 + (S - 85) / 30 * 780, py = (c) => 1400 - c * 37;
+        txt("Option value today · 3 months left", 100, 586, `600 29px ${FI}`, "#34373c");
         hline(170, 950, py(0), C.ink, 2.5);
-        [[0, "₹0"], [5, "₹5"], [10, "₹10"], [15, "₹15"]].forEach(([v, s]) => { txt(s, 156, py(v), `500 20px ${FM}`, C.grey, "right", "middle"); if (v) hline(170, 950, py(v), C.line, 1.5); });
-        [85, 95, 100, 105, 115].forEach((S) => txt("₹" + S, px(S), 1246, `500 21px ${FM}`, C.grey, "center"));
+        [[0, "₹0"], [5, "₹5"], [10, "₹10"], [15, "₹15"]].forEach(([v, s]) => { txt(s, 156, py(v), `500 22px ${FM}`, C.grey, "right", "middle"); if (v) hline(170, 950, py(v), C.line, 1.5); });
+        [85, 95, 100, 105, 115].forEach((S) => txt("₹" + S, px(S), 1452, `500 23px ${FM}`, C.grey, "center"));
         const pts = []; for (let S = 85; S <= 115.001; S += 0.25) pts.push([px(S), py(call(S, 0.25))]);
-        poly(pts, C.teal, 7, pr(tt, s0 + 0.05, 0.8, EZ.io2));
+        poly(pts, C.teal, 8, pr(tt, s0 + 0.05, 0.8, EZ.io2));
         const tg = pr(tt, T("a03", 3), 0.6, EZ.o2);
         if (tg > 0) {
           const L = 12 * tg, a = [px(100 - L), py(C0 - D0 * L)], b = [px(100 + L), py(C0 + D0 * L)];
-          X.save(); X.beginPath(); X.rect(170, 790, 780, 420); X.clip(); poly([a, b], C.ink, 4); X.restore();
-          if (tg > 0.6) { const q = X.globalAlpha; X.globalAlpha = q * (tg - 0.6) / 0.4; pill("slope = Δ = 0.52", px(108.5), py(C0 + D0 * 8.5) - 46, `700 26px ${FM}`, C.yel, C.ink, "center"); X.globalAlpha = q; }
+          X.save(); X.beginPath(); X.rect(170, 760, 780, 645); X.clip(); poly([a, b], C.ink, 5); X.restore();
+          if (tg > 0.6) { const q = X.globalAlpha; X.globalAlpha = q * (tg - 0.6) / 0.4; pill("slope = Δ = 0.52", px(108.5), py(C0 + D0 * 8.5) - 52, `700 28px ${FM}`, C.yel, C.ink, "center"); X.globalAlpha = q; }
         }
         const mv = pr(tt, T("a03", 10), 0.7, EZ.io2), S = 100 + mv;
-        if (pr(tt, s0 + 0.6, 0.2) > 0) { const q = X.globalAlpha; X.globalAlpha = q * pr(tt, s0 + 0.6, 0.2); dot(px(100), py(C0), 11, "#ffffff", C.ink); if (mv > 0) dot(px(S), py(call(S, 0.25)), 11, C.teal, C.ink); X.globalAlpha = q; }
-        stat(100, 700, 380, 84, "+₹1.00", "STOCK MOVES", C.tealL, pr(tt, T("a03", 10), 0.35, EZ.o3));
-        stat(504, 700, 468, 84, "≈ +₹0.52", "OPTION MOVES (Δ × ₹1)", C.yelL, pr(tt, T("a03", 13), 0.35, EZ.o3));
+        if (pr(tt, s0 + 0.6, 0.2) > 0) { const q = X.globalAlpha; X.globalAlpha = q * pr(tt, s0 + 0.6, 0.2); dot(px(100), py(C0), 13, "#ffffff", C.ink); if (mv > 0) dot(px(S), py(call(S, 0.25)), 13, C.teal, C.ink); X.globalAlpha = q; }
+        stat(100, 616, 380, 104, "+₹1.00", "STOCK MOVES", C.tealL, pr(tt, T("a03", 10), 0.35, EZ.o3));
+        stat(504, 616, 468, 104, "≈ +₹0.52", "OPTION MOVES (Δ × ₹1)", C.yelL, pr(tt, T("a03", 13), 0.35, EZ.o3));
       };
 
       // 3 · delta ≈ 0.5: for each call sold, buy about half a share
       const s3 = (tt) => {
-        const s0 = SC[2];
-        txt("Δ ≈ 0.52", 100, 790, `700 150px ${FS}`, C.ink);
-        txt("about half", 760, 760, `600 34px ${FI}`, C.grey);
-        const a = pr(tt, T("a04", 8), 0.4, EZ.o3), b = pr(tt, T("a04", 13), 0.4, EZ.o3), q = X.globalAlpha;
+        txt("Δ ≈ 0.52", 100, 724, `700 172px ${FS}`, C.ink);
+        txt("about half", 790, 690, `600 38px ${FI}`, C.grey);
+        const a = pr(tt, T("a04", 8), 0.4, EZ.o3), b = pr(tt, T("a04", 13), 0.4, EZ.o3), q = X.globalAlpha, H = 560;
         if (a > 0) {
-          X.globalAlpha = q * a; const y = 880 + (1 - a) * 20;
-          X.beginPath(); X.roundRect(100, y, 360, 340, 22); X.fillStyle = C.roseL; X.fill(); X.lineWidth = 4; X.strokeStyle = C.rose; X.stroke();
-          txt("YOU SOLD", 128, y + 58, `700 24px ${FM}`, C.rose);
-          txt("1 call", 128, y + 170, `700 92px ${FS}`, C.ink);
-          txt("short the upside", 128, y + 300, `500 26px ${FI}`, "#34373c");
+          X.globalAlpha = q * a; const y = 800 + (1 - a) * 20;
+          X.beginPath(); X.roundRect(100, y, 370, H, 24); X.fillStyle = C.roseL; X.fill(); X.lineWidth = 4; X.strokeStyle = C.rose; X.stroke();
+          txt("YOU SOLD", 130, y + 70, `700 27px ${FM}`, C.rose);
+          txt("1 call", 130, y + 260, `700 118px ${FS}`, C.ink);
+          txt("short the upside", 130, y + H - 40, `500 29px ${FI}`, "#34373c");
           X.globalAlpha = q;
         }
         if (b > 0) {
-          X.globalAlpha = q * b; const y = 880 + (1 - b) * 20, f = 0.52 * pr(tt, T("a04", 14), 0.8, EZ.io2);
-          txt("→", 530, y + 190, `700 80px ${FS}`, C.ink, "center");
-          X.beginPath(); X.roundRect(600, y, 372, 340, 22); X.fillStyle = "#ffffff"; X.fill();
-          X.save(); X.beginPath(); X.roundRect(600, y, 372, 340, 22); X.clip(); X.fillStyle = "rgba(8,169,162,0.32)"; X.fillRect(600, y + 340 * (1 - f), 372, 340 * f);
-          hline(600, 972, y + 340 * 0.48, C.teal, 3, [10, 8]); X.restore();
-          X.beginPath(); X.roundRect(600, y, 372, 340, 22); X.lineWidth = 4; X.strokeStyle = C.teal; X.stroke();
-          txt("YOU BUY", 628, y + 58, `700 24px ${FM}`, C.teal);
-          txt(f.toFixed(2), 628, y + 170, `700 92px ${FS}`, C.ink);
-          txt("share of the stock", 628, y + 300, `500 26px ${FI}`, "#34373c");
+          X.globalAlpha = q * b; const y = 800 + (1 - b) * 20, f = 0.52 * pr(tt, T("a04", 14), 0.8, EZ.io2);
+          txt("→", 535, y + H / 2 + 30, `700 92px ${FS}`, C.ink, "center");
+          X.beginPath(); X.roundRect(600, y, 372, H, 24); X.fillStyle = "#ffffff"; X.fill();
+          X.save(); X.beginPath(); X.roundRect(600, y, 372, H, 24); X.clip(); X.fillStyle = "rgba(8,169,162,0.32)"; X.fillRect(600, y + H * (1 - f), 372, H * f);
+          hline(600, 972, y + H * 0.48, C.teal, 3, [10, 8]); X.restore();
+          X.beginPath(); X.roundRect(600, y, 372, H, 24); X.lineWidth = 4; X.strokeStyle = C.teal; X.stroke();
+          txt("YOU BUY", 630, y + 70, `700 27px ${FM}`, C.teal);
+          txt(f.toFixed(2), 630, y + 260, `700 118px ${FS}`, C.ink);
+          txt("share of the stock", 630, y + H - 40, `500 29px ${FI}`, "#34373c");
+          txt("hedge ratio = Δ = shares per call sold", 540, 1446, `500 25px ${FM}`, C.grey, "center");
           X.globalAlpha = q;
         }
       };
@@ -252,58 +259,59 @@
       // 4 · the stock ticks up ₹1: the call loses, the shares gain, the net is almost zero
       const s4 = (tt) => {
         const up = pr(tt, T("a05", 4), 0.5, EZ.io2), S = 100 + up;
-        txt("STOCK", 100, 662, `700 22px ${FM}`, C.grey);
-        txt(`₹100.00 → ₹${S.toFixed(2)}`, 100, 730, `700 62px ${FS}`, C.ink);
-        const zx = 560, k = 420;
-        vline(zx, 770, 1250, C.ink, 3);
+        txt("STOCK", 100, 586, `700 25px ${FM}`, C.grey);
+        txt(`₹100.00 → ₹${S.toFixed(2)}`, 100, 672, `700 72px ${FS}`, C.ink);
+        const zx = 560, k = 420, BH = 88;
+        vline(zx, 730, 1360, C.ink, 3);
         const bar = (lab, y, v, col, p, valAl) => {
           if (p <= 0) return; const q = X.globalAlpha; X.globalAlpha = q * Math.min(1, p * 2);
-          txt(lab, 100, y - 16, `600 28px ${FI}`, "#34373c");
-          const w = v * k * p; X.fillStyle = col; X.fillRect(Math.min(zx, zx + w), y, Math.abs(w) || 2, 64); X.lineWidth = 3; X.strokeStyle = C.ink; X.strokeRect(Math.min(zx, zx + w), y, Math.abs(w) || 2, 64);
-          txt(rs(v * p), valAl === "left" ? zx + Math.max(w, 0) + 16 : zx + Math.min(w, 0) - 16, y + 34, `700 40px ${FS}`, C.ink, valAl, "middle");
+          txt(lab, 100, y - 20, `600 31px ${FI}`, "#34373c");
+          const w = v * k * p; X.fillStyle = col; X.fillRect(Math.min(zx, zx + w), y, Math.abs(w) || 2, BH); X.lineWidth = 3; X.strokeStyle = C.ink; X.strokeRect(Math.min(zx, zx + w), y, Math.abs(w) || 2, BH);
+          txt(rs(v * p), valAl === "left" ? zx + Math.max(w, 0) + 18 : zx + Math.min(w, 0) - 18, y + BH / 2 + 2, `700 46px ${FS}`, C.ink, valAl, "middle");
           X.globalAlpha = q;
         };
         const cU = D.C_up1 - C0;
-        bar("The call you sold", 836, -cU, C.rose, pr(tt, T("a05", 7), 0.5, EZ.o3), "right");
-        bar("The 0.52 shares you bought", 1000, D0, C.teal, pr(tt, T("a05", 13), 0.5, EZ.o3), "left");
+        bar("The call you sold", 800, -cU, C.rose, pr(tt, T("a05", 7), 0.5, EZ.o3), "right");
+        bar("The 0.52 shares you bought", 1010, D0, C.teal, pr(tt, T("a05", 13), 0.5, EZ.o3), "left");
         const n = pr(tt, T("a05", 18), 0.4, EZ.o3);
         if (n > 0) {
           const q = X.globalAlpha; X.globalAlpha = q * n;
-          txt("Net", 100, 1148, `600 28px ${FI}`, "#34373c");
-          const w = (D0 - cU) * k; X.fillStyle = C.ink; X.fillRect(zx + Math.min(w, 0), 1164, Math.max(3, Math.abs(w)), 64);
-          pill(`${rs(D0 - cU)}  ≈ 0`, zx + 24, 1196, `700 34px ${FM}`, C.yel, C.ink);
+          txt("Net", 100, 1200, `600 31px ${FI}`, "#34373c");
+          const w = (D0 - cU) * k; X.fillStyle = C.ink; X.fillRect(zx + Math.min(w, 0), 1220, Math.max(3, Math.abs(w)), BH);
+          pill(`${rs(D0 - cU)}  ≈ 0`, zx + 26, 1264, `700 38px ${FM}`, C.yel, C.ink);
+          txt("the leftover is gamma: −½ · Γ · (₹1)² ≈ −₹0.02", 540, 1446, `500 25px ${FM}`, C.grey, "center");
           X.globalAlpha = q;
         }
       };
 
       // 5 · delta moves with the stock, so the hedge must be traded back to it
       const s5 = (tt) => {
-        const s0 = SC[4], px = (S) => 170 + (S - 80) / 40 * 780, py = (d) => 1150 - d * 380;
-        txt("Δ depends on where the stock is", 100, 668, `600 27px ${FI}`, "#34373c");
+        const s0 = SC[4], px = (S) => 170 + (S - 80) / 40 * 780, py = (d) => 1290 - d * 500;
+        txt("Δ depends on where the stock is", 100, 586, `600 29px ${FI}`, "#34373c");
         hline(170, 950, py(0), C.ink, 2.5);
-        [[0, "0"], [0.5, "0.5"], [1, "1"]].forEach(([v, s]) => { txt(s, 156, py(v), `500 20px ${FM}`, C.grey, "right", "middle"); if (v) hline(170, 950, py(v), C.line, 1.5); });
-        [80, 90, 100, 110, 120].forEach((S) => txt("₹" + S, px(S), 1188, `500 21px ${FM}`, C.grey, "center"));
+        [[0, "0"], [0.5, "0.5"], [1, "1"]].forEach(([v, s]) => { txt(s, 156, py(v), `500 22px ${FM}`, C.grey, "right", "middle"); if (v) hline(170, 950, py(v), C.line, 1.5); });
+        [80, 90, 100, 110, 120].forEach((S) => txt("₹" + S, px(S), 1332, `500 23px ${FM}`, C.grey, "center"));
         const pts = []; for (let S = 80; S <= 120.001; S += 0.25) pts.push([px(S), py(delta(S, 0.25))]);
-        poly(pts, C.teal, 7, pr(tt, s0 + 0.05, 0.7, EZ.io2));
-        const S = key(tt, [[s0 + 0.5, 100], [T("a06", 5), 100], [T("a06", 8), 109], [T("a06", 13), 93], [T("a06", 16), 105], [T("a06", 19) + 0.3, 101]]);
-        const d = delta(S, 0.25), x = px(S), y = py(d), on = pr(tt, s0 + 0.5, 0.25);
+        poly(pts, C.teal, 8, pr(tt, s0 + 0.05, 0.7, EZ.io2));
+        const KS = [[s0 + 0.5, 100], [T("a06", 5), 100], [T("a06", 8), 109], [T("a06", 13), 93], [T("a06", 16), 105], [T("a06", 19) + 0.3, 101]];
+        const S = key(tt, KS), d = delta(S, 0.25), x = px(S), y = py(d), on = pr(tt, s0 + 0.5, 0.25);
         // the hedge is traded back to delta at each rebalance, and drifts in between
         const reb = [s0 + 0.5, T("a06", 14), T("a06", 15), T("a06", 17), T("a06", 19) + 0.15];
-        let held = D0; reb.forEach((r) => { if (tt >= r) held = delta(key(r, [[s0 + 0.5, 100], [T("a06", 5), 100], [T("a06", 8), 109], [T("a06", 13), 93], [T("a06", 16), 105], [T("a06", 19) + 0.3, 101]]), 0.25); });
+        let held = D0; reb.forEach((r) => { if (tt >= r) held = delta(key(r, KS), 0.25); });
         if (on > 0) {
           const q = X.globalAlpha; X.globalAlpha = q * on;
           vline(x, y, py(0), C.grey, 2, [6, 6]); hline(170, x, y, C.grey, 2, [6, 6]);
-          dot(x, y, 13, C.teal, C.ink);
-          stat(190, 712, 340, 84, `Δ ${d.toFixed(2)}`, `STOCK ₹${S.toFixed(0)}`, C.tealL, 1);
+          dot(x, y, 15, C.teal, C.ink);
+          stat(190, 616, 360, 104, `Δ ${d.toFixed(2)}`, `STOCK ₹${S.toFixed(0)}`, C.tealL, 1);
           // shares held vs delta: the gap is the unhedged part
-          txt("SHARES HELD", 100, 1226, `700 20px ${FM}`, C.grey);
-          const bx = 290, bw = 560;
-          X.fillStyle = C.greyL; X.fillRect(bx, 1206, bw, 34);
-          X.fillStyle = "rgba(8,169,162,0.55)"; X.fillRect(bx, 1206, bw * held, 34);
-          if (Math.abs(d - held) > 0.01) { X.fillStyle = C.roseF; X.fillRect(bx + bw * Math.min(d, held), 1206, bw * Math.abs(d - held), 34); vline(bx + bw * d, 1200, 1246, C.rose, 4); }
-          X.lineWidth = 3; X.strokeStyle = C.ink; X.strokeRect(bx, 1206, bw, 34);
-          txt(held.toFixed(2), bx + bw + 16, 1224, `700 30px ${FS}`, C.ink, "left", "middle");
-          reb.slice(1).forEach((r) => { const k = pr(tt, r, 0.5); if (k > 0 && k < 1) pill("rebalance", bx + bw * held, 1170 - 14 * k, `700 22px ${FM}`, C.yel, C.ink, "center"); });
+          txt("SHARES HELD", 100, 1412, `700 22px ${FM}`, C.grey);
+          const bx = 300, by = 1386, bh = 46, bw = 540;
+          X.fillStyle = C.greyL; X.fillRect(bx, by, bw, bh);
+          X.fillStyle = "rgba(8,169,162,0.55)"; X.fillRect(bx, by, bw * held, bh);
+          if (Math.abs(d - held) > 0.01) { X.fillStyle = C.roseF; X.fillRect(bx + bw * Math.min(d, held), by, bw * Math.abs(d - held), bh); vline(bx + bw * d, by - 8, by + bh + 8, C.rose, 4); }
+          X.lineWidth = 3; X.strokeStyle = C.ink; X.strokeRect(bx, by, bw, bh);
+          txt(held.toFixed(2), bx + bw + 16, by + bh / 2 + 1, `700 34px ${FS}`, C.ink, "left", "middle");
+          reb.slice(1).forEach((r) => { const kk = pr(tt, r, 0.6); if (kk > 0 && kk < 1) pill("rebalance", Math.min(x, 860), y - 62 - 16 * kk, `700 26px ${FM}`, C.yel, C.ink, "center"); });
           X.globalAlpha = q;
         }
       };
@@ -311,80 +319,80 @@
       // 6 · one simulated path, hedged 5, 20 and 200 times: the error at expiry shrinks
       const s6 = (tt) => {
         const s0 = SC[5], P = D.path, n = P.S.length, px = (i) => 130 + i / (n - 1) * 830;
-        const py = (S) => 880 - (S - 98) / 30 * 196, ey = (e) => 1236 - (e + 3) / 4 * 280;
-        txt("One simulated path · stock price", 100, 660, `600 25px ${FI}`, "#34373c");
-        txt(`seed ${P.seed}`, 972, 660, `500 20px ${FM}`, C.grey, "right");
-        hline(130, 960, py(100), C.grey, 2, [8, 8]); txt("strike ₹100", 960, py(100) + 24, `500 19px ${FM}`, C.grey, "right");
+        const py = (S) => 1000 - (S - 98) / 30 * 300, ey = (e) => 1450 - (e + 3) / 4 * 340;
+        txt("One simulated path · stock price", 100, 580, `600 28px ${FI}`, "#34373c");
+        txt(`seed ${P.seed}`, 972, 580, `500 22px ${FM}`, C.grey, "right");
+        hline(130, 960, py(100), C.grey, 2, [8, 8]); txt("strike ₹100", 960, py(100) + 28, `500 21px ${FM}`, C.grey, "right");
         const pp = P.S.map((S, i) => [px(i), py(S)]);
-        const tip = poly(pp, C.ink, 4, pr(tt, s0 + 0.05, T("a07", 3) + 0.4 - s0, EZ.io2));
-        if (tip && pr(tt, T("a07", 3) + 0.45, 0.2) > 0) txt(`₹${P.ST} at expiry`, 960, py(P.max) - 4, `600 20px ${FM}`, C.ink, "right");
+        const tip = poly(pp, C.ink, 4.5, pr(tt, s0 + 0.05, T("a07", 3) + 0.4 - s0, EZ.io2));
+        if (tip && pr(tt, T("a07", 3) + 0.45, 0.2) > 0) txt(`₹${P.ST} at expiry`, 960, py(P.max) - 8, `600 23px ${FM}`, C.ink, "right");
         // the rebalances, as dots on the path
         const NS = [[5, T("a07", 5)], [20, T("a08", 0)], [200, T("a08", 6)]];
         let cur = 0; NS.forEach(([nn, at], j) => { if (tt >= at) cur = j + 1; });
-        if (cur) { const nn = NS[cur - 1][0], step = (n - 1) / nn, r = nn > 50 ? 3 : nn > 10 ? 5.5 : 9, col = [C.rose, C.amber, C.teal][cur - 1];
+        if (cur) { const nn = NS[cur - 1][0], step = (n - 1) / nn, r = nn > 50 ? 3.5 : nn > 10 ? 6 : 10, col = [C.rose, C.amber, C.teal][cur - 1];
           for (let k = 0; k < nn; k++) { const i = Math.round(k * step); dot(px(i), py(P.S[i]), r, col); } }
         // the error panel
-        txt("Hedge error, ₹ (premium + hedge − option)", 100, 930, `600 25px ${FI}`, "#34373c");
+        txt("Hedge error, ₹ (premium + hedge − option)", 100, 1066, `600 28px ${FI}`, "#34373c");
         hline(130, 960, ey(0), C.ink, 2.5);
-        [[1, "+1"], [0, "0"], [-1, "−1"], [-2, "−2"], [-3, "−3"]].forEach(([v, s]) => { txt(s, 120, ey(v), `500 19px ${FM}`, C.grey, "right", "middle"); if (v) hline(130, 960, ey(v), C.line, 1.5); });
-        const L = [["run5", C.rose, T("a07", 4), T("a07", 10) + 0.25, "5×", "err5"], ["run20", C.amber, T("a08", 0), T("a08", 4) + 0.25, "20×", "err20"], ["run200", C.teal, T("a08", 5), T("a08", 11) + 0.1, "200×", "err200"]];
+        [[1, "+1"], [0, "0"], [-1, "−1"], [-2, "−2"], [-3, "−3"]].forEach(([v, s]) => { txt(s, 120, ey(v), `500 21px ${FM}`, C.grey, "right", "middle"); if (v) hline(130, 960, ey(v), C.line, 1.5); });
+        const L = [["run5", C.rose, T("a07", 4), T("a07", 10) + 0.25, "5", "err5"], ["run20", C.amber, T("a08", 0), T("a08", 4) + 0.25, "20", "err20"], ["run200", C.teal, T("a08", 5), T("a08", 11) + 0.1, "200", "err200"]];
         L.forEach(([k, col, a, b, lab, ek], j) => {
-          const p = pr(tt, a, b - a, EZ.io2); poly(P[k].map((e, i) => [px(i), ey(Math.max(-3.2, e))]), col, j === 2 ? 5 : 4, p);
+          const p = pr(tt, a, b - a, EZ.io2); poly(P[k].map((e, i) => [px(i), ey(Math.max(-3.2, e))]), col, j === 2 ? 5.5 : 4.5, p);
           const lg = pr(tt, b - 0.1, 0.3);
-          if (lg > 0) { const q = X.globalAlpha; X.globalAlpha = q * lg; const y = 1084 + j * 38; X.fillStyle = col; X.fillRect(600, y - 6, 34, 12);
-            txt(`${lab.replace("×", "")} rebalances`, 646, y, `600 23px ${FM}`, C.ink, "left", "middle"); txt(rs(P[ek]), 962, y, `700 26px ${FS}`, C.ink, "right", "middle"); X.globalAlpha = q; }
+          if (lg > 0) { const q = X.globalAlpha; X.globalAlpha = q * lg; const y = 1270 + j * 40; X.fillStyle = col; X.fillRect(590, y - 7, 36, 14);
+            txt(`${lab} rebalances`, 640, y, `600 25px ${FM}`, C.ink, "left", "middle"); txt(rs(P[ek]), 964, y, `700 29px ${FS}`, C.ink, "right", "middle"); X.globalAlpha = q; }
         });
-        txt("3 months →", 960, 1266, `500 19px ${FM}`, C.grey, "right");
+        txt("3 months →", 960, 1484, `500 21px ${FM}`, C.grey, "right");
       };
 
       // 7 · over 2,000 paths: four times the rebalances, about half the spread of the error
       const s7 = (tt) => {
-        const s0 = SC[6], sp = D.spread, base = 1150, k = 400 / 1.5;
-        txt("Spread of the final error · 2,000 simulated paths", 100, 668, `600 27px ${FI}`, "#34373c");
+        const sp = D.spread, base = 1316, k = 560 / 1.5;
+        txt("Spread of the final error · 2,000 simulated paths", 100, 586, `600 29px ${FI}`, "#34373c");
         const Ns = [5, 20, 80, 320], xs = [235, 435, 635, 835];
         hline(130, 960, base, C.ink, 3);
         Ns.forEach((N, j) => {
           const v = sp.std[sp.N.indexOf(N)], p = pr(tt, T("a09", 4) + j * 0.32, 0.5, EZ.o3), h = v * k * p;
-          if (p > 0) { X.fillStyle = j % 2 ? "rgba(8,169,162,0.42)" : "rgba(8,169,162,0.62)"; X.fillRect(xs[j] - 66, base - h, 132, h); X.lineWidth = 3; X.strokeStyle = C.ink; X.strokeRect(xs[j] - 66, base - h, 132, h);
-            const q = X.globalAlpha; X.globalAlpha = q * Math.min(1, p * 2); txt("₹" + v.toFixed(2), xs[j], base - h - 16, `700 36px ${FS}`, C.ink, "center"); X.globalAlpha = q; }
-          txt(String(N), xs[j], base + 46, `700 38px ${FS}`, C.ink, "center");
-          if (j) txt("×4", (xs[j] + xs[j - 1]) / 2, base + 42, `600 22px ${FM}`, C.grey, "center");
+          if (p > 0) { X.fillStyle = j % 2 ? "rgba(8,169,162,0.42)" : "rgba(8,169,162,0.62)"; X.fillRect(xs[j] - 70, base - h, 140, h); X.lineWidth = 3; X.strokeStyle = C.ink; X.strokeRect(xs[j] - 70, base - h, 140, h);
+            const q = X.globalAlpha; X.globalAlpha = q * Math.min(1, p * 2); txt("₹" + v.toFixed(2), xs[j], base - h - 18, `700 42px ${FS}`, C.ink, "center"); X.globalAlpha = q; }
+          txt(String(N), xs[j], base + 54, `700 44px ${FS}`, C.ink, "center");
+          if (j) txt("×4", (xs[j] + xs[j - 1]) / 2, base + 50, `600 25px ${FM}`, C.grey, "center");
           if (j) { const h2 = pr(tt, T("a09", 12) + (j - 1) * 0.22, 0.35, EZ.b); if (h2 > 0) { const q = X.globalAlpha; X.globalAlpha = q * Math.min(1, h2);
-            const y = base - (sp.std[sp.N.indexOf(Ns[j - 1])] * k) * 0.55; pill("÷2", (xs[j] + xs[j - 1]) / 2, y, `700 30px ${FM}`, C.yel, C.ink, "center"); X.globalAlpha = q; } }
+            const y = base - (sp.std[sp.N.indexOf(Ns[j - 1])] * k) * 0.55; pill("÷2", (xs[j] + xs[j - 1]) / 2, y, `700 32px ${FM}`, C.yel, C.ink, "center"); X.globalAlpha = q; } }
         });
-        txt("rebalances over 3 months", 540, base + 92, `500 22px ${FM}`, C.grey, "center");
+        txt("rebalances over 3 months", 540, base + 112, `500 25px ${FM}`, C.grey, "center");
       };
 
       // 8 · every trade costs: error falls, cost rises (illustrative cost of 0.1% per trade)
       const s8 = (tt) => {
-        const s0 = SC[7], sp = D.spread, px = (N) => 170 + Math.log2(N / 5) / 6 * 780, py = (v) => 1150 - v * 235;
-        txt("Error vs trading cost", 100, 668, `600 27px ${FI}`, "#34373c");
-        txt("illustrative: 0.1% per trade", 972, 668, `500 20px ${FM}`, C.grey, "right");
+        const s0 = SC[7], sp = D.spread, px = (N) => 170 + Math.log2(N / 5) / 6 * 780, py = (v) => 1320 - v * 340;
+        txt("Error vs trading cost", 100, 586, `600 29px ${FI}`, "#34373c");
+        txt("illustrative: 0.1% per trade", 972, 586, `500 22px ${FM}`, C.grey, "right");
         const band = pr(tt, T("a10", 7), 0.5, EZ.o2);
-        if (band > 0) { X.fillStyle = `rgba(253,202,56,${0.45 * band})`; X.fillRect(px(80), 760, (px(160) - px(80)), 390); pill("the balance", (px(80) + px(160)) / 2, 790, `700 24px ${FM}`, C.yel, C.ink, "center"); }
+        if (band > 0) { X.fillStyle = `rgba(253,202,56,${0.45 * band})`; X.fillRect(px(80), 690, (px(160) - px(80)), 630); pill("the balance", (px(80) + px(160)) / 2, 722, `700 26px ${FM}`, C.yel, C.ink, "center"); }
         hline(170, 950, py(0), C.ink, 2.5);
-        [[0, "₹0"], [0.5, "₹0.5"], [1, "₹1.0"], [1.5, "₹1.5"]].forEach(([v, s]) => { txt(s, 156, py(v), `500 20px ${FM}`, C.grey, "right", "middle"); if (v) hline(170, 950, py(v), C.line, 1.5); });
-        sp.N.forEach((N) => txt(String(N), px(N), 1186, `600 22px ${FM}`, C.grey, "center"));
-        txt("rebalances", 560, 1222, `500 20px ${FM}`, C.grey, "center");
+        [[0, "₹0"], [0.5, "₹0.5"], [1, "₹1.0"], [1.5, "₹1.5"]].forEach(([v, s]) => { txt(s, 156, py(v), `500 22px ${FM}`, C.grey, "right", "middle"); if (v) hline(170, 950, py(v), C.line, 1.5); });
+        sp.N.forEach((N) => txt(String(N), px(N), 1364, `600 25px ${FM}`, C.grey, "center"));
+        txt("rebalances", 560, 1408, `500 23px ${FM}`, C.grey, "center");
         const e = pr(tt, s0 + 0.05, 0.8, EZ.io2), c = pr(tt, T("a10", 2), 0.8, EZ.io2);
-        poly(sp.N.map((N, i) => [px(N), py(sp.std[i])]), C.teal, 6, e);
-        poly(sp.N.map((N, i) => [px(N), py(sp.cost[i])]), C.rose, 6, c);
-        if (e > 0) { const q = X.globalAlpha; X.globalAlpha = q * Math.min(1, e * 2); X.fillStyle = C.teal; X.fillRect(200, 1012, 30, 10); txt("error spread", 240, 1018, `600 23px ${FM}`, C.ink, "left", "middle"); X.globalAlpha = q; }
-        if (c > 0) { const q = X.globalAlpha; X.globalAlpha = q * Math.min(1, c * 2); X.fillStyle = C.rose; X.fillRect(200, 1050, 30, 10); txt("average cost", 240, 1056, `600 23px ${FM}`, C.ink, "left", "middle"); X.globalAlpha = q; }
+        poly(sp.N.map((N, i) => [px(N), py(sp.std[i])]), C.teal, 7, e);
+        poly(sp.N.map((N, i) => [px(N), py(sp.cost[i])]), C.rose, 7, c);
+        if (e > 0) { const q = X.globalAlpha; X.globalAlpha = q * Math.min(1, e * 2); X.fillStyle = C.teal; X.fillRect(200, 1150, 34, 12); txt("error spread", 246, 1157, `600 26px ${FM}`, C.ink, "left", "middle"); X.globalAlpha = q; }
+        if (c > 0) { const q = X.globalAlpha; X.globalAlpha = q * Math.min(1, c * 2); X.fillStyle = C.rose; X.fillRect(200, 1194, 34, 12); txt("average cost", 246, 1201, `600 26px ${FM}`, C.ink, "left", "middle"); X.globalAlpha = q; }
       };
 
       const scenes = [s1, s2, s3, s4, s5, s6, s7, s8];
       const P = { time: 0 };
       const draw = () => {
         const tt = P.time;
-        X.setTransform(1, 0, 0, 1, 0, 0); X.globalAlpha = 1; X.clearRect(0, 0, 1080, 1920);
+        X.setTransform(1, 0, 0, 1, 0, 0); X.globalAlpha = 1; X.clearRect(0, 0, 1080, 1920); X.setTransform(1, 0, 0, SY, 0, TY);
         scenes.forEach((fn, k) => { const a = vis(tt, k); if (a <= 0.001) return; X.save(); X.globalAlpha = a; X.translate(0, (1 - a) * 10); fn(tt); X.restore(); });
       };
       draw();
 
       const tl = gsap.timeline({ paused: true });
       tl.to(P, { time: END, duration: END, ease: "none", onUpdate: draw }, 0);
-      gsap.set([".hd", ".sb", ".cap", "#h-cover", "#h-url"], { opacity: 0 });
+      gsap.set([".hd", ".sb", ".cap", "#h-cover", "#h-url", "#h-end"], { opacity: 0 });
       gsap.set(".hl i", { scaleX: 0 });
       tl.fromTo("#h-top", { y: -14 }, { y: 0, duration: 0.4, ease: "power2.out" }, 0);
       tl.fromTo("#h-card", { y: 24, scale: 0.98 }, { y: 0, scale: 1, duration: 0.45, ease: "power3.out" }, 0);
@@ -421,13 +429,17 @@
       tl.fromTo("#h-cover", { opacity: 0, y: 60, rotation: -3 }, { opacity: 1, y: 0, rotation: 0, duration: 0.55, ease: "back.out(1.4)" }, T("a11", 0) - 0.05);
       tl.fromTo("#h-url", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(2)" }, T("a11", 9));
 
+      tl.fromTo("#h-end", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, T("a11", 9) + 0.2);
+      // the chapter strip: the current chapter on yellow, the ones done on pale teal
+      const PG = [0, T("a03", 0), T("a05", 0), T("a06", 0), T("a07", 0), T("a09", 0), T("a10", 0), T("a11", 0)];
+      for (let i = 0; i < 7; i++) { tl.set("#pg" + (i + 1), { backgroundColor: "#fdca38" }, Math.max(0, PG[i] - 0.2)); tl.set("#pg" + (i + 1), { backgroundColor: "#dff2f0" }, PG[i + 1] - 0.2); }
       // captions: the line in ink, the spoken word on a yellow highlight
       const caps = [...document.querySelectorAll("#root .cap")];
       caps.forEach((g, gi) => {
         const spans = [...g.querySelectorAll("span")], i0 = +spans[0].dataset.w;
         const next = gi + 1 < caps.length ? +caps[gi + 1].querySelector("span").dataset.w : null;
         tl.fromTo(g, { opacity: 0 }, { opacity: 1, duration: 0.08 }, Math.max(0.3, t(i0) - 0.12));
-        tl.to(g, { opacity: 0, duration: 0.06 }, next !== null ? t(next) - 0.14 : VO_END + V + 0.8);
+        if (next !== null) tl.to(g, { opacity: 0, duration: 0.06 }, t(next) - 0.14);   // the last line stays to the end
         spans.forEach((s, k) => {
           tl.set(s, { backgroundColor: "#fdca38" }, t(+s.dataset.w));
           if (k + 1 < spans.length) tl.set(s, { backgroundColor: "rgba(253,202,56,0)" }, t(+spans[k + 1].dataset.w));

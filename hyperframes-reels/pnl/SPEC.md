@@ -1,8 +1,11 @@
 # "We made $1.5 million today. Why?" — P&L explain on a desk screen (English)
 
-1080×1920, 30 fps, 62.8 s (voice 60.0 s). Voice: Amit (the founder's saved, consented English voice; Audio8 on CPU), same processing
-as the hedge reel (speech-checked takes, pauses to 0.3 s, ×1.15 rubberband, −16 LUFS). Takes: seed 11, except b06 seed 12
-(after the speed-up, seed 11 had an "uh" before "six") and b11 seed 12 (seed 11 dropped the opening "If").
+1080×1920, 30 fps, 56.2 s (voice 52.7 s). Voice: Manish (saved, consented voice; Audio8 on CPU), speaking English, one take per
+line after a speech check (seed 11, except b03 seed 12, which says "explain" clearly, and b08 seed 13, whose pause after "Add it
+up:" is kept; cutting it made "Added up"), pauses cut to 0.3 s, natural speed, −16 LUFS (vo_spec.json).
+Frame: filled top to bottom: top bar y 40, today's P&L y 144–406, the intraday chart and the head of desk's message (or the
+market tiles and the waterfall) y 426–1478, a navy caption band y 1498–1670, footer, and a RISK line y 1746–1824 (Δ −$450k per 1%,
+ν +$600k per vol point, Θ −$350k per day: the book's sensitivities that, times the day's moves, give the waterfall).
 Look: a light trading-desk screen in the site's own palette (paper #eef3f8 with a 36 px dot grid, white panels with a 2 px
 #d6dfeb border and a soft shadow, navy #06275b, teal #08a9a2 / #067a75, rose #f43f5e, amber #f59e0b). Type: Inter (UI) and
 JetBrains Mono (numbers, clock, formulas). Captions: white on a navy band, the spoken word on teal. Real logo, real cover.

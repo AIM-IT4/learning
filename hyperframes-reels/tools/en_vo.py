@@ -1,7 +1,7 @@
 """Assemble an English voiceover from chosen takes and time every word for the scene.
 usage: python3 en_vo.py lines.json spec.json out_dir
-spec.json: {"tempo": 1.15, "max_pause": 0.4, "keep": 0.3, "parts": [["a01", "takes/a01_s11.wav"], ...], "gaps": [0.3, ...]}
-Each take has its long pauses cut (tighten.py), is sped up by ffmpeg's rubberband (pitch kept) into out_dir/<name>.wav,
+spec.json: {"tempo": 1.0, "max_pause": 0.4, "keep": 0.3, "parts": [["a01", "takes/a01_s11.wav"], ...], "gaps": [0.3, ...]}
+Each take has its long pauses cut (tighten.py) and, if tempo is not 1, is sped up by ffmpeg's rubberband (pitch kept),
 then join_vo.py trims the silent edges, joins with the gaps and normalises to -16 LUFS (out_dir/vo.wav). en_words.py
 hears every processed take again (a second speech check) and times its words; out_dir/timing.json holds W (every
 word's onset in vo.wav) and VO_END for en_caps.py."""
@@ -11,11 +11,13 @@ here = os.path.dirname(os.path.abspath(__file__))
 lines, spec, out = sys.argv[1], json.load(open(sys.argv[2], encoding="utf-8")), sys.argv[3]
 os.makedirs(out, exist_ok=True)
 proc = []
-for name, f in spec["parts"]:
+for name, f, *opt in spec["parts"]:                      # a part may carry its own {"max_pause": s} (a pause that must stay)
+    o = {**spec, **(opt[0] if opt else {})}
     tight, fin = os.path.join(out, name + ".tight.wav"), os.path.join(out, name + ".wav")
-    subprocess.run([sys.executable, os.path.join(here, "tighten.py"), f, tight, str(spec.get("max_pause", 0.4)), str(spec.get("keep", 0.3))],
+    subprocess.run([sys.executable, os.path.join(here, "tighten.py"), f, tight, str(o.get("max_pause", 0.4)), str(o.get("keep", 0.3))],
                    check=True, capture_output=True)
-    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", tight, "-af", f"rubberband=tempo={spec['tempo']}", "-ar", "48000", "-ac", "1", fin], check=True)
+    speed = ["-af", f"rubberband=tempo={spec['tempo']}"] if spec.get("tempo", 1) != 1 else []   # tempo 1: the take as spoken
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", tight] + speed + ["-ar", "48000", "-ac", "1", fin], check=True)
     proc.append((name, fin))
 json.dump({"parts": [[f, 0, None] for _, f in proc], "gaps": spec["gaps"]}, open(os.path.join(out, "join.json"), "w"))
 r = subprocess.run([sys.executable, os.path.join(here, "join_vo.py"), os.path.join(out, "vo.wav"), os.path.join(out, "join.json")],

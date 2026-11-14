@@ -8,7 +8,7 @@ W = [float(x) for x in re.search(r"const W = \[(.*?)\];", s).group(1).split(",")
 VO_END = float(re.search(r"const VO_END = ([0-9.]+);", s).group(1))
 V = 0.4
 T = lambda line, k: round(W[LS[line] + k] + V, 2)
-END = round(VO_END + V + 2.6, 2)
+END = round(VO_END + V + 3.2, 2)
 if proj == "hedge":
     sfx = [["x-in", "whoosh-short", 0.0, 0.6, 0.16], ["x-rally", "whoosh-short", T("a01", 9) + 0.05, 0.6, 0.12],
            ["x-hl", "pop", T("a02", 10) + 0.25, 0.5, 0.18], ["x-s2", "click-soft", T("a03", 0) - 0.2, 0.3, 0.22],

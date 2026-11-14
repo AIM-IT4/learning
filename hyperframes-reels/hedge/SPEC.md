@@ -1,9 +1,11 @@
 # Delta hedging in a minute — Desk2Quant explainer (English)
 
-1080×1920, 30 fps, 62.4 s (voice 59.6 s). Voice: Amit (the founder's saved, consented English voice; Audio8 on CPU),
-one take per line after a speech check (seed 11, except a05 seed 13 — seeds 11 and 12 said "picks up" — a06 seed 13 — seed 11
-said "data" — and a07 seed 12 — seed 11 said "pass"), long pauses cut to 0.3 s, sped up ×1.15 with rubberband (pitch kept),
-joined at −16 LUFS (vo_spec.json).
+1080×1920, 30 fps, 55.3 s (voice 51.8 s). Voice: Manish (saved, consented voice; Audio8 on CPU), speaking English from his
+Hindi reference, one take per line after a speech check (seed 11, except a07 seed 14: seed 11 said "the hedge drips"), long
+pauses cut to 0.3 s, natural speed, joined at −16 LUFS (vo_spec.json).
+Frame: filled top to bottom: header at y 44, two-line headlines at 116 px (y 136–368), the chart card y 452–1500 (charts drawn
+for a 980 px card and stretched to 1,048 px, text kept upright), captions at 54 px from y 1528, footer, and a chapter strip
+(payoff · delta · hedge · rebalance · simulate · 4× rule · cost) at y 1760–1816.
 Look: the Desk2Quant product covers come alive. Grid paper #f7f8f3 with 48 px lines #e8e9e4, ink #0b0b0b, the cover yellow
 #fdca38 as a highlighter behind one word per headline, a white chart card with a 4 px ink border and a hard 14 px ink shadow,
 pastel stat cards (#fff3cc, #dff2f0, #ecebe4). Type: Space Grotesk 700 (headlines), Inter (chart titles, captions),

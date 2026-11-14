@@ -23,8 +23,8 @@ with a `SPEC.md` that gives the script, the palette and every shot as a number.
 | `neon/` | दोहरा pendulum → CHAOS — 100 double pendulums 0.001° apart split on "अलग" | 26.9 s | Manish | **neon / synthwave** |
 | `chalk/` | त्रिकोण का जादू — a² + b² = c² by sliding four triangles | 29.5 s | Manish | **chalkboard** |
 | `paper/` | 72 का नियम — rule vs exact doubling times on a spinning front page | 30.0 s | Manish | **newspaper print** |
-| `hedge/` | Delta hedging in a minute (English) — short call, delta as a slope, one simulated path hedged 5/20/200 times, error halves per 4× trades | 62.4 s | Amit (English) | **Desk2Quant product covers, alive** |
-| `pnl/` | "We made $1.5 million today. Why?" (English) — P&L explain on a light desk screen: delta, gamma, vega, theta, the $50k gap | 62.8 s | Amit (English) | **light trading-desk screen** |
+| `hedge/` | Delta hedging in a minute (English) — short call, delta as a slope, one simulated path hedged 5/20/200 times, error halves per 4× trades | 55.3 s | Manish (English) | **Desk2Quant product covers, alive** |
+| `pnl/` | "We made $1.5 million today. Why?" (English) — P&L explain on a light desk screen: delta, gamma, vega, theta, the $50k gap | 56.2 s | Manish (English) | **light trading-desk screen** |
 
 The shape, recursion and site reels follow prompt-motion.com entries: shape morphing through UI states and the landing page 3D scroll
 (@twoclipping), and recursion explained in genres (@emollick). Their music beds are synthesised by `tools/bed_synth.py`
@@ -78,11 +78,11 @@ cuts pauses over 0.5 s down to 0.36 s and prints the cuts so measured word times
 watercolour storybook, pixel-art game, paper cut-out, retro terminal, 3D product film.
 
 Round 7 (hedge, pnl) is two one-minute English reels for Desk2Quant, in the site's light palette with the real logo and
-product covers. Gemini TTS was switched off on Composio that day, so the voice is the founder's saved English reference
-spoken locally: `voice/lines_amit_en_d2q.json`, one seed per line, then `tools/en_words.py` (faster-whisper hears each take
-with no prompt and times every script word; five lines were retaken: "picks up", "data", "pass", a dropped "If", and an "uh"
-that only showed after the speed-up).
-`tools/en_vo.py <lines> <project>/vo_spec.json <out>` cuts pauses over 0.4 s to 0.3 s, speeds each take ×1.15 with
-rubberband (pitch kept), joins at −16 LUFS and writes timing.json; `tools/en_caps.py` writes the caption groups and the word
+product covers, every frame filled from top to bottom. The voice is Manish's saved reference speaking English (a test of Manish
+and Onkar on four lines read both cleanly; Manish is quicker): `voice/lines_en_d2q.json` holds the English lines, one seed per
+line, then `tools/en_words.py` (faster-whisper hears each take with no prompt and times every script word; three lines were
+retaken: "drips" for "drifts", "explained" for "explain", and "Added up" after a pause was cut).
+`tools/en_vo.py <lines> <project>/vo_spec.json <out>` cuts pauses over 0.4 s to 0.3 s (a part can keep its pause), speeds up
+only if tempo is not 1, joins at −16 LUFS and writes timing.json; `tools/en_caps.py` writes the caption groups and the word
 cues into the scene, and `tools/mkroot_d2q.py` writes the root with every sound on its cue. The hedge numbers come from
 `tools/hedge_sim.py` (Black–Scholes, seeded GBM paths); the P&L book is illustrative and labelled so on screen.
