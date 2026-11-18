@@ -1,0 +1,8 @@
+{
+ "tool": "flow_narrate",
+ "engine": "gemini",
+ "voice": "Charon",
+ "style": "confident, warm promo read, one flowing take",
+ "text": "You can derive the Black-Scholes model. But can you hedge with it? If you're preparing for a quant interview, this changes how you study. One simulated path: hedge it five times, and the error is two point three two. Two hundred times: zero point zero seven. Everyone memorises formulas. But formulas were never the hard part. Explaining them under pressure is. Desk to Quant trains exactly that. Built by a practising bank quant. First, notes with the code that runs them. Then the desk: Greeks, P and L explain, X V A, model validation. Then the interview: a thousand problems, with solutions. Don't know where to start? Ten resources are free. Textbooks teach you the model. The desk teaches you what breaks it. Comment FREE, and we'll DM you all ten.",
+ "after": "en_vo.py voice/charon/lines_all.json voice/charon/vo_spec_charon.json voice/out_charon  (one part; pauses over 0.5 s kept at 0.42 s; tempo 1.03)"
+}

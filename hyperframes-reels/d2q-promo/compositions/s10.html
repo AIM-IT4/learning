@@ -58,7 +58,7 @@
   </div>
   <script>
     (function () {
-      /*DATA*/ const DUR = 4.46; const W = [0.16, 0.46, 0.58, 1.1, 1.32, 1.9, 2.34, 3.16, 3.56]; /*END*/
+      /*DATA*/ const DUR = 5.3; const W = [0.16, 0.33, 0.49, 1.26, 2.01, 2.43, 3.35, 4.21, 4.47]; /*END*/
       // words: 0 Then 1 the 2 desk: 3 Greeks, 4 P&L 5 explain, 6 XVA, 7 model 8 validation.
       const w = (i) => Math.max(0, W.length > i ? W[i] : 0.16 + i * 0.4);
       const tl = gsap.timeline({ paused: true });

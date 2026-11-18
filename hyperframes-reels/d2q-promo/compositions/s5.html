@@ -37,7 +37,7 @@
   </div>
   <script>
     (function () {
-      /*DATA*/ const DUR = 1.95; const W = [0.16, 0.72, 1.16]; /*END*/
+      /*DATA*/ const DUR = 2.0; const W = [0.16, 0.5, 1.1]; /*END*/
       // words: 0 Everyone 1 memorises 2 formulas.
       const w = (i) => Math.max(0, W.length > i ? W[i] : 0.16 + i * 0.44);
       const tl = gsap.timeline({ paused: true });

@@ -127,7 +127,7 @@
   </div>
   <script>
     (function () {
-      /*DATA*/ const DUR = 4.0; const W = [0.16, 0.62, 0.84, 1.04, 1.22, 1.4, 1.58, 1.72]; /*END*/
+      /*DATA*/ const DUR = 4.26; const W = [0.16, 0.44, 1.04, 1.16, 1.38, 1.64, 1.82, 2.06]; /*END*/
       // words: 0 Comment 1 FREE, 2 and 3 we'll 4 DM 5 you 6 all 7 ten.
       const w = (i) => Math.max(0, W.length > i ? W[i] : 0.16 + i * 0.22);
       const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
