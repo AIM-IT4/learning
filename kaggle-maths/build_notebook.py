@@ -12,16 +12,17 @@ HERE = Path(__file__).resolve().parent
 src = (HERE / "maths_finetune.py").read_text()
 
 cells = []
-for chunk in src.split("# %%")[1:]:
+for i, chunk in enumerate(src.split("# %%")[1:]):
     kind = "markdown" if chunk.startswith(" [markdown]") else "code"
     body = chunk.split("\n", 1)[1] if "\n" in chunk else ""
+    cell_id = f"cell-{i:02d}"                    # notebook format 4.5 requires an id on every cell
     if kind == "markdown":
         lines = [ln[2:] if ln.startswith("# ") else ln.lstrip("#") for ln in body.strip("\n").splitlines()]
         text = "\n".join(lines)
-        cells.append({"cell_type": "markdown", "metadata": {}, "source": text.splitlines(keepends=True)})
+        cells.append({"cell_type": "markdown", "id": cell_id, "metadata": {}, "source": text.splitlines(keepends=True)})
     else:
         text = body.strip("\n")
-        cells.append({"cell_type": "code", "metadata": {}, "execution_count": None, "outputs": [],
+        cells.append({"cell_type": "code", "id": cell_id, "metadata": {}, "execution_count": None, "outputs": [],
                       "source": text.splitlines(keepends=True)})
 
 notebook = {

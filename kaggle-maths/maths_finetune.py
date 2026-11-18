@@ -21,7 +21,22 @@ import subprocess
 import sys
 
 IN_KAGGLE = os.path.exists("/kaggle")
+
+
+def internet_on():
+    import socket
+    try:
+        socket.create_connection(("pypi.org", 443), timeout=5).close()
+        return True
+    except OSError:
+        return False
+
+
 if IN_KAGGLE:
+    if not internet_on():
+        raise RuntimeError("Internet is off for this notebook. On Kaggle, verify your phone number "
+                           "(Settings → Phone verification), then switch Internet on in the notebook's "
+                           "right-hand panel and run again.")
     subprocess.run([sys.executable, "-m", "pip", "install", "-q",
                     "transformers==5.23.0", "peft==0.21.3", "trl==1.18.1",
                     "datasets==5.2.0", "accelerate==1.16.0"], check=True)
@@ -48,6 +63,9 @@ os.makedirs(OUT_DIR, exist_ok=True)
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 print("Device:", DEVICE, torch.cuda.get_device_name(0) if DEVICE == "cuda" else "(no GPU: slow, fine for a test run)")
+if IN_KAGGLE and DEVICE == "cpu" and not SMOKE:
+    raise RuntimeError("No GPU on this notebook. On Kaggle, verify your phone number (Settings → Phone "
+                       "verification), then set Accelerator to 'GPU T4 x2' in the right-hand panel and run again.")
 random.seed(0)
 torch.manual_seed(0)
 
