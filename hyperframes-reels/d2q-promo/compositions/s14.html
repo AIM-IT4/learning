@@ -84,7 +84,7 @@
   </div>
   <script>
     (function () {
-      /*DATA*/ const DUR = 3.57; const W = [0.16, 0.68, 0.88, 1.02, 1.1, 1.69, 1.93, 2.15, 2.37, 2.55, 2.67, 2.89]; /*END*/
+      /*DATA*/ const DUR = 4.24; const W = [0.16, 0.74, 0.96, 1.1, 1.2, 1.95, 2.25, 2.47, 2.71, 2.89, 3.03, 3.29]; /*END*/
       // words: 0 Textbooks 1 teach 2 you 3 the 4 model. | 5 The 6 desk 7 teaches 8 you 9 what 10 breaks 11 it.
       const w = (i) => Math.max(0, W.length > i ? W[i] : 0.16 + i * 0.25);
       const clamp = (x, a, b) => Math.max(a, Math.min(b, x));

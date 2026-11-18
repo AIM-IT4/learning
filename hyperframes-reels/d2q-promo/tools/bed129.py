@@ -1,10 +1,12 @@
 """The v3 music bed: an original 129 BPM electronic pulse in A minor, synthesised (no samples), shaped to the edit.
-usage: python3 tools/bed129.py <seconds> <out.wav>
-The bar grid is anchored so a bar line lands on "Desk2Quant" (the drop after the riser); "pressure" falls on a beat.
+usage: python3 tools/bed129.py <seconds> <out.wav> [ov.html]
+The edit points come from the caption overlay's LINES (build/compositions/ov.html, written by tools/timing.py), so the
+bed follows any re-timed voice. The bar grid is anchored so a bar line lands on "Desk2Quant" (the drop after the riser).
 Energy: groove from frame 1, lighter under the notebook explanation, a breakdown and riser into the product reveal,
-full groove through the product, a half-time build into the hit on "breaks", groove back for the CTA, a final chord.
+full groove through the product, lighter on "Don't know where to start?", a half-time build into the hit on "breaks",
+groove back for the CTA, a final chord.
 Uses the instrument helpers of hyperframes-reels/tools/bed_synth.py."""
-import importlib.util, os, sys
+import importlib.util, json, os, re, sys
 import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -20,29 +22,36 @@ SR = bs.SR
 BPM = 129.0
 BEAT = 60.0 / BPM
 BAR = 4 * BEAT
-DROP = 17.66            # "Desk2Quant"
-BREAKS = 34.70          # "breaks": the hit
-CTA = 35.60             # the call to action starts
-G0 = DROP - 9 * BAR     # bar 0 starts here; bar -1 is a pickup that starts before the film
 PROG = [(45, (57, 60, 64)), (41, (57, 60, 65)), (48, (60, 64, 67)), (43, (59, 62, 67))]   # Am F C G
 
 
-def energy(b):
-    t0 = G0 + b * BAR
-    if t0 < 0.5: return "mid"                     # pickup into the hook
-    if t0 < 6.4: return "full"                    # the hook and the interview line
-    if t0 < 12.0: return "mid"                    # the notebook explanation: leave room for the numbers
-    if t0 < 15.7: return "full"
-    if t0 < DROP - 0.01: return "break"           # breakdown + riser into the reveal
-    if t0 < 28.7: return "full"                   # the product: drop
-    if t0 < 30.6: return "mid"                    # "Don't know where to start?"
-    if t0 < 32.4: return "full"                   # "10 resources are free"
-    if t0 < BREAKS: return "half"                 # textbooks / the desk: half-time build
-    if t0 < 38.0: return "full"                   # after the hit: the CTA
-    return "end"
+def edit_points(ov_path, seconds):
+    s = open(ov_path, encoding="utf-8").read()
+    L = {x["id"]: x["on"] for x in json.loads(re.search(r"const LINES = (\[.*?\]); const CUTS", s, re.S).group(1))}
+    return {"drop": L["L8a"][0],                    # "Desk2Quant"
+            "breaks": L["L14"][5],                  # "breaks"
+            "mid1": L["L4"][0] - 0.4,               # the notebook explanation
+            "full2": L["L6"][0] - 0.4,              # "Everyone memorises formulas."
+            "mid2": L["L12a"][0] - 0.4,             # "Don't know where to start?"
+            "full3": L["L12b"][0] - 0.4,            # "10 resources are free."
+            "half": L["L13"][0] - 0.4,              # textbooks / the desk
+            "end": seconds - 1.4}
 
 
-def build(seconds):
+def build(seconds, P):
+    G0 = P["drop"] - np.floor(P["drop"] / BAR) * BAR       # bar lines land on the drop
+    def energy(t0):
+        if t0 < 0.5: return "mid"                           # pickup into the hook
+        if t0 < P["mid1"]: return "full"
+        if t0 < P["full2"]: return "mid"
+        if t0 < P["drop"] - BAR - 0.01: return "full"
+        if t0 < P["drop"] - 0.01: return "break"            # one bar of breakdown + riser into the reveal
+        if t0 < P["mid2"]: return "full"
+        if t0 < P["full3"]: return "mid"
+        if t0 < P["half"]: return "full"
+        if t0 < P["breaks"]: return "half"
+        if t0 < P["end"]: return "full"
+        return "end"
     N = int((seconds + 2) * SR); dry = np.zeros(N); wet = np.zeros(N)
     def put(buf, s, at, g=1.0):
         if at < 0:
@@ -52,7 +61,7 @@ def build(seconds):
         bs.place(buf, s, at, g)
     b = -1
     while G0 + b * BAR < seconds:
-        t0 = G0 + b * BAR; root, chord = PROG[b % 4]; e = energy(b)
+        t0 = G0 + b * BAR; root, chord = PROG[b % 4]; e = energy(t0)
         if e == "end":
             put(dry, bs.kick(0.42), t0); put(dry, bs.impact(0.5), t0)
             put(wet, bs.pad(chord, 2.6, 0.14, 2600), t0); put(dry, bs.sub(root - 12, 2.4, 0.16), t0)
@@ -83,19 +92,22 @@ def build(seconds):
             put(wet, bs.pluck(m, 0.28, {"full": 0.085, "mid": 0.06, "half": 0.05, "break": 0.07}[e]), t0 + k * BEAT / 4)
         b += 1
     # risers and hits shaped to the edit
-    put(dry, bs.riser(DROP - (G0 + 8 * BAR), 0.5), G0 + 8 * BAR)
-    put(dry, bs.impact(0.5), DROP)
-    put(dry, bs.riser(1.0, 0.42), BREAKS - 1.0)
-    put(dry, bs.impact(0.55), BREAKS)
-    root, chord = PROG[0]; put(wet, bs.pad(chord, 1.2, 0.13, 2600), BREAKS)
+    put(dry, bs.riser(BAR, 0.5), P["drop"] - BAR)
+    put(dry, bs.impact(0.5), P["drop"])
+    put(dry, bs.riser(1.0, 0.42), P["breaks"] - 1.0)
+    put(dry, bs.impact(0.55), P["breaks"])
+    root, chord = PROG[0]; put(wet, bs.pad(chord, 1.2, 0.13, 2600), P["breaks"])
     mix = dry + bs.reverb(wet)
     mix = mix[: int(seconds * SR)]
     f = int(1.0 * SR); mix[-f:] *= np.linspace(1, 0, f) ** 1.5
-    return 0.89 * mix / (np.abs(mix).max() + 1e-9)
+    return 0.89 * mix / (np.abs(mix).max() + 1e-9), G0
 
 
 if __name__ == "__main__":
     import soundfile as sf
     sec, out = float(sys.argv[1]), sys.argv[2]
-    sf.write(out, build(sec).astype(np.float32), SR)
-    print(out, f"{sec}s, {BPM} BPM, grid origin {G0:.3f}s, beat {BEAT:.4f}s")
+    ov = sys.argv[3] if len(sys.argv) > 3 else os.path.join(HERE, "..", "build", "compositions", "ov.html")
+    P = edit_points(ov, sec)
+    y, g0 = build(sec, P)
+    sf.write(out, y.astype(np.float32), SR)
+    print(out, f"{sec}s, {BPM} BPM, grid origin {g0:.3f}s, drop {P['drop']:.2f}s, hit {P['breaks']:.2f}s")

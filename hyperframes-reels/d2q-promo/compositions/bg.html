@@ -14,7 +14,7 @@
   </div>
   <script>
     (function () {
-      /*DATA*/ const DUR = 39.46; const SHOTS = [[0.0, "L"], [1.52, "D"], [2.71, "L"], [5.9, "D"], [12.27, "L"], [13.91, "D"], [17.5, "L"], [19.56, "D"], [21.28, "L"], [23.14, "D"], [26.94, "L"], [29.61, "D"], [30.69, "L"], [32.03, "D"], [35.6, "L"]]; /*END*/
+      /*DATA*/ const DUR = 47.07; const SHOTS = [[0.0, "L"], [1.93, "D"], [3.33, "L"], [7.1, "D"], [14.91, "L"], [16.86, "D"], [21.2, "L"], [23.44, "D"], [25.37, "L"], [27.57, "D"], [32.03, "L"], [35.11, "D"], [36.93, "L"], [38.83, "D"], [43.07, "L"]]; /*END*/
       const tl = gsap.timeline({ paused: true });
       // light and dark scenes alternate on every cut, as in the reference; the overlay's wipe hides each switch
       SHOTS.forEach(([t0, th]) => tl.set("#bg-d", { opacity: th === "D" ? 1 : 0 }, t0));

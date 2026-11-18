@@ -85,7 +85,7 @@
   </div>
   <script>
     (function () {
-      /*DATA*/ const DUR = 3.19; const W = [0.16, 0.44, 0.54, 0.86, 1.08, 1.2, 1.38, 2.0, 2.12, 2.42, 2.64, 2.8]; /*END*/
+      /*DATA*/ const DUR = 3.77; const W = [0.16, 0.5, 0.62, 1.0, 1.22, 1.36, 1.54, 2.22, 2.36, 2.72, 2.98, 3.12]; /*END*/
       // words: 0 If 1 you're 2 preparing 3 for 4 a 5 quant 6 interview, 7 this 8 changes 9 how 10 you 11 study.
       const w = (i) => Math.max(0, W.length > i ? W[i] : 0.16 + i * 0.24);
       const tl = gsap.timeline({ paused: true });
