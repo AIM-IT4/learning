@@ -4,6 +4,7 @@
     python kaggle/build_kernel.py stage1      --user KAGGLE_USERNAME --out /tmp/kernel-stage1
     python kaggle/build_kernel.py stage1_rl   --user KAGGLE_USERNAME --out /tmp/kernel-rl     # practice with judge
     python kaggle/build_kernel.py stage2_data --user KAGGLE_USERNAME --out /tmp/kernel-data   # CPU only
+    python kaggle/build_kernel.py bench       --user KAGGLE_USERNAME --out /tmp/kernel-bench    # benchmark
     python kaggle/build_kernel.py stage2_a    --user KAGGLE_USERNAME --out /tmp/kernel-2a     # reading, session 1
     python kaggle/build_kernel.py stage2_b    --user KAGGLE_USERNAME --out /tmp/kernel-2b     # reading ends, practice, tests
     kaggle kernels push -p /tmp/kernel-stage1 --accelerator NvidiaTeslaT4 -t 7200
@@ -31,6 +32,12 @@ JOBS = {
                       internet=True, gpu=True, sources=["slm-stage-1"],
                       config={"init": "run/model.pt", "steps": 200, "lr": 2e-5, "prompts": 8, "samples": 8,
                               "minutes": 45}),
+    "bench": dict(template="bench_kernel.py", title="SLM Benchmark", slug="slm-benchmark",
+                  files=FULL + ["bench.py", "quantexam.py"], internet=True, gpu=True,
+                  sources=["slm-stage-2-data", "slm-stage-1"],
+                  config={"gpu0": ["ours:run/model.pt", "hf:HuggingFaceTB/SmolLM2-135M-Instruct",
+                                   "hf:HuggingFaceTB/SmolLM2-360M-Instruct", "hf:Qwen/Qwen2.5-0.5B-Instruct"],
+                          "gpu1": ["hf:Qwen/Qwen3-0.6B", "hf:Qwen/Qwen2.5-Math-1.5B-Instruct"], "n": 200, "gsm": 300}),
     "stage2_a": dict(template="stage2_train.py", title="SLM Stage 2 A", slug="slm-stage-2-a", files=FULL,
                      internet=True, gpu=True, sources=["slm-stage-2-data"],
                      config={"steps": [dict(READ, minutes=680)], "eval": False}),
