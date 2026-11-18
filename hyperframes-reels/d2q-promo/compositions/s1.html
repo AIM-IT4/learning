@@ -1,8 +1,8 @@
 <template>
   <style>
-    @font-face { font-family: "Inter"; font-weight: 100 900; src: url("assets/fonts/Inter.ttf"); }
+    @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
     @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
-    #root { position: absolute; inset: 0; overflow: hidden; font-family: Inter, sans-serif; color: #0f172a; }
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: D2QSans, sans-serif; color: #0f172a; }
     #s1-cam { position: absolute; inset: 0; transform-origin: 540px 1100px; }
     #s1-glow { position: absolute; left: 0; top: 620px; width: 1080px; height: 960px; border-radius: 50%;
                background: radial-gradient(ellipse at center, rgba(8,169,162,0.22), rgba(8,169,162,0) 66%); }
@@ -26,13 +26,13 @@
     #s1-glare { position: absolute; inset: 0; background: linear-gradient(125deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.03) 32%, rgba(255,255,255,0) 46%); }
     #s1-sheen { position: absolute; left: -300px; top: -160px; width: 200px; height: 960px;
                 background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.13), rgba(255,255,255,0)); }
-    #s1-lab { position: absolute; left: 40px; top: 32px; font: 600 28px/48px Inter, sans-serif; color: #94a3b8; letter-spacing: 0.01em; }
+    #s1-lab { position: absolute; left: 40px; top: 32px; font: 600 28px/48px D2QSans, sans-serif; color: #94a3b8; letter-spacing: 0.01em; }
     #s1-lab i { display: inline-block; width: 14px; height: 14px; border-radius: 7px; background: #08a9a2; margin-right: 14px; vertical-align: 2px;
                 box-shadow: 0 0 12px rgba(8,169,162,0.9); }
     #s1-ok { position: absolute; right: 34px; top: 30px; height: 52px; padding: 0 22px; border-radius: 26px; background: rgba(8,169,162,0.22);
-             border: 2px solid rgba(103,214,207,0.65); font: 700 27px/48px Inter, sans-serif; color: #67d6cf; opacity: 0; }
+             border: 2px solid rgba(103,214,207,0.65); font: 700 27px/48px D2QSans, sans-serif; color: #67d6cf; opacity: 0; }
     .s1-line { position: absolute; left: 0; width: 908px; height: 150px; }
-    .s1-t { position: absolute; top: 0; height: 150px; padding-left: 4px; font: 600 120px/150px Inter, sans-serif; color: #67d6cf; white-space: nowrap;
+    .s1-t { position: absolute; top: 0; height: 150px; padding-left: 4px; font: 600 120px/150px D2QSans, sans-serif; color: #67d6cf; white-space: nowrap;
             clip-path: inset(-30% 100% -30% -8%); text-shadow: 0 0 24px rgba(8,169,162,0.35); }
     .s1-t i { font-style: italic; }
     .s1-t sub, .s1-t sup { font-size: 0.58em; line-height: 0; position: relative; vertical-align: baseline; }
@@ -117,23 +117,23 @@
           <path d="M50 46 C50 4 94 4 94 46" fill="none" stroke="#334155" stroke-width="14" stroke-linecap="round"/>
           <path d="M12 150 L132 150 L114 52 Q112 42 102 42 L42 42 Q32 42 30 52 Z" fill="url(#s1-gNavy)" stroke="#0f172a" stroke-width="2"/>
           <path d="M36 54 L48 54 L36 140 L24 140 Z" fill="#ffffff" opacity="0.22"/>
-          <text x="72" y="128" text-anchor="middle" font-family="Inter, sans-serif" font-weight="800" font-style="italic" font-size="64" fill="#ffffff">C</text>
+          <text x="72" y="128" text-anchor="middle" font-family="D2QSans, sans-serif" font-weight="800" font-style="italic" font-size="64" fill="#ffffff">C</text>
         </svg></div>
         <div id="s1-wt" class="s1-j"><svg id="s1-wts" class="s1-load" width="144" height="150" viewBox="0 0 144 150">
           <path d="M50 46 C50 4 94 4 94 46" fill="none" stroke="#067a75" stroke-width="14" stroke-linecap="round"/>
           <path d="M12 150 L132 150 L114 52 Q112 42 102 42 L42 42 Q32 42 30 52 Z" fill="url(#s1-gTeal)" stroke="#067a75" stroke-width="2"/>
           <path d="M36 54 L48 54 L36 140 L24 140 Z" fill="#ffffff" opacity="0.35"/>
-          <text x="72" y="130" text-anchor="middle" font-family="Inter, sans-serif" font-weight="800" font-size="70" fill="#ffffff">Δ</text>
+          <text x="72" y="130" text-anchor="middle" font-family="D2QSans, sans-serif" font-weight="800" font-size="70" fill="#ffffff">Δ</text>
         </svg></div>
         <div id="s1-dLf" class="s1-j"><svg class="s1-dish" width="260" height="150" viewBox="-130 -140 260 150">
           <path d="M -120 -112 A 120 22 0 0 0 120 -112 L 104 -56 A 104 18 0 0 1 -104 -56 Z" fill="url(#s1-gFace)" stroke="#c3cedb" stroke-width="2"/>
           <path d="M -118 -110 A 118 21 0 0 0 118 -110" fill="none" stroke="#ffffff" stroke-width="3"/>
-          <text x="0" y="-52" text-anchor="middle" font-family="Inter, sans-serif" font-weight="800" font-size="30" fill="#0f172a">short call</text>
+          <text x="0" y="-52" text-anchor="middle" font-family="D2QSans, sans-serif" font-weight="800" font-size="30" fill="#0f172a">short call</text>
         </svg></div>
         <div id="s1-dRf" class="s1-j"><svg class="s1-dish" width="260" height="150" viewBox="-130 -140 260 150">
           <path d="M -120 -112 A 120 22 0 0 0 120 -112 L 104 -56 A 104 18 0 0 1 -104 -56 Z" fill="url(#s1-gFace)" stroke="#c3cedb" stroke-width="2"/>
           <path d="M -118 -110 A 118 21 0 0 0 118 -110" fill="none" stroke="#ffffff" stroke-width="3"/>
-          <text x="0" y="-52" text-anchor="middle" font-family="Inter, sans-serif" font-weight="800" font-size="30" fill="#0f172a">stock</text>
+          <text x="0" y="-52" text-anchor="middle" font-family="D2QSans, sans-serif" font-weight="800" font-size="30" fill="#0f172a">stock</text>
           <ellipse id="s1-ring" cx="0" cy="-112" rx="120" ry="22" fill="none" stroke="#67d6cf" stroke-width="5" opacity="0"/>
         </svg></div>
         <div id="s1-beam">
@@ -187,7 +187,7 @@
   </div>
   <script>
     (function () {
-      /*DATA*/ const DUR = 3.117; const W = [0.15, 0.27, 0.37, 0.65, 0.81, 1.33, 2.068, 2.188, 2.308, 2.428, 2.648, 2.808]; /*END*/
+      /*DATA*/ const DUR = 4.04; const W = [-0.08, 0.24, 0.4, 0.74, 0.92, 1.48, 2.43, 2.75, 2.89, 3.05, 3.23, 3.45]; /*END*/
       // words: 0 You 1 can 2 derive 3 the 4 Black–Scholes 5 model. | 6 But 7 can 8 you 9 hedge 10 with 11 it?
       const w = (i) => (W.length > i ? W[i] : 0.15 + i * 0.31);
       const clamp = (x, a, b) => Math.max(a, Math.min(b, x));

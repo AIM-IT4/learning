@@ -1,8 +1,8 @@
 <template>
   <style>
-    @font-face { font-family: "Inter"; font-weight: 100 900; src: url("assets/fonts/Inter.ttf"); }
+    @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
     @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
-    #root { position: absolute; inset: 0; overflow: hidden; font-family: Inter, sans-serif; color: #0f172a; }
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: D2QSans, sans-serif; color: #0f172a; }
     #s7-cam { position: absolute; inset: 0; transform-origin: 540px 900px; }
     #s7-scene { position: absolute; inset: 0; }
     #s7-aura { position: absolute; left: 10px; top: 400px; width: 1060px; height: 1200px; border-radius: 50%;
@@ -41,7 +41,7 @@
                 background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.5), rgba(255,255,255,0)); }
     .s7-chin { position: absolute; left: 0; right: 0; top: 421px; height: 56px; }
     .s7-off, .s7-on { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 12px;
-                      font: 700 30px/1 Inter, sans-serif; letter-spacing: -0.01em; white-space: nowrap; }
+                      font: 700 30px/1 D2QSans, sans-serif; letter-spacing: -0.01em; white-space: nowrap; }
     .s7-off { color: #7c8ba1; }
     .s7-on { color: #ffffff; opacity: 0; }
     .s7-off i, .s7-on i { display: block; width: 13px; height: 13px; border-radius: 7px; }
@@ -164,7 +164,7 @@
   </div>
   <script>
     (function () {
-      /*DATA*/ const DUR = 4.85; const W = [0.18, 0.32, 0.42, 0.86, 1.53, 2.04, 2.86, 3.73, 4.02]; /*END*/
+      /*DATA*/ const DUR = 3.96; const W = [0.18, 0.52, 0.64, 1.06, 1.36, 1.88, 2.54, 2.98, 3.3]; /*END*/
       // words: 0 Then 1 the 2 desk: 3 Greeks, 4 P&L 5 explain, 6 XVA, 7 model 8 validation.
       const w = (i) => (W.length > i ? W[i] : 0.18 + i * 0.42);
       const ON = [w(3), w(4), w(6), w(7)];          // each monitor lights on its word

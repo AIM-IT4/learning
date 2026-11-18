@@ -25,7 +25,7 @@ with a `SPEC.md` that gives the script, the palette and every shot as a number.
 | `paper/` | 72 का नियम — rule vs exact doubling times on a spinning front page | 30.0 s | Manish | **newspaper print** |
 | `hedge/` | Delta hedging in a minute (English) — short call, delta as a slope, one simulated path hedged 5/20/200 times, error halves per 4× trades | 59.1 s | Manish (English) | **Desk2Quant product covers, alive** |
 | `pnl/` | "We made $1.5 million today. Why?" (English) — P&L explain on a light desk screen: delta, gamma, vega, theta, the $50k gap | 60.0 s | Manish (English) | **light trading-desk screen** |
-| `d2q-promo/` | "Can you hedge with it?" (English) — a Desk2Quant promo in the style of a reference reel: one glossy object per sentence, hero-word slams, pixel wipes, a 2.32 → 0.07 hedging-error climax, a coin flip from textbook to desk, "Comment FREE" | 45.5 s | Manish (English) | **light site palette, glossy props** |
+| `d2q-promo/` | "Can you hedge with it?" (English) — a Desk2Quant promo in the style of a reference reel: one glossy object per sentence, hero-word slams, pixel wipes, a 2.32 → 0.07 hedging-error climax, a coin flip from textbook to desk, "Comment FREE" | 46.7 s | Paradee `bm_fable` (English) | **light site palette, glossy props, Bricolage Grotesque** |
 
 The shape, recursion and site reels follow prompt-motion.com entries: shape morphing through UI states and the landing page 3D scroll
 (@twoclipping), and recursion explained in genres (@emollick). Their music beds are synthesised by `tools/bed_synth.py`
@@ -93,6 +93,7 @@ The `d2q-promo` reel follows a reference reel the ReelMimic way (`video-skills/r
 (STYLE.md, peaks, route). The build is layered: `bg.html` (paper/mint alternation, drifting squares), one file per
 sentence (`s1`–`s11`, built in parallel, each reviewed fresh), and `ov.html` (word-by-word captions, hero slams, logo,
 pixel wipes). `tools/timing.py voice/out/timing.json` writes every scene's `/*DATA*/` block (its length and word
-onsets) and the root from the measured voice (`voice/vo_spec.json`, takes by `tools/en_vo.py`), so a new take
-re-times the whole film. The facts come from desk2quant.com and its product API; the covers and logo are fetched from the
+onsets) and the root from the measured voice (`voice/vo_spec.json`; takes by `tools/paradee_say.py --voice bm_fable --speed 1.22`, joined
+and timed by `tools/en_vo.py`), so a new take re-times the whole film. The scenes name the font family `D2QSans`, which
+is Bricolage Grotesque (OFL) at `assets/fonts/D2QSans.ttf`. The facts come from desk2quant.com and its product API; the covers and logo are fetched from the
 site at build time.

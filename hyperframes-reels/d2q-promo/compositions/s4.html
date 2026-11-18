@@ -1,8 +1,8 @@
 <template>
   <style>
-    @font-face { font-family: "Inter"; font-weight: 100 900; src: url("assets/fonts/Inter.ttf"); }
+    @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
     @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
-    #root { position: absolute; inset: 0; overflow: hidden; font-family: Inter, sans-serif; color: #0f172a; }
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: D2QSans, sans-serif; color: #0f172a; }
     #s4-cam { position: absolute; inset: 0; transform-origin: 540px 1150px; }
     .s4-shadow { position: absolute; border-radius: 50%; background: radial-gradient(ellipse at center, rgba(15,23,42,0.22), rgba(15,23,42,0) 70%); }
     #s4-pfloor { left: 120px; top: 1452px; width: 840px; height: 96px; }
@@ -16,7 +16,7 @@
     .s4-bar { position: absolute; left: 32px; top: 42px; width: 12px; height: 66px; border-radius: 6px;
               background: linear-gradient(180deg, #67d6cf, #08a9a2); box-shadow: 0 4px 10px rgba(8,169,162,0.35); }
     .s4-f { position: absolute; left: 70px; top: 0; height: 150px; line-height: 150px; white-space: nowrap;
-            font: 600 56px/150px Inter, sans-serif; letter-spacing: -0.01em; color: #0f172a; }
+            font: 600 56px/150px D2QSans, sans-serif; letter-spacing: -0.01em; color: #0f172a; }
     .s4-f i { font-style: italic; margin-right: 0.07em; }
     .s4-f sub, .s4-f sup { font-size: 0.6em; line-height: 0; position: relative; vertical-align: baseline; }
     .s4-f sub { top: 0.32em; }
@@ -46,7 +46,7 @@
                background: radial-gradient(circle at 50% 30%, #ffffff 0%, #f8fafc 52%, #e6edf5 100%);
                box-shadow: inset 0 10px 22px rgba(15,23,42,0.20), inset 0 -4px 10px rgba(255,255,255,0.9); }
     #s4-arc { position: absolute; left: 0; top: 0; width: 740px; height: 740px; }
-    #s4-label { position: absolute; left: 0; width: 740px; top: 546px; text-align: center; font: 800 38px/1 Inter, sans-serif;
+    #s4-label { position: absolute; left: 0; width: 740px; top: 546px; text-align: center; font: 800 38px/1 D2QSans, sans-serif;
                 letter-spacing: 0.22em; text-indent: 0.22em; color: #475569; opacity: 0; }
     #s4-needle { position: absolute; left: 338px; top: 100px; width: 64px; height: 340px; transform-origin: 32px 270px; transform: rotate(-130deg); }
     #s4-hub { position: absolute; left: 322px; top: 322px; width: 96px; height: 96px; border-radius: 50%;
@@ -61,7 +61,7 @@
     #s4-chip { position: absolute; left: 566px; top: 610px; height: 96px; padding: 0 34px 0 30px; border-radius: 48px; display: flex; align-items: center; gap: 18px;
                background: linear-gradient(180deg, #ffffff 0%, #f3f7fa 100%); border: 2px solid #d6dfeb; white-space: nowrap;
                box-shadow: 0 18px 36px rgba(15,23,42,0.16), 0 4px 10px rgba(15,23,42,0.08), inset 0 2px 0 #ffffff;
-               font: 800 40px/1 Inter, sans-serif; letter-spacing: -0.02em; color: #0f172a; opacity: 0; transform-origin: 30% 50%; }
+               font: 800 40px/1 D2QSans, sans-serif; letter-spacing: -0.02em; color: #0f172a; opacity: 0; transform-origin: 30% 50%; }
     #s4-chip b { color: #08a9a2; font-weight: 800; }
     #s4-dot { position: relative; width: 24px; height: 24px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #67d6cf, #08a9a2 60%, #067a75); flex: none; }
     #s4-ring { position: absolute; left: -2px; top: -2px; width: 24px; height: 24px; border-radius: 50%; border: 3px solid #08a9a2; }
@@ -108,7 +108,7 @@
   </div>
   <script>
     (function () {
-      /*DATA*/ const DUR = 5.509; const W = [0.18, 0.54, 1.0, 2.005, 2.145, 2.485, 2.725, 2.925, 3.065, 3.245, 3.705, 4.145, 4.305, 4.525, 4.905]; /*END*/
+      /*DATA*/ const DUR = 6.01; const W = [0.18, 0.82, 1.34, 2.54, 2.86, 3.24, 3.44, 3.62, 3.76, 3.98, 4.56, 4.96, 5.16, 5.36, 5.64]; /*END*/
       // words: 0 Everyone 1 memorises 2 formulas. | 3 But 4 formulas 5 were 6 never 7 the 8 hard 9 part. 10 Explaining 11 them 12 under 13 pressure 14 is.
       const w = (i) => (W.length > i ? W[i] : 0.2 + i * 0.32);
       const CARD0 = 0.04, CARD4 = Math.max(CARD0 + 0.8, w(2) + 0.02);          // five cards, one about every 0.3 s

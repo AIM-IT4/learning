@@ -1,8 +1,8 @@
 <template>
   <style>
-    @font-face { font-family: "Inter"; font-weight: 100 900; src: url("assets/fonts/Inter.ttf"); }
+    @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
     @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
-    #root { position: absolute; inset: 0; overflow: hidden; font-family: Inter, sans-serif; color: #0f172a; }
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: D2QSans, sans-serif; color: #0f172a; }
     #s3-floor { position: absolute; left: 150px; top: 1546px; width: 780px; height: 80px; border-radius: 50%;
                 background: radial-gradient(ellipse at center, rgba(15,23,42,0.20), rgba(15,23,42,0) 70%); }
     #s3-cam { position: absolute; inset: 0; transform-origin: 540px 1040px; }
@@ -13,17 +13,17 @@
     .s3-dot { position: absolute; top: 34px; width: 20px; height: 20px; border-radius: 10px; }
     #s3-file { position: absolute; left: 132px; top: 0; font: 600 27px/88px "JetBrains Mono", monospace; color: #475569; }
     #s3-tag { position: absolute; right: 30px; top: 22px; height: 44px; padding: 0 18px; border-radius: 22px; background: #e6f6f4;
-              font: 700 21px/44px Inter, sans-serif; color: #067a75; }
+              font: 700 21px/44px D2QSans, sans-serif; color: #067a75; }
     #s3-chart { position: absolute; left: 34px; top: 112px; width: 880px; height: 440px; }
     #s3-one { position: absolute; right: 58px; top: 128px; height: 44px; padding: 0 18px; border-radius: 22px; background: #fff1f2;
               border: 2px solid #fda4af; font: 700 21px/40px "JetBrains Mono", monospace; color: #e11d48; letter-spacing: 0.02em; }
-    #s3-sllab { position: absolute; left: 50px; top: 600px; font: 700 28px/60px Inter, sans-serif; color: #475569; }
+    #s3-sllab { position: absolute; left: 50px; top: 600px; font: 700 28px/60px D2QSans, sans-serif; color: #475569; }
     #s3-track { position: absolute; left: 270px; top: 623px; width: 600px; height: 14px; border-radius: 7px; background: #e2e8f0; }
     #s3-fill { position: absolute; left: 0; top: 0; height: 14px; width: 0; border-radius: 7px; background: linear-gradient(90deg, #67d6cf, #08a9a2); }
     #s3-knob { position: absolute; left: 248px; top: 607px; width: 46px; height: 46px; border-radius: 23px; background: #ffffff;
                border: 7px solid #08a9a2; box-shadow: 0 6px 14px rgba(8,169,162,0.35); }
     #s3-slv { position: absolute; left: 221px; top: 548px; width: 100px; text-align: center; font: 800 32px/1 "JetBrains Mono", monospace; color: #0f172a; }
-    #s3-errlab { position: absolute; left: 50px; top: 712px; font: 700 28px/1 Inter, sans-serif; color: #475569; }
+    #s3-errlab { position: absolute; left: 50px; top: 712px; font: 700 28px/1 D2QSans, sans-serif; color: #475569; }
     #s3-err { position: absolute; left: 40px; top: 752px; font: 800 210px/1 "JetBrains Mono", monospace; letter-spacing: -0.04em; color: #f43f5e; opacity: 0; }
     #s3-cover { position: absolute; right: 50px; top: 730px; width: 230px; height: 230px; border-radius: 20px; overflow: hidden;
                 box-shadow: 0 14px 30px rgba(15,23,42,0.18); border: 2px solid #ffffff; }
@@ -54,7 +54,7 @@
   </div>
   <script>
     (function () {
-      /*DATA*/ const DUR = 7.625; const W = [0.18, 0.4, 0.86, 1.33, 1.64, 1.74, 1.94, 2.68, 2.8, 2.9, 3.12, 3.32, 4.622, 4.755, 5.022, 6.122]; /*END*/
+      /*DATA*/ const DUR = 7.99; const W = [0.18, 0.6, 1.06, 1.62, 1.82, 1.94, 2.14, 2.7, 2.88, 2.98, 3.18, 3.36, 4.86, 5.06, 5.46, 6.02]; /*END*/
       // words: 0 One 1 simulated 2 path. 3 Hedge 4 it 5 five 6 times, 7 and 8 the 9 error 10 is 11 2.32 | 12 Two 13 hundred 14 times: 15 0.07
       const w = (i) => (W.length > i ? W[i] : 0.2 + i * 0.42);
       // the knob, the path and the error move together from "Two" and land on "zero point zero seven"

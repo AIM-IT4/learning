@@ -1,8 +1,8 @@
 <template>
   <style>
-    @font-face { font-family: "Inter"; font-weight: 100 900; src: url("assets/fonts/Inter.ttf"); }
+    @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
     @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
-    #root { position: absolute; inset: 0; overflow: hidden; font-family: Inter, sans-serif; color: #0f172a; }
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: D2QSans, sans-serif; color: #0f172a; }
     #s2-cam { position: absolute; inset: 0; transform-origin: 540px 520px; }
     #s2-floor { position: absolute; left: 40px; top: 1580px; width: 1000px; height: 110px; border-radius: 50%;
                 background: radial-gradient(ellipse at center, rgba(15,23,42,0.22), rgba(15,23,42,0) 70%); }
@@ -15,7 +15,7 @@
                  background: linear-gradient(160deg, #ffffff 0%, #f8fafc 55%, #eef2f7 100%); box-shadow: inset 0 2px 6px rgba(15,23,42,0.10); }
     #s2-wbdim { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(100,116,139,0.30), rgba(71,85,105,0.24)); }
     #s2-wbsheen { position: absolute; left: -240px; top: -60px; width: 160px; height: 460px; background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.8), rgba(255,255,255,0)); }
-    #s2-q { position: absolute; left: 0; right: 0; top: 92px; text-align: center; font: 800 70px/1 Inter, sans-serif; letter-spacing: -0.02em; color: #0f172a;
+    #s2-q { position: absolute; left: 0; right: 0; top: 92px; text-align: center; font: 800 70px/1 D2QSans, sans-serif; letter-spacing: -0.02em; color: #0f172a;
             clip-path: inset(-20% 100% -20% -2%); }
     #s2-q b { color: #08a9a2; font-weight: 800; }
     #s2-qline { position: absolute; left: 0; top: 0; width: 812px; height: 312px; overflow: visible; }
@@ -49,7 +49,7 @@
     #s2-scin { position: absolute; inset: 0; transform-origin: 50% 50%; }
     .s2-face { position: absolute; inset: 0; border-radius: 26px; border: 2px solid #d6dfeb; background: linear-gradient(180deg, #ffffff 0%, #f4f7fa 100%);
                box-shadow: 0 20px 36px rgba(15,23,42,0.18), 0 6px 12px rgba(15,23,42,0.08), inset 0 2px 0 #ffffff; }
-    .s2-face span { position: absolute; left: 0; right: 0; top: 0; text-align: center; font: 800 62px/192px Inter, sans-serif; letter-spacing: -0.02em; color: #0f172a; }
+    .s2-face span { position: absolute; left: 0; right: 0; top: 0; text-align: center; font: 800 62px/192px D2QSans, sans-serif; letter-spacing: -0.02em; color: #0f172a; }
     #s2-back { opacity: 0; }
     #s2-back span { text-align: left; left: 44px; }
     #s2-chk { position: absolute; left: 330px; top: 66px; width: 62px; height: 62px; border-radius: 31px; background: radial-gradient(circle at 35% 30%, #67d6cf, #08a9a2 60%, #067a75);
@@ -118,7 +118,7 @@
           <path d="M 40 6 L 360 6 L 352 14 L 48 14 Z" fill="#94a3b8"/>
           <path d="M 20 110 L 380 110 L 360 12 L 40 12 Z" fill="url(#s2-gNp)" stroke="#0f172a" stroke-width="2" stroke-linejoin="round"/>
           <path d="M 42 15 L 358 15" stroke="#ffffff" stroke-width="2" opacity="0.4"/>
-          <text x="200" y="74" text-anchor="middle" font-family="Inter, sans-serif" font-weight="800" font-size="38" letter-spacing="4" fill="#ffffff">FINAL ROUND</text>
+          <text x="200" y="74" text-anchor="middle" font-family="D2QSans, sans-serif" font-weight="800" font-size="38" letter-spacing="4" fill="#ffffff">FINAL ROUND</text>
           <rect x="160" y="86" width="80" height="5" rx="2.5" fill="#67d6cf"/>
           <rect id="s2-npsheen" x="-60" y="12" width="40" height="98" fill="rgba(255,255,255,0.22)" transform="skewX(-18)"/>
         </svg>
@@ -155,7 +155,7 @@
   </div>
   <script>
     (function () {
-      /*DATA*/ const DUR = 3.609; const W = [0.18, 0.32, 0.46, 0.78, 0.96, 1.08, 1.34, 1.98, 2.2, 2.52, 2.78, 2.92]; /*END*/
+      /*DATA*/ const DUR = 3.65; const W = [0.18, 0.52, 0.64, 0.96, 1.2, 1.32, 1.46, 2.1, 2.26, 2.56, 2.82, 2.96]; /*END*/
       // words: 0 If 1 you're 2 preparing 3 for 4 a 5 quant 6 interview, 7 this 8 changes 9 how 10 you 11 study.
       const w = (i) => (W.length > i ? W[i] : 0.18 + i * 0.27);
       const clamp = (x, a, b) => Math.max(a, Math.min(b, x));

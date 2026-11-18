@@ -1,8 +1,8 @@
 <template>
   <style>
-    @font-face { font-family: "Inter"; font-weight: 100 900; src: url("assets/fonts/Inter.ttf"); }
+    @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
     @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
-    #root { position: absolute; inset: 0; overflow: hidden; font-family: Inter, sans-serif; color: #0f172a; }
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: D2QSans, sans-serif; color: #0f172a; }
     #s11-cam { position: absolute; inset: 0; transform-origin: 540px 1000px; }
     #s11-glow { position: absolute; left: -132px; top: -132px; width: 580px; height: 580px; border-radius: 50%;
                 background: radial-gradient(closest-side, rgba(8,169,162,0.42), rgba(8,169,162,0.12) 60%, rgba(8,169,162,0) 100%); }
@@ -18,8 +18,8 @@
               background: linear-gradient(180deg, #e2e8f0 0%, #cbd5e1 100%); box-shadow: inset 0 2px 0 #ffffff, 0 4px 10px rgba(15,23,42,0.12); }
     #s11-in { position: absolute; left: 140px; top: 23px; width: 652px; height: 104px; border-radius: 52px; background: #f1f5f9; border: 2px solid #e2e8f0;
               box-shadow: inset 0 3px 6px rgba(15,23,42,0.06); }
-    #s11-ph { position: absolute; left: 36px; top: 0; font: 500 38px/100px Inter, sans-serif; color: #94a3b8; white-space: nowrap; }
-    #s11-typed { position: absolute; left: 36px; top: 0; height: 100px; display: flex; align-items: center; font: 800 46px/1 Inter, sans-serif; color: #0f172a; letter-spacing: 0.02em; }
+    #s11-ph { position: absolute; left: 36px; top: 0; font: 500 38px/100px D2QSans, sans-serif; color: #94a3b8; white-space: nowrap; }
+    #s11-typed { position: absolute; left: 36px; top: 0; height: 100px; display: flex; align-items: center; font: 800 46px/1 D2QSans, sans-serif; color: #0f172a; letter-spacing: 0.02em; }
     #s11-typed span { display: none; }
     #s11-caret { display: block; width: 4px; height: 52px; border-radius: 2px; background: #08a9a2; margin-left: 4px; }
     #s11-send { position: absolute; left: 806px; top: 27px; width: 96px; height: 96px; border-radius: 50%;
@@ -29,11 +29,11 @@
     #s11-rip { position: absolute; left: 806px; top: 27px; width: 96px; height: 96px; border-radius: 50%; border: 5px solid #08a9a2; opacity: 0; }
     /* DM */
     #s11-dm { position: absolute; left: 80px; top: 676px; width: 920px; height: 360px; opacity: 0; }
-    #s11-name { position: absolute; left: 122px; top: 0; font: 800 34px/40px Inter, sans-serif; color: #0f172a; letter-spacing: -0.01em; white-space: nowrap; }
+    #s11-name { position: absolute; left: 122px; top: 0; font: 800 34px/40px D2QSans, sans-serif; color: #0f172a; letter-spacing: -0.01em; white-space: nowrap; }
     #s11-bub { position: absolute; left: 116px; top: 50px; width: 804px; height: 188px; border-radius: 40px 40px 40px 12px; padding: 32px 38px;
                background: linear-gradient(180deg, #ffffff 0%, #effaf8 100%); border: 2px solid #b9e6e1;
                box-shadow: 0 24px 46px rgba(15,23,42,0.14), 0 6px 14px rgba(8,169,162,0.12), inset 0 2px 0 #ffffff;
-               font: 600 42px/58px Inter, sans-serif; color: #0f172a; letter-spacing: -0.01em; }
+               font: 600 42px/58px D2QSans, sans-serif; color: #0f172a; letter-spacing: -0.01em; }
     #s11-dav { position: absolute; left: 0; top: 138px; width: 100px; height: 100px; filter: drop-shadow(0 8px 14px rgba(15,23,42,0.25));
                 background: url("assets/logo.png") center / 100% 100% no-repeat; }
     #s11-row { position: absolute; left: 0; top: 262px; width: 920px; height: 88px; }
@@ -54,8 +54,8 @@
     #s11-logo { position: absolute; left: 50px; top: 50px; width: 216px; height: 216px; border-radius: 52px; background: #ffffff; border: 2px solid #d6dfeb;
                 box-shadow: 0 16px 32px rgba(15,23,42,0.16); }
     #s11-logo img { position: absolute; left: 4px; top: 4px; width: 204px; height: 204px; }
-    #s11-pn { position: absolute; left: 300px; top: 128px; font: 900 72px/1 Inter, sans-serif; letter-spacing: -0.035em; color: #0f172a; white-space: nowrap; }
-    #s11-ph2 { position: absolute; left: 303px; top: 214px; font: 600 38px/1 Inter, sans-serif; color: #64748b; white-space: nowrap; }
+    #s11-pn { position: absolute; left: 300px; top: 128px; font: 900 72px/1 D2QSans, sans-serif; letter-spacing: -0.035em; color: #0f172a; white-space: nowrap; }
+    #s11-ph2 { position: absolute; left: 303px; top: 214px; font: 600 38px/1 D2QSans, sans-serif; color: #64748b; white-space: nowrap; }
     #s11-site { position: absolute; left: 50px; top: 298px; height: 70px; padding: 0 30px 0 22px; border-radius: 35px; display: flex; align-items: center; gap: 14px;
                 background: #e6f6f4; border: 2px solid #b9e6e1; font: 700 34px/1 "JetBrains Mono", monospace; color: #067a75; white-space: nowrap; }
   </style>
@@ -112,7 +112,7 @@
   </div>
   <script>
     (function () {
-      /*DATA*/ const DUR = 3.635; const W = [0.18, 0.38, 0.98, 1.08, 1.3, 1.48, 1.68, 1.86]; /*END*/
+      /*DATA*/ const DUR = 3.92; const W = [0.18, 0.74, 1.0, 1.26, 1.44, 1.64, 1.88, 2.1]; /*END*/
       // words: 0 Comment 1 FREE, 2 and 3 we'll 4 DM 5 you 6 all 7 ten.
       const w = (i) => (W.length > i ? W[i] : 0.18 + i * 0.44);
       const clamp = (x, a, b) => Math.max(a, Math.min(b, x));

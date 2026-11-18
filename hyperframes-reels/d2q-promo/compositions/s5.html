@@ -1,8 +1,8 @@
 <template>
   <style>
-    @font-face { font-family: "Inter"; font-weight: 100 900; src: url("assets/fonts/Inter.ttf"); }
+    @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
     @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
-    #root { position: absolute; inset: 0; overflow: hidden; font-family: Inter, sans-serif; color: #0f172a; }
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: D2QSans, sans-serif; color: #0f172a; }
     #s5-cam { position: absolute; inset: 0; transform-origin: 540px 1080px; }
     #s5-glow { position: absolute; left: 40px; top: 560px; width: 1000px; height: 1000px; border-radius: 50%;
                background: radial-gradient(circle, rgba(8,169,162,0.30) 0%, rgba(8,169,162,0.12) 38%, rgba(8,169,162,0) 66%); }
@@ -48,8 +48,8 @@
     #s5-badge { position: absolute; left: 26px; top: 22px; width: 96px; height: 96px; border-radius: 50%;
                 background: radial-gradient(circle at 35% 28%, #67d6cf 0%, #08a9a2 55%, #067a75 100%);
                 box-shadow: 0 8px 18px rgba(8,169,162,0.40), inset 0 2px 2px rgba(255,255,255,0.55); display: flex; align-items: center; justify-content: center; }
-    #s5-nm { position: absolute; left: 148px; top: 24px; font: 800 50px/1.1 Inter, sans-serif; letter-spacing: -0.02em; color: #0f172a; white-space: nowrap; }
-    #s5-role { position: absolute; left: 150px; top: 86px; font: 600 31px/1.1 Inter, sans-serif; letter-spacing: -0.005em; color: #475569; white-space: nowrap; opacity: 0; }
+    #s5-nm { position: absolute; left: 148px; top: 24px; font: 800 50px/1.1 D2QSans, sans-serif; letter-spacing: -0.02em; color: #0f172a; white-space: nowrap; }
+    #s5-role { position: absolute; left: 150px; top: 86px; font: 600 31px/1.1 D2QSans, sans-serif; letter-spacing: -0.005em; color: #475569; white-space: nowrap; opacity: 0; }
     #s5-role b { color: #067a75; font-weight: 700; }
     #s5-rk { position: relative; display: inline-block; }
     #s5-ul { position: absolute; left: 0; right: 0; bottom: -7px; height: 5px; border-radius: 3px; background: linear-gradient(90deg, #67d6cf, #08a9a2); transform-origin: 0 50%; }
@@ -89,7 +89,7 @@
   </div>
   <script>
     (function () {
-      /*DATA*/ const DUR = 4.317; const W = [0.18, 0.96, 1.63, 2.02, 2.53, 2.74, 2.96, 3.1, 3.34, 3.72]; /*END*/
+      /*DATA*/ const DUR = 4.13; const W = [0.18, 1.04, 1.28, 1.78, 2.34, 2.52, 2.72, 2.86, 3.14, 3.56]; /*END*/
       // words: 0 Desk2Quant 1 trains 2 exactly 3 that. | 4 Built 5 by 6 a 7 practising 8 bank 9 quant.
       const w = (i) => (W.length > i ? W[i] : 0.2 + i * 0.3);
       const tl = gsap.timeline({ paused: true });

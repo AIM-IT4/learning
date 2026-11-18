@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "title": "Desk2Quant: Can you hedge with it?",
   "logline": "You can derive Black–Scholes, but can you hedge with it? One notebook drops the hedging error from 2.32 to 0.07, then Desk2Quant is introduced as the place that trains the desk side; comment FREE for all 10 free resources.",
   "style": "product-promo",
@@ -8,7 +8,7 @@
     "width": 1080,
     "height": 1920,
     "fps": 30,
-    "duration_s": 45.09
+    "duration_s": 46.7
   },
   "music": {
     "source": "library",
@@ -19,9 +19,9 @@
     "note": "pulse bed at about -29 LUFS under the voice"
   },
   "voice": {
-    "who": "Manish (saved, consented voice), English",
-    "takes": "one per line, speech-checked with faster-whisper",
-    "final": "voice/out/vo.wav, 43.5 s, natural speed; line 1 retaken (seed 11) as 'the Black Shoals model' after 'Black Scholes' was heard as 'black skulls'"
+    "who": "Paradee 1.2 (Apache-2.0, an 8M distillation of Kokoro), British male bm_fable, speed 1.22",
+    "final": "voice/out_paradee/vo.wav, 45.3 s; every line speech-checked",
+    "spelling": "'Black Sholes' for Black–Scholes"
   },
   "look": {
     "medium": "2D vector motion graphics with glossy drawn props",
@@ -32,7 +32,7 @@
       "#08a9a2",
       "#f43f5e"
     ],
-    "typography": "Inter 800/900 (captions, hero words), JetBrains Mono (numbers)",
+    "typography": "Bricolage Grotesque (OFL) for captions, hero words and prop text; JetBrains Mono for numbers and code",
     "texture": "dot grid + drifting teal squares",
     "color_arc": "paper and mint alternate every cut; teal accent; rose only for error"
   },
@@ -336,7 +336,7 @@
   ],
   "required_inputs": [],
   "rules": [
-    "no mention of how it was made, on screen or in the caption",
+    "no AI or tool mentions on screen or in the caption",
     "no sales counts, ratings or follower counts",
     "every number from the live site; 'one simulated path' labelled",
     "light site palette; fill the frame",
@@ -344,6 +344,7 @@
   ],
   "changelog": [
     "v1: plan from the reference breakdown and the live site's facts (18 Nov 2026)",
-    "v2: line 1 is 'You can derive the Black–Scholes model.' (speech check); timing from the measured voice; film 45.1 s; layered build (bg, 11 scenes, overlay)"
+    "v2: line 1 is 'You can derive the Black–Scholes model.' (speech check); timing from the measured voice; film 45.1 s; layered build (bg, 11 scenes, overlay)",
+    "v3: voice Paradee bm_fable at 1.22x (the founder's pick; Charon's Composio route is disabled), font Bricolage Grotesque (the founder's pick from three); film 46.7 s"
   ]
 }

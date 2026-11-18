@@ -16,7 +16,7 @@
   </div>
   <script>
     (function () {
-      /*DATA*/ const DUR = 45.49; const SHOTS = [[0.0, "A"], [3.117, "B"], [6.726, "A"], [14.351, "B"], [19.86, "A"], [24.177, "B"], [26.661, "A"], [31.511, "B"], [34.949, "A"], [37.829, "B"], [41.855, "A"]]; /*END*/
+      /*DATA*/ const DUR = 46.7; const SHOTS = [[0.0, "A"], [4.04, "B"], [7.69, "A"], [15.68, "B"], [21.69, "A"], [25.82, "B"], [28.47, "A"], [32.43, "B"], [35.26, "A"], [38.15, "B"], [42.78, "A"]]; /*END*/
       const tl = gsap.timeline({ paused: true });
       // the background alternates paper (A) and mint (B) on every cut; the pixel wipe in the overlay hides the switch
       SHOTS.forEach(([t0, bg]) => tl.set("#bg-b", { opacity: bg === "B" ? 1 : 0 }, t0));

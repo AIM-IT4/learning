@@ -1,8 +1,8 @@
 <template>
   <style>
-    @font-face { font-family: "Inter"; font-weight: 100 900; src: url("assets/fonts/Inter.ttf"); }
+    @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
     @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
-    #root { position: absolute; inset: 0; overflow: hidden; font-family: Inter, sans-serif; color: #0f172a; }
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: D2QSans, sans-serif; color: #0f172a; }
     #s8-cam { position: absolute; inset: 0; transform-origin: 540px 760px; }
     #s8-glow { position: absolute; left: 0px; top: 560px; width: 760px; height: 760px; border-radius: 50%;
                background: radial-gradient(closest-side, rgba(8,169,162,0.38), rgba(8,169,162,0.12) 60%, rgba(8,169,162,0) 100%); }
@@ -16,7 +16,7 @@
     .s8-tick { position: absolute; left: 16px; top: 19px; width: 38px; height: 38px; border-radius: 19px; background: linear-gradient(180deg, #14b8b0, #067a75);
                box-shadow: 0 4px 10px rgba(8,169,162,0.45); }
     .s8-tick svg { position: absolute; left: 7px; top: 8px; }
-    .s8-card b { position: absolute; left: 62px; top: 22px; font: 800 28px/34px Inter, sans-serif; letter-spacing: -0.015em; color: #0f172a; white-space: nowrap; }
+    .s8-card b { position: absolute; left: 62px; top: 22px; font: 800 28px/34px D2QSans, sans-serif; letter-spacing: -0.015em; color: #0f172a; white-space: nowrap; }
     .s8-ln { position: absolute; left: 22px; height: 12px; border-radius: 6px; background: #e2e8f0; }
     #s8-c0 { left: -165px; top: -190px; width: 330px; height: 380px; }
     #s8-c0 b { font-size: 32px; left: 66px; top: 22px; }
@@ -25,7 +25,7 @@
     #s8-stamp { position: absolute; left: 15px; top: 162px; width: 300px; height: 78px; border-radius: 16px; display: flex; align-items: center; justify-content: center; gap: 10px;
                 background: linear-gradient(180deg, #17bdb5 0%, #08a9a2 100%); border: 3px solid #067a75; opacity: 0;
                 box-shadow: inset 0 0 0 4px #17bdb5, inset 0 0 0 7px rgba(255,255,255,0.88), 0 12px 24px rgba(8,169,162,0.38);
-                font: 800 29px/1 Inter, sans-serif; color: #ffffff; letter-spacing: -0.01em; white-space: nowrap; }
+                font: 800 29px/1 D2QSans, sans-serif; color: #ffffff; letter-spacing: -0.01em; white-space: nowrap; }
     #s8-ink { position: absolute; left: 15px; top: 162px; width: 300px; height: 78px; border-radius: 22px; border: 6px solid #08a9a2; opacity: 0; }
     /* display stand with the odometer */
     #s8-ped { position: absolute; left: 120px; top: 1252px; width: 840px; height: 322px; }
@@ -50,7 +50,7 @@
                text-align: center; text-shadow: 0 0 22px rgba(8,169,162,0.85); opacity: 0; }
     #s8-dflash { position: absolute; left: -6px; top: -6px; width: 688px; height: 204px; border-radius: 28px; border: 4px solid #4fd1c9;
                  box-shadow: 0 0 34px rgba(8,169,162,0.75); opacity: 0; }
-    #s8-lab { position: absolute; left: 0; width: 840px; top: 274px; text-align: center; font: 800 30px/1 Inter, sans-serif; letter-spacing: 0.28em; color: #067a75; opacity: 0; }
+    #s8-lab { position: absolute; left: 0; width: 840px; top: 274px; text-align: center; font: 800 30px/1 D2QSans, sans-serif; letter-spacing: 0.28em; color: #067a75; opacity: 0; }
     /* the book */
     #s8-bob { position: absolute; left: 110px; top: 664px; width: 540px; height: 540px; }
     #s8-book { position: absolute; inset: 0; }
@@ -141,7 +141,7 @@
   </div>
   <script>
     (function () {
-      /*DATA*/ const DUR = 3.438; const W = [0.18, 0.32, 0.46, 1.13, 1.54, 2.43, 2.56]; /*END*/
+      /*DATA*/ const DUR = 2.83; const W = [0.18, 0.52, 0.6, 1.2, 1.48, 1.94, 2.22]; /*END*/
       // words: 0 Then 1 the 2 interview: 3 1000+ 4 problems, 5 with 6 solutions.
       const w = (i) => (W.length > i ? W[i] : 0.18 + i * 0.4);
       const T1 = w(1), T3 = w(3);                      // the counter rolls from "the" and lands exactly on "1000+"

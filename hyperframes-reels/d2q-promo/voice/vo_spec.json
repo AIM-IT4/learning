@@ -5,66 +5,66 @@
  "parts": [
   [
    "p01",
-   "voice/takes_p01/p01f_s11.wav"
+   "voice/paradee_fable/p01.wav"
   ],
   [
    "p02",
-   "voice/takes_s11/p02.wav"
+   "voice/paradee_fable/p02.wav"
   ],
   [
    "p03",
-   "voice/takes_s11/p03.wav"
+   "voice/paradee_fable/p03.wav"
   ],
   [
    "p04",
-   "voice/takes_s11/p04.wav"
+   "voice/paradee_fable/p04.wav"
   ],
   [
    "p05",
-   "voice/takes_s11/p05.wav",
+   "voice/paradee_fable/p05.wav",
    {
     "max_pause": 9
    }
   ],
   [
    "p06",
-   "voice/takes_s11/p06.wav"
+   "voice/paradee_fable/p06.wav"
   ],
   [
    "p07",
-   "voice/takes_s11/p07.wav"
+   "voice/paradee_fable/p07.wav"
   ],
   [
    "p08",
-   "voice/takes_s11/p08.wav"
+   "voice/paradee_fable/p08.wav"
   ],
   [
    "p09",
-   "voice/takes_s11/p09.wav"
+   "voice/paradee_fable/p09.wav"
   ],
   [
    "p10",
-   "voice/takes_s11/p10.wav"
+   "voice/paradee_fable/p10.wav"
   ],
   [
    "p11",
-   "voice/takes_s11/p11.wav"
+   "voice/paradee_fable/p11.wav"
   ],
   [
    "p12",
-   "voice/takes_s11/p12.wav"
+   "voice/paradee_fable/p12.wav"
   ],
   [
    "p13",
-   "voice/takes_s11/p13.wav"
+   "voice/paradee_fable/p13.wav"
   ],
   [
    "p14",
-   "voice/takes_s11/p14.wav"
+   "voice/paradee_fable/p14.wav"
   ],
   [
    "p15",
-   "voice/takes_s11/p15.wav"
+   "voice/paradee_fable/p15.wav"
   ]
  ],
  "gaps": [
