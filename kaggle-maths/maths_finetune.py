@@ -32,6 +32,21 @@ def internet_on():
         return False
 
 
+def remove_incompatible_torchao():
+    """Kaggle preinstalls an old torchao, and peft refuses to add LoRA layers while it's
+    installed. This notebook doesn't use torchao, so remove an old copy if there is one."""
+    from importlib.metadata import PackageNotFoundError, version
+    try:
+        v = version("torchao")
+    except PackageNotFoundError:
+        return
+    if tuple(int(x) for x in re.findall(r"\d+", v)[:2]) < (0, 16):
+        subprocess.run([sys.executable, "-m", "pip", "uninstall", "-y", "-q", "torchao"], check=True)
+        print(f"Removed torchao {v}: too old for peft, and not needed here.")
+
+
+import re
+
 if IN_KAGGLE:
     if not internet_on():
         raise RuntimeError("Internet is off for this notebook. On Kaggle, verify your phone number "
@@ -40,6 +55,8 @@ if IN_KAGGLE:
     subprocess.run([sys.executable, "-m", "pip", "install", "-q",
                     "transformers==5.23.0", "peft==0.21.3", "trl==1.18.1",
                     "datasets==5.2.0", "accelerate==1.16.0"], check=True)
+if IN_KAGGLE or os.environ.get("FIX_TORCHAO") == "1":
+    remove_incompatible_torchao()
 # Use one GPU even when Kaggle offers two: simpler and more reliable for a model this size.
 os.environ.setdefault("CUDA_VISIBLE_DEVICES", "0")
 
