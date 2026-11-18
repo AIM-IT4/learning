@@ -78,6 +78,23 @@ kaggle kernels output YOUR_KAGGLE_USERNAME/slm-stage-1 -p out/   # when it has f
 Measured on Kaggle's two T4 GPUs, the 100M-parameter model trains at 39,044 tokens a second
 (19,999 on one GPU), so 2 billion tokens take about 14 hours.
 
+## Results so far
+
+**Stage 1** (14.9M parameters, 240M tokens, 22 minutes on Kaggle's two T4 GPUs), graded on
+1,922 problems it never saw (`results/stage1.json`):
+
+| Test | Score |
+|---|---|
+| Level 1: new numbers | 100.0% of 453 |
+| Level 3: new combinations of disguises | 48.6% of 500 |
+| Level 2: wording never used in training | 27.6% of 500 |
+| Everyday maths, practised wording | 98.6% of 219 |
+| Everyday maths, new wording | 47.6% of 250 |
+
+It learned every method, and solves about half the problem structures it never practised.
+Unfamiliar wording is its weak spot, which is what Stage 2 (a 100M model that first reads
+1.6 billion tokens of English) is for.
+
 ## What it will not do
 
 It only understands questions worded like the ones it practised (a bigger model trained

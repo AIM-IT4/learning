@@ -2,6 +2,7 @@
 
     python kaggle/build_kernel.py speed       --user KAGGLE_USERNAME --out /tmp/kernel-speed
     python kaggle/build_kernel.py stage1      --user KAGGLE_USERNAME --out /tmp/kernel-stage1
+    python kaggle/build_kernel.py stage1_rl   --user KAGGLE_USERNAME --out /tmp/kernel-rl     # practice with judge
     python kaggle/build_kernel.py stage2_data --user KAGGLE_USERNAME --out /tmp/kernel-data   # CPU only
     python kaggle/build_kernel.py stage2_a    --user KAGGLE_USERNAME --out /tmp/kernel-2a     # reading, session 1
     python kaggle/build_kernel.py stage2_b    --user KAGGLE_USERNAME --out /tmp/kernel-2b     # reading ends, practice, tests
@@ -26,6 +27,10 @@ JOBS = {
     "stage1": dict(template="stage1.py", title="SLM Stage 1", slug="slm-stage-1", files=FULL, internet=True, gpu=True),
     "stage2_data": dict(template="stage2_data.py", title="SLM Stage 2 Data", slug="slm-stage-2-data", files=FULL,
                         internet=True, gpu=False),
+    "stage1_rl": dict(template="rl_kernel.py", title="SLM Stage 1 RL", slug="slm-stage-1-rl", files=FULL + ["rl.py"],
+                      internet=True, gpu=True, sources=["slm-stage-1"],
+                      config={"init": "run/model.pt", "steps": 200, "lr": 2e-5, "prompts": 8, "samples": 8,
+                              "minutes": 45}),
     "stage2_a": dict(template="stage2_train.py", title="SLM Stage 2 A", slug="slm-stage-2-a", files=FULL,
                      internet=True, gpu=True, sources=["slm-stage-2-data"],
                      config={"steps": [dict(READ, minutes=680)], "eval": False}),
