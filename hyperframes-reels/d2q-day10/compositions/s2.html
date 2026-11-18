@@ -1,0 +1,133 @@
+<template>
+  <style>
+    @font-face { font-family: "Fredoka"; font-weight: 400; src: url("assets/fonts/fredoka-400.woff2"); }
+    @font-face { font-family: "Fredoka"; font-weight: 700; src: url("assets/fonts/fredoka-700.woff2"); }
+    @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
+    @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
+    #root { position: absolute; inset: 0; overflow: hidden; perspective: 2400px; perspective-origin: 540px 1150px; }
+    #s2-flip, #s2-cam, #s2-bob { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #s2-flip { transform-origin: 540px 1150px; }
+    #s2-cam { transform-origin: 540px 760px; }
+    #s2-dio { position: absolute; left: 0; top: -8px; width: 1080px; height: 1935px; }
+    /* the interviewer's speech bubble: a white signboard floating over the room, tail on the interviewer's chair */
+    #s2-bub { position: absolute; left: 180px; top: 604px; width: 720px; padding: 28px 24px 32px; box-sizing: border-box; background: #ffffff;
+              border-radius: 44px; box-shadow: 0 12px 0 #2563eb, 0 26px 40px rgba(30,64,175,0.22); transform-origin: 240px 290px; opacity: 0;
+              text-align: center; font: 700 54px/1.18 "Fredoka", "D2QSans", "JetBrains Mono", sans-serif; color: #0b1b3a; }
+    .s2-ln { white-space: nowrap; }
+    .s2-w { display: inline-block; opacity: 0; transform-origin: 50% 80%; }
+    .s2-w.a { color: #2563eb; }
+    #s2-tail { position: absolute; left: 176px; bottom: -66px; width: 130px; height: 84px; overflow: visible; }
+    #s2-dots { position: absolute; left: 0; top: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; gap: 20px; opacity: 0; }
+    .s2-dot { width: 26px; height: 26px; border-radius: 13px; background: #3b82f6; }
+    #s2-tag { position: absolute; left: 212px; top: 588px; height: 46px; padding: 0 22px; border-radius: 23px; background: #2563eb; color: #ffffff;
+              font: 700 28px/46px "Fredoka", "D2QSans", "JetBrains Mono", sans-serif; letter-spacing: 0.08em; white-space: nowrap;
+              box-shadow: 0 6px 0 #1e40af, 0 12px 20px rgba(30,64,175,0.22); transform-origin: 0% 100%; opacity: 0; }
+    /* the daily P&L ticker pill below the desk */
+    #s2-tk { position: absolute; left: 330px; top: 1226px; width: 420px; height: 126px; transform-origin: 50% 100%; opacity: 0; }
+    #s2-tk-edge { position: absolute; left: 0; top: 10px; width: 420px; height: 126px; border-radius: 63px; background: #2563eb;
+                  box-shadow: 0 24px 36px rgba(30,64,175,0.22); }
+    #s2-tk-face { position: absolute; left: 0; top: 0; width: 420px; height: 126px; border-radius: 63px; background: #ffffff; overflow: hidden; }
+    #s2-tk-lab { position: absolute; left: 0; right: 0; top: 15px; text-align: center; white-space: nowrap;
+                 font: 400 28px/1 "Fredoka", "D2QSans", "JetBrains Mono", sans-serif; color: #0b1b3a; }
+    .s2-tv { position: absolute; left: 0; right: 0; top: 50px; height: 62px; text-align: center; white-space: nowrap; opacity: 0;
+             font: 700 60px/62px "Fredoka", "D2QSans", "JetBrains Mono", sans-serif; color: #2563eb; transform-origin: 50% 50%; }
+    .s2-tv.R { color: #e11d48; }
+  </style>
+  <div id="root" data-composition-id="s2" data-width="1080" data-height="1920">
+    <div id="s2-flip">
+      <div id="s2-cam">
+        <div id="s2-bob">
+          <img id="s2-dio" src="assets/plates/i02.png" alt="" />
+        </div>
+        <div id="s2-bub">
+          <div class="s2-ln"><span class="s2-w">Your</span> <span class="s2-w">hedge</span> <span class="s2-w">is</span> <span class="s2-w">perfect.</span></div>
+          <div class="s2-ln"><span class="s2-w">Why</span> <span class="s2-w">does</span> <span class="s2-w">your</span> <span class="s2-w">P&amp;L</span></div>
+          <div class="s2-ln"><span class="s2-w">still</span> <span class="s2-w a">move</span> <span class="s2-w">every</span> <span class="s2-w">day?</span></div>
+          <svg id="s2-tail" viewBox="0 0 130 84">
+            <path d="M14 0 L112 0 Q74 22 64 82 Q48 28 14 0 Z" transform="translate(0 12)" fill="#2563eb" />
+            <path d="M14 -16 L112 -16 L112 0 Q74 22 64 82 Q48 28 14 0 Z" fill="#ffffff" />
+          </svg>
+          <div id="s2-dots"><div class="s2-dot"></div><div class="s2-dot"></div><div class="s2-dot"></div></div>
+        </div>
+        <div id="s2-tag">INTERVIEWER</div>
+        <div id="s2-tk">
+          <div id="s2-tk-edge"></div>
+          <div id="s2-tk-face">
+            <div id="s2-tk-lab">daily P&amp;L · 1,000 calls</div>
+            <div class="s2-tv" id="s2-v0">+₹23.42</div>
+            <div class="s2-tv R" id="s2-v1">−₹13.33</div>
+            <div class="s2-tv" id="s2-v2">+₹24.53</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      /*DATA*/ const DUR = 5.27; const W = [0.16, 0.52, 0.56, 1.1, 1.73, 1.86, 2.08, 2.22, 2.72, 2.92, 3.12, 3.28, 3.4, 3.84, 4.16, 4.52, 4.7]; /*END*/
+      // words: 0 Then 1 the 2 interviewer 3 asks: 4 your 5 hedge 6 is 7 perfect, 8 so 9 why 10 does 11 your 12 P&L 13 still 14 move 15 every 16 day?
+      const w = (i) => Math.max(0, W.length > i ? W[i] : 0.3 + i * 0.28);
+      const tl = gsap.timeline({ paused: true });
+      const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+      // entrance: cube flip in; camera pushes slowly toward the room
+      tl.fromTo("#s2-flip", { rotationY: -90, scale: 0.94 }, { rotationY: 0, scale: 1, duration: 0.36, ease: "power3.out" }, 0);
+      tl.fromTo("#s2-cam", { scale: 1 }, { scale: 1.04, duration: DUR, ease: "none" }, 0);
+
+      // the bubble pops up out of the interviewer's chair with typing dots; the INTERVIEWER tag lands on "asks:"
+      const B0 = Math.max(0.42, w(2) - 0.06);
+      tl.fromTo("#s2-bub", { opacity: 0, scale: 0.3, y: 60 }, { opacity: 1, scale: 1, y: 0, duration: 0.42, ease: "back.out(2.2)" }, B0);
+      tl.fromTo("#s2-bub", { scaleX: 1, scaleY: 1 }, { scaleX: 1.03, scaleY: 0.92, duration: 0.07, ease: "power2.out", immediateRender: false }, B0 + 0.42);
+      tl.fromTo("#s2-bub", { scaleX: 1.03, scaleY: 0.92 }, { scaleX: 1, scaleY: 1, duration: 0.34, ease: "back.out(3)", immediateRender: false }, B0 + 0.49);
+      const D0 = B0 + 0.16, D1 = Math.max(D0 + 0.3, w(4) - 0.1);
+      tl.fromTo("#s2-dots", { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.2, ease: "back.out(2.6)" }, D0);
+      tl.fromTo("#s2-dots", { opacity: 1, scale: 1 }, { opacity: 0, scale: 0.4, duration: 0.1, ease: "power2.in", immediateRender: false }, D1);
+      tl.fromTo("#s2-tag", { opacity: 0, scale: 0.2, rotation: -16 }, { opacity: 1, scale: 1, rotation: -2, duration: 0.34, ease: "back.out(2.8)" }, w(3) - 0.04);
+
+      // the question reveals word by word with the voice ("so" is not on the card)
+      const words = Array.from(document.querySelectorAll("#s2-bub .s2-w"));
+      const onset = [4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15, 16];
+      words.forEach((el, k) => {
+        const t = w(onset[k]) - 0.04;
+        tl.fromTo(el, { opacity: 0, scale: 0.4, y: 22 }, { opacity: 1, scale: 1, y: 0, duration: 0.3, ease: "back.out(3)" }, t);
+      });
+      // "move" gets a hop when it lands
+      const mv = words[9];
+      tl.fromTo(mv, { y: 0 }, { y: -16, duration: 0.1, ease: "power2.out", immediateRender: false }, w(14) + 0.28);
+      tl.fromTo(mv, { y: -16 }, { y: 0, duration: 0.26, ease: "bounce.out", immediateRender: false }, w(14) + 0.38);
+
+      // the ticker pops on "P&L", then flips day by day: +₹23.42 -> −₹13.33 on "move" -> +₹24.53 on "day?"
+      const T0 = w(12) - 0.02, F1 = w(14), F2 = Math.min(DUR - 0.5, Math.max(F1 + 0.5, w(16)));
+      tl.fromTo("#s2-tk", { opacity: 0, scale: 0.3, y: 30 }, { opacity: 1, scale: 1, y: 0, duration: 0.34, ease: "back.out(2.6)" }, T0);
+      tl.fromTo("#s2-v0", { opacity: 0, rotationX: -90 }, { opacity: 1, rotationX: 0, transformPerspective: 500, duration: 0.24, ease: "back.out(2)" }, T0 + 0.1);
+      const flip = (out, inn, t) => {
+        tl.fromTo(out, { opacity: 1, rotationX: 0 }, { opacity: 0, rotationX: 90, transformPerspective: 500, duration: 0.1, ease: "power2.in", immediateRender: false }, t - 0.08);
+        tl.fromTo(inn, { opacity: 0, rotationX: -90 }, { opacity: 1, rotationX: 0, transformPerspective: 500, duration: 0.26, ease: "back.out(2.2)" }, t + 0.02);
+        tl.fromTo("#s2-tk", { y: 0 }, { y: -18, duration: 0.1, ease: "power2.out", immediateRender: false }, t - 0.04);
+        tl.fromTo("#s2-tk", { y: -18 }, { y: 0, duration: 0.3, ease: "bounce.out", immediateRender: false }, t + 0.06);
+      };
+      flip("#s2-v0", "#s2-v1", F1);
+      tl.fromTo("#s2-tk-edge", { backgroundColor: "#2563eb" }, { backgroundColor: "#e11d48", duration: 0.12, ease: "power1.out" }, F1);
+      flip("#s2-v1", "#s2-v2", F2);
+      tl.fromTo("#s2-tk-edge", { backgroundColor: "#e11d48" }, { backgroundColor: "#2563eb", duration: 0.12, ease: "power1.out", immediateRender: false }, F2);
+
+      // continuous: the diorama bobs, the typing dots bounce
+      const bob = document.getElementById("s2-bob"), dots = Array.from(document.querySelectorAll(".s2-dot"));
+      function draw(t) {
+        bob.style.transform = "translateY(" + (-8 * Math.sin((2 * Math.PI * (t + 0.4)) / 3)).toFixed(2) + "px)";
+        dots.forEach((d, i) => {
+          const ph = (t - D0 - i * 0.12) / 0.5;
+          const y = t > D0 && t < D1 + 0.12 ? -12 * Math.max(0, Math.sin(Math.PI * 2 * ph)) : 0;
+          d.style.transform = "translateY(" + y.toFixed(2) + "px)";
+        });
+      }
+      const st = { t: 0 };
+      tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: () => draw(st.t) }, 0);
+      draw(0);
+
+      // exit: cube flip into s3
+      tl.fromTo("#s2-flip", { rotationY: 0 }, { rotationY: 90, duration: 0.26, ease: "power2.in", immediateRender: false }, DUR - 0.26);
+      window.__timelines["s2"] = tl;
+    })();
+  </script>
+</template>

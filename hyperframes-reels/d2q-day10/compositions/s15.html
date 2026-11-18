@@ -1,0 +1,290 @@
+<template>
+  <style>
+    @font-face { font-family: "Fredoka"; font-weight: 400; src: url("assets/fonts/fredoka-400.woff2"); }
+    @font-face { font-family: "Fredoka"; font-weight: 700; src: url("assets/fonts/fredoka-700.woff2"); }
+    @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
+    @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
+    #root { position: absolute; inset: 0; overflow: hidden; perspective: 2400px; perspective-origin: 540px 1150px; }
+    #s15-flip, #s15-cam, #s15-bob { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #s15-flip { transform-origin: 540px 1150px; }
+    #s15-cam { transform-origin: 540px 1120px; }
+    #s15-cv { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    .s15-t { font-family: "Fredoka", "D2QSans", "JetBrains Mono", sans-serif; font-weight: 700; color: #0b1b3a; white-space: nowrap; }
+    .s15-pw { position: absolute; opacity: 0; transform-origin: 50% 100%; }
+    .s15-pw.s15-ctr { left: 0; right: 0; display: flex; justify-content: center; }
+    .s15-hop { position: relative; transform-origin: 50% 100%; }
+    .s15-box { background: #ffffff; border-radius: 26px; box-shadow: 0 10px 0 #2563eb, 0 24px 36px rgba(30,64,175,0.22); }
+    .s15-box.s15-sky { box-shadow: 0 10px 0 #93c5fd, 0 24px 36px rgba(30,64,175,0.18); }
+    /* the formula signboard */
+    #s15-fw { top: 598px; }
+    #s15-fw .s15-box { width: 940px; height: 140px; position: relative; }
+    #s15-l1 { position: absolute; left: 0; right: 0; top: 12px; text-align: center; font-size: 32px; line-height: 38px; color: #475569; }
+    #s15-l2 { position: absolute; left: 0; right: 0; top: 52px; height: 76px; display: flex; justify-content: center; align-items: baseline; gap: 12px; font-size: 60px; line-height: 76px; }
+    #s15-l2 > span, #s15-l2 > svg { flex: none; }
+    .s15-pa { margin: 0 -6px; }
+    .s15-gs { display: block; flex: none; overflow: visible; }
+    .s15-hw { position: relative; display: block; flex: none; padding: 0 14px; }
+    .s15-hw b { position: relative; display: flex; align-items: baseline; font-weight: 700; }
+    .s15-chip { position: absolute; left: 0; right: 0; top: 7px; bottom: 3px; border-radius: 22px; opacity: 0; transform-origin: 50% 100%; }
+    #s15-mvc { background: #2563eb; box-shadow: 0 7px 0 #1e40af; }
+    #s15-sgc { background: #dbeafe; box-shadow: 0 7px 0 #93c5fd; }
+    /* the column labels */
+    .s15-lb .s15-box { height: 66px; padding: 0 26px; display: flex; align-items: center; font-size: 34px; letter-spacing: 0.03em; }
+    #s15-lbp { left: 248px; top: 868px; }
+    #s15-lbm { left: 482px; top: 760px; }
+    #s15-lbm .s15-box { color: #2563eb; }
+    /* numbers printed on the columns' front faces (mapped with faceMatrix every frame) */
+    .s15-fn { position: absolute; left: 0; top: 0; width: 130px; height: 80px; transform-origin: 0 0; opacity: 0; text-align: center; font-size: 64px; line-height: 80px; }
+    /* the win stamp and its footnote */
+    #s15-win { top: 1240px; }
+    #s15-winr { transform: rotate(-3deg); margin-right: 300px; }
+    #s15-winc { display: flex; align-items: center; gap: 14px; height: 96px; padding: 0 34px; border-radius: 48px; background: #ffffff;
+                box-shadow: 0 10px 0 #2563eb, 0 26px 40px rgba(30,64,175,0.22); color: #0b1b3a; font-size: 48px; }
+    #s15-winc i { font-style: normal; color: #2563eb; }
+    #s15-wst { left: 628px; top: 1226px; }
+    #s15-wstr { transform: rotate(-7deg); }
+    #s15-wstc { display: flex; align-items: center; gap: 12px; height: 108px; padding: 0 30px 0 26px; border-radius: 54px; background: #2563eb; border: 8px solid #ffffff;
+                box-shadow: 0 12px 0 #1e40af, 0 28px 44px rgba(15,23,42,0.28); color: #ffffff; font-size: 54px; }
+    #s15-wstc i { font-style: normal; color: #bfdbfe; }
+    #s15-ft { top: 1394px; }
+    #s15-ftx { padding: 0 24px; border-radius: 26px; background: rgba(255,255,255,0.86); font-size: 30px; line-height: 50px; color: #33415c; box-shadow: 0 8px 20px rgba(30,64,175,0.14); }
+    #s15-ftx b { color: #2563eb; }
+    #s15-sc { top: 1514px; }
+    #s15-scx { padding: 0 22px; border-radius: 24px; background: rgba(255,255,255,0.72); font-size: 30px; line-height: 48px; color: #33415c; }
+    #s15-scx i { font-style: normal; color: #2563eb; }
+  </style>
+  <div id="root" data-composition-id="s15" data-width="1080" data-height="1920">
+    <div id="s15-flip">
+      <div id="s15-cam">
+        <div id="s15-bob">
+          <canvas id="s15-cv" width="1080" height="1920"></canvas>
+          <div class="s15-t s15-fn" id="s15-fnp" data-layout-ignore>20%</div>
+          <div class="s15-t s15-fn" id="s15-fnm" data-layout-ignore style="color: #ffffff;">30%</div>
+          <div class="s15-pw s15-lb" id="s15-lbp"><div class="s15-hop" id="s15-lbph"><div class="s15-box s15-sky s15-t">VOL YOU PAID</div></div></div>
+          <div class="s15-pw s15-lb" id="s15-lbm"><div class="s15-hop" id="s15-lbmh"><div class="s15-box s15-t">HOW MUCH IT MOVED</div></div></div>
+          <div class="s15-pw s15-ctr" id="s15-fw"><div class="s15-hop" id="s15-fh"><div class="s15-box">
+            <div class="s15-t" id="s15-l1">Daily hedged P&amp;L ≈</div>
+            <div class="s15-t" id="s15-l2" data-layout-ignore><span>½</span><svg class="s15-gs" width="38" height="47" viewBox="0 0 40 50"><path d="M8 45.5 V4.5 H34" fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" /></svg><span>S²</span><span class="s15-pa">(</span><span class="s15-hw" id="s15-mv"><i class="s15-chip" id="s15-mvc"></i><b id="s15-mvt">move²</b></span><span>−</span><span class="s15-hw" id="s15-sg"><i class="s15-chip" id="s15-sgc"></i><b id="s15-sgt"><svg class="s15-gs" width="39" height="35" viewBox="0 0 41 37"><circle cx="17" cy="21" r="11.5" fill="none" stroke="currentColor" stroke-width="8" /><path d="M17 9.5 H37" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round" /></svg><span>²/252</span></b></span><span class="s15-pa">)</span></div>
+          </div></div></div>
+          <div class="s15-pw s15-ctr" id="s15-win"><div class="s15-hop" id="s15-winh"><div id="s15-winr"><div class="s15-t" id="s15-winc">
+            <span>MOVED</span><i>&gt;</i><span>PAID</span></div></div></div></div>
+          <div class="s15-pw" id="s15-wst"><div class="s15-hop" id="s15-wsth"><div id="s15-wstr"><div class="s15-t" id="s15-wstc">
+            <i>→</i><span>WIN</span>
+            <svg width="50" height="50" viewBox="0 0 40 40"><path d="M8 21 L17 30 L33 11" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" /></svg></div></div></div></div>
+          <div class="s15-pw s15-ctr" id="s15-sc"><div class="s15-t" id="s15-scx">height: <i>1 block = 10% vol</i> · dashed = the vol you paid</div></div>
+          <div class="s15-pw s15-ctr" id="s15-ft"><div class="s15-t" id="s15-ftx"><b>+₹3,964</b> · mean, simulated, 1,000 calls</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      /*DATA*/ const DUR = 3.01; const W = [0.16, 0.31, 0.41, 0.63, 0.91, 1.11, 1.25, 1.35, 1.73, 1.97, 2.15, 2.53, 2.67]; /*END*/
+      // words: 0 If 1 the 2 stock 3 moves 4 more 5 than 6 the 7 volatility 8 you 9 paid 10 for, 11 you 12 win.
+// ISO KIT v1: isometric toy-world drawing on a 2D canvas, matching the Flow dioramas' look.
+// Copy this block verbatim into a scene's <script> (inside its IIFE). World units: x to the right-back, y to the left-back,
+// z up. P(x, y, z) -> frame px. Visible faces of a box: top, the face at y+d (front-left) and the face at x+w (front-right).
+// Draw back to front: sort what you draw by (x + y) ascending, then z ascending (painter's order).
+const ISO = (function () {
+  const C30 = Math.cos(Math.PI / 6), S30 = 0.5;
+  const MAT = {
+    white: { top: "#ffffff", left: "#e3ebfb", right: "#c9d8f5" },
+    blue:  { top: "#7fb0ff", left: "#3b82f6", right: "#2563eb" },
+    navy:  { top: "#4f6fe0", left: "#1e40af", right: "#1e3a8a" },
+    sky:   { top: "#dbeafe", left: "#bfdbfe", right: "#93c5fd" },
+    rose:  { top: "#fda4af", left: "#f43f5e", right: "#e11d48" },
+    gold:  { top: "#fde68a", left: "#f59e0b", right: "#d97706" },
+    grey:  { top: "#f1f5f9", left: "#cbd5e1", right: "#94a3b8" },
+    wood:  { top: "#f3c58f", left: "#d99a5b", right: "#b97a3f" },
+  };
+  function make(g, ox, oy, u) {
+    const P = (x, y, z) => [ox + (x - y) * C30 * u, oy + (x + y) * S30 * u - (z || 0) * u];
+    function poly(pts, fill, stroke, lw) {
+      g.beginPath(); pts.forEach(([a, b], i) => (i ? g.lineTo(a, b) : g.moveTo(a, b))); g.closePath();
+      if (fill) { g.fillStyle = fill; g.fill(); }
+      if (stroke) { g.strokeStyle = stroke; g.lineWidth = lw || 1.5; g.stroke(); }
+    }
+    function box(x, y, z, w, d, h, mat, edge) {
+      if (h <= 0 || w <= 0 || d <= 0) return;
+      edge = edge === undefined ? "rgba(15,35,90,0.14)" : edge;
+      poly([P(x, y + d, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x, y + d, z + h)], mat.left, edge);
+      poly([P(x + w, y, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x + w, y, z + h)], mat.right, edge);
+      poly([P(x, y, z + h), P(x + w, y, z + h), P(x + w, y + d, z + h), P(x, y + d, z + h)], mat.top, edge);
+    }
+    // a soft contact shadow on the floor plane z
+    function shadow(x, y, z, w, d, a) {
+      const c = P(x + w / 2, y + d / 2, z); const rx = (w + d) * C30 * u * 0.55, ry = (w + d) * S30 * u * 0.55;
+      const gr = g.createRadialGradient(c[0], c[1], 0, c[0], c[1], rx);
+      gr.addColorStop(0, `rgba(30,64,175,${a || 0.18})`); gr.addColorStop(1, "rgba(30,64,175,0)");
+      g.save(); g.translate(c[0], c[1]); g.scale(1, ry / rx); g.translate(-c[0], -c[1]);
+      g.fillStyle = gr; g.beginPath(); g.arc(c[0], c[1], rx, 0, 6.2832); g.fill(); g.restore();
+    }
+    // the floating platform: white top slab, blue band, white band, blue base (like the dioramas), its top at z = 0
+    function platform(x, y, w, d) {
+      box(x, y, -1.5, w, d, 0.42, MAT.blue);
+      box(x, y, -1.08, w, d, 0.3, MAT.white);
+      box(x, y, -0.78, w, d, 0.28, MAT.blue);
+      box(x, y, -0.5, w, d, 0.5, MAT.white);
+    }
+    // a 2D affine matrix that maps a flat w x h DOM element onto a face given three projected corners (TL, TR, BL)
+    function faceMatrix(tl, tr, bl, w, h) {
+      const a = (tr[0] - tl[0]) / w, b = (tr[1] - tl[1]) / w, c = (bl[0] - tl[0]) / h, d = (bl[1] - tl[1]) / h;
+      return `matrix(${a.toFixed(5)},${b.toFixed(5)},${c.toFixed(5)},${d.toFixed(5)},${tl[0].toFixed(2)},${tl[1].toFixed(2)})`;
+    }
+    return { P, poly, box, shadow, platform, faceMatrix, u };
+  }
+  return { make, MAT };
+})();
+      const w = (i) => Math.max(0, W.length > i ? W[i] : 0.16 + i * 0.21);
+      const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+      const tl = gsap.timeline({ paused: true });
+
+      // ---- the set: two vol columns on one platform. Height scale: 1 unit = 5% vol, one block = 2 units = 10% vol.
+      //      VOL YOU PAID 20% = 4 units (sky), HOW MUCH IT MOVED 30% = 6 units (blue); the mean simulated result at 30% is +₹3,964.
+      const U = 48, SZ = 8.4, CW = 3.0, PER = 5;
+      const cv = document.getElementById("s15-cv"), g = cv.getContext("2d");
+      const K = ISO.make(g, 540, 1014, U), MAT = ISO.MAT, P = K.P;
+      const PAID = { x: 0.9, y: 4.5, h: 20 / PER, mat: MAT.sky, fn: document.getElementById("s15-fnp") };
+      const MOVED = { x: 4.5, y: 0.9, h: 30 / PER, mat: MAT.blue, fn: document.getElementById("s15-fnm") };
+
+      // ---- timing
+      const TG = w(3) - 0.04, TGD = 0.5;          // "moves": the moved column grows
+      const TM = w(4) - 0.02;                     // "more": the part above the paid level lights up
+      const TV = w(7) - 0.04, TP = w(9) - 0.04;   // "volatility you paid": the paid column hops
+      const TW = w(12);                           // "win."
+      const TS = w(10) + 0.02;                    // "for,": the WIN stamp lands
+      const backOut = (p, s) => { const q = p - 1; return 1 + (s + 1) * q * q * q + s * q * q; };
+      // the paid column's two blocks drop in with a bounce during the flip
+      function dropZ(t, t0) {
+        const p = clamp((t - t0) / 0.3, 0, 1);
+        if (p < 0.62) { const k = p / 0.62; return 7 * (1 - k * k); }
+        const k = (p - 0.62) / 0.38; return 0.55 * Math.sin(Math.PI * k) * (1 - k * 0.3);
+      }
+      function hopZ(t, t0, a) { const p = (t - t0) / 0.3; return p <= 0 || p >= 1 ? 0 : a * Math.sin(Math.PI * p); }
+
+      function seam(x, y, w, z) {
+        const a = P(x, y + w, z), b = P(x + w, y + w, z), c = P(x + w, y, z);
+        g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); g.lineTo(c[0], c[1]); g.stroke();
+      }
+      function mapNum(C, zTop, alpha) {
+        const tlp = P(C.x + 0.15, C.y + CW, zTop - 0.18), trp = P(C.x + CW - 0.15, C.y + CW, zTop - 0.18), blp = P(C.x + 0.15, C.y + CW, zTop - 1.85);
+        C.fn.style.transform = K.faceMatrix(tlp, trp, blp, 130, 80);
+        C.fn.style.opacity = alpha.toFixed(3);
+      }
+      const LIGHT = { top: "#a9c9ff", left: "#60a5fa", right: "#3b82f6" };
+      const mixHex = (a, b, k) => "#" + [1, 3, 5].map((i) => Math.round(parseInt(a.substr(i, 2), 16) * (1 - k) + parseInt(b.substr(i, 2), 16) * k).toString(16).padStart(2, "0")).join("");
+
+      const st = { t: 0 };
+      function draw() {
+        const t = st.t;
+        g.clearRect(0, 0, 1080, 1920);
+        K.shadow(0, 0, -1.7, SZ, SZ, 0.2);
+        K.platform(0, 0, SZ, SZ);
+        // the paid column (drawn first: same depth as the moved one, they do not overlap on screen)
+        const hp = hopZ(t, TV, 0.35) + hopZ(t, TP, 0.3);
+        const z1 = dropZ(t, 0.06), z2 = dropZ(t, 0.16);
+        K.shadow(PAID.x, PAID.y, 0, CW, CW, 0.22 * clamp(1 - z1 / 7, 0, 1));
+        K.box(PAID.x, PAID.y, z1 + hp, CW, CW, 2, PAID.mat);
+        K.box(PAID.x, PAID.y, 2 + z2 + hp, CW, CW, 2, PAID.mat);
+        mapNum(PAID, 4 + z2 + hp, clamp((t - 0.3) / 0.12, 0, 1));
+        // the moved column grows with an overshoot on "moves"; its top block (above the paid level) lights on "more"
+        const gp = clamp((t - TG) / TGD, 0, 1);
+        const hm = MOVED.h * backOut(gp, 2.2);
+        const hj = hopZ(t, TW - 0.06, 0.5);
+        if (hm > 0.01) {
+          K.shadow(MOVED.x, MOVED.y, 0, CW, CW, 0.22);
+          const low = Math.min(hm, 4);
+          K.box(MOVED.x, MOVED.y, hj, CW, CW, low, MOVED.mat);
+          if (hm > 4) {
+            const glow = clamp((t - TM) / 0.15, 0, 1) * (0.55 + 0.45 * Math.cos(clamp((t - TM) / 0.5, 0, 1) * Math.PI * 2) * (1 - clamp((t - TM) / 0.5, 0, 1)));
+            const m = glow > 0 ? { top: mixHex(MOVED.mat.top, LIGHT.top, glow), left: mixHex(MOVED.mat.left, LIGHT.left, glow), right: mixHex(MOVED.mat.right, LIGHT.right, glow) } : MOVED.mat;
+            K.box(MOVED.x, MOVED.y, 4 + hj, CW, CW, hm - 4, m);
+          }
+          g.strokeStyle = "rgba(255,255,255,0.75)"; g.lineWidth = 3;
+          if (hm > 2.05) seam(MOVED.x, MOVED.y, CW, 2 + hj);
+          // the paid level, dashed, on "more"
+          const lv = clamp((t - TM) / 0.2, 0, 1);
+          if (hm > 4.05 && lv > 0) {
+            g.save(); g.setLineDash([12, 9]); g.strokeStyle = "rgba(11,27,58," + (0.85 * lv).toFixed(3) + ")"; g.lineWidth = 4;
+            seam(MOVED.x, MOVED.y, CW, 4 + hj); g.restore();
+          } else if (hm > 4.05) { seam(MOVED.x, MOVED.y, CW, 4 + hj); }
+          mapNum(MOVED, hm + hj, clamp((gp - 0.55) / 0.2, 0, 1));
+        } else mapNum(MOVED, 0.1, 0);
+        g.strokeStyle = "rgba(255,255,255,0.85)"; g.lineWidth = 3;
+        if (z2 < 0.05) seam(PAID.x, PAID.y, CW, 2 + hp);
+        confetti(t);
+      }
+
+      // ---- seeded confetti out of the moved column's top on "win." (mulberry32), never into the caption zone
+      function mulberry32(a) { return function () { a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+      const rnd = mulberry32(1515);
+      const COLS = ["#2563eb", "#3b82f6", "#93c5fd", "#f59e0b", "#fbbf24", "#ffffff", "#2563eb", "#f59e0b"];
+      const TOP = P(MOVED.x + CW / 2, MOVED.y + CW / 2, MOVED.h), T0 = TW - 0.08, GRAV = 2600, DRAG = 3.2;
+      const bits = [];
+      for (let i = 0; i < 90; i++) {
+        const side = rnd() < 0.5 ? -1 : 1, ang = (-90 + side * (28 + rnd() * 58)) * Math.PI / 180, sp = 850 + rnd() * 900;
+        bits.push({ x0: TOP[0] + (rnd() * 2 - 1) * 60, y0: TOP[1] + (rnd() * 2 - 1) * 20, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp, t0: T0 + rnd() * 0.06,
+                    w: 10 + rnd() * 12, h: 6 + rnd() * 8, r0: rnd() * 6.28, spin: (rnd() * 2 - 1) * 14, col: COLS[Math.floor(rnd() * COLS.length)],
+                    kind: rnd() < 0.25 ? 1 : 0, flip: 6 + rnd() * 10 });
+      }
+      const cf = g;   // confetti shares the scene canvas, drawn last (above the columns, below the signboards)
+      function cube(x, y, s, col) {
+        const h = s * 0.58;
+        cf.fillStyle = "#ffffff"; cf.beginPath(); cf.moveTo(x, y - h); cf.lineTo(x + s, y); cf.lineTo(x, y + h); cf.lineTo(x - s, y); cf.closePath(); cf.fill();
+        cf.fillStyle = col; cf.beginPath(); cf.moveTo(x - s, y); cf.lineTo(x, y + h); cf.lineTo(x, y + h + s); cf.lineTo(x - s, y + s); cf.closePath(); cf.fill();
+        cf.fillStyle = "#1e40af"; cf.beginPath(); cf.moveTo(x + s, y); cf.lineTo(x, y + h); cf.lineTo(x, y + h + s); cf.lineTo(x + s, y + s); cf.closePath(); cf.fill();
+      }
+      function confetti(t) {
+        for (const b of bits) {
+          const dt = t - b.t0;
+          if (dt <= 0) continue;
+          const k = (1 - Math.exp(-DRAG * dt)) / DRAG;
+          const x = b.x0 + b.vx * k, y = b.y0 + (b.vy - GRAV / DRAG) * k + (GRAV / DRAG) * dt;
+          const a = Math.min(1, dt / 0.04) * clamp((y - 610) / 50, 0, 1);
+          if (a <= 0) continue;
+          cf.globalAlpha = a;
+          if (b.kind === 1) cube(x, y, b.w * 0.55, b.col === "#ffffff" ? "#3b82f6" : b.col);
+          else { cf.save(); cf.translate(x, y); cf.rotate(b.r0 + b.spin * dt); cf.scale(1, Math.cos(b.flip * dt)); cf.fillStyle = b.col; cf.fillRect(-b.w / 2, -b.h / 2, b.w, b.h); cf.restore(); }
+        }
+        cf.globalAlpha = 1;
+      }
+
+      // ---- camera: the cube flip in (no flip out: the tile cascade covers this cut), slow push; the bob lives in the proxy tween
+      tl.fromTo("#s15-flip", { rotationY: -90, scale: 0.94 }, { rotationY: 0, scale: 1, duration: 0.36, ease: "power3.out" }, 0);
+      tl.fromTo("#s15-cam", { scale: 1 }, { scale: 1.04, duration: DUR, ease: "sine.inOut" }, 0);
+      const pop = (sel, t, d) => tl.fromTo(sel, { opacity: 0, scale: 0.3, y: 24 }, { opacity: 1, scale: 1, y: 0, duration: d || 0.4, ease: "back.out(2.8)" }, t);
+      const hop = (sel, t, h, sq) => {
+        tl.fromTo(sel, { y: 0 }, { y: -h, duration: 0.11, ease: "power2.out", immediateRender: false }, t);
+        tl.fromTo(sel, { y: -h }, { y: 0, duration: 0.12, ease: "power2.in", immediateRender: false }, t + 0.11);
+        tl.fromTo(sel, { scaleY: sq, scaleX: 1 + (1 - sq) * 0.6 }, { scaleY: 1, scaleX: 1, duration: 0.3, ease: "back.out(3)", immediateRender: false }, t + 0.23);
+      };
+      // the formula board and the paid label arrive with the set; the moved label pops as its column grows
+      tl.fromTo("#s15-fw", { opacity: 0, scale: 0.5, y: 24 }, { opacity: 1, scale: 1, y: 0, duration: 0.4, ease: "back.out(1.7)" }, 0.2);
+      pop("#s15-lbp", 0.32, 0.36);
+      pop("#s15-lbm", TG + 0.06, 0.36);
+      // "moves": move² lights blue with the moved column
+      tl.fromTo("#s15-mvc", { opacity: 0, scale: 0.3 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(3)" }, TG);
+      tl.fromTo("#s15-mvt", { color: "#0b1b3a" }, { color: "#ffffff", duration: 0.08 }, TG + 0.03);
+      hop("#s15-mv", TG + 0.2, 12, 1);
+      // "volatility you paid": σ²/252 lights sky with the paid column, the paid label hops on "paid"
+      tl.fromTo("#s15-sgc", { opacity: 0, scale: 0.3 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(3)" }, TV);
+      hop("#s15-sg", TV + 0.16, 12, 1);
+      hop("#s15-lbph", TP, 14, 0.86);
+      // "more": MOVED > PAID pops; "volatility": the +₹3,964 footnote; "for,": the WIN stamp thumps on (the tile cascade
+      // covers this cut's last 0.3 s, so the stamp lands half a second before "win."); "win.": confetti and the moved label hops
+      pop("#s15-win", TM + 0.08, 0.36);
+      tl.fromTo("#s15-ft", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.24, ease: "power2.out" }, TV);
+      tl.fromTo("#s15-wst", { opacity: 0, scale: 2.2, y: -40 }, { opacity: 1, scale: 1, y: 0, duration: 0.16, ease: "power3.in" }, TS - 0.16);
+      tl.fromTo("#s15-wsth", { scaleY: 0.78, scaleX: 1.12 }, { scaleY: 1, scaleX: 1, duration: 0.26, ease: "back.out(3)", immediateRender: false }, TS);
+      hop("#s15-winh", TS + 0.02, 10, 0.9);
+      tl.fromTo("#s15-sc", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, 0.5);
+      hop("#s15-lbmh", TW - 0.08, 14, 0.86);
+
+      const bob = document.getElementById("s15-bob");
+      tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: () => { bob.style.transform = "translateY(" + (-8 * Math.sin((2 * Math.PI * st.t) / 3)).toFixed(2) + "px)"; draw(); } }, 0);
+      draw();
+      window.__timelines["s15"] = tl;
+    })();
+  </script>
+</template>

@@ -1,0 +1,233 @@
+<template>
+  <style>
+    @font-face { font-family: "Fredoka"; font-weight: 400; src: url("assets/fonts/fredoka-400.woff2"); }
+    @font-face { font-family: "Fredoka"; font-weight: 700; src: url("assets/fonts/fredoka-700.woff2"); }
+    @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
+    @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
+    #root { position: absolute; inset: 0; overflow: hidden; perspective: 2400px; perspective-origin: 540px 1150px; }
+    #s5-flip, #s5-cam, #s5-bob { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #s5-flip { transform-origin: 540px 1150px; }
+    #s5-cam { transform-origin: 540px 1000px; }
+    #s5-cv { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    .s5-t { font-family: "Fredoka", "D2QSans", "JetBrains Mono", sans-serif; color: #0b1b3a; white-space: nowrap; }
+    /* text mapped onto the block faces */
+    .s5-map { position: absolute; left: 0; top: 0; transform-origin: 0 0; color: #ffffff; text-align: center; }
+    #s5-sft { position: absolute; left: 0; right: 0; top: 10px; font-weight: 700; font-size: 30px; line-height: 32px; letter-spacing: 0.02em; color: #bfdbfe; }
+    #s5-sfv { position: absolute; left: 0; right: 0; top: 42px; font-weight: 700; font-size: 54px; line-height: 56px; }
+    #s5-pfv { position: absolute; left: 0; right: 0; top: 0; bottom: 0; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 58px; }
+    /* signboards on projected points: .s5-anc is the point, .s5-ctr centres the board above it */
+    .s5-anc { position: absolute; left: 0; top: 0; width: 0; height: 0; }
+    .s5-ctr { position: absolute; left: -200px; width: 400px; bottom: 0; display: flex; justify-content: center; }
+    .s5-ctr.s5-dn { bottom: auto; top: 0; }
+    .s5-sb { position: relative; background: #ffffff; border-radius: 24px; box-shadow: 0 10px 0 #2563eb, 0 24px 36px rgba(30,64,175,0.22);
+             opacity: 0; transform-origin: 50% 100%; text-align: center; padding: 8px 20px 12px; }
+    .s5-sb.s5-r { box-shadow: 0 10px 0 #e11d48, 0 24px 36px rgba(159,18,57,0.22); }
+    .s5-nm { font-weight: 700; font-size: 30px; line-height: 34px; letter-spacing: 0.08em; }
+    .s5-v { font-weight: 700; font-size: 50px; line-height: 56px; color: #2563eb; }
+    .s5-sb.s5-r .s5-v { color: #e11d48; }
+    #s5-netv { display: flex; align-items: center; justify-content: center; gap: 6px; }
+    #s5-net { padding: 8px 16px 12px; }
+    #s5-netv svg { width: 40px; height: 40px; flex: none; }
+    #s5-chk { stroke-dasharray: 26; stroke-dashoffset: 26; }
+    #s5-up { display: flex; align-items: center; gap: 10px; height: 76px; padding: 0 26px 0 22px; border-radius: 38px; background: #2563eb; color: #ffffff;
+             font-weight: 700; font-size: 50px; line-height: 76px; box-shadow: 0 10px 0 #1e40af, 0 24px 36px rgba(30,64,175,0.25);
+             opacity: 0; transform-origin: 50% 100%; }
+    #s5-up svg { width: 34px; height: 34px; }
+    #s5-note { height: 54px; padding: 0 22px; border-radius: 27px; background: rgba(255,255,255,0.86); font-weight: 400; font-size: 30px; line-height: 54px;
+               box-shadow: 0 6px 0 #bfdbfe; opacity: 0; transform-origin: 50% 0%; }
+    #s5-note b { font-weight: 700; }
+  </style>
+  <div id="root" data-composition-id="s5" data-width="1080" data-height="1920">
+    <div id="s5-flip">
+      <div id="s5-cam">
+        <div id="s5-bob">
+          <canvas id="s5-cv" width="1080" height="1920"></canvas>
+          <div class="s5-map s5-t" id="s5-sf" data-layout-ignore><div id="s5-sft">STOCK</div><div id="s5-sfv">100</div></div>
+          <div class="s5-map s5-t" id="s5-pf" data-layout-ignore><div id="s5-pfv">102</div></div>
+          <div class="s5-anc" id="s5-aup"><div class="s5-ctr"><div class="s5-t" id="s5-up"><svg viewBox="0 0 24 24"><path d="M12 20 V5 M5.5 11 L12 4.5 L18.5 11" fill="none" stroke="#ffffff" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" /></svg>+2%</div></div></div>
+          <div class="s5-anc" id="s5-ac"><div class="s5-ctr"><div class="s5-sb s5-t" id="s5-call"><div class="s5-nm">CALL</div><div class="s5-v">+1.12</div></div></div></div>
+          <div class="s5-anc" id="s5-ah"><div class="s5-ctr"><div class="s5-sb s5-r s5-t" id="s5-hedge"><div class="s5-nm">HEDGE</div><div class="s5-v">−1.08</div></div></div></div>
+          <div class="s5-anc" id="s5-an"><div class="s5-ctr"><div class="s5-sb s5-t" id="s5-net"><div class="s5-nm">NET</div><div class="s5-v" id="s5-netv">+0.04<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#2563eb" /><path id="s5-chk" d="M6.5 12.5 L10.5 16.5 L17.5 8" fill="none" stroke="#ffffff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" /></svg></div></div></div></div>
+          <div class="s5-anc" id="s5-ano"><div class="s5-ctr s5-dn"><div class="s5-t" id="s5-note">scale: <b>1.00 = 3 units</b></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      /*DATA*/ const DUR = 6.9; const W = [0.16, 0.74, 0.86, 1.1, 1.44, 2.41, 2.48, 2.7, 3.08, 4.31, 4.4, 4.5, 4.78, 5.2, 6.41, 6.52, 6.7]; /*END*/
+      // words: 0 Now 1 the 2 stock 3 jumps 4 2%. 5 The 6 call 7 gains 8 1.12, 9 and 10 the 11 hedge 12 loses 13 1.08. 14 So 15 you're 16 up.
+// ISO KIT v1: isometric toy-world drawing on a 2D canvas, matching the Flow dioramas' look.
+// Copy this block verbatim into a scene's <script> (inside its IIFE). World units: x to the right-back, y to the left-back,
+// z up. P(x, y, z) -> frame px. Visible faces of a box: top, the face at y+d (front-left) and the face at x+w (front-right).
+// Draw back to front: sort what you draw by (x + y) ascending, then z ascending (painter's order).
+const ISO = (function () {
+  const C30 = Math.cos(Math.PI / 6), S30 = 0.5;
+  const MAT = {
+    white: { top: "#ffffff", left: "#e3ebfb", right: "#c9d8f5" },
+    blue:  { top: "#7fb0ff", left: "#3b82f6", right: "#2563eb" },
+    navy:  { top: "#4f6fe0", left: "#1e40af", right: "#1e3a8a" },
+    sky:   { top: "#dbeafe", left: "#bfdbfe", right: "#93c5fd" },
+    rose:  { top: "#fda4af", left: "#f43f5e", right: "#e11d48" },
+    gold:  { top: "#fde68a", left: "#f59e0b", right: "#d97706" },
+    grey:  { top: "#f1f5f9", left: "#cbd5e1", right: "#94a3b8" },
+    wood:  { top: "#f3c58f", left: "#d99a5b", right: "#b97a3f" },
+  };
+  function make(g, ox, oy, u) {
+    const P = (x, y, z) => [ox + (x - y) * C30 * u, oy + (x + y) * S30 * u - (z || 0) * u];
+    function poly(pts, fill, stroke, lw) {
+      g.beginPath(); pts.forEach(([a, b], i) => (i ? g.lineTo(a, b) : g.moveTo(a, b))); g.closePath();
+      if (fill) { g.fillStyle = fill; g.fill(); }
+      if (stroke) { g.strokeStyle = stroke; g.lineWidth = lw || 1.5; g.stroke(); }
+    }
+    function box(x, y, z, w, d, h, mat, edge) {
+      if (h <= 0 || w <= 0 || d <= 0) return;
+      edge = edge === undefined ? "rgba(15,35,90,0.14)" : edge;
+      poly([P(x, y + d, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x, y + d, z + h)], mat.left, edge);
+      poly([P(x + w, y, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x + w, y, z + h)], mat.right, edge);
+      poly([P(x, y, z + h), P(x + w, y, z + h), P(x + w, y + d, z + h), P(x, y + d, z + h)], mat.top, edge);
+    }
+    // a soft contact shadow on the floor plane z
+    function shadow(x, y, z, w, d, a) {
+      const c = P(x + w / 2, y + d / 2, z); const rx = (w + d) * C30 * u * 0.55, ry = (w + d) * S30 * u * 0.55;
+      const gr = g.createRadialGradient(c[0], c[1], 0, c[0], c[1], rx);
+      gr.addColorStop(0, `rgba(30,64,175,${a || 0.18})`); gr.addColorStop(1, "rgba(30,64,175,0)");
+      g.save(); g.translate(c[0], c[1]); g.scale(1, ry / rx); g.translate(-c[0], -c[1]);
+      g.fillStyle = gr; g.beginPath(); g.arc(c[0], c[1], rx, 0, 6.2832); g.fill(); g.restore();
+    }
+    // the floating platform: white top slab, blue band, white band, blue base (like the dioramas), its top at z = 0
+    function platform(x, y, w, d) {
+      box(x, y, -1.5, w, d, 0.42, MAT.blue);
+      box(x, y, -1.08, w, d, 0.3, MAT.white);
+      box(x, y, -0.78, w, d, 0.28, MAT.blue);
+      box(x, y, -0.5, w, d, 0.5, MAT.white);
+    }
+    // a 2D affine matrix that maps a flat w x h DOM element onto a face given three projected corners (TL, TR, BL)
+    function faceMatrix(tl, tr, bl, w, h) {
+      const a = (tr[0] - tl[0]) / w, b = (tr[1] - tl[1]) / w, c = (bl[0] - tl[0]) / h, d = (bl[1] - tl[1]) / h;
+      return `matrix(${a.toFixed(5)},${b.toFixed(5)},${c.toFixed(5)},${d.toFixed(5)},${tl[0].toFixed(2)},${tl[1].toFixed(2)})`;
+    }
+    return { P, poly, box, shadow, platform, faceMatrix, u };
+  }
+  return { make, MAT };
+})();
+
+      const w = (i) => Math.max(0, W.length > i ? W[i] : 0.3 + i * 0.4);
+      const tl = gsap.timeline({ paused: true });
+      const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+      const backOut = (p, s) => { p = clamp(p, 0, 1); const q = p - 1; return q * q * ((s + 1) * q + s) + 1; };
+      const bounceOut = (p) => {
+        p = clamp(p, 0, 1); const n = 7.5625, d = 2.75;
+        if (p < 1 / d) return n * p * p;
+        if (p < 2 / d) { p -= 1.5 / d; return n * p * p + 0.75; }
+        if (p < 2.5 / d) { p -= 2.25 / d; return n * p * p + 0.9375; }
+        p -= 2.625 / d; return n * p * p + 0.984375;
+      };
+      const squash = (t, ti, amt, dur) => { const p = (t - ti) / dur; return p < 0 || p > 1 ? 1 : 1 - amt * Math.sin(p * Math.PI * 3) * Math.exp(-p * 4.2); };
+      const hop = (t, t0, d, h) => { const p = (t - t0) / d; return p < 0 || p > 1 ? 0 : h * Math.sin(Math.PI * p); };
+
+      // ---- the world: left, the price step (STOCK 100 block, then a blue step block up to 102); right, three P&L columns ----
+      const U = 48, OX = 520, OY = 815;
+      const g = document.getElementById("s5-cv").getContext("2d");
+      const K = ISO.make(g, OX, OY, U), MAT = ISO.MAT, P = K.P;
+      const STK = { x: 0.4, y: 7.2, w: 2.4, d: 2.4, h: 2.2 };          // the STOCK 100 block
+      const STP = { x: 0.4, y: 4.8, w: 2.4, d: 2.4, h: 3.2 };          // the step it climbs to: 102 (an illustration of the move, not to scale)
+      // P&L per share for a +2% day: call +1.1189, hedge −1.0797, net +0.0393; column height = 3 units per 1.00 (honest scale)
+      const SCALE = 3, CW = 1.4;
+      const COLS = [
+        { c: [5.04, 5.16], v: 1.1189267924240838, mat: MAT.blue, id: "s5-ac" },
+        { c: [7.025, 3.175], v: 1.079655674554058, mat: MAT.rose, id: "s5-ah" },
+        { c: [9.2, 0.8], v: 0.039271117870025796, mat: MAT.blue, id: "s5-an" },
+      ];
+
+      // ---- beats ----
+      const tDrop = 0.06, dDrop = 0.6;                                          // the STOCK block lands as the shot flips in
+      const tHop = Math.max(0.6, w(2) - 0.06);                                  // it hops on "stock"
+      const tR0 = Math.max(tHop + 0.2, w(3) - 0.02), tR1 = Math.max(tR0 + 0.25, w(4) + 0.02);   // the step rises over "jumps 2%."
+      const grow = [
+        [Math.max(tR1 + 0.4, w(7) - 0.05), w(8) + 0.02],                        // CALL lands on "1.12,"
+        [Math.max(w(8) + 0.6, w(12) - 0.02), w(13) + 0.02],                     // HEDGE lands on "1.08."
+        [Math.max(w(13) + 0.6, w(14) - 0.12), Math.max(w(13) + 0.85, w(15) - 0.02)], // NET grows on "So you're", its tick on "up."
+      ];
+
+      // entrance flip and a slow push
+      tl.fromTo("#s5-flip", { rotationY: -90, scale: 0.94 }, { rotationY: 0, scale: 1, duration: 0.36, ease: "power3.out" }, 0);
+      tl.fromTo("#s5-cam", { scale: 1 }, { scale: 1.04, duration: DUR, ease: "none" }, 0);
+      // +2% pill pops on "2%."
+      tl.fromTo("#s5-up", { opacity: 0, scale: 0.3, y: 30 }, { opacity: 1, scale: 1, y: 0, duration: 0.32, ease: "back.out(2.8)" }, tR1 - 0.06);
+      // column boards pop as each column lands
+      ["#s5-call", "#s5-hedge", "#s5-net"].forEach((id, k) => {
+        const t1 = grow[k][1];
+        tl.fromTo(id, { opacity: 0, scale: 0.3, y: 24 }, { opacity: 1, scale: 1, y: 0, duration: 0.3, ease: "back.out(2.8)" }, t1 - 0.12);
+        tl.fromTo(id, { scaleX: 1, scaleY: 1 }, { scaleX: 1.08, scaleY: 0.86, duration: 0.07, ease: "power2.out", immediateRender: false }, t1 + 0.18);
+        tl.fromTo(id, { scaleX: 1.08, scaleY: 0.86 }, { scaleX: 1, scaleY: 1, duration: 0.28, ease: "back.out(3)", immediateRender: false }, t1 + 0.25);
+      });
+      tl.fromTo("#s5-chk", { strokeDashoffset: 26 }, { strokeDashoffset: 0, duration: 0.18, ease: "power2.out" }, grow[2][1] + 0.04);
+      tl.fromTo("#s5-note", { opacity: 0, scale: 0.4, y: -12 }, { opacity: 1, scale: 1, y: 0, duration: 0.3, ease: "back.out(2.4)" }, grow[0][1] + 0.3);
+
+      // static anchors
+      const place = (id, p) => { const e = document.getElementById(id); e.style.left = p[0].toFixed(1) + "px"; e.style.top = p[1].toFixed(1) + "px"; };
+      place("s5-aup", P(STP.x + STP.w / 2, STP.y + STP.d / 2, STP.h + 0.35));
+      place("s5-ano", P(11.4, 8.6, -1.5));
+      const sf = document.getElementById("s5-sf"), pf = document.getElementById("s5-pf"), bob = document.getElementById("s5-bob");
+      const SFW = STK.w * U, SFH = STK.h * U, PFW = STP.d * U, PFH = STP.h * U;
+      sf.style.width = SFW + "px"; sf.style.height = SFH + "px"; pf.style.width = PFW + "px"; pf.style.height = PFH + "px";
+      const anc = COLS.map((c) => document.getElementById(c.id));
+
+      function floorShadow() {
+        const cx = OX + 40, cy = OY + 10 * U + 1.5 * U + 70, rx = 460, ry = 120;
+        g.save(); g.translate(cx, cy); g.scale(1, ry / rx);
+        const gr = g.createRadialGradient(0, 0, 0, 0, 0, rx);
+        gr.addColorStop(0, "rgba(37,99,235,0.30)"); gr.addColorStop(0.55, "rgba(37,99,235,0.12)"); gr.addColorStop(1, "rgba(37,99,235,0)");
+        g.fillStyle = gr; g.beginPath(); g.arc(0, 0, rx, 0, 6.2832); g.fill(); g.restore();
+      }
+      // a box squashed about its base centre
+      const sbox = (b, z, h, sx, mat) => { const wq = b.w * sx, dq = b.d * sx; K.box(b.x + (b.w - wq) / 2, b.y + (b.d - dq) / 2, z, wq, dq, h, mat); };
+
+      function draw(t) {
+        bob.style.transform = "translateY(" + (-8 * Math.sin((2 * Math.PI * (t + 2.2)) / 3)).toFixed(2) + "px)";
+        g.clearRect(0, 0, 1080, 1920);
+        floorShadow();
+        K.shadow(0, 0, -1.6, 10, 10, 0.2);
+        K.platform(0, 0, 10, 10);
+        // column sockets on the platform
+        for (const c of COLS) {
+          const x0 = c.c[0] - CW / 2 - 0.12, y0 = c.c[1] - CW / 2 - 0.12, s = CW + 0.24;
+          K.poly([P(x0, y0, 0), P(x0 + s, y0, 0), P(x0 + s, y0 + s, 0), P(x0, y0 + s, 0)], "#e6eefd", "rgba(37,99,235,0.28)", 2);
+        }
+        // the step block rises over "jumps 2%."
+        const pr = (t - tR0) / (tR1 - tR0), hs = pr <= 0 ? 0 : STP.h * backOut(pr, 1.5);
+        K.shadow(STP.x, STP.y, 0, STP.w, STP.d, 0.16);
+        if (hs > 0.02) K.box(STP.x, STP.y, 0, STP.w, STP.d, hs, MAT.blue);
+        else K.poly([P(STP.x, STP.y, 0), P(STP.x + STP.w, STP.y, 0), P(STP.x + STP.w, STP.y + STP.d, 0), P(STP.x, STP.y + STP.d, 0)], "#e6eefd", "rgba(37,99,235,0.28)", 2);
+        const xr = STP.x + STP.w;
+        pf.style.opacity = clamp((pr - 0.45) / 0.3, 0, 1).toFixed(3);
+        pf.style.transform = K.faceMatrix(P(xr, STP.y + STP.d, hs), P(xr, STP.y, hs), P(xr, STP.y + STP.d, 0), PFW, PFH);
+        // the STOCK 100 block: drops in, hops on "stock"
+        const pd = (t - tDrop) / dDrop, zb = (pd < 1 ? 7 * (1 - bounceOut(pd)) : 0) + hop(t, tHop, 0.34, 0.8);
+        const bz = squash(t, tDrop + dDrop / 2.75, 0.16, 0.4) * squash(t, tHop + 0.34, 0.14, 0.4), bx = 1 + (1 - bz) * 0.5;
+        K.shadow(STK.x, STK.y, 0, STK.w, STK.d, 0.22 * clamp(1 - zb / 8, 0.25, 1));
+        sbox(STK, zb, STK.h * bz, bx, MAT.navy);
+        const wq = STK.w * bx, x0 = STK.x + (STK.w - wq) / 2, yf = STK.y + (STK.d + STK.d * bx) / 2;
+        sf.style.transform = K.faceMatrix(P(x0, yf, zb + STK.h * bz), P(x0 + wq, yf, zb + STK.h * bz), P(x0, yf, zb), SFW, SFH);
+        // the P&L columns grow with an overshoot; their boards ride on the tops
+        COLS.forEach((c, k) => {
+          const [t0, t1] = grow[k], p = (t - t0) / (t1 - t0), H = c.v * SCALE, h = p <= 0 ? 0 : H * backOut(p, 1.8);
+          if (h > 0.004) {
+            K.shadow(c.c[0] - CW / 2, c.c[1] - CW / 2, 0, CW, CW, 0.18);
+            K.box(c.c[0] - CW / 2, c.c[1] - CW / 2, 0, CW, CW, h, c.mat);
+          }
+          const a = P(c.c[0], c.c[1], Math.max(h, H) + 0.3);
+          anc[k].style.left = a[0].toFixed(1) + "px"; anc[k].style.top = a[1].toFixed(1) + "px";
+        });
+      }
+      const st = { t: 0 };
+      tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: () => draw(st.t) }, 0);
+      draw(0);
+
+      // exit: cube flip into s6
+      tl.fromTo("#s5-flip", { rotationY: 0 }, { rotationY: 90, duration: 0.26, ease: "power2.in", immediateRender: false }, DUR - 0.26);
+      window.__timelines["s5"] = tl;
+    })();
+  </script>
+</template>

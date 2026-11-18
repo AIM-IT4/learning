@@ -1,0 +1,127 @@
+<template>
+  <style>
+    @font-face { font-family: "Fredoka"; font-weight: 400; src: url("assets/fonts/fredoka-400.woff2"); }
+    @font-face { font-family: "Fredoka"; font-weight: 700; src: url("assets/fonts/fredoka-700.woff2"); }
+    @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
+    @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
+    #root { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+    #ov-brand { position: absolute; left: 0; right: 0; top: 40px; height: 70px; display: flex; justify-content: center; align-items: center; }
+    #ov-pill { display: flex; align-items: center; gap: 12px; height: 64px; padding: 0 12px 0 10px; background: #ffffff; border-radius: 32px;
+               box-shadow: 0 6px 0 #2563eb, 0 14px 26px rgba(30,64,175,0.18); }
+    #ov-pill img { width: 44px; height: 44px; border-radius: 12px; }
+    #ov-pill span { font: 700 30px/1 "Fredoka", "D2QSans", sans-serif; color: #0b1b3a; }
+    #ov-day { font: 700 21px/1 "Fredoka", sans-serif; letter-spacing: 0.05em; color: #ffffff; background: #2563eb; padding: 9px 13px; border-radius: 16px; }
+    #ov-caps { position: absolute; left: 50px; top: 150px; width: 980px; height: 390px; }
+    .ov-cap { position: absolute; left: 0; top: 0; width: 980px; height: 390px; display: flex; align-items: center; justify-content: center; opacity: 0; }
+    .ov-cap p { margin: 0; text-align: center; font-family: "Fredoka", "D2QSans", "JetBrains Mono", sans-serif; font-weight: 700;
+                line-height: 1.16; letter-spacing: -0.01em; color: #0b1b3a; }
+    .ov-cap .w { display: inline-block; opacity: 0; padding: 0 6px 2px; border-radius: 16px; }
+    .ov-cap .a { color: #2563eb; }
+    .ov-cap .r { color: #e11d48; }
+    .ov-cap .h { font-size: 1.22em; }
+    .ov-stk-wrap { position: absolute; left: 0; top: 150px; width: 1080px; height: 390px; display: flex; align-items: center; justify-content: center; }
+    .ov-stk { display: inline-block; opacity: 0; white-space: nowrap; font-family: "Fredoka", "D2QSans", "JetBrains Mono", sans-serif; font-weight: 700;
+              line-height: 1; color: #ffffff; background: #2563eb; border: 9px solid #ffffff; border-radius: 40px; padding: 10px 40px 22px;
+              box-shadow: 0 16px 0 #1e40af, 0 34px 56px rgba(15,23,42,0.28); }
+    .ov-stk.R { background: #e11d48; box-shadow: 0 16px 0 #9f1239, 0 34px 56px rgba(15,23,42,0.28); }
+    #ov-wipe { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+  </style>
+  <div id="root" data-composition-id="ov" data-width="1080" data-height="1920">
+    <div id="ov-caps" data-layout-allow-overlap></div>
+    <div id="ov-heroes" data-layout-allow-overlap></div>
+    <div id="ov-brand"><div id="ov-pill"><img src="assets/logo.png" alt="" /><span>Desk2Quant</span><b id="ov-day">DAY 10/30</b></div></div>
+    <canvas id="ov-wipe" width="1080" height="1920"></canvas>
+  </div>
+  <script>
+    (function () {
+      /*DATA*/ const DUR = 84.0; const LINES = [{"id": "L1", "tok": ["You", "know", "how", "to", "delta-hedge."], "acc": [4], "rose": [], "on": [-0.06, 0.32, 0.6, 0.82, 0.98], "hero": {"i": 4, "size": 150}, "theme": "L"}, {"id": "L2a", "tok": ["Then", "the", "interviewer", "asks:"], "acc": [], "rose": [], "on": [2.02, 2.38, 2.42, 2.96], "hero": null, "theme": "L"}, {"id": "L2b", "tok": ["your", "hedge", "is", "perfect,", "so", "why", "does", "your", "P&L", "still", "move", "every", "day?"], "acc": [8], "rose": [], "on": [3.59, 3.72, 3.94, 4.08, 4.58, 4.78, 4.98, 5.14, 5.26, 5.7, 6.02, 6.38, 6.56], "hero": {"i": 10, "size": 260}, "theme": "L"}, {"id": "L3a", "tok": ["You", "own", "a", "call."], "acc": [], "rose": [], "on": [7.29, 7.42, 7.6, 7.72], "hero": {"i": 3, "size": 280}, "theme": "L"}, {"id": "L3b", "tok": ["The", "stock", "is", "at", "100,", "the", "strike", "is", "100,"], "acc": [4, 8], "rose": [], "on": [8.24, 8.34, 8.56, 8.72, 8.82, 9.49, 9.62, 9.84, 10.02], "hero": null, "theme": "L"}, {"id": "L3c", "tok": ["volatility", "is", "20%,", "and", "it", "expires", "in", "one", "year."], "acc": [2], "rose": [], "on": [10.76, 11.14, 11.5, 12.39, 12.48, 12.58, 13.04, 13.22, 13.42], "hero": null, "theme": "L"}, {"id": "L4", "tok": ["Its", "delta", "is", "0.54,", "so", "you", "hedge", "by", "shorting", "0.54", "shares."], "acc": [9], "rose": [], "on": [14.19, 14.36, 14.64, 14.94, 16.16, 16.38, 16.52, 16.8, 17.02, 17.42, 18.4], "hero": {"i": 3, "size": 300}, "theme": "L"}, {"id": "L5", "tok": ["Now", "the", "stock", "jumps", "2%."], "acc": [], "rose": [], "on": [19.14, 19.72, 19.84, 20.08, 20.42], "hero": {"i": 4, "size": 320}, "theme": "L"}, {"id": "L6", "tok": ["The", "call", "gains", "1.12,", "and", "the", "hedge", "loses", "1.08.", "So", "you're", "up."], "acc": [3], "rose": [8], "on": [21.39, 21.46, 21.68, 22.06, 23.29, 23.38, 23.48, 23.76, 24.18, 25.39, 25.5, 25.68], "hero": {"i": 11, "size": 300}, "theme": "L"}, {"id": "L7", "tok": ["If", "the", "stock", "drops", "2%", "instead,", "you're", "still", "up."], "acc": [8], "rose": [3], "on": [26.04, 26.42, 26.52, 26.76, 27.08, 27.44, 28.08, 28.28, 28.46], "hero": null, "theme": "L"}, {"id": "L8", "tok": ["You", "win", "both", "ways.", "Why?"], "acc": [3], "rose": [], "on": [29.14, 29.28, 29.52, 29.78, 30.39], "hero": {"i": 2, "size": 300}, "theme": "L"}, {"id": "L9", "tok": ["Because", "the", "call's", "price", "is", "a", "curve,", "not", "a", "straight", "line."], "acc": [], "rose": [], "on": [30.9, 31.3, 31.44, 31.74, 32.0, 32.2, 32.34, 32.89, 33.06, 33.18, 33.36], "hero": {"i": 6, "size": 280}, "theme": "L"}, {"id": "L10", "tok": ["When", "the", "stock", "rises,", "delta", "grows.", "When", "it", "falls,", "delta", "shrinks."], "acc": [5], "rose": [10], "on": [33.94, 34.22, 34.32, 34.56, 35.24, 35.42, 36.04, 36.16, 36.26, 36.82, 37.02], "hero": null, "theme": "L"}, {"id": "L11", "tok": ["That", "bend", "is", "gamma."], "acc": [], "rose": [], "on": [37.84, 38.04, 38.36, 38.64], "hero": {"i": 3, "size": 280}, "theme": "L"}, {"id": "L12a", "tok": ["But", "nothing", "is", "free."], "acc": [], "rose": [], "on": [39.29, 39.42, 39.66, 39.86], "hero": {"i": 3, "size": 300}, "theme": "L"}, {"id": "L12b", "tok": ["Every", "day,", "the", "call", "loses", "a", "little", "value.", "That's", "theta."], "acc": [], "rose": [4], "on": [40.56, 40.76, 40.98, 41.18, 41.4, 41.74, 42.04, 42.22, 42.89, 43.26], "hero": {"i": 9, "size": 280}, "theme": "L"}, {"id": "L13", "tok": ["On", "a", "thousand", "calls,", "it", "costs", "you", "about", "₹16", "a", "day."], "acc": [], "rose": [8], "on": [43.84, 44.12, 44.24, 44.48, 45.0, 45.08, 45.38, 45.56, 45.8, 46.52, 46.72], "hero": {"i": 8, "size": 320, "c": "r"}, "theme": "L"}, {"id": "L14", "tok": ["So", "when", "do", "you", "actually", "win?"], "acc": [5], "rose": [], "on": [47.14, 47.52, 47.68, 47.78, 47.88, 48.2], "hero": null, "theme": "L"}, {"id": "L15", "tok": ["When", "the", "stock", "moves", "more", "than", "1.26%", "in", "a", "day,", "up", "or", "down."], "acc": [], "rose": [], "on": [48.74, 48.86, 48.98, 49.22, 49.52, 49.7, 49.82, 50.92, 51.16, 51.26, 51.64, 51.8, 51.88], "hero": {"i": 6, "size": 260}, "theme": "L"}, {"id": "L16", "tok": ["That's", "20%", "divided", "by", "16.", "Traders", "call", "it", "the", "rule", "of", "16."], "acc": [9], "rose": [], "on": [52.38, 52.72, 53.16, 53.52, 53.76, 54.56, 54.84, 55.06, 55.18, 55.34, 55.54, 55.66], "hero": {"i": 11, "size": 360}, "theme": "L"}, {"id": "L17", "tok": ["Now", "simulate", "a", "year", "of", "daily", "hedging."], "acc": [], "rose": [], "on": [56.34, 56.7, 57.08, 57.34, 57.58, 57.74, 57.98], "hero": {"i": 3, "size": 300}, "theme": "L"}, {"id": "L18", "tok": ["Big", "days", "pay", "you,", "and", "quiet", "days", "cost", "you", "rent."], "acc": [2], "rose": [9], "on": [58.74, 58.88, 59.14, 59.38, 59.68, 59.86, 60.16, 60.44, 60.72, 60.86], "hero": null, "theme": "L"}, {"id": "L19", "tok": ["If", "the", "stock", "really", "moves", "20%", "a", "year,", "you", "end", "up", "near", "zero."], "acc": [], "rose": [], "on": [61.29, 61.6, 61.7, 61.92, 62.18, 62.52, 62.98, 63.16, 63.54, 63.64, 63.84, 63.96, 64.1], "hero": {"i": 12, "size": 300}, "theme": "L"}, {"id": "L20", "tok": ["At", "30%,", "you", "profit.", "At", "10%,", "you", "lose."], "acc": [3], "rose": [7], "on": [64.74, 64.86, 65.32, 65.6, 66.19, 66.36, 66.78, 67.04], "hero": null, "theme": "L"}, {"id": "L21", "tok": ["So", "here's", "the", "answer:", "a", "delta-hedged", "call", "is", "a", "bet", "on", "volatility."], "acc": [], "rose": [], "on": [67.69, 67.82, 68.1, 68.2, 68.76, 68.98, 69.52, 69.78, 69.98, 70.08, 70.32, 70.54], "hero": {"i": 11, "size": 165}, "theme": "L"}, {"id": "L22", "tok": ["Gamma", "earns,", "theta", "eats."], "acc": [1], "rose": [3], "on": [71.5, 71.8, 72.44, 72.62], "hero": {"i": 1, "size": 300}, "theme": "L"}, {"id": "L23", "tok": ["If", "the", "stock", "moves", "more", "than", "the", "volatility", "you", "paid", "for,", "you", "win."], "acc": [], "rose": [], "on": [73.29, 73.44, 73.54, 73.76, 74.04, 74.24, 74.38, 74.48, 74.86, 75.1, 75.28, 75.66, 75.8], "hero": {"i": 12, "size": 320}, "theme": "L"}, {"id": "L24", "tok": ["Comment", "GREEKS,", "and", "we'll", "DM", "you", "the", "free", "Greeks", "Cheat", "Sheet."], "acc": [1], "rose": [], "on": [76.3, 76.74, 77.1, 77.3, 77.5, 77.72, 77.88, 78.02, 78.24, 78.56, 78.78], "hero": null, "theme": "L"}, {"id": "L25", "tok": ["Save", "this,", "share", "it,", "and", "follow", "Desk2Quant", "for", "Day", "11."], "acc": [6], "rose": [], "on": [79.22, 79.62, 79.94, 80.2, 80.34, 80.5, 80.78, 81.42, 81.58, 81.72], "hero": null, "theme": "L"}]; const CUTS = [[1.86, "L", "flip"], [7.13, "L", "flip"], [14.03, "L", "flip"], [18.98, "L", "flip"], [25.88, "L", "flip"], [30.74, "L", "tiles"], [39.13, "L", "flip"], [43.68, "L", "flip"], [46.98, "L", "flip"], [52.22, "L", "flip"], [56.18, "L", "tiles"], [61.13, "L", "flip"], [67.53, "L", "flip"], [73.13, "L", "flip"], [76.14, "L", "tiles"]]; /*END*/
+      const tl = gsap.timeline({ paused: true });
+      const capsEl = document.getElementById("ov-caps"), heroesEl = document.getElementById("ov-heroes");
+      const sizeFor = (n) => (n <= 30 ? 86 : n <= 44 ? 76 : n <= 58 ? 68 : 62);
+      const HL = "rgba(59,130,246,0.18)", HL0 = "rgba(59,130,246,0)";
+
+      // captions: every word bounces in on its spoken onset and wears a soft blue highlight while it is being said;
+      // the hero word pops up as a big 3D sticker over the dimmed line, then the line comes back with it at 1.22x
+      LINES.forEach((L, li) => {
+        const cap = document.createElement("div"); cap.className = "ov-cap"; cap.id = "ov-c" + L.id;
+        const p = document.createElement("p"); cap.appendChild(p);
+        p.style.fontSize = sizeFor(L.tok.join(" ").length) + "px";
+        const H = L.hero;
+        const spans = L.tok.map((w, i) => {
+          const s = document.createElement("span");
+          s.className = "w" + (L.acc.includes(i) ? " a" : "") + (L.rose.includes(i) ? " r" : "") + (H && i === H.i ? " h" : "");
+          s.textContent = w; p.appendChild(s);
+          if (i < L.tok.length - 1) p.appendChild(document.createTextNode(" "));
+          return s;
+        });
+        capsEl.appendChild(cap);
+        const t0 = L.on[0];
+        const next = li + 1 < LINES.length ? LINES[li + 1].on[0] : DUR + 1;
+        const hideT = next - 0.1;
+        const th = H ? L.on[H.i] : null;
+        const backT = H ? Math.max(th + 0.12, Math.min(th + 0.6, hideT - 0.3)) : null;
+        const outD = H ? Math.max(0.06, Math.min(0.24, hideT - 0.02 - backT)) : null;
+        tl.fromTo(cap, { opacity: 0 }, { opacity: 1, duration: 0.01 }, Math.max(0, t0 - 0.08));
+        spans.forEach((s, i) => {
+          const at = Math.max(0, H && i === H.i ? backT + 0.02 : L.on[i] - 0.04);
+          tl.fromTo(s, { opacity: 0, scale: 0.45, y: 26 }, { opacity: 1, scale: 1, y: 0, duration: 0.3, ease: "back.out(3)" }, at);
+          // karaoke highlight from this word's onset to the next word's (or 0.45 s for the last word)
+          const on = Math.max(0, L.on[i] - 0.02), off = i + 1 < L.on.length ? L.on[i + 1] - 0.02 : Math.min(L.on[i] + 0.45, hideT - 0.05);
+          if (off - on > 0.08) {
+            tl.fromTo(s, { backgroundColor: HL0 }, { backgroundColor: HL, duration: 0.06, immediateRender: false }, on);
+            tl.fromTo(s, { backgroundColor: HL }, { backgroundColor: HL0, duration: 0.1, immediateRender: false }, Math.max(on + 0.07, off - 0.1));
+          }
+        });
+        if (H) {
+          const wrap = document.createElement("div"); wrap.className = "ov-stk-wrap";
+          const h = document.createElement("div"); h.className = "ov-stk" + (H.c === "r" ? " R" : ""); h.id = "ov-h" + L.id;
+          const raw = L.tok[H.i];
+          h.textContent = raw.replace(/[,:?!]+$/, "").replace(/\.$/, () => (/[a-z]\.$/i.test(raw) ? "." : ""));
+          h.style.fontSize = Math.round(H.size * 0.62) + "px";
+          wrap.appendChild(h); heroesEl.appendChild(wrap);
+          tl.fromTo(cap, { opacity: 1 }, { opacity: 0.22, duration: 0.12, immediateRender: false }, th - 0.06);
+          const inD = Math.max(0.08, Math.min(0.34, backT - (th - 0.02) - 0.01));   // the pop-in always ends before the pop-out starts
+          tl.fromTo(h, { opacity: 0, scale: 0.2, rotation: -16, y: 40 }, { opacity: 1, scale: 1, rotation: -5, y: 0, duration: inD, ease: "back.out(2.6)", immediateRender: false }, th - 0.02);
+          tl.fromTo(h, { opacity: 1, scale: 1, rotation: -5 }, { opacity: 0, scale: 0.3, rotation: 8, duration: outD, ease: "back.in(2)", immediateRender: false }, backT);
+          const restD = Math.min(0.2, hideT - backT - 0.05);
+          if (restD > 0.01) tl.fromTo(cap, { opacity: 0.22 }, { opacity: 1, duration: restD, immediateRender: false }, backT + 0.02);
+        }
+        if (li + 1 < LINES.length) tl.fromTo(cap, { opacity: 1 }, { opacity: 0, duration: 0.01, immediateRender: false }, hideT);
+      });
+
+      // section cuts ("tiles"): isometric diamond tiles flip in along a diagonal, cover the cut, then flip away
+      const g = document.getElementById("ov-wipe").getContext("2d");
+      function mulberry32(a) { return function () { a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+      const rnd = mulberry32(23);
+      const TW = 64, TH = 37, tiles = [];
+      for (let r = -1; r < 1920 / TH + 2; r++) for (let c = -1; c < 1080 / (2 * TW) + 2; c++) {
+        const cx = c * 2 * TW + (r % 2 ? TW : 0), cy = r * TH;
+        const k = (cx / 1080) * 0.55 + ((1920 - cy) / 1920) * 0.45 + rnd() * 0.12;
+        const col = ["#ffffff", "#dbeafe", "#3b82f6", "#2563eb", "#ffffff", "#bfdbfe"][Math.floor(rnd() * 6)];
+        tiles.push({ cx, cy, k: k / 1.12, col });
+      }
+      const st = { t: 0 };
+      function draw() {
+        const t = st.t;
+        g.clearRect(0, 0, 1080, 1920);
+        CUTS.forEach(([tc, th, kind]) => {
+          if (kind !== "tiles") return;
+          const a = tc - 0.3, b = tc + 0.32;
+          if (t < a || t > b) return;
+          for (const q of tiles) {
+            let s;
+            if (t < tc) { const e = (t - a) / (tc - a) * 1.25; s = Math.max(0, Math.min(1, (e - q.k) / 0.25)); }
+            else { const e = (t - tc) / (b - tc) * 1.25; s = 1 - Math.max(0, Math.min(1, (e - q.k) / 0.25)); }
+            if (s <= 0) continue;
+            const w = TW * s, h = TH * s;
+            g.fillStyle = q.col;
+            g.beginPath(); g.moveTo(q.cx, q.cy - h); g.lineTo(q.cx + w, q.cy); g.lineTo(q.cx, q.cy + h); g.lineTo(q.cx - w, q.cy); g.closePath(); g.fill();
+          }
+        });
+      }
+      tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: draw }, 0);
+      window.__timelines["ov"] = tl;
+    })();
+  </script>
+</template>

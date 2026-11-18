@@ -1,0 +1,131 @@
+<template>
+  <style>
+    @font-face { font-family: "Fredoka"; font-weight: 400; src: url("assets/fonts/fredoka-400.woff2"); }
+    @font-face { font-family: "Fredoka"; font-weight: 700; src: url("assets/fonts/fredoka-700.woff2"); }
+    @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
+    @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
+    #root { position: absolute; inset: 0; overflow: hidden; perspective: 2400px; perspective-origin: 540px 1150px; }
+    #s1-flip, #s1-cam, #s1-drop, #s1-bob { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #s1-flip { transform-origin: 540px 1150px; }
+    #s1-cam { transform-origin: 557px 760px; }
+    #s1-drop { transform-origin: 540px 1452px; }
+    #s1-dio { position: absolute; left: 0; top: -8px; width: 1080px; height: 1935px; }
+    /* the two desk monitors, mapped from measured screen corners (built at 2x, transformed down onto the glass) */
+    .s1-scr { position: absolute; left: 0; top: 0; transform-origin: 0 0; overflow: hidden; border-radius: 5px;
+              font-family: "Fredoka", "D2QSans", "JetBrains Mono", sans-serif; }
+    /* left monitor: TL (434.5,859.1) TR (531.6,808.8) BL (434.5,927.9) */
+    #s1-scrL { width: 218px; height: 140px; transform: matrix(0.44509, -0.23046, 0, 0.49136, 434.53, 859.07); }
+    /* right monitor: TL (549.8,806.2) TR (680.6,807.6) BL (549.8,875.1) */
+    #s1-scrR { width: 262px; height: 138px; transform: matrix(0.49920, 0.00538, 0, 0.49935, 549.84, 806.22); }
+    .s1-sbg { position: absolute; inset: 0; opacity: 0; background: linear-gradient(180deg, #ffffff 0%, #e6efff 100%); }
+    .s1-bar { position: absolute; left: 0; right: 0; top: 0; height: 42px; display: flex; align-items: center; justify-content: center;
+              background: #2563eb; color: #ffffff; font-weight: 700; font-size: 27px; letter-spacing: 0.03em; white-space: nowrap; opacity: 0; }
+    .s1-val { position: absolute; left: 0; right: 0; top: 46px; height: 90px; display: flex; align-items: center; justify-content: center; gap: 8px;
+              font-weight: 700; font-size: 60px; line-height: 1; color: #2563eb; white-space: nowrap; opacity: 0; }
+    .s1-val i { font-style: normal; font-family: "JetBrains Mono", sans-serif; font-weight: 800; font-size: 40px; color: #0b1b3a; }
+    .s1-val.R { color: #e11d48; }
+    /* floating signboards above the desk */
+    #s1-netw { position: absolute; left: 307px; top: 686px; width: 500px; height: 100px; display: flex; justify-content: center; }
+    #s1-net { display: flex; align-items: center; gap: 18px; height: 92px; padding: 0 30px 0 32px; background: #ffffff; border-radius: 26px;
+              box-shadow: 0 10px 0 #2563eb, 0 24px 36px rgba(30,64,175,0.22); transform-origin: 50% 100%; opacity: 0; }
+    .s1-nl { font: 700 34px/1 "Fredoka", "D2QSans", "JetBrains Mono", sans-serif; color: #2563eb; letter-spacing: 0.03em; white-space: nowrap; }
+    .s1-nl i { font-style: normal; font-family: "JetBrains Mono", sans-serif; font-weight: 800; }
+    .s1-num { display: flex; align-items: center; height: 66px; font: 700 66px/66px "Fredoka", "D2QSans", "JetBrains Mono", sans-serif; color: #0b1b3a; }
+    #s1-sgn { display: inline-block; width: 38px; overflow: hidden; text-align: center; color: #2563eb; }
+    .s1-reel { display: inline-block; width: 40px; height: 66px; overflow: hidden; text-align: center; }
+    .s1-strip { display: block; }
+    .s1-strip span { display: block; height: 66px; }
+    #s1-okw { position: absolute; left: 257px; top: 592px; width: 600px; height: 76px; display: flex; justify-content: center; }
+    #s1-ok { display: inline-flex; align-items: center; gap: 12px; height: 72px; padding: 0 30px 0 36px; border-radius: 36px; background: #2563eb;
+             color: #ffffff; font: 700 44px/1 "Fredoka", "D2QSans", "JetBrains Mono", sans-serif; letter-spacing: 0.04em; white-space: nowrap;
+             box-shadow: 0 10px 0 #1e40af, 0 24px 36px rgba(30,64,175,0.25); transform-origin: 50% 100%; opacity: 0; }
+    #s1-ok svg { width: 44px; height: 44px; }
+    #s1-chk { stroke-dasharray: 26; stroke-dashoffset: 26; }
+  </style>
+  <div id="root" data-composition-id="s1" data-width="1080" data-height="1920">
+    <div id="s1-flip">
+      <div id="s1-cam">
+        <div id="s1-drop">
+          <div id="s1-bob">
+            <img id="s1-dio" src="assets/plates/i01.png" alt="" />
+            <div class="s1-scr" id="s1-scrL" data-layout-ignore>
+              <div class="s1-sbg"></div>
+              <div class="s1-bar">LONG 1 CALL</div>
+              <div class="s1-val"><i>Δ</i>+0.54</div>
+            </div>
+            <div class="s1-scr" id="s1-scrR" data-layout-ignore>
+              <div class="s1-sbg"></div>
+              <div class="s1-bar">SHORT 0.54 sh</div>
+              <div class="s1-val R"><i>Δ</i>−0.54</div>
+            </div>
+          </div>
+        </div>
+        <div id="s1-netw">
+          <div id="s1-net">
+            <span class="s1-nl">NET <i>Δ</i></span>
+            <span class="s1-num" data-layout-ignore><span id="s1-sgn">+</span><span class="s1-reel"><span class="s1-strip" id="s1-r0"></span></span>.<span class="s1-reel"><span class="s1-strip" id="s1-r1"></span></span><span class="s1-reel"><span class="s1-strip" id="s1-r2"></span></span></span>
+          </div>
+        </div>
+        <div id="s1-okw">
+          <div id="s1-ok">HEDGED<svg viewBox="0 0 24 24"><path id="s1-chk" d="M4.5 12.5 L10 18 L19.5 6.5" fill="none" stroke="#ffffff" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" /></svg></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      /*DATA*/ const DUR = 1.86; const W = [-0.06, 0.32, 0.6, 0.82, 0.98]; /*END*/
+      // words: 0 You 1 know 2 how 3 to 4 delta-hedge.
+      const w = (i) => Math.max(0, W.length > i ? W[i] : 0.2 + i * 0.2);
+      const tl = gsap.timeline({ paused: true });
+      const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+      // camera: the hook moves from frame 1, the diorama drops in from above and lands with a squash; slow push throughout
+      tl.fromTo("#s1-cam", { scale: 1 }, { scale: 1.04, duration: DUR, ease: "none" }, 0);
+      tl.fromTo("#s1-drop", { y: -700 }, { y: 0, duration: 0.6, ease: "back.out(1.6)" }, 0);
+      tl.fromTo("#s1-drop", { scaleX: 1, scaleY: 1 }, { scaleX: 1.05, scaleY: 0.9, duration: 0.08, ease: "power2.out" }, 0.2);
+      tl.fromTo("#s1-drop", { scaleX: 1.05, scaleY: 0.9 }, { scaleX: 1, scaleY: 1, duration: 0.42, ease: "back.out(3)", immediateRender: false }, 0.28);
+
+      // the monitors switch on: the long call on "know", the short hedge on "how"
+      const screenOn = (id, t) => {
+        tl.fromTo(`#${id} .s1-sbg`, { opacity: 0 }, { opacity: 1, duration: 0.1, ease: "power1.out" }, t);
+        tl.fromTo(`#${id} .s1-bar`, { opacity: 0, y: -42 }, { opacity: 1, y: 0, duration: 0.18, ease: "back.out(2.5)" }, t + 0.03);
+        tl.fromTo(`#${id} .s1-val`, { opacity: 0, scale: 0.35 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2.8)" }, t + 0.07);
+      };
+      screenOn("s1-scrL", Math.max(0.3, w(1) - 0.02));
+      screenOn("s1-scrR", Math.max(0.56, w(2) + 0.02));
+
+      // NET Δ signboard pops above the desk reading +0.54, then rolls down to 0.00 and lands on "delta-hedge."
+      const R0 = Math.max(0.7, w(2) + 0.1), R1 = Math.max(R0 + 0.12, w(4));
+      tl.fromTo("#s1-net", { opacity: 0, scale: 0.3, y: 30 }, { opacity: 1, scale: 1, y: 0, duration: 0.32, ease: "back.out(2.6)" }, 0.44);
+      tl.fromTo("#s1-net", { scaleX: 1, scaleY: 1 }, { scaleX: 1.07, scaleY: 0.85, duration: 0.07, ease: "power2.out", immediateRender: false }, R1);
+      tl.fromTo("#s1-net", { scaleX: 1.07, scaleY: 0.85 }, { scaleX: 1, scaleY: 1, duration: 0.34, ease: "back.out(3)", immediateRender: false }, R1 + 0.07);
+
+      // HEDGED ✓ pill pops on top on W[4], the tick draws itself
+      tl.fromTo("#s1-ok", { opacity: 0, scale: 0.25, y: 34, rotation: -10 }, { opacity: 1, scale: 1, y: 0, rotation: -2, duration: 0.34, ease: "back.out(2.8)" }, w(4) - 0.02);
+      tl.fromTo("#s1-ok", { scaleX: 1, scaleY: 1 }, { scaleX: 1.07, scaleY: 0.86, duration: 0.07, ease: "power2.out", immediateRender: false }, w(4) + 0.32);
+      tl.fromTo("#s1-ok", { scaleX: 1.07, scaleY: 0.86 }, { scaleX: 1, scaleY: 1, duration: 0.3, ease: "back.out(3)", immediateRender: false }, w(4) + 0.39);
+      tl.fromTo("#s1-chk", { strokeDashoffset: 26 }, { strokeDashoffset: 0, duration: 0.2, ease: "power2.out" }, w(4) + 0.14);
+
+      // odometer reels and the diorama bob, as pure functions of time
+      const reels = [0, 1, 2].map((k) => document.getElementById("s1-r" + k));
+      reels.forEach((r) => { for (let d = 0; d <= 9; d++) { const e = document.createElement("span"); e.textContent = String(d); r.appendChild(e); } });
+      const sgn = document.getElementById("s1-sgn"), bob = document.getElementById("s1-bob");
+      function draw(t) {
+        bob.style.transform = "translateY(" + (-8 * Math.sin((2 * Math.PI * t) / 3)).toFixed(2) + "px)";
+        const p = clamp((t - R0) / (R1 - R0), 0, 1), e = 1 - Math.pow(1 - p, 3);
+        const pos = [0, 5 * (1 - e), 4 * (1 - e)];
+        reels.forEach((r, k) => { r.style.transform = "translateY(" + (-pos[k] * 66).toFixed(1) + "px)"; });
+        sgn.style.opacity = (1 - e).toFixed(3);
+        sgn.style.width = (38 * (1 - e)).toFixed(1) + "px";
+      }
+      const st = { t: 0 };
+      tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: () => draw(st.t) }, 0);
+      draw(0);
+
+      // exit: cube flip into s2
+      tl.fromTo("#s1-flip", { rotationY: 0 }, { rotationY: 90, duration: 0.26, ease: "power2.in", immediateRender: false }, DUR - 0.26);
+      window.__timelines["s1"] = tl;
+    })();
+  </script>
+</template>

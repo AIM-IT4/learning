@@ -1,0 +1,288 @@
+<template>
+  <style>
+    @font-face { font-family: "Fredoka"; font-weight: 400; src: url("assets/fonts/fredoka-400.woff2"); }
+    @font-face { font-family: "Fredoka"; font-weight: 700; src: url("assets/fonts/fredoka-700.woff2"); }
+    @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
+    @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
+    #root { position: absolute; inset: 0; overflow: hidden; perspective: 2400px; perspective-origin: 540px 1150px; }
+    #s9-flip, #s9-cam, #s9-bob { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #s9-flip { transform-origin: 540px 1150px; }
+    #s9-cam { transform-origin: 540px 860px; }
+    #s9-cv { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    .s9-t { font-family: "Fredoka", "D2QSans", "JetBrains Mono", sans-serif; font-weight: 700; color: #0b1b3a; white-space: nowrap; }
+    .s9-pw { position: absolute; opacity: 0; transform-origin: 50% 100%; }
+    .s9-hop { position: absolute; inset: 0; transform-origin: 50% 100%; }
+    .s9-card { position: absolute; inset: 0; background: #ffffff; border-radius: 28px; box-shadow: 0 10px 0 #2563eb, 0 24px 36px rgba(30,64,175,0.22); }
+    /* "x 1,000 calls" signboard over the ten stacks */
+    #s9-mul { left: 92px; top: 612px; width: 372px; height: 132px; }
+    #s9-mulx { position: absolute; left: 0; right: 0; top: 12px; display: flex; justify-content: center; align-items: baseline; gap: 12px; font-size: 60px; line-height: 70px; }
+    #s9-mulx b { color: #2563eb; font-size: 58px; }
+    #s9-muls { position: absolute; left: 0; right: 0; top: 82px; text-align: center; font-size: 30px; line-height: 34px; font-weight: 400; color: #334155; }
+    #s9-tail { position: absolute; left: 236px; top: 128px; width: 44px; height: 30px; overflow: visible; }
+    /* the register's face label, mapped onto the body's front-left face every frame */
+    #s9-face { position: absolute; left: 0; top: 0; width: 202px; height: 58px; transform-origin: 0 0; opacity: 0; display: flex; align-items: center;
+               justify-content: center; font-size: 42px; line-height: 1; letter-spacing: 0.12em; color: #ffffff; }
+    /* the receipt: a paper strip standing in the diagonal plane of the register's slot, so it faces the camera; it feeds up out of the slot */
+    #s9-rcw { position: absolute; left: 567px; top: 718px; width: 286px; height: 338px; overflow: hidden; }
+    #s9-rc { position: absolute; left: 0; top: 0; width: 286px; height: 338px; }
+    #s9-paper { position: absolute; inset: 0; background: linear-gradient(90deg, #eef3fc 0%, #ffffff 9%, #ffffff 91%, #e9effb 100%); }
+    #s9-rch { position: absolute; left: 0; right: 0; top: 30px; text-align: center; font-size: 32px; line-height: 36px; letter-spacing: 0.14em; color: #2563eb; }
+    .s9-rule { position: absolute; left: 20px; right: 20px; height: 0; border-top: 4px dashed #c3d3f0; }
+    .s9-row { position: absolute; left: 22px; right: 22px; font-size: 40px; line-height: 46px; }
+    #s9-r1 { top: 96px; text-align: left; }
+    #s9-r2 { top: 144px; text-align: right; }
+    #s9-tot { position: absolute; left: 0; right: 0; top: 216px; text-align: center; font-size: 62px; line-height: 72px; color: #e11d48; letter-spacing: -0.01em; transform-origin: 50% 60%; }
+    #s9-day { position: absolute; left: 0; right: 0; top: 286px; text-align: center; font-size: 32px; line-height: 36px; color: #0b1b3a; }
+    #s9-lip { position: absolute; left: 0; right: 0; bottom: 0; height: 16px; background: linear-gradient(180deg, rgba(30,58,138,0) 0%, rgba(30,58,138,0.22) 100%); }
+    /* "≈ ₹16" stamp */
+    #s9-stw { position: absolute; left: 806px; top: 982px; width: 184px; height: 90px; opacity: 0; transform-origin: 30% 60%; }
+    #s9-st { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; border-radius: 30px; background: #e11d48; border: 6px solid #ffffff;
+             box-shadow: 0 9px 0 #9f1239, 0 20px 30px rgba(159,18,57,0.28); font-size: 48px; line-height: 1; color: #ffffff; transform-origin: 50% 100%; }
+  </style>
+  <div id="root" data-composition-id="s9" data-width="1080" data-height="1920">
+    <div id="s9-flip">
+      <div id="s9-cam">
+        <div id="s9-bob">
+          <canvas id="s9-cv" width="1080" height="1920"></canvas>
+          <div class="s9-t" id="s9-face" data-layout-ignore>RENT</div>
+          <div id="s9-rcw" data-layout-ignore>
+            <div id="s9-rc">
+              <div id="s9-paper"></div>
+              <div class="s9-t" id="s9-rch">DAILY RENT</div>
+              <div class="s9-rule" style="top: 78px;"></div>
+              <div class="s9-t s9-row" id="s9-r1">1,000 calls</div>
+              <div class="s9-t s9-row" id="s9-r2">× ₹0.01575</div>
+              <div class="s9-rule" style="top: 202px;"></div>
+              <div class="s9-t" id="s9-tot">= ₹15.75</div>
+              <div class="s9-t" id="s9-day">a day</div>
+            </div>
+            <div id="s9-lip"></div>
+          </div>
+          <div class="s9-pw" id="s9-mul"><div class="s9-hop" id="s9-mulh"><div class="s9-card"></div>
+            <div class="s9-t" id="s9-mulx"><b>×</b><span>1,000 calls</span></div>
+            <div class="s9-t" id="s9-muls">10 stacks × 100</div>
+            <svg id="s9-tail" viewBox="0 0 44 30"><path d="M0 0 L44 0 L22 26 Z" fill="#2563eb" transform="translate(0 4)" /><path d="M0 -6 L44 -6 L44 0 L22 24 L0 0 Z" fill="#ffffff" /></svg>
+          </div></div>
+          <div id="s9-stw"><div class="s9-t" id="s9-st">≈ ₹16</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      /*DATA*/ const DUR = 3.3; const W = [0.16, 0.44, 0.56, 0.8, 1.32, 1.4, 1.7, 1.88, 2.12, 2.84, 3.04]; /*END*/
+      // words: 0 On 1 a 2 thousand 3 calls, 4 it 5 costs 6 you 7 about 8 ₹16 9 a 10 day.
+      const w = (i) => Math.max(0, W.length > i ? W[i] : 0.16 + i * 0.3);
+// ISO KIT v1: isometric toy-world drawing on a 2D canvas, matching the Flow dioramas' look.
+// Copy this block verbatim into a scene's <script> (inside its IIFE). World units: x to the right-back, y to the left-back,
+// z up. P(x, y, z) -> frame px. Visible faces of a box: top, the face at y+d (front-left) and the face at x+w (front-right).
+// Draw back to front: sort what you draw by (x + y) ascending, then z ascending (painter's order).
+const ISO = (function () {
+  const C30 = Math.cos(Math.PI / 6), S30 = 0.5;
+  const MAT = {
+    white: { top: "#ffffff", left: "#e3ebfb", right: "#c9d8f5" },
+    blue:  { top: "#7fb0ff", left: "#3b82f6", right: "#2563eb" },
+    navy:  { top: "#4f6fe0", left: "#1e40af", right: "#1e3a8a" },
+    sky:   { top: "#dbeafe", left: "#bfdbfe", right: "#93c5fd" },
+    rose:  { top: "#fda4af", left: "#f43f5e", right: "#e11d48" },
+    gold:  { top: "#fde68a", left: "#f59e0b", right: "#d97706" },
+    grey:  { top: "#f1f5f9", left: "#cbd5e1", right: "#94a3b8" },
+    wood:  { top: "#f3c58f", left: "#d99a5b", right: "#b97a3f" },
+  };
+  function make(g, ox, oy, u) {
+    const P = (x, y, z) => [ox + (x - y) * C30 * u, oy + (x + y) * S30 * u - (z || 0) * u];
+    function poly(pts, fill, stroke, lw) {
+      g.beginPath(); pts.forEach(([a, b], i) => (i ? g.lineTo(a, b) : g.moveTo(a, b))); g.closePath();
+      if (fill) { g.fillStyle = fill; g.fill(); }
+      if (stroke) { g.strokeStyle = stroke; g.lineWidth = lw || 1.5; g.stroke(); }
+    }
+    function box(x, y, z, w, d, h, mat, edge) {
+      if (h <= 0 || w <= 0 || d <= 0) return;
+      edge = edge === undefined ? "rgba(15,35,90,0.14)" : edge;
+      poly([P(x, y + d, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x, y + d, z + h)], mat.left, edge);
+      poly([P(x + w, y, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x + w, y, z + h)], mat.right, edge);
+      poly([P(x, y, z + h), P(x + w, y, z + h), P(x + w, y + d, z + h), P(x, y + d, z + h)], mat.top, edge);
+    }
+    // a soft contact shadow on the floor plane z
+    function shadow(x, y, z, w, d, a) {
+      const c = P(x + w / 2, y + d / 2, z); const rx = (w + d) * C30 * u * 0.55, ry = (w + d) * S30 * u * 0.55;
+      const gr = g.createRadialGradient(c[0], c[1], 0, c[0], c[1], rx);
+      gr.addColorStop(0, `rgba(30,64,175,${a || 0.18})`); gr.addColorStop(1, "rgba(30,64,175,0)");
+      g.save(); g.translate(c[0], c[1]); g.scale(1, ry / rx); g.translate(-c[0], -c[1]);
+      g.fillStyle = gr; g.beginPath(); g.arc(c[0], c[1], rx, 0, 6.2832); g.fill(); g.restore();
+    }
+    // the floating platform: white top slab, blue band, white band, blue base (like the dioramas), its top at z = 0
+    function platform(x, y, w, d) {
+      box(x, y, -1.5, w, d, 0.42, MAT.blue);
+      box(x, y, -1.08, w, d, 0.3, MAT.white);
+      box(x, y, -0.78, w, d, 0.28, MAT.blue);
+      box(x, y, -0.5, w, d, 0.5, MAT.white);
+    }
+    // a 2D affine matrix that maps a flat w x h DOM element onto a face given three projected corners (TL, TR, BL)
+    function faceMatrix(tl, tr, bl, w, h) {
+      const a = (tr[0] - tl[0]) / w, b = (tr[1] - tl[1]) / w, c = (bl[0] - tl[0]) / h, d = (bl[1] - tl[1]) / h;
+      return `matrix(${a.toFixed(5)},${b.toFixed(5)},${c.toFixed(5)},${d.toFixed(5)},${tl[0].toFixed(2)},${tl[1].toFixed(2)})`;
+    }
+    return { P, poly, box, shadow, platform, faceMatrix, u };
+  }
+  return { make, MAT };
+})();
+
+      const tl = gsap.timeline({ paused: true });
+      const g = document.getElementById("s9-cv").getContext("2d");
+      const K = ISO.make(g, 540, 900, 48), M = ISO.MAT, P = K.P;
+      const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+      const outBack = (p, s) => { if (p <= 0) return 0; if (p >= 1) return 1; p -= 1; return p * p * ((s + 1) * p + s) + 1; };
+      const outCub = (p) => 1 - Math.pow(1 - clamp(p, 0, 1), 3);
+      // a landing squash: 0.82 at touch-down, a little stretch, then settled
+      const land = (dt) => (dt < 0 ? 1 : 1 - 0.18 * Math.exp(-dt / 0.08) * Math.cos(dt * 26));
+
+      // ---- the 1,000 calls: ten stacks of 100 thin ticket slabs (0.04 units each, so a stack of 100 is 4 units tall) ----
+      const TW = 1.6, TD = 1.1, SLAB = 0.036, NS = 100, SH = SLAB * NS;
+      const STACKS = [];
+      [0.8, 2.6, 4.4, 6.2, 8.0].forEach((y) => [0.6, 2.7].forEach((x) => STACKS.push({ x, y })));
+      STACKS.slice().sort((a, b) => a.x + a.y - (b.x + b.y)).forEach((s, i) => { s.T = 0.14 + i * 0.045; });   // land back to front
+      function drawStack(s, t) {
+        const fall = 0.22;
+        if (t < s.T - fall) return;
+        let z = 0;
+        if (t < s.T) { const p = (t - (s.T - fall)) / fall; z = 3 * (1 - p * p); }
+        const sq = land(t - s.T), sx = 1 + (1 - sq) * 0.5;
+        const wd = TW * sx, dp = TD * sx, h = SH * sq, x = s.x - (wd - TW) / 2, y = s.y - (dp - TD) / 2;
+        K.box(x, y, z, wd, dp, h, M.white, "rgba(15,35,90,0.18)");
+        // one hairline per ticket on both side faces: 100 tickets per stack
+        g.lineWidth = 1;
+        for (let i = 1; i < NS; i++) {
+          const zi = z + i * SLAB * sq;
+          g.strokeStyle = i % 10 === 0 ? "rgba(37,99,235,0.17)" : "rgba(37,99,235,0.09)";
+          const a = P(x, y + dp, zi), b = P(x + wd, y + dp, zi), c = P(x + wd, y, zi);
+          g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); g.lineTo(c[0], c[1]); g.stroke();
+        }
+        // the top ticket: a blue header band and two printed lines
+        const zt = z + h;
+        K.poly([P(x, y, zt), P(x + 0.42 * sx, y, zt), P(x + 0.42 * sx, y + dp, zt), P(x, y + dp, zt)], "#3b82f6");
+        [0.32, 0.62].forEach((f) => K.poly([P(x + 0.62 * sx, y + f * dp, zt), P(x + wd - 0.18, y + f * dp, zt), P(x + wd - 0.18, y + (f + 0.1) * dp, zt), P(x + 0.62 * sx, y + (f + 0.1) * dp, zt)], "#c9d8f5"));
+      }
+
+      // ---- the register: drawer base, blue body, keys; its slot runs along the top's diagonal, so the receipt stands facing the camera ----
+      const RX = 5.0, RY = 0.9, RW = 4.5, RD = 4.5;   // drawer 0.8 + body 1.2: the top of the body is at z = 2.0
+      const R_LAND = 1.06, KEY_T = w(5) - 0.05, CHING = w(8) - 0.04;
+      const faceEl = document.getElementById("s9-face"), rcw = document.getElementById("s9-rcw"), rc = document.getElementById("s9-rc");
+      function drawRegister(t) {
+        const fall = 0.24;
+        if (t < R_LAND - fall) { faceEl.style.opacity = "0"; return; }
+        let z = 0;
+        if (t < R_LAND) { const p = (t - (R_LAND - fall)) / fall; z = 3 * (1 - p * p); }
+        // landing squash, plus a small "cha-ching" hop on the total
+        let sq = land(t - R_LAND);
+        const hp = (t - CHING) / 0.26; if (hp > 0 && hp < 1) z += 0.32 * Math.sin(Math.PI * hp);
+        sq *= land(t - CHING - 0.26) * 0.5 + 0.5;
+        const sx = 1 + (1 - sq) * 0.4, cx = RX + RW / 2, cy = RY + RD / 2;
+        const W2 = RW * sx, D2 = RD * sx, x0 = cx - W2 / 2, y0 = cy - D2 / 2;
+        const hb = 0.8 * sq, hbody = 1.2 * sq;
+        // drawer base
+        K.box(x0, y0, z, W2, D2, hb, M.white);
+        const dz0 = z + 0.14 * sq, dz1 = z + 0.66 * sq;
+        // the drawer slides out on the total, with a few coins in its tray
+        const out = 0.95 * outBack((t - CHING) / 0.3, 2.2);
+        if (out > 0.01) {
+          const dx0 = x0 + 0.45, dx1 = x0 + W2 - 0.45, dy = y0 + D2 - 0.02;
+          K.box(dx0, dy, dz0, dx1 - dx0, out, dz1 - dz0, M.sky);
+          const tz = dz1;
+          K.poly([P(dx0 + 0.12, dy, tz), P(dx1 - 0.12, dy, tz), P(dx1 - 0.12, dy + out - 0.1, tz), P(dx0 + 0.12, dy + out - 0.1, tz)], "#93c5fd");
+          [[0.25, 0.35], [0.55, 0.5], [0.8, 0.3]].forEach(([fx, fy]) => {
+            const c = P(dx0 + 0.3 + fx * (dx1 - dx0 - 0.6), dy + fy * out, tz + 0.06);
+            g.fillStyle = "#d97706"; g.beginPath(); g.ellipse(c[0], c[1] + 3, 15, 8.5, 0, 0, 6.2832); g.fill();
+            g.fillStyle = "#fbbf24"; g.beginPath(); g.ellipse(c[0], c[1], 15, 8.5, 0, 0, 6.2832); g.fill();
+          });
+        } else {
+          K.poly([P(x0 + 0.45, y0 + D2, dz0), P(x0 + W2 - 0.45, y0 + D2, dz0), P(x0 + W2 - 0.45, y0 + D2, dz1), P(x0 + 0.45, y0 + D2, dz1)], "#bfdbfe", "rgba(15,35,90,0.18)");
+        }
+        const hx = x0 + W2 / 2, hz = (dz0 + dz1) / 2, hd = Math.max(out, 0) + y0 + D2;
+        K.poly([P(hx - 0.4, hd, hz - 0.06), P(hx + 0.4, hd, hz - 0.06), P(hx + 0.4, hd, hz + 0.06), P(hx - 0.4, hd, hz + 0.06)], "#1e3a8a");
+        // body
+        const bz = z + hb, bx = x0 + 0.15, by = y0 + 0.15, bw = W2 - 0.3, bd = D2 - 0.3;
+        K.box(bx, by, bz, bw, bd, hbody, M.blue);
+        const tz = bz + hbody;
+        // the slot along the diagonal of the top face (horizontal on screen)
+        const L = [bx + 0.3, by + bd - 0.3], R = [bx + bw - 0.3, by + 0.3];
+        K.poly([P(L[0], L[1], tz), P(R[0], R[1], tz), P(R[0] + 0.1, R[1] + 0.1, tz), P(L[0] + 0.1, L[1] + 0.1, tz)], "#1e3a8a");
+        // keys on the front half of the top; the rose "total" key presses on "costs"
+        const kp = (t - KEY_T) / 0.2, press = kp > 0 && kp < 1 ? Math.sin(Math.PI * kp) : 0;
+        for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) {
+          const kx = bx + bw - 1.75 + i * 0.55, ky = by + bd - 1.75 + j * 0.55, rose = i === 2 && j === 2;
+          K.box(kx, ky, tz, 0.42, 0.42, (rose ? 0.2 - 0.14 * press : 0.18) * sq, rose ? M.rose : M.white);
+        }
+        // the face label "RENT", mapped onto the body's front-left face
+        const f0 = P(bx + 0.1, by + bd, tz - 0.08), f1 = P(bx + bw - 0.1, by + bd, tz - 0.08), f2 = P(bx + 0.1, by + bd, bz + 0.08);
+        faceEl.style.transform = K.faceMatrix(f0, f1, f2, 202, 58);
+        faceEl.style.opacity = "1";
+        return { z, sq };
+      }
+
+      // the receipt feeds up out of the slot in three printer steps on "costs" .. "about", then sits; it jolts when the stamp lands
+      const RH = 338, FEED = [[w(5) + 0.02, 96], [w(5) + 0.24, 212], [w(5) + 0.47, RH]];
+      function feed(t) {
+        let shown = 0;
+        FEED.forEach(([t0, to], i) => {
+          const from = i ? FEED[i - 1][1] : 0;
+          if (t >= t0) shown = from + (to - from) * outCub((t - t0) / 0.17);
+        });
+        return shown;
+      }
+
+      const st = { t: 0 }, bob = document.getElementById("s9-bob");
+      function draw() {
+        const t = st.t;
+        g.clearRect(0, 0, 1080, 1920);
+        bob.style.transform = "translateY(" + (-8 * Math.sin((2 * Math.PI * (t + 0.6)) / 3)).toFixed(2) + "px)";
+        K.shadow(0, 0, -1.6, 10, 10, 0.22);
+        K.platform(0, 0, 10, 10);
+        // contact shadows
+        STACKS.forEach((s) => { if (t > s.T - 0.22) K.shadow(s.x - 0.15, s.y - 0.15, 0, TW + 0.3, TD + 0.3, 0.16 * clamp((t - s.T + 0.22) / 0.22, 0, 1)); });
+        if (t > R_LAND - 0.24) K.shadow(RX - 0.2, RY - 0.2, 0, RW + 0.4, RD + 0.4, 0.2 * clamp((t - R_LAND + 0.24) / 0.24, 0, 1));
+        // painter's order: the stacks by (x + y); every stack lies at x < RX, so the register comes after all of them
+        STACKS.slice().sort((a, b) => a.x + a.y - (b.x + b.y)).forEach((s) => drawStack(s, t));
+        const reg = drawRegister(t);
+        // receipt: the paper rides with the register; it feeds up out of the slot
+        const shown = feed(t);
+        rcw.style.opacity = shown > 0.5 ? "1" : "0";
+        const jolt = (t > CHING ? -10 * Math.exp(-(t - CHING) / 0.09) * Math.cos((t - CHING) * 30) : 0) - (reg ? (reg.z + 2.0 * reg.sq - 2.0) * 48 : 0);
+        rcw.style.transform = "translateY(" + jolt.toFixed(2) + "px)";
+        rc.style.transform = "translateY(" + (RH - shown).toFixed(2) + "px)";
+      }
+      // zigzag torn top edge of the receipt
+      (function () {
+        const n = 13, tw = 286 / n; let pts = ["0px 12px"];
+        for (let i = 0; i < n; i++) { pts.push(((i + 0.5) * tw).toFixed(1) + "px 0px"); pts.push(((i + 1) * tw).toFixed(1) + "px 12px"); }
+        pts.push("286px 338px", "0px 338px");
+        document.getElementById("s9-rc").style.clipPath = "polygon(" + pts.join(",") + ")";
+      })();
+
+      // ---- the cube flip in and out, the slow push ----
+      tl.fromTo("#s9-flip", { rotationY: -90, scale: 0.94 }, { rotationY: 0, scale: 1, duration: 0.36, ease: "power3.out" }, 0);
+      tl.fromTo("#s9-flip", { rotationY: 0 }, { rotationY: 90, duration: 0.26, ease: "power2.in", immediateRender: false }, DUR - 0.26);
+      tl.fromTo("#s9-cam", { scale: 1 }, { scale: 1.04, duration: DUR, ease: "sine.inOut" }, 0);
+
+      // ---- signboards ----
+      const pop = (sel, t, d) => tl.fromTo(sel, { opacity: 0, scale: 0.3, y: 26 }, { opacity: 1, scale: 1, y: 0, duration: d || 0.4, ease: "back.out(2.8)" }, t);
+      const hop = (sel, t, h, sq) => {
+        tl.fromTo(sel, { y: 0 }, { y: -h, duration: 0.12, ease: "power2.out", immediateRender: false }, t);
+        tl.fromTo(sel, { y: -h }, { y: 0, duration: 0.13, ease: "power2.in", immediateRender: false }, t + 0.12);
+        tl.fromTo(sel, { scaleY: sq, scaleX: 1 + (1 - sq) * 0.6 }, { scaleY: 1, scaleX: 1, duration: 0.32, ease: "back.out(3)", immediateRender: false }, t + 0.25);
+      };
+      // "thousand": the x 1,000 calls signboard pops over the stacks, hops on "calls,"
+      pop("#s9-mul", w(2) - 0.06);
+      hop("#s9-mulh", w(3) + 0.06, 14, 0.88);
+      // "₹16": the total thumps, and a rose "≈ ₹16" stamp slams on beside it
+      tl.fromTo("#s9-tot", { scale: 1 }, { scale: 1.12, duration: 0.08, ease: "power2.out" }, w(8) - 0.04);
+      tl.fromTo("#s9-tot", { scale: 1.12 }, { scale: 1, duration: 0.3, ease: "back.out(3)", immediateRender: false }, w(8) + 0.04);
+      tl.fromTo("#s9-stw", { opacity: 0, scale: 1.7, rotation: -16 }, { opacity: 1, scale: 1, rotation: -8, duration: 0.16, ease: "power3.in" }, w(8) - 0.12);
+      tl.fromTo("#s9-st", { scaleY: 0.78, scaleX: 1.14 }, { scaleY: 1, scaleX: 1, duration: 0.32, ease: "back.out(3)", immediateRender: false }, w(8) + 0.04);
+
+      tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: draw }, 0);
+      draw();
+      window.__timelines["s9"] = tl;
+    })();
+  </script>
+</template>

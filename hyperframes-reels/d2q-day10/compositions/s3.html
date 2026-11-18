@@ -1,0 +1,261 @@
+<template>
+  <style>
+    @font-face { font-family: "Fredoka"; font-weight: 400; src: url("assets/fonts/fredoka-400.woff2"); }
+    @font-face { font-family: "Fredoka"; font-weight: 700; src: url("assets/fonts/fredoka-700.woff2"); }
+    @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
+    @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
+    #root { position: absolute; inset: 0; overflow: hidden; perspective: 2400px; perspective-origin: 540px 1150px; }
+    #s3-flip, #s3-cam, #s3-bob { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #s3-flip { transform-origin: 540px 1150px; }
+    #s3-cam { transform-origin: 540px 1000px; }
+    .s3-cv { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    /* flat faces mapped onto the 3D boxes with ISO faceMatrix (set every frame from the projected corners) */
+    .s3-map { position: absolute; left: 0; top: 0; transform-origin: 0 0; font-family: "Fredoka", "D2QSans", "JetBrains Mono", sans-serif; color: #0b1b3a; }
+    /* the contract card's front face: blue header band on top, then the stamp line, four rows and the footer */
+    #s3-hdt { position: absolute; left: 0; right: 0; top: 0; height: 72px; display: flex; align-items: center; justify-content: center;
+              color: #ffffff; font-weight: 700; font-size: 46px; letter-spacing: 0.07em; white-space: nowrap; }
+    #s3-hdtx { display: block; opacity: 0; transform-origin: 50% 60%; }
+    #s3-stw { position: absolute; left: 0; right: 0; top: 80px; height: 64px; display: flex; align-items: center; justify-content: center; }
+    #s3-stamp { display: block; height: 56px; line-height: 47px; padding: 0 20px; border: 5px solid #2563eb; border-radius: 16px;
+                background: rgba(37,99,235,0.08); color: #2563eb; font-weight: 700; font-size: 38px; letter-spacing: 0.05em; white-space: nowrap;
+                opacity: 0; transform-origin: 50% 50%; }
+    /* the four terms sit in a 2 x 2 grid of cells: label on top, value under it (each cell reads on its own on the angled face) */
+    .s3-cell { position: absolute; width: 227px; height: 100px; }
+    .s3-slot { position: absolute; left: 0; top: 0; right: 0; bottom: 0; border-radius: 18px; background: #eef3fd; }
+    .s3-lab { position: absolute; left: 18px; top: 9px; font-weight: 400; font-size: 30px; line-height: 34px; color: #a6b6d4; white-space: nowrap; }
+    .s3-vw { position: absolute; left: 16px; top: 44px; height: 50px; display: flex; align-items: center; }
+    .s3-val { display: block; font-weight: 700; font-size: 50px; line-height: 1; color: #0b1b3a; white-space: nowrap; opacity: 0; transform-origin: 0% 70%; }
+    #s3-rule { position: absolute; left: 36px; right: 36px; top: 370px; height: 3px; border-radius: 2px; background: #dbe6fb; }
+    #s3-ftw { position: absolute; left: 0; right: 0; top: 377px; height: 56px; display: flex; align-items: center; justify-content: center; }
+    #s3-ft { display: block; font-weight: 400; font-size: 32px; white-space: nowrap; opacity: 0; transform-origin: 50% 60%; }
+    #s3-ft b { font-weight: 700; font-size: 38px; color: #2563eb; }
+    /* the STOCK price block's front face */
+    #s3-bf { color: #ffffff; text-align: center; }
+    #s3-bt { position: absolute; left: 0; right: 0; top: 10px; font-weight: 700; font-size: 30px; line-height: 32px; letter-spacing: 0.08em; color: #bfdbfe; }
+    #s3-bv { position: absolute; left: 0; right: 0; top: 42px; font-weight: 700; font-size: 56px; line-height: 58px; }
+  </style>
+  <div id="root" data-composition-id="s3" data-width="1080" data-height="1920">
+    <div id="s3-flip">
+      <div id="s3-cam">
+        <div id="s3-bob">
+          <canvas class="s3-cv" id="s3-cvb" width="1080" height="1920"></canvas>
+          <div class="s3-map" id="s3-face" data-layout-ignore>
+            <div id="s3-hdt"><span id="s3-hdtx">CALL OPTION</span></div>
+            <div id="s3-stw"><div id="s3-stamp">LONG ×1</div></div>
+            <div class="s3-cell" style="left: 14px; top: 150px;"><div class="s3-slot"></div><span class="s3-lab">Stock</span><span class="s3-vw"><b class="s3-val">100</b></span></div>
+            <div class="s3-cell" style="left: 253px; top: 150px;"><div class="s3-slot"></div><span class="s3-lab">Strike</span><span class="s3-vw"><b class="s3-val">100</b></span></div>
+            <div class="s3-cell" style="left: 14px; top: 260px;"><div class="s3-slot"></div><span class="s3-lab">Volatility</span><span class="s3-vw"><b class="s3-val">20%</b></span></div>
+            <div class="s3-cell" style="left: 253px; top: 260px;"><div class="s3-slot"></div><span class="s3-lab">Expiry</span><span class="s3-vw"><b class="s3-val">1 year</b></span></div>
+            <div id="s3-rule"></div>
+            <div id="s3-ftw"><span id="s3-ft">Price <b>7.97</b> · rates 0%</span></div>
+          </div>
+          <canvas class="s3-cv" id="s3-cvf" width="1080" height="1920"></canvas>
+          <div class="s3-map" id="s3-bf" data-layout-ignore>
+            <div id="s3-bt">STOCK</div>
+            <div id="s3-bv">100</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      /*DATA*/ const DUR = 6.9; const W = [0.16, 0.29, 0.47, 0.59, 1.11, 1.21, 1.43, 1.59, 1.69, 2.36, 2.49, 2.71, 2.89, 3.63, 4.01, 4.37, 5.26, 5.35, 5.45, 5.91, 6.09, 6.29]; /*END*/
+      // words: 0 You 1 own 2 a 3 call. 4 The 5 stock 6 is 7 at 8 100, 9 the 10 strike 11 is 12 100, 13 volatility 14 is 15 20%, 16 and 17 it 18 expires 19 in 20 one 21 year.
+// ISO KIT v1: isometric toy-world drawing on a 2D canvas, matching the Flow dioramas' look.
+// Copy this block verbatim into a scene's <script> (inside its IIFE). World units: x to the right-back, y to the left-back,
+// z up. P(x, y, z) -> frame px. Visible faces of a box: top, the face at y+d (front-left) and the face at x+w (front-right).
+// Draw back to front: sort what you draw by (x + y) ascending, then z ascending (painter's order).
+const ISO = (function () {
+  const C30 = Math.cos(Math.PI / 6), S30 = 0.5;
+  const MAT = {
+    white: { top: "#ffffff", left: "#e3ebfb", right: "#c9d8f5" },
+    blue:  { top: "#7fb0ff", left: "#3b82f6", right: "#2563eb" },
+    navy:  { top: "#4f6fe0", left: "#1e40af", right: "#1e3a8a" },
+    sky:   { top: "#dbeafe", left: "#bfdbfe", right: "#93c5fd" },
+    rose:  { top: "#fda4af", left: "#f43f5e", right: "#e11d48" },
+    gold:  { top: "#fde68a", left: "#f59e0b", right: "#d97706" },
+    grey:  { top: "#f1f5f9", left: "#cbd5e1", right: "#94a3b8" },
+    wood:  { top: "#f3c58f", left: "#d99a5b", right: "#b97a3f" },
+  };
+  function make(g, ox, oy, u) {
+    const P = (x, y, z) => [ox + (x - y) * C30 * u, oy + (x + y) * S30 * u - (z || 0) * u];
+    function poly(pts, fill, stroke, lw) {
+      g.beginPath(); pts.forEach(([a, b], i) => (i ? g.lineTo(a, b) : g.moveTo(a, b))); g.closePath();
+      if (fill) { g.fillStyle = fill; g.fill(); }
+      if (stroke) { g.strokeStyle = stroke; g.lineWidth = lw || 1.5; g.stroke(); }
+    }
+    function box(x, y, z, w, d, h, mat, edge) {
+      if (h <= 0 || w <= 0 || d <= 0) return;
+      edge = edge === undefined ? "rgba(15,35,90,0.14)" : edge;
+      poly([P(x, y + d, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x, y + d, z + h)], mat.left, edge);
+      poly([P(x + w, y, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x + w, y, z + h)], mat.right, edge);
+      poly([P(x, y, z + h), P(x + w, y, z + h), P(x + w, y + d, z + h), P(x, y + d, z + h)], mat.top, edge);
+    }
+    // a soft contact shadow on the floor plane z
+    function shadow(x, y, z, w, d, a) {
+      const c = P(x + w / 2, y + d / 2, z); const rx = (w + d) * C30 * u * 0.55, ry = (w + d) * S30 * u * 0.55;
+      const gr = g.createRadialGradient(c[0], c[1], 0, c[0], c[1], rx);
+      gr.addColorStop(0, `rgba(30,64,175,${a || 0.18})`); gr.addColorStop(1, "rgba(30,64,175,0)");
+      g.save(); g.translate(c[0], c[1]); g.scale(1, ry / rx); g.translate(-c[0], -c[1]);
+      g.fillStyle = gr; g.beginPath(); g.arc(c[0], c[1], rx, 0, 6.2832); g.fill(); g.restore();
+    }
+    // the floating platform: white top slab, blue band, white band, blue base (like the dioramas), its top at z = 0
+    function platform(x, y, w, d) {
+      box(x, y, -1.5, w, d, 0.42, MAT.blue);
+      box(x, y, -1.08, w, d, 0.3, MAT.white);
+      box(x, y, -0.78, w, d, 0.28, MAT.blue);
+      box(x, y, -0.5, w, d, 0.5, MAT.white);
+    }
+    // a 2D affine matrix that maps a flat w x h DOM element onto a face given three projected corners (TL, TR, BL)
+    function faceMatrix(tl, tr, bl, w, h) {
+      const a = (tr[0] - tl[0]) / w, b = (tr[1] - tl[1]) / w, c = (bl[0] - tl[0]) / h, d = (bl[1] - tl[1]) / h;
+      return `matrix(${a.toFixed(5)},${b.toFixed(5)},${c.toFixed(5)},${d.toFixed(5)},${tl[0].toFixed(2)},${tl[1].toFixed(2)})`;
+    }
+    return { P, poly, box, shadow, platform, faceMatrix, u };
+  }
+  return { make, MAT };
+})();
+
+      const w = (i) => Math.max(0, W.length > i ? W[i] : 0.3 + i * 0.29);
+      const tl = gsap.timeline({ paused: true });
+      const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+      const backOut = (p, s) => { p = clamp(p, 0, 1); const q = p - 1; return q * q * ((s + 1) * q + s) + 1; };
+      const bounceOut = (p) => {
+        p = clamp(p, 0, 1); const n = 7.5625, d = 2.75;
+        if (p < 1 / d) return n * p * p;
+        if (p < 2 / d) { p -= 1.5 / d; return n * p * p + 0.75; }
+        if (p < 2.5 / d) { p -= 2.25 / d; return n * p * p + 0.9375; }
+        p -= 2.625 / d; return n * p * p + 0.984375;
+      };
+      // a damped squash after an impact at ti: returns the height factor (the width grows by half as much)
+      const squash = (t, ti, amt, dur) => { const p = (t - ti) / dur; return p < 0 || p > 1 ? 1 : 1 - amt * Math.sin(p * Math.PI * 3) * Math.exp(-p * 4.2); };
+      const hop = (t, t0, d, h) => { const p = (t - t0) / d; return p < 0 || p > 1 ? 0 : h * Math.sin(Math.PI * p); };
+      const hex = (c) => [parseInt(c.slice(1, 3), 16), parseInt(c.slice(3, 5), 16), parseInt(c.slice(5, 7), 16)];
+      const mix = (a, b, p) => { const A = hex(a), B = hex(b); return "rgb(" + A.map((v, i) => Math.round(v + (B[i] - v) * p)).join(",") + ")"; };
+      const mixMat = (m0, m1, p) => ({ top: mix(m0.top, m1.top, p), left: mix(m0.left, m1.left, p), right: mix(m0.right, m1.right, p) });
+
+      // ---- the world: the reference platform, a thick white contract card standing in a blue stand, a navy STOCK price block ----
+      const U = 48, OX = 540, OY = 950;
+      const gB = document.getElementById("s3-cvb").getContext("2d"), gF = document.getElementById("s3-cvf").getContext("2d");
+      const KB = ISO.make(gB, OX, OY, U), KF = ISO.make(gF, OX, OY, U);
+      const MAT = ISO.MAT;
+      // the card is turned 30 degrees toward the camera from the x axis, so its face reads almost straight on
+      const TH = -Math.PI / 6, EX = Math.cos(TH), EY = Math.sin(TH), NX = -EY, NY = EX;
+      const ES = Math.hypot((EX - EY) * Math.cos(Math.PI / 6), (EX + EY) * 0.5);       // screen length of one unit along the card
+      const CARD = { c: [4.7, 4.5], L: 8.6, T: 1.0, z0: 0.55, H: 9.3, band: 1.5 };
+      const STAND = { L: 9.4, T: 2.2, H: 0.55 };
+      const BLK = { c: [8.036, 7.078], L: 2.6, T: 1.6, H: 2.2 };
+      const FW = CARD.L * ES * U, FH = CARD.H * U, BW = BLK.L * ES * U, BH = BLK.H * U;
+      const face = document.getElementById("s3-face"), bface = document.getElementById("s3-bf");
+      face.style.width = FW.toFixed(1) + "px"; face.style.height = FH.toFixed(1) + "px";
+      bface.style.width = BW.toFixed(1) + "px"; bface.style.height = BH.toFixed(1) + "px";
+
+      // a box turned by TH about its base centre c: front face (+n), right end (+e) and top are the visible faces
+      function prism(K, c, L, T, z0, H, mat, front) {
+        const hx = (EX * L) / 2, hy = (EY * L) / 2, tx = (NX * T) / 2, ty = (NY * T) / 2, P = K.P, z1 = z0 + H, ed = "rgba(15,35,90,0.14)";
+        const FL = [c[0] - hx + tx, c[1] - hy + ty], FR = [c[0] + hx + tx, c[1] + hy + ty];
+        const BL = [c[0] - hx - tx, c[1] - hy - ty], BR = [c[0] + hx - tx, c[1] + hy - ty];
+        if (H > 0) {
+          K.poly([P(FL[0], FL[1], z0), P(FR[0], FR[1], z0), P(FR[0], FR[1], z1), P(FL[0], FL[1], z1)], front || mat.left, ed);
+          K.poly([P(FR[0], FR[1], z0), P(BR[0], BR[1], z0), P(BR[0], BR[1], z1), P(FR[0], FR[1], z1)], mat.right, ed);
+        }
+        K.poly([P(BL[0], BL[1], z1), P(BR[0], BR[1], z1), P(FR[0], FR[1], z1), P(FL[0], FL[1], z1)], mat.top, ed);
+        return { FL, FR, z0, z1 };
+      }
+      // a soft shadow stretched along the card's direction
+      function longShadow(g, K, c, L, T, a) {
+        const p = K.P(c[0], c[1], 0), ang = Math.atan2((EX + EY) * 0.5, (EX - EY) * Math.cos(Math.PI / 6));
+        const rx = (L * ES * U) / 2 + 40, ry = T * 0.75 * U * 0.5 + 26;
+        g.save(); g.translate(p[0], p[1]); g.rotate(ang); g.scale(1, ry / rx);
+        const gr = g.createRadialGradient(0, 0, 0, 0, 0, rx);
+        gr.addColorStop(0, `rgba(30,64,175,${a})`); gr.addColorStop(0.6, `rgba(30,64,175,${a * 0.45})`); gr.addColorStop(1, "rgba(30,64,175,0)");
+        g.fillStyle = gr; g.beginPath(); g.arc(0, 0, rx, 0, 6.2832); g.fill(); g.restore();
+      }
+      function floorShadow(g) {
+        const cx = OX + 24, cy = OY + 10 * U + 1.5 * U + 70, rx = 440, ry = 120;
+        g.save(); g.translate(cx, cy); g.scale(1, ry / rx);
+        const gr = g.createRadialGradient(0, 0, 0, 0, 0, rx);
+        gr.addColorStop(0, "rgba(37,99,235,0.30)"); gr.addColorStop(0.55, "rgba(37,99,235,0.12)"); gr.addColorStop(1, "rgba(37,99,235,0)");
+        g.fillStyle = gr; g.beginPath(); g.arc(0, 0, rx, 0, 6.2832); g.fill(); g.restore();
+      }
+
+      // ---- beats ----
+      const tStamp = Math.max(0.3, w(1) + 0.02), tHit = tStamp + 0.14;        // the LONG x1 stamp thumps onto the card on "own"
+      const tLit = Math.max(tHit + 0.1, w(3) - 0.02);                         // CALL OPTION lights on "call."
+      const tDrop = Math.max(tLit + 0.3, w(4) - 0.06), dDrop = 0.6;           // the STOCK block drops in on "The stock"
+      const tBump = tDrop + dDrop / 2.75;                                     // its first impact (bounce.out)
+      const tHop = Math.max(tDrop + dDrop + 0.02, w(8) - 0.1);                // and hops on "100,"
+      const rows = [[5, 8], [10, 12], [13, 15], [18, 21]];                    // label word, value word
+      const tFoot = Math.min(DUR - 0.36, w(21) + 0.1);                        // footer right after "year."
+
+      // entrance: cube flip in; slow push for the whole shot
+      tl.fromTo("#s3-flip", { rotationY: -90, scale: 0.94 }, { rotationY: 0, scale: 1, duration: 0.36, ease: "power3.out" }, 0);
+      tl.fromTo("#s3-cam", { scale: 1 }, { scale: 1.04, duration: DUR, ease: "none" }, 0);
+
+      // the stamp: a fast thump down onto the face, then an ink squash
+      tl.fromTo("#s3-stamp", { opacity: 0, scale: 2.3, rotation: -20 }, { opacity: 1, scale: 1, rotation: -6, duration: 0.14, ease: "power3.in" }, tStamp);
+      tl.fromTo("#s3-stamp", { scaleX: 1, scaleY: 1 }, { scaleX: 1.12, scaleY: 0.84, duration: 0.06, ease: "power2.out", immediateRender: false }, tHit);
+      tl.fromTo("#s3-stamp", { scaleX: 1.12, scaleY: 0.84 }, { scaleX: 1, scaleY: 1, duration: 0.3, ease: "back.out(3)", immediateRender: false }, tHit + 0.06);
+      // CALL OPTION pops in white on the lit band
+      tl.fromTo("#s3-hdtx", { opacity: 0, scale: 0.4, y: 10 }, { opacity: 1, scale: 1, y: 0, duration: 0.34, ease: "back.out(2.6)" }, tLit + 0.03);
+
+      // the rows fill on their words: the label lights on its noun, the value pops on its number
+      const rowEls = Array.from(document.querySelectorAll("#s3-face .s3-cell"));
+      rowEls.forEach((r, k) => {
+        const lab = r.querySelector(".s3-lab"), val = r.querySelector(".s3-val"), slot = r.querySelector(".s3-slot");
+        const tL = Math.max(tLit + 0.2, w(rows[k][0]) - 0.03), tV = Math.max(tL + 0.12, w(rows[k][1]) - 0.03);
+        tl.fromTo(lab, { color: "#a6b6d4" }, { color: "#0b1b3a", duration: 0.16, ease: "power1.out" }, tL);
+        tl.fromTo(slot, { backgroundColor: "#eef3fd" }, { backgroundColor: "#dbe7fd", duration: 0.16, ease: "power1.out" }, tL);
+        tl.fromTo(val, { opacity: 0, scale: 0.3, y: 12 }, { opacity: 1, scale: 1, y: 0, duration: 0.32, ease: "back.out(3)" }, tV);
+        tl.fromTo(slot, { backgroundColor: "#dbe7fd" }, { backgroundColor: "#eaf1fe", duration: 0.4, ease: "power1.out", immediateRender: false }, tV + 0.12);
+      });
+      // footer: Price 7.97 · rates 0%
+      tl.fromTo("#s3-ft", { opacity: 0, scale: 0.5, y: 16 }, { opacity: 1, scale: 1, y: 0, duration: 0.24, ease: "back.out(2.6)" }, tFoot);
+
+      // ---- the canvas world, a pure function of time ----
+      const bob = document.getElementById("s3-bob");
+      function draw(t) {
+        bob.style.transform = "translateY(" + (-8 * Math.sin((2 * Math.PI * (t + 0.5)) / 3)).toFixed(2) + "px)";
+        // back layer: platform, stand, card
+        gB.clearRect(0, 0, 1080, 1920);
+        floorShadow(gB);
+        KB.shadow(0, 0, -1.6, 10, 10, 0.2);
+        KB.platform(0, 0, 10, 10);
+        longShadow(gB, KB, [CARD.c[0] + NX * 0.4, CARD.c[1] + NY * 0.4], STAND.L, STAND.T, 0.3);
+        prism(KB, CARD.c, STAND.L, STAND.T, 0, STAND.H, MAT.blue);
+        // the card squashes a little under the stamp and gives a small hop when it lights
+        const sz = squash(t, tHit, 0.035, 0.42) * squash(t, tLit + 0.24, 0.025, 0.36), sx = 1 + (1 - sz) * 0.5;
+        const z0 = CARD.z0 + hop(t, tLit, 0.24, 0.28), H = CARD.H * sz, L = CARD.L * sx, T = CARD.T * sx;
+        const hb = CARD.band * sz, lit = clamp((t - tLit) / 0.14, 0, 1);
+        const body = prism(KB, CARD.c, L, T, z0, H - hb, MAT.white, "#f6f9ff");
+        prism(KB, CARD.c, L, T, z0 + H - hb, hb, mixMat(MAT.sky, MAT.blue, lit));
+        const P = KB.P;
+        face.style.transform = KB.faceMatrix(P(body.FL[0], body.FL[1], z0 + H), P(body.FR[0], body.FR[1], z0 + H), P(body.FL[0], body.FL[1], z0), FW, FH);
+        // front layer: the STOCK price block (drops in with a bounce, hops on "100,")
+        gF.clearRect(0, 0, 1080, 1920);
+        const on = clamp((t - tDrop) / 0.08, 0, 1);
+        if (on > 0) {
+          const zb = (t < tDrop + dDrop ? 8.5 * (1 - bounceOut((t - tDrop) / dDrop)) : 0) + hop(t, tHop, 0.34, 0.85);
+          const bz = squash(t, tBump, 0.16, 0.4) * squash(t, tHop + 0.34, 0.14, 0.4), bx = 1 + (1 - bz) * 0.5;
+          gF.globalAlpha = on;
+          KF.shadow(BLK.c[0] - 1.2, BLK.c[1] - 1.2, 0, 2.4, 2.4, 0.26 * clamp(1 - zb / 9, 0.25, 1));
+          const b = prism(KF, BLK.c, BLK.L * bx, BLK.T * bx, zb, BLK.H * bz, MAT.navy);
+          gF.globalAlpha = 1;
+          bface.style.opacity = on.toFixed(3);
+          bface.style.transform = KF.faceMatrix(KF.P(b.FL[0], b.FL[1], b.z1), KF.P(b.FR[0], b.FR[1], b.z1), KF.P(b.FL[0], b.FL[1], b.z0), BW, BH);
+        } else {
+          bface.style.opacity = "0";
+          bface.style.transform = "translate(-2000px,0)";
+        }
+      }
+      const st = { t: 0 };
+      tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: () => draw(st.t) }, 0);
+      draw(0);
+
+      // exit: cube flip into s4
+      tl.fromTo("#s3-flip", { rotationY: 0 }, { rotationY: 90, duration: 0.26, ease: "power2.in", immediateRender: false }, DUR - 0.26);
+      window.__timelines["s3"] = tl;
+    })();
+  </script>
+</template>

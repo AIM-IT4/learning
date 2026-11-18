@@ -1,0 +1,217 @@
+<template>
+  <style>
+    @font-face { font-family: "Fredoka"; font-weight: 400; src: url("assets/fonts/fredoka-400.woff2"); }
+    @font-face { font-family: "Fredoka"; font-weight: 700; src: url("assets/fonts/fredoka-700.woff2"); }
+    @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
+    @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
+    #root { position: absolute; inset: 0; overflow: hidden; perspective: 2400px; perspective-origin: 540px 1150px; }
+    #s11-flip, #s11-cam, #s11-bob { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #s11-flip { transform-origin: 540px 1150px; }
+    #s11-cam { transform-origin: 540px 860px; }
+    #s11-cv { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    .s11-t { font-family: "Fredoka", "D2QSans", "JetBrains Mono", sans-serif; font-weight: 700; color: #0b1b3a; white-space: nowrap; }
+    .s11-pw { position: absolute; opacity: 0; transform-origin: 50% 100%; }
+    .s11-hop { position: absolute; inset: 0; transform-origin: 50% 100%; }
+    .s11-card { position: absolute; inset: 0; background: #ffffff; border-radius: 28px; box-shadow: 0 10px 0 #2563eb, 0 24px 36px rgba(30,64,175,0.22); }
+    /* the numbers on the blocks' front-right faces; each is mapped onto its face every frame */
+    .s11-f { position: absolute; left: 0; top: 0; transform-origin: 0 0; opacity: 0; display: flex; align-items: center; justify-content: center; line-height: 1; }
+    /* the exact version, a signboard */
+    #s11-ex { left: 86px; top: 1262px; width: 452px; height: 116px; }
+    #s11-ex1 { position: absolute; left: 0; right: 0; top: 12px; text-align: center; font-size: 30px; line-height: 34px; color: #334155; font-weight: 400; }
+    #s11-ex2 { position: absolute; left: 0; right: 0; top: 50px; text-align: center; font-size: 46px; line-height: 52px; }
+    #s11-ex2 b { color: #2563eb; }
+    /* RULE OF 16: a big sticker-stamp */
+    #s11-stw { position: absolute; left: 260px; top: 636px; width: 560px; height: 140px; opacity: 0; transform-origin: 50% 100%; }
+    #s11-st { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 22px; border-radius: 40px; background: #2563eb;
+              border: 9px solid #ffffff; box-shadow: 0 14px 0 #1e40af, 0 30px 48px rgba(15,23,42,0.26); color: #ffffff; transform-origin: 50% 100%; }
+    #s11-st span { font-size: 68px; line-height: 1; letter-spacing: 0.02em; }
+    #s11-st b { font-size: 98px; line-height: 1; }
+  </style>
+  <div id="root" data-composition-id="s11" data-width="1080" data-height="1920">
+    <div id="s11-flip">
+      <div id="s11-cam">
+        <div id="s11-bob">
+          <canvas id="s11-cv" width="1080" height="1920"></canvas>
+          <div id="s11-faces" data-layout-ignore></div>
+          <div class="s11-pw" id="s11-ex"><div class="s11-hop" id="s11-exh"><div class="s11-card"></div>
+            <div class="s11-t" id="s11-ex1">exact:</div>
+            <div class="s11-t" id="s11-ex2">20% ÷ √252 = <b>1.26%</b></div></div></div>
+          <div id="s11-stw"><div class="s11-t" id="s11-st"><span>RULE OF</span><b>16</b></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      /*DATA*/ const DUR = 3.96; const W = [0.16, 0.5, 0.94, 1.3, 1.54, 2.34, 2.62, 2.84, 2.96, 3.12, 3.32, 3.44]; /*END*/
+      // words: 0 That's 1 20% 2 divided 3 by 4 16. 5 Traders 6 call 7 it 8 the 9 rule 10 of 11 16.
+      const w = (i) => Math.max(0, W.length > i ? W[i] : 0.16 + i * 0.3);
+// ISO KIT v1: isometric toy-world drawing on a 2D canvas, matching the Flow dioramas' look.
+// Copy this block verbatim into a scene's <script> (inside its IIFE). World units: x to the right-back, y to the left-back,
+// z up. P(x, y, z) -> frame px. Visible faces of a box: top, the face at y+d (front-left) and the face at x+w (front-right).
+// Draw back to front: sort what you draw by (x + y) ascending, then z ascending (painter's order).
+const ISO = (function () {
+  const C30 = Math.cos(Math.PI / 6), S30 = 0.5;
+  const MAT = {
+    white: { top: "#ffffff", left: "#e3ebfb", right: "#c9d8f5" },
+    blue:  { top: "#7fb0ff", left: "#3b82f6", right: "#2563eb" },
+    navy:  { top: "#4f6fe0", left: "#1e40af", right: "#1e3a8a" },
+    sky:   { top: "#dbeafe", left: "#bfdbfe", right: "#93c5fd" },
+    rose:  { top: "#fda4af", left: "#f43f5e", right: "#e11d48" },
+    gold:  { top: "#fde68a", left: "#f59e0b", right: "#d97706" },
+    grey:  { top: "#f1f5f9", left: "#cbd5e1", right: "#94a3b8" },
+    wood:  { top: "#f3c58f", left: "#d99a5b", right: "#b97a3f" },
+  };
+  function make(g, ox, oy, u) {
+    const P = (x, y, z) => [ox + (x - y) * C30 * u, oy + (x + y) * S30 * u - (z || 0) * u];
+    function poly(pts, fill, stroke, lw) {
+      g.beginPath(); pts.forEach(([a, b], i) => (i ? g.lineTo(a, b) : g.moveTo(a, b))); g.closePath();
+      if (fill) { g.fillStyle = fill; g.fill(); }
+      if (stroke) { g.strokeStyle = stroke; g.lineWidth = lw || 1.5; g.stroke(); }
+    }
+    function box(x, y, z, w, d, h, mat, edge) {
+      if (h <= 0 || w <= 0 || d <= 0) return;
+      edge = edge === undefined ? "rgba(15,35,90,0.14)" : edge;
+      poly([P(x, y + d, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x, y + d, z + h)], mat.left, edge);
+      poly([P(x + w, y, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x + w, y, z + h)], mat.right, edge);
+      poly([P(x, y, z + h), P(x + w, y, z + h), P(x + w, y + d, z + h), P(x, y + d, z + h)], mat.top, edge);
+    }
+    // a soft contact shadow on the floor plane z
+    function shadow(x, y, z, w, d, a) {
+      const c = P(x + w / 2, y + d / 2, z); const rx = (w + d) * C30 * u * 0.55, ry = (w + d) * S30 * u * 0.55;
+      const gr = g.createRadialGradient(c[0], c[1], 0, c[0], c[1], rx);
+      gr.addColorStop(0, `rgba(30,64,175,${a || 0.18})`); gr.addColorStop(1, "rgba(30,64,175,0)");
+      g.save(); g.translate(c[0], c[1]); g.scale(1, ry / rx); g.translate(-c[0], -c[1]);
+      g.fillStyle = gr; g.beginPath(); g.arc(c[0], c[1], rx, 0, 6.2832); g.fill(); g.restore();
+    }
+    // the floating platform: white top slab, blue band, white band, blue base (like the dioramas), its top at z = 0
+    function platform(x, y, w, d) {
+      box(x, y, -1.5, w, d, 0.42, MAT.blue);
+      box(x, y, -1.08, w, d, 0.3, MAT.white);
+      box(x, y, -0.78, w, d, 0.28, MAT.blue);
+      box(x, y, -0.5, w, d, 0.5, MAT.white);
+    }
+    // a 2D affine matrix that maps a flat w x h DOM element onto a face given three projected corners (TL, TR, BL)
+    function faceMatrix(tl, tr, bl, w, h) {
+      const a = (tr[0] - tl[0]) / w, b = (tr[1] - tl[1]) / w, c = (bl[0] - tl[0]) / h, d = (bl[1] - tl[1]) / h;
+      return `matrix(${a.toFixed(5)},${b.toFixed(5)},${c.toFixed(5)},${d.toFixed(5)},${tl[0].toFixed(2)},${tl[1].toFixed(2)})`;
+    }
+    return { P, poly, box, shadow, platform, faceMatrix, u };
+  }
+  return { make, MAT };
+})();
+
+      const tl = gsap.timeline({ paused: true });
+      const g = document.getElementById("s11-cv").getContext("2d");
+      const K = ISO.make(g, 540, 900, 48), M = ISO.MAT, P = K.P;
+      const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+      const land = (dt) => (dt < 0 ? 1 : 1 - 0.2 * Math.exp(-dt / 0.08) * Math.cos(dt * 26));
+
+      // ---- the toy number blocks: three rows standing along y, each number on its block's front-right face (it reads rising to the right) ----
+      // row A "20% ÷ 16", row B "= 1.25%", row C (smaller) "√252 = 15.87 ≈ 16"
+      const NAVY = "#0b1b3a", BLUE = "#2563eb";
+      const B = [
+        // label, x0, w, y0, d, h, material, text colour, font px, land time
+        ["20%", 0.4, 2.0, 5.6, 3.5, 2.4, M.white, NAVY, 74, w(1)],
+        ["÷", 0.4, 2.0, 3.65, 1.6, 2.4, M.sky, "#1e3a8a", 88, w(2)],
+        ["16", 0.4, 2.0, 0.9, 2.4, 2.4, M.blue, "#ffffff", 80, w(4)],
+        ["=", 5.3, 2.0, 5.5, 1.6, 2.4, M.sky, "#1e3a8a", 88, w(4) + 0.26],
+        ["1.25%", 5.3, 2.0, 0.35, 4.8, 2.4, M.white, BLUE, 74, w(4) + 0.48],
+        ["√252", 8.7, 1.0, 7.2, 2.2, 1.1, M.white, NAVY, 40, w(5)],
+        ["=", 8.7, 1.0, 6.1, 0.9, 1.1, M.sky, "#1e3a8a", 42, w(5) + 0.07],
+        ["15.87", 8.7, 1.0, 3.5, 2.4, 1.1, M.white, NAVY, 40, w(5) + 0.14],
+        ["≈", 8.7, 1.0, 2.4, 0.9, 1.1, M.sky, "#1e3a8a", 42, w(5) + 0.21],
+        ["16", 8.7, 1.0, 0.9, 1.3, 1.1, M.blue, "#ffffff", 42, w(5) + 0.28],
+      ].map(([lab, x, wd, y, d, h, mat, col, fs, T], i) => {
+        const el = document.createElement("div");
+        el.className = "s11-f s11-t"; el.textContent = lab;
+        el.style.width = (d * 48).toFixed(1) + "px"; el.style.height = (h * 48).toFixed(1) + "px";
+        el.style.fontSize = fs + "px"; el.style.color = col;
+        document.getElementById("s11-faces").appendChild(el);
+        return { lab, x, wd, y, d, h, mat, T, el, small: h < 2 };
+      });
+      // the "16" blocks hop on "rule of 16."
+      const HOP16 = w(11) - 0.02;
+      function drawBlock(b, t) {
+        const fall = 0.22;
+        if (t < b.T - fall) { b.el.style.opacity = "0"; return; }
+        let z = 0;
+        if (t < b.T) { const p = (t - (b.T - fall)) / fall; z = (b.small ? 2.2 : 3.0) * (1 - p * p); }
+        let sq = land(t - b.T);
+        if (b.lab === "16") { const hp = (t - HOP16) / 0.3; if (hp > 0 && hp < 1) z += (b.small ? 0.7 : 0.55) * Math.sin(Math.PI * hp); sq *= land(t - HOP16 - 0.3) * 0.6 + 0.4; }
+        const sx = 1 + (1 - sq) * 0.45;
+        const W2 = b.wd * sx, D2 = b.d * sx, x0 = b.x + b.wd / 2 - W2 / 2, y0 = b.y + b.d / 2 - D2 / 2, h = b.h * sq;
+        K.box(x0, y0, z, W2, D2, h, b.mat, "rgba(15,35,90,0.16)");
+        // a soft highlight along the top's front edges, like the toy blocks elsewhere in the film
+        g.lineWidth = 3; g.strokeStyle = "rgba(255,255,255,0.7)"; g.lineCap = "round";
+        const a = P(x0, y0 + D2, z + h), c = P(x0 + W2, y0 + D2, z + h), e = P(x0 + W2, y0, z + h);
+        g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(c[0], c[1]); g.lineTo(e[0], e[1]); g.stroke();
+        // the number, mapped onto the front-right face (x = x0 + W2), reading from y0 + D2 (left) to y0 (right)
+        const fx = x0 + W2, TL = P(fx, y0 + D2, z + h), TR = P(fx, y0, z + h), BL = P(fx, y0 + D2, z), fw = b.d * 48, fh = b.h * 48;
+        b.el.style.transform = K.faceMatrix(TL, TR, BL, fw, fh);
+        b.el.style.opacity = "1";
+        // what the occlusion pass needs: the block's screen silhouette and its face mapping
+        const corners = [];
+        [x0, x0 + W2].forEach((cx) => [y0, y0 + D2].forEach((cy) => [z, z + h].forEach((cz) => corners.push(P(cx, cy, cz)))));
+        const hl = hull(corners), BR = [TR[0] + BL[0] - TL[0], TR[1] + BL[1] - TL[1]], fq = [TL, TR, BR, BL];
+        return { b, hl, bb: bbox(hl), fb: bbox(fq), m: [(TR[0] - TL[0]) / fw, (TR[1] - TL[1]) / fw, (BL[0] - TL[0]) / fh, (BL[1] - TL[1]) / fh, TL[0], TL[1]], fw, fh };
+      }
+      // ---- occlusion for the DOM face numbers: a block drawn later (in front) cuts a hole in the clip of every face it covers ----
+      function hull(pts) {
+        pts = pts.slice().sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+        const cr = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+        const lo = [], up = [];
+        pts.forEach((p) => { while (lo.length > 1 && cr(lo[lo.length - 2], lo[lo.length - 1], p) <= 0) lo.pop(); lo.push(p); });
+        for (let i = pts.length - 1; i >= 0; i--) { const p = pts[i]; while (up.length > 1 && cr(up[up.length - 2], up[up.length - 1], p) <= 0) up.pop(); up.push(p); }
+        lo.pop(); up.pop(); return lo.concat(up);
+      }
+      const bbox = (q) => [Math.min(...q.map((p) => p[0])), Math.min(...q.map((p) => p[1])), Math.max(...q.map((p) => p[0])), Math.max(...q.map((p) => p[1]))];
+      function occlude(drawn) {
+        drawn.forEach((A, i) => {
+          const [a, b, c, d, e, f] = A.m, det = a * d - b * c;
+          const loc = ([X, Y]) => { const x = X - e, y = Y - f; return [(d * x - c * y) / det, (-b * x + a * y) / det]; };
+          const pts = [[0, 0], [A.fw, 0], [A.fw, A.fh], [0, A.fh], [0, 0]];
+          let n = 0;
+          for (let j = i + 1; j < drawn.length; j++) {
+            const O = drawn[j];
+            if (O.bb[0] > A.fb[2] || O.bb[2] < A.fb[0] || O.bb[1] > A.fb[3] || O.bb[3] < A.fb[1]) continue;
+            const L = O.hl.map(loc); pts.push(...L, L[0], [0, 0]); n++;
+          }
+          A.b.el.style.clipPath = n ? "polygon(evenodd, " + pts.map(([x, y]) => x.toFixed(1) + "px " + y.toFixed(1) + "px").join(", ") + ")" : "none";
+        });
+      }
+
+      const st = { t: 0 }, bob = document.getElementById("s11-bob");
+      function draw() {
+        const t = st.t;
+        g.clearRect(0, 0, 1080, 1920);
+        bob.style.transform = "translateY(" + (-8 * Math.sin((2 * Math.PI * (t + 2.2)) / 3)).toFixed(2) + "px)";
+        K.shadow(0, 0, -1.6, 10, 10, 0.22);
+        K.platform(0, 0, 10, 10);
+        B.forEach((b) => { if (t > b.T - 0.22) K.shadow(b.x - 0.2, b.y - 0.2, 0, b.wd + 0.4, b.d + 0.4, 0.17 * clamp((t - b.T + 0.22) / 0.22, 0, 1)); });
+        // painter's order by (x + y) of the block's centre: rows are far enough apart that no two blocks overlap on screen out of order
+        const drawn = [];
+        B.slice().sort((a, b) => a.x + a.wd / 2 + a.y + a.d / 2 - (b.x + b.wd / 2 + b.y + b.d / 2)).forEach((b) => { const r = drawBlock(b, t); if (r) drawn.push(r); });
+        occlude(drawn);
+      }
+
+      // ---- the cube flip in (no flip out: the tile cascade covers the cut), the slow push ----
+      tl.fromTo("#s11-flip", { rotationY: -90, scale: 0.94 }, { rotationY: 0, scale: 1, duration: 0.36, ease: "power3.out" }, 0);
+      tl.fromTo("#s11-cam", { scale: 1 }, { scale: 1.04, duration: DUR, ease: "sine.inOut" }, 0);
+
+      // "call": the exact version pops in under the rows
+      tl.fromTo("#s11-ex", { opacity: 0, scale: 0.3, y: 26 }, { opacity: 1, scale: 1, y: 0, duration: 0.4, ease: "back.out(2.6)" }, w(5) + 0.4);
+      // "rule ... of ... 16.": the stamp comes down from the camera and slams; a squash, and the 16s hop
+      tl.fromTo("#s11-stw", { opacity: 0, scale: 1.2, rotation: -1 }, { opacity: 1, scale: 1, rotation: -3, duration: 0.18, ease: "power3.in" }, w(6) + 0.04);
+      tl.fromTo("#s11-st", { scaleY: 0.78, scaleX: 1.12 }, { scaleY: 1, scaleX: 1, duration: 0.34, ease: "back.out(3)", immediateRender: false }, w(6) + 0.22);
+      tl.fromTo("#s11-st", { y: 0 }, { y: -16, duration: 0.11, ease: "power2.out", immediateRender: false }, w(11) + 0.02);
+      tl.fromTo("#s11-st", { y: -16 }, { y: 0, duration: 0.2, ease: "bounce.out", immediateRender: false }, w(11) + 0.13);
+      tl.fromTo("#s11-cam", { y: 0 }, { y: 7, duration: 0.05, ease: "power2.out" }, w(6) + 0.22);
+      tl.fromTo("#s11-cam", { y: 7 }, { y: 0, duration: 0.3, ease: "back.out(3)", immediateRender: false }, w(6) + 0.27);
+
+      tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: draw }, 0);
+      draw();
+      window.__timelines["s11"] = tl;
+    })();
+  </script>
+</template>

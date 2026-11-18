@@ -1,0 +1,19 @@
+You know how to delta-hedge. Then the interviewer asks: your hedge is perfect, so why does your P&L still move every day? 🎯
+
+Day 10/30 · Making Quant Easy
+
+1️⃣ The setup: say you own a call. The stock is at 100, the strike is 100, volatility is 20%, and it expires in one year. Delta is 0.54, so you hedge by shorting 0.54 shares.
+2️⃣ Stock +2%: the call gains 1.12, the hedge loses 1.08. Stock −2%: the call loses 1.04, the hedge gains 1.08. Net +0.04 either way. That's gamma: the call's price is a curve, so delta grows as the stock rises (0.58 at 102) and shrinks as it falls (0.50 at 98).
+3️⃣ The cost is theta. One day later, at the same stock, the call is worth 7.95 instead of 7.97. On 1,000 calls that's about ₹15.75 a day.
+4️⃣ The breakeven: gamma pays more than the rent when the stock moves more than σ/√252 = 1.26% in a day. That's the rule of 16: 20% ÷ 16 ≈ 1.25%.
+5️⃣ Simulate it, hedging every day for a year. Averaged over 2,000 simulated years, 1,000 calls end near ₹0 if the stock really moves 20% a year, about +₹3,964 at 30%, and about −₹3,958 at 10%.
+
+🎤 Quant interview line: "A delta-hedged call earns gamma on big moves and pays theta every day. It breaks even when the stock moves σ/√252 a day, 1.26% here. So its P&L is realised volatility against the implied volatility you paid."
+
+📅 Day 11 tomorrow.
+💬 Comment GREEKS and we'll DM you the free Greeks Cheat Sheet
+➡️ Save this, share it with a friend, and follow @desk2quant for all 30 days
+
+Illustrative example: Black–Scholes, a call with stock 100, strike 100, volatility 20%, 1 year, zero interest; P&L per 1,000 calls, hedged at each day's close. Simulated with a fixed seed (2,000 years for each volatility). Not investment advice.
+
+#quantfinance #optionsgreeks #gamma #theta #deltahedging #quantinterview #makingquanteasy #desk2quant

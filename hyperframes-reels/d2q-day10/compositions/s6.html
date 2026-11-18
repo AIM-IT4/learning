@@ -1,0 +1,275 @@
+<template>
+  <style>
+    @font-face { font-family: "Fredoka"; font-weight: 400; src: url("assets/fonts/fredoka-400.woff2"); }
+    @font-face { font-family: "Fredoka"; font-weight: 700; src: url("assets/fonts/fredoka-700.woff2"); }
+    @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
+    @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
+    #root { position: absolute; inset: 0; overflow: hidden; perspective: 2400px; perspective-origin: 540px 1150px; }
+    #s6-flip, #s6-cam, #s6-bob { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #s6-flip { transform-origin: 540px 1150px; }
+    #s6-cam { transform-origin: 540px 1000px; }
+    #s6-cv { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    .s6-t { font-family: "Fredoka", "D2QSans", "JetBrains Mono", sans-serif; color: #0b1b3a; white-space: nowrap; }
+    /* text mapped onto the block faces (the same set as s5) */
+    .s6-map { position: absolute; left: 0; top: 0; transform-origin: 0 0; color: #ffffff; text-align: center; }
+    #s6-sft { position: absolute; left: 0; right: 0; top: 10px; font-weight: 700; font-size: 30px; line-height: 32px; letter-spacing: 0.02em; color: #bfdbfe; }
+    #s6-sfv { position: absolute; left: 0; right: 0; top: 42px; font-weight: 700; font-size: 54px; line-height: 56px; }
+    #s6-pf { opacity: 0; }
+    #s6-pfv { position: absolute; left: 0; right: 0; top: 0; bottom: 0; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 50px; }
+    /* signboards on projected points: .s6-anc is the point, .s6-ctr centres the board above it */
+    .s6-anc { position: absolute; left: 0; top: 0; width: 0; height: 0; }
+    .s6-ctr { position: absolute; left: -200px; width: 400px; bottom: 0; display: flex; justify-content: center; }
+    .s6-ctr.s6-below { bottom: auto; top: 0; }
+    .s6-sb { position: relative; background: #ffffff; border-radius: 24px; box-shadow: 0 10px 0 #2563eb, 0 24px 36px rgba(30,64,175,0.22);
+             opacity: 0; transform-origin: 50% 100%; text-align: center; padding: 8px 20px 12px; }
+    .s6-sb.s6-r { box-shadow: 0 10px 0 #e11d48, 0 24px 36px rgba(159,18,57,0.22); }
+    .s6-nm { font-weight: 700; font-size: 30px; line-height: 34px; letter-spacing: 0.08em; }
+    .s6-v { font-weight: 700; font-size: 50px; line-height: 56px; color: #2563eb; }
+    .s6-sb.s6-r .s6-v { color: #e11d48; }
+    #s6-netv { display: flex; align-items: center; justify-content: center; gap: 6px; }
+    #s6-net { padding: 8px 16px 12px; }
+    #s6-netv svg { width: 40px; height: 40px; flex: none; }
+    #s6-chk { stroke-dasharray: 26; stroke-dashoffset: 26; }
+    #s6-dn { display: flex; align-items: center; gap: 10px; height: 76px; padding: 0 26px 0 22px; border-radius: 38px; background: #e11d48; color: #ffffff;
+             font-weight: 700; font-size: 50px; line-height: 76px; box-shadow: 0 10px 0 #9f1239, 0 24px 36px rgba(159,18,57,0.25);
+             opacity: 0; transform-origin: 50% 100%; }
+    #s6-dn svg { width: 34px; height: 34px; }
+    #s6-note { height: 54px; padding: 0 22px; border-radius: 27px; background: rgba(255,255,255,0.86); font-weight: 400; font-size: 30px; line-height: 54px;
+               box-shadow: 0 6px 0 #bfdbfe; opacity: 0; transform-origin: 50% 0%; }
+    #s6-note b { font-weight: 700; }
+    /* the ghost of the +2% day's net */
+    #s6-gt { margin-top: 10px; height: 46px; padding: 0 16px; border-radius: 23px; background: rgba(255,255,255,0.9); border: 3px dashed #60a5fa; font-weight: 700;
+             font-size: 30px; line-height: 40px; color: #3b82f6; opacity: 0; transform-origin: 50% 0%; }
+    /* BOTH WAYS pill and the "?" bubble */
+    #s6-bothw { position: absolute; left: 340px; top: 646px; width: 600px; height: 100px; display: flex; justify-content: center; }
+    #s6-both { display: inline-flex; align-items: center; gap: 12px; height: 88px; padding: 0 32px 0 34px; border-radius: 44px; background: #2563eb;
+               color: #ffffff; font-weight: 700; font-size: 48px; box-shadow: 0 10px 0 #1e40af, 0 24px 36px rgba(30,64,175,0.25);
+               transform-origin: 50% 100%; opacity: 0; }
+    #s6-both i { font-style: normal; opacity: 0.6; }
+    #s6-qw { position: absolute; left: 92px; top: 606px; width: 140px; height: 140px; }
+    #s6-q { position: absolute; inset: 0; border-radius: 70px; background: #ffffff; box-shadow: 0 10px 0 #2563eb, 0 24px 36px rgba(30,64,175,0.25);
+            display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 98px; line-height: 1; color: #2563eb;
+            transform-origin: 70% 90%; opacity: 0; }
+    .s6-qd { position: absolute; border-radius: 50%; background: #ffffff; box-shadow: 0 5px 0 #2563eb; opacity: 0; }
+    #s6-qd1 { left: 196px; top: 746px; width: 26px; height: 26px; }
+    #s6-qd2 { left: 220px; top: 778px; width: 16px; height: 16px; }
+  </style>
+  <div id="root" data-composition-id="s6" data-width="1080" data-height="1920">
+    <div id="s6-flip">
+      <div id="s6-cam">
+        <div id="s6-bob">
+          <canvas id="s6-cv" width="1080" height="1920"></canvas>
+          <div class="s6-map s6-t" id="s6-sf" data-layout-ignore><div id="s6-sft">STOCK</div><div id="s6-sfv">100</div></div>
+          <div class="s6-map s6-t" id="s6-pf" data-layout-ignore><div id="s6-pfv">98</div></div>
+          <div class="s6-anc" id="s6-adn"><div class="s6-ctr"><div class="s6-t" id="s6-dn"><svg viewBox="0 0 24 24"><path d="M12 4 V19 M5.5 13 L12 19.5 L18.5 13" fill="none" stroke="#ffffff" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" /></svg>−2%</div></div></div>
+          <div class="s6-anc" id="s6-ac"><div class="s6-ctr"><div class="s6-sb s6-r s6-t" id="s6-call"><div class="s6-nm">CALL</div><div class="s6-v">−1.04</div></div></div></div>
+          <div class="s6-anc" id="s6-ah"><div class="s6-ctr"><div class="s6-sb s6-t" id="s6-hedge"><div class="s6-nm">HEDGE</div><div class="s6-v">+1.08</div></div></div></div>
+          <div class="s6-anc" id="s6-an"><div class="s6-ctr"><div class="s6-sb s6-t" id="s6-net"><div class="s6-nm">NET</div><div class="s6-v" id="s6-netv">+0.04<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#2563eb" /><path id="s6-chk" d="M6.5 12.5 L10.5 16.5 L17.5 8" fill="none" stroke="#ffffff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" /></svg></div></div></div></div>
+          <div class="s6-anc" id="s6-ag"><div class="s6-ctr s6-below"><div class="s6-t" id="s6-gt">+2% day</div></div></div>
+          <div class="s6-anc" id="s6-ano"><div class="s6-ctr s6-below"><div class="s6-t" id="s6-note">scale: <b>1.00 = 3 units</b></div></div></div>
+          <div id="s6-bothw"><div class="s6-t" id="s6-both">BOTH WAYS <i>·</i> +0.04</div></div>
+          <div class="s6-qd" id="s6-qd2"></div>
+          <div class="s6-qd" id="s6-qd1"></div>
+          <div id="s6-qw"><div class="s6-t" id="s6-q">?</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      /*DATA*/ const DUR = 4.86; const W = [0.16, 0.54, 0.64, 0.88, 1.2, 1.56, 2.2, 2.4, 2.58, 3.26, 3.4, 3.64, 3.9, 4.51]; /*END*/
+      // words: 0 If 1 the 2 stock 3 drops 4 2% 5 instead, 6 you're 7 still 8 up. 9 You 10 win 11 both 12 ways. 13 Why?
+      const w = (i) => Math.max(0, W.length > i ? W[i] : 0.16 + i * 0.32);
+// ISO KIT v1: isometric toy-world drawing on a 2D canvas, matching the Flow dioramas' look.
+// Copy this block verbatim into a scene's <script> (inside its IIFE). World units: x to the right-back, y to the left-back,
+// z up. P(x, y, z) -> frame px. Visible faces of a box: top, the face at y+d (front-left) and the face at x+w (front-right).
+// Draw back to front: sort what you draw by (x + y) ascending, then z ascending (painter's order).
+const ISO = (function () {
+  const C30 = Math.cos(Math.PI / 6), S30 = 0.5;
+  const MAT = {
+    white: { top: "#ffffff", left: "#e3ebfb", right: "#c9d8f5" },
+    blue:  { top: "#7fb0ff", left: "#3b82f6", right: "#2563eb" },
+    navy:  { top: "#4f6fe0", left: "#1e40af", right: "#1e3a8a" },
+    sky:   { top: "#dbeafe", left: "#bfdbfe", right: "#93c5fd" },
+    rose:  { top: "#fda4af", left: "#f43f5e", right: "#e11d48" },
+    gold:  { top: "#fde68a", left: "#f59e0b", right: "#d97706" },
+    grey:  { top: "#f1f5f9", left: "#cbd5e1", right: "#94a3b8" },
+    wood:  { top: "#f3c58f", left: "#d99a5b", right: "#b97a3f" },
+  };
+  function make(g, ox, oy, u) {
+    const P = (x, y, z) => [ox + (x - y) * C30 * u, oy + (x + y) * S30 * u - (z || 0) * u];
+    function poly(pts, fill, stroke, lw) {
+      g.beginPath(); pts.forEach(([a, b], i) => (i ? g.lineTo(a, b) : g.moveTo(a, b))); g.closePath();
+      if (fill) { g.fillStyle = fill; g.fill(); }
+      if (stroke) { g.strokeStyle = stroke; g.lineWidth = lw || 1.5; g.stroke(); }
+    }
+    function box(x, y, z, w, d, h, mat, edge) {
+      if (h <= 0 || w <= 0 || d <= 0) return;
+      edge = edge === undefined ? "rgba(15,35,90,0.14)" : edge;
+      poly([P(x, y + d, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x, y + d, z + h)], mat.left, edge);
+      poly([P(x + w, y, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x + w, y, z + h)], mat.right, edge);
+      poly([P(x, y, z + h), P(x + w, y, z + h), P(x + w, y + d, z + h), P(x, y + d, z + h)], mat.top, edge);
+    }
+    // a soft contact shadow on the floor plane z
+    function shadow(x, y, z, w, d, a) {
+      const c = P(x + w / 2, y + d / 2, z); const rx = (w + d) * C30 * u * 0.55, ry = (w + d) * S30 * u * 0.55;
+      const gr = g.createRadialGradient(c[0], c[1], 0, c[0], c[1], rx);
+      gr.addColorStop(0, `rgba(30,64,175,${a || 0.18})`); gr.addColorStop(1, "rgba(30,64,175,0)");
+      g.save(); g.translate(c[0], c[1]); g.scale(1, ry / rx); g.translate(-c[0], -c[1]);
+      g.fillStyle = gr; g.beginPath(); g.arc(c[0], c[1], rx, 0, 6.2832); g.fill(); g.restore();
+    }
+    // the floating platform: white top slab, blue band, white band, blue base (like the dioramas), its top at z = 0
+    function platform(x, y, w, d) {
+      box(x, y, -1.5, w, d, 0.42, MAT.blue);
+      box(x, y, -1.08, w, d, 0.3, MAT.white);
+      box(x, y, -0.78, w, d, 0.28, MAT.blue);
+      box(x, y, -0.5, w, d, 0.5, MAT.white);
+    }
+    // a 2D affine matrix that maps a flat w x h DOM element onto a face given three projected corners (TL, TR, BL)
+    function faceMatrix(tl, tr, bl, w, h) {
+      const a = (tr[0] - tl[0]) / w, b = (tr[1] - tl[1]) / w, c = (bl[0] - tl[0]) / h, d = (bl[1] - tl[1]) / h;
+      return `matrix(${a.toFixed(5)},${b.toFixed(5)},${c.toFixed(5)},${d.toFixed(5)},${tl[0].toFixed(2)},${tl[1].toFixed(2)})`;
+    }
+    return { P, poly, box, shadow, platform, faceMatrix, u };
+  }
+  return { make, MAT };
+})();
+
+      const tl = gsap.timeline({ paused: true });
+      const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+      const backOut = (p, s) => { p = clamp(p, 0, 1); const q = p - 1; return q * q * ((s + 1) * q + s) + 1; };
+      const squash = (t, ti, amt, dur) => { const p = (t - ti) / dur; return p < 0 || p > 1 ? 1 : 1 - amt * Math.sin(p * Math.PI * 3) * Math.exp(-p * 4.2); };
+      const hop = (t, t0, d, h) => { const p = (t - t0) / d; return p < 0 || p > 1 ? 0 : h * Math.sin(Math.PI * p); };
+      const hex = (c) => [1, 3, 5].map((i) => parseInt(c.substr(i, 2), 16));
+      const mixC = (a, b, k) => { const A = hex(a), B = hex(b); return "rgb(" + A.map((v, i) => Math.round(v + (B[i] - v) * k)).join(",") + ")"; };
+      const mixM = (a, b, k) => ({ top: mixC(a.top, b.top, k), left: mixC(a.left, b.left, k), right: mixC(a.right, b.right, k) });
+
+      // ---- the same set as s5, other direction: left, the price step (STOCK 100, then the step down to 98); right, the P&L columns ----
+      const U = 48, OX = 520, OY = 815;
+      const g = document.getElementById("s6-cv").getContext("2d");
+      const K = ISO.make(g, OX, OY, U), MAT = ISO.MAT, P = K.P;
+      const STK = { x: 0.4, y: 7.2, w: 2.4, d: 2.4, h: 2.2 };          // the STOCK 100 block
+      const STP = { x: 0.4, y: 4.8, w: 2.4, d: 2.4 };                   // the step: level with 100, then down to 98 (s5's 2% step is 1.0 unit up; here 1.0 down)
+      const H100 = 2.2, H98 = 1.2;
+      // P&L per share for a −2% day: call −1.0396, hedge +1.0797, net +0.0401; column height = 3 units per 1.00 (honest scale, as in s5)
+      const SCALE = 3, CW = 1.4;
+      const COLS = [
+        { c: [5.04, 5.16], v: 1.0395924950274988, mat: MAT.rose, id: "s6-ac" },
+        { c: [7.025, 3.175], v: 1.079655674554058, mat: MAT.blue, id: "s6-ah" },
+        { c: [9.2, 0.8], v: 0.040063179526559134, mat: MAT.blue, id: "s6-an" },
+      ];
+      const GHOST = { c: [9.2, 2.4], v: 0.039271117870025796 };        // the +2% day's net (s5), as a ghost beside this one
+
+      // ---- beats ----
+      const tHop = w(2) - 0.06;                                                 // STOCK hops on "stock"
+      const tS0 = w(3) - 0.02, tS1 = w(4) + 0.02;                               // the step sinks over "drops 2%"
+      const grow = [
+        [w(5) - 0.1, w(5) + 0.3],                                               // CALL on "instead,"
+        [w(6) - 0.14, w(6) + 0.26],                                             // HEDGE on "you're still"
+        [w(8) - 0.18, w(8) + 0.08],                                             // NET on "up."
+      ];
+      const tG = w(11) - 0.06, tJ = w(12) - 0.06;                               // ghost on "both", hop on "ways."
+
+      // entrance flip and a slow push (no exit flip: the tile cascade covers the cut)
+      tl.fromTo("#s6-flip", { rotationY: -90, scale: 0.94 }, { rotationY: 0, scale: 1, duration: 0.36, ease: "power3.out" }, 0);
+      tl.fromTo("#s6-cam", { scale: 1 }, { scale: 1.04, duration: DUR, ease: "none" }, 0);
+      // −2% pill pops on "2%"
+      tl.fromTo("#s6-dn", { opacity: 0, scale: 0.3, y: 30 }, { opacity: 1, scale: 1, y: 0, duration: 0.32, ease: "back.out(2.8)" }, tS1 - 0.08);
+      // column boards pop as each column lands
+      ["#s6-call", "#s6-hedge", "#s6-net"].forEach((id, k) => {
+        const t1 = grow[k][1];
+        tl.fromTo(id, { opacity: 0, scale: 0.3, y: 24 }, { opacity: 1, scale: 1, y: 0, duration: 0.3, ease: "back.out(2.8)" }, t1 - 0.12);
+        tl.fromTo(id, { scaleX: 1, scaleY: 1 }, { scaleX: 1.08, scaleY: 0.86, duration: 0.07, ease: "power2.out", immediateRender: false }, t1 + 0.18);
+        tl.fromTo(id, { scaleX: 1.08, scaleY: 0.86 }, { scaleX: 1, scaleY: 1, duration: 0.28, ease: "back.out(3)", immediateRender: false }, t1 + 0.25);
+      });
+      tl.fromTo("#s6-chk", { strokeDashoffset: 26 }, { strokeDashoffset: 0, duration: 0.18, ease: "power2.out" }, grow[2][1] + 0.04);
+      tl.fromTo("#s6-note", { opacity: 0, scale: 0.4, y: -12 }, { opacity: 1, scale: 1, y: 0, duration: 0.3, ease: "back.out(2.4)" }, grow[0][1] + 0.3);
+      // "both": the pill, and the +2% day's net returns as a ghost beside this one
+      tl.fromTo("#s6-both", { opacity: 0, scale: 0.25, y: 34, rotation: -8 }, { opacity: 1, scale: 1, y: 0, rotation: -2, duration: 0.34, ease: "back.out(2.8)" }, w(11) - 0.04);
+      tl.fromTo("#s6-both", { scaleX: 1, scaleY: 1 }, { scaleX: 1.07, scaleY: 0.86, duration: 0.07, ease: "power2.out", immediateRender: false }, w(11) + 0.3);
+      tl.fromTo("#s6-both", { scaleX: 1.07, scaleY: 0.86 }, { scaleX: 1, scaleY: 1, duration: 0.3, ease: "back.out(3)", immediateRender: false }, w(11) + 0.37);
+      tl.fromTo("#s6-gt", { opacity: 0, scale: 0.4, y: -10 }, { opacity: 1, scale: 1, y: 0, duration: 0.3, ease: "back.out(2.6)" }, tG + 0.14);
+      // "Why?": a thought bubble
+      tl.fromTo("#s6-qd2", { opacity: 0, scale: 0.2 }, { opacity: 1, scale: 1, duration: 0.16, ease: "back.out(3)" }, w(13) - 0.14);
+      tl.fromTo("#s6-qd1", { opacity: 0, scale: 0.2 }, { opacity: 1, scale: 1, duration: 0.16, ease: "back.out(3)" }, w(13) - 0.09);
+      tl.fromTo("#s6-q", { opacity: 0, scale: 0.2, rotation: 20 }, { opacity: 1, scale: 1, rotation: -6, duration: 0.3, ease: "back.out(3)" }, w(13) - 0.04);
+
+      // static anchors
+      const place = (id, p) => { const e = document.getElementById(id); e.style.left = p[0].toFixed(1) + "px"; e.style.top = p[1].toFixed(1) + "px"; };
+      place("s6-adn", P(STP.x + STP.w / 2, STP.y + STP.d / 2, H100 + 0.6));
+      place("s6-ano", P(11.4, 8.6, -1.5));
+      place("s6-ag", P(GHOST.c[0] + CW / 2, GHOST.c[1] + CW / 2, 0));
+      const sf = document.getElementById("s6-sf"), pf = document.getElementById("s6-pf"), bob = document.getElementById("s6-bob");
+      const SFW = STK.w * U, SFH = STK.h * U, PFW = STP.d * U, PFH = H98 * U;
+      sf.style.width = SFW + "px"; sf.style.height = SFH + "px"; pf.style.width = PFW + "px"; pf.style.height = PFH + "px";
+      const anc = COLS.map((c) => document.getElementById(c.id));
+
+      function floorShadow() {
+        const cx = OX + 40, cy = OY + 10 * U + 1.5 * U + 70, rx = 460, ry = 120;
+        g.save(); g.translate(cx, cy); g.scale(1, ry / rx);
+        const gr = g.createRadialGradient(0, 0, 0, 0, 0, rx);
+        gr.addColorStop(0, "rgba(37,99,235,0.30)"); gr.addColorStop(0.55, "rgba(37,99,235,0.12)"); gr.addColorStop(1, "rgba(37,99,235,0)");
+        g.fillStyle = gr; g.beginPath(); g.arc(0, 0, rx, 0, 6.2832); g.fill(); g.restore();
+      }
+      // a box squashed about its base centre
+      const sbox = (b, z, h, sx, mat) => { const wq = b.w * sx, dq = b.d * sx; K.box(b.x + (b.w - wq) / 2, b.y + (b.d - dq) / 2, z, wq, dq, h, mat); };
+      function dashedTile(x, y, z, s, h, a) {
+        g.save(); g.globalAlpha = a; g.setLineDash([7, 6]); g.lineWidth = 2.5; g.strokeStyle = "#2563eb"; g.lineJoin = "round";
+        const z1 = z + h, pts = [P(x, y + s, z), P(x + s, y + s, z), P(x + s, y, z), P(x + s, y, z1), P(x, y, z1), P(x, y + s, z1)];
+        g.beginPath(); pts.forEach(([p, q], i) => (i ? g.lineTo(p, q) : g.moveTo(p, q))); g.closePath(); g.stroke();
+        g.beginPath(); g.moveTo(...P(x, y + s, z1)); g.lineTo(...P(x + s, y + s, z1)); g.lineTo(...P(x + s, y, z1)); g.stroke(); g.restore();
+      }
+
+      function draw(t) {
+        bob.style.transform = "translateY(" + (-8 * Math.sin((2 * Math.PI * (t + 2.2)) / 3)).toFixed(2) + "px)";
+        g.clearRect(0, 0, 1080, 1920);
+        floorShadow();
+        K.shadow(0, 0, -1.6, 10, 10, 0.2);
+        K.platform(0, 0, 10, 10);
+        // column sockets on the platform
+        for (const c of COLS) {
+          const x0 = c.c[0] - CW / 2 - 0.12, y0 = c.c[1] - CW / 2 - 0.12, s = CW + 0.24;
+          K.poly([P(x0, y0, 0), P(x0 + s, y0, 0), P(x0 + s, y0 + s, 0), P(x0, y0 + s, 0)], "#e6eefd", "rgba(37,99,235,0.28)", 2);
+        }
+        // the step: level with 100, then it steps down to 98 over "drops 2%" (overshoot, squash), turning rose
+        const pr = (t - tS0) / (tS1 - tS0), hs = H100 - (H100 - H98) * (pr <= 0 ? 0 : backOut(pr, 2.2));
+        const sqS = squash(t, tS1, 0.14, 0.4), bxS = 1 + (1 - sqS) * 0.5, kS = clamp(pr * 1.4, 0, 1);
+        K.shadow(STP.x, STP.y, 0, STP.w, STP.d, 0.16);
+        sbox(STP, 0, hs * sqS, bxS, mixM(MAT.white, MAT.rose, kS));
+        const xr = STP.x + STP.w, hf = hs * sqS;
+        pf.style.opacity = clamp((pr - 0.55) / 0.3, 0, 1).toFixed(3);
+        pf.style.transform = K.faceMatrix(P(xr, STP.y + STP.d, hf), P(xr, STP.y, hf), P(xr, STP.y + STP.d, hf - H98), PFW, PFH);
+        // the STOCK 100 block: hops on "stock"
+        const zb = hop(t, tHop, 0.34, 0.8);
+        const bz = squash(t, tHop + 0.34, 0.14, 0.4), bx = 1 + (1 - bz) * 0.5;
+        K.shadow(STK.x, STK.y, 0, STK.w, STK.d, 0.22 * clamp(1 - zb / 8, 0.25, 1));
+        sbox(STK, zb, STK.h * bz, bx, MAT.navy);
+        const wq = STK.w * bx, x0 = STK.x + (STK.w - wq) / 2, yf = STK.y + (STK.d + STK.d * bx) / 2;
+        sf.style.transform = K.faceMatrix(P(x0, yf, zb + STK.h * bz), P(x0 + wq, yf, zb + STK.h * bz), P(x0, yf, zb), SFW, SFH);
+        // the P&L columns grow with an overshoot; their boards ride on the tops; NET and its ghost hop on "ways."
+        const jN = hop(t, tJ, 0.28, 0.5), jG = hop(t, tJ + 0.1, 0.28, 0.5);
+        COLS.forEach((c, k) => {
+          const [t0, t1] = grow[k], p = (t - t0) / (t1 - t0), H = c.v * SCALE, h = p <= 0 ? 0 : H * backOut(p, 1.8);
+          const z = k === 2 ? jN : 0;
+          if (h > 0.004) {
+            K.shadow(c.c[0] - CW / 2, c.c[1] - CW / 2, 0, CW, CW, 0.18);
+            K.box(c.c[0] - CW / 2, c.c[1] - CW / 2, z, CW, CW, h, c.mat);
+          }
+          const a = P(c.c[0], c.c[1], Math.max(h, H) + 0.3 + z);
+          anc[k].style.left = a[0].toFixed(1) + "px"; anc[k].style.top = a[1].toFixed(1) + "px";
+        });
+        // the ghost: the +2% day's net, faint, beside this one (drawn last: it stands in front)
+        const gA = clamp((t - tG) / 0.3, 0, 1);
+        if (gA > 0) {
+          const H = GHOST.v * SCALE * backOut(gA, 2), x = GHOST.c[0] - CW / 2, y = GHOST.c[1] - CW / 2;
+          g.save(); g.globalAlpha = 0.8 * gA; K.box(x, y, jG, CW, CW, H, { top: "#c7dcfd", left: "#93c5fd", right: "#7fb0ff" }, null); g.restore();
+          dashedTile(x, y, jG, CW, H, 0.95 * gA);
+        }
+      }
+      const st = { t: 0 };
+      tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: () => draw(st.t) }, 0);
+      draw(0);
+      window.__timelines["s6"] = tl;
+    })();
+  </script>
+</template>

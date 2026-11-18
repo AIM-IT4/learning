@@ -1,0 +1,158 @@
+<template>
+  <style>
+    @font-face { font-family: "Fredoka"; font-weight: 400; src: url("assets/fonts/fredoka-400.woff2"); }
+    @font-face { font-family: "Fredoka"; font-weight: 700; src: url("assets/fonts/fredoka-700.woff2"); }
+    @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
+    @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
+    #root { position: absolute; inset: 0; overflow: hidden; perspective: 2400px; perspective-origin: 540px 1150px; }
+    #s14-flip { position: absolute; inset: 0; transform-origin: 540px 1150px; }
+    #s14-cam { position: absolute; inset: 0; transform-origin: 540px 1100px; }
+    #s14-pun { position: absolute; inset: 0; transform-origin: 560px 1120px; }
+    #s14-bob { position: absolute; inset: 0; }
+    #s14-bump { position: absolute; inset: 0; }
+    #s14-dio { position: absolute; left: 0; top: -8px; width: 1080px; height: 1935px; }
+    .s14-t { font-family: "Fredoka", "D2QSans", "JetBrains Mono", sans-serif; font-weight: 700; color: #0b1b3a; white-space: nowrap; }
+    .s14-card { position: absolute; inset: 0; background: #ffffff; border-radius: 26px; box-shadow: 0 10px 0 #2563eb, 0 24px 36px rgba(30,64,175,0.22); }
+    .s14-card.r { box-shadow: 0 10px 0 #e11d48, 0 24px 36px rgba(159,18,57,0.22); }
+    .s14-pw { position: absolute; opacity: 0; transform-origin: 50% 100%; }
+    .s14-hop { position: absolute; inset: 0; transform-origin: 50% 100%; }
+    /* the toy blocks (isometric boxes drawn in SVG); outer = drop and hops, inner = squash about the bottom corner */
+    .s14-blk { position: absolute; width: 196px; height: 182px; opacity: 0; }
+    .s14-bsq { position: absolute; inset: 0; transform-origin: 70px 176px; }
+    .s14-blk svg { position: absolute; left: 0; top: 0; overflow: visible; }
+    .s14-shd { position: absolute; width: 190px; height: 64px; border-radius: 50%; opacity: 0;
+               background: radial-gradient(closest-side, rgba(15,23,42,0.30), rgba(15,23,42,0.10) 60%, rgba(15,23,42,0) 100%); }
+    #s14-str { position: absolute; left: 0; top: 0; overflow: visible; opacity: 0.8; }
+    /* the question pill above the beam */
+    #s14-bet { left: 222px; top: 610px; width: 636px; height: 92px; }
+    #s14-bet .s14-card { border-radius: 46px; }
+    #s14-betx { position: absolute; left: 0; right: 0; top: 0; height: 92px; display: flex; justify-content: center; align-items: baseline; gap: 15px; font-size: 52px; line-height: 92px; }
+    #s14-betx span, #s14-betx b { display: block; flex: none; }
+    #s14-betx b { color: #2563eb; transform-origin: 0% 80%; }
+    /* the two side signs and the plaque */
+    #s14-ern { left: 112px; top: 1290px; width: 268px; height: 112px; }
+    #s14-eat { left: 664px; top: 1104px; width: 252px; height: 112px; }
+    .s14-two { position: absolute; left: 0; right: 0; top: 10px; text-align: center; font-size: 42px; line-height: 46px; }
+    #s14-plq { left: 176px; top: 1466px; width: 728px; height: 86px; }
+    #s14-plqx { position: absolute; left: 0; right: 0; top: 0; text-align: center; font-size: 39px; line-height: 86px; }
+    #s14-plqx b { color: #2563eb; }
+  </style>
+  <div id="root" data-composition-id="s14" data-width="1080" data-height="1920">
+    <div id="s14-flip">
+      <div id="s14-cam">
+        <div id="s14-pun">
+          <div id="s14-bob">
+            <div id="s14-bump">
+              <img id="s14-dio" src="assets/plates/i14.png" alt="" />
+              <div class="s14-shd" id="s14-sg"></div>
+              <div class="s14-shd" id="s14-st"></div>
+              <div class="s14-blk" id="s14-bg"><div class="s14-bsq" id="s14-bgq"></div></div>
+              <div class="s14-blk" id="s14-bt"><div class="s14-bsq" id="s14-btq"></div></div>
+              <svg id="s14-str" width="1080" height="1920" viewBox="0 0 1080 1920"></svg>
+            </div>
+            <div class="s14-pw" id="s14-bet"><div class="s14-hop" id="s14-beth"><div class="s14-card"></div>
+              <div class="s14-t" id="s14-betx"><span>a bet on</span><b id="s14-vol">volatility</b></div></div></div>
+            <div class="s14-pw" id="s14-ern"><div class="s14-hop" id="s14-ernh"><div class="s14-card"></div>
+              <div class="s14-t s14-two" style="color: #2563eb;">earns on<br />big moves</div></div></div>
+            <div class="s14-pw" id="s14-eat"><div class="s14-hop" id="s14-eath"><div class="s14-card r"></div>
+              <div class="s14-t s14-two" style="color: #e11d48;">eats<br />every day</div></div></div>
+            <div class="s14-pw" id="s14-plq"><div class="s14-hop"><div class="s14-card"></div>
+              <div class="s14-t" id="s14-plqx">at the vol you paid, <b>they balance</b></div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      /*DATA*/ const DUR = 5.6; const W = [0.16, 0.29, 0.57, 0.67, 1.23, 1.45, 1.99, 2.25, 2.45, 2.55, 2.79, 3.01, 3.97, 4.27, 4.91, 5.09]; /*END*/
+      // words: 0 So 1 here's 2 the 3 answer: 4 a 5 delta-hedged 6 call 7 is 8 a 9 bet 10 on 11 volatility. 12 Gamma 13 earns, 14 theta 15 eats.
+      const w = (i) => Math.max(0, W.length > i ? W[i] : 0.16 + i * 0.32);
+
+      // ---- the toy blocks: isometric boxes (2:1), left face carries the Greek letter, right face the name ----
+      const P = 66, Q = 124, V = 80, ux = 0.894, uy = 0.447;
+      const L0 = [-P * ux, -P * uy], R0 = [Q * ux, -Q * uy], F1 = [0, -V];
+      const L1 = [L0[0], L0[1] - V], R1 = [R0[0], R0[1] - V], B1 = [L1[0] + R0[0], L1[1] + R0[1]];
+      const pt = (p) => p[0].toFixed(1) + "," + p[1].toFixed(1);
+      const mat = (TL, TR, BL, w0, h0) => "matrix(" + [(TR[0] - TL[0]) / w0, (TR[1] - TL[1]) / w0, (BL[0] - TL[0]) / h0, (BL[1] - TL[1]) / h0, TL[0], TL[1]].map((v) => v.toFixed(4)).join(" ") + ")";
+      function blockSVG(c, glyph, word) {
+        const face = (pts, fill) => '<polygon points="' + pts.map(pt).join(" ") + '" fill="' + fill + '" stroke="' + fill + '" stroke-width="7" stroke-linejoin="round"/>';
+        return '<svg width="196" height="182" viewBox="-70 -176 196 182">' +
+          face([L0, [0, 0], F1, L1], c.l) + face([[0, 0], R0, R1, F1], c.r) + face([F1, R1, B1, L1], c.t) +
+          '<polyline points="' + [L1, F1, R1].map(pt).join(" ") + '" fill="none" stroke="rgba(255,255,255,0.75)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>' +
+          '<g transform="' + mat(L1, F1, L0, 132, 160) + '">' + glyph + "</g>" +
+          '<g transform="' + mat(F1, R1, [0, 0], 248, 160) + '"><text x="124" y="104" text-anchor="middle" font-family="Fredoka, D2QSans, sans-serif" font-weight="700" font-size="68" fill="#ffffff" letter-spacing="1">' + word + "</text></g>" +
+          "</svg>";
+      }
+      const GAMMA = '<path d="M 44 132 V 34 H 98" fill="none" stroke="#ffffff" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>';
+      const THETA = '<ellipse cx="66" cy="83" rx="34" ry="47" fill="none" stroke="#ffffff" stroke-width="18"/><path d="M 48 83 H 84" stroke="#ffffff" stroke-width="16" stroke-linecap="round"/>';
+      document.getElementById("s14-bgq").innerHTML = blockSVG({ t: "#93c5fd", l: "#3b82f6", r: "#2563eb" }, GAMMA, "GAMMA");
+      document.getElementById("s14-btq").innerHTML = blockSVG({ t: "#fda4af", l: "#fb7185", r: "#e11d48" }, THETA, "THETA");
+      // each block's footprint is centred on its pan's rim (measured on the plate, frame px): left pan (359.3, 1209.8), right pan (739.0, 1029.0)
+      const PANS = [{ id: "s14-bg", sh: "s14-sg", c: [359.3, 1209.8] }, { id: "s14-bt", sh: "s14-st", c: [739.0, 1029.0] }];
+      PANS.forEach((p) => {
+        const fx = p.c[0] - (L0[0] + R0[0]) / 2, fy = p.c[1] - (L0[1] + R0[1]) / 2 + 2;     // the block's front-bottom corner
+        const b = document.getElementById(p.id); b.style.left = (fx - 70).toFixed(1) + "px"; b.style.top = (fy - 176).toFixed(1) + "px";
+        const s = document.getElementById(p.sh); s.style.left = (p.c[0] - 95).toFixed(1) + "px"; s.style.top = (p.c[1] - 30).toFixed(1) + "px";
+      });
+      // the front hanger strings of both pans, redrawn over the blocks so the blocks sit inside the pans
+      const STR = [[[351.0, 1012], [285.5, 1237.9]], [[355.0, 1012], [419.1, 1237.9]], [[730.6, 845], [663.8, 1056.5]], [[733.6, 845], [797.3, 1056.5]]];
+      document.getElementById("s14-str").innerHTML = STR.map((s) =>
+        '<line x1="' + s[0][0] + '" y1="' + s[0][1] + '" x2="' + s[1][0] + '" y2="' + s[1][1] + '" stroke="#2f343c" stroke-width="3.6" stroke-linecap="round"/>' +
+        '<line x1="' + (s[0][0] + 0.9) + '" y1="' + s[0][1] + '" x2="' + (s[1][0] + 0.9) + '" y2="' + s[1][1] + '" stroke="rgba(226,232,240,0.85)" stroke-width="1.1" stroke-linecap="round"/>').join("");
+
+      const tl = gsap.timeline({ paused: true });
+      // the cube flip in and out, the slow push
+      tl.fromTo("#s14-flip", { rotationY: -90, scale: 0.94 }, { rotationY: 0, scale: 1, duration: 0.36, ease: "power3.out" }, 0);
+      tl.fromTo("#s14-flip", { rotationY: 0 }, { rotationY: 90, duration: 0.26, ease: "power2.in", immediateRender: false }, DUR - 0.26);
+      tl.fromTo("#s14-cam", { scale: 1 }, { scale: 1.04, duration: DUR, ease: "sine.inOut" }, 0);
+
+      const pop = (sel, t, d) => tl.fromTo(sel, { opacity: 0, scale: 0.3, y: 26 }, { opacity: 1, scale: 1, y: 0, duration: d || 0.42, ease: "back.out(2.8)" }, t);
+      const hop = (sel, t, h, sq) => {
+        tl.fromTo(sel, { y: 0 }, { y: -h, duration: 0.12, ease: "power2.out", immediateRender: false }, t);
+        tl.fromTo(sel, { y: -h }, { y: 0, duration: 0.13, ease: "power2.in", immediateRender: false }, t + 0.12);
+        tl.fromTo(sel, { scaleY: sq, scaleX: 1 + (1 - sq) * 0.6 }, { scaleY: 1, scaleX: 1, duration: 0.32, ease: "back.out(3)", immediateRender: false }, t + 0.25);
+      };
+      // "bet": the question pill pops above the beam, and hops on "volatility."
+      pop("#s14-bet", w(9) - 0.06);
+      tl.fromTo("#s14-vol", { opacity: 0, scale: 0.2, y: 14 }, { opacity: 1, scale: 1, y: 0, duration: 0.34, ease: "back.out(3)" }, w(11) - 0.1);
+      hop("#s14-beth", w(11) + 0.12, 14, 0.88);
+      // "volatility.": the two toy blocks fall into the pans, land with a squash, bounce once, and the platform takes the weight
+      [["#s14-bg", "#s14-bgq", "#s14-sg", w(11) - 0.3], ["#s14-bt", "#s14-btq", "#s14-st", w(11) - 0.2]].forEach(([b, q, s, t0]) => {
+        tl.fromTo(b, { opacity: 0 }, { opacity: 1, duration: 0.05 }, t0);
+        tl.fromTo(b, { y: -280 }, { y: 0, duration: 0.28, ease: "power2.in" }, t0);
+        tl.fromTo(b, { y: 0 }, { y: -30, duration: 0.13, ease: "power2.out", immediateRender: false }, t0 + 0.3);
+        tl.fromTo(b, { y: -30 }, { y: 0, duration: 0.13, ease: "power2.in", immediateRender: false }, t0 + 0.43);
+        tl.fromTo(q, { scaleY: 0.76, scaleX: 1.14 }, { scaleY: 1, scaleX: 1, duration: 0.28, ease: "back.out(3)", immediateRender: false }, t0 + 0.28);
+        tl.fromTo(q, { scaleY: 0.9, scaleX: 1.06 }, { scaleY: 1, scaleX: 1, duration: 0.26, ease: "back.out(3)", immediateRender: false }, t0 + 0.57);
+        tl.fromTo(s, { opacity: 0, scale: 0.35 }, { opacity: 1, scale: 1, duration: 0.28, ease: "power2.in" }, t0);
+      });
+      tl.fromTo("#s14-bump", { y: 0 }, { y: 6, duration: 0.07, ease: "power2.out" }, w(11) - 0.02);
+      tl.fromTo("#s14-bump", { y: 6 }, { y: 0, duration: 0.34, ease: "back.out(3)", immediateRender: false }, w(11) + 0.05);
+      // the scale stays level: the plaque says why
+      pop("#s14-plq", w(11) + 0.42);
+      // "Gamma" (the music drops): a punch, the GAMMA block jumps, "earns on big moves" pops and hops on "earns,"
+      tl.fromTo("#s14-pun", { scale: 1 }, { scale: 1.03, duration: 0.09, ease: "power2.out" }, w(12) - 0.03);
+      tl.fromTo("#s14-pun", { scale: 1.03 }, { scale: 1, duration: 0.42, ease: "back.out(2)", immediateRender: false }, w(12) + 0.06);
+      tl.fromTo("#s14-bg", { y: 0 }, { y: -46, duration: 0.14, ease: "power2.out", immediateRender: false }, w(12) - 0.02);
+      tl.fromTo("#s14-bg", { y: -46 }, { y: 0, duration: 0.15, ease: "power2.in", immediateRender: false }, w(12) + 0.12);
+      tl.fromTo("#s14-bgq", { scaleY: 0.8, scaleX: 1.12 }, { scaleY: 1, scaleX: 1, duration: 0.3, ease: "back.out(3)", immediateRender: false }, w(12) + 0.27);
+      pop("#s14-ern", w(12) - 0.04);
+      hop("#s14-ernh", w(13) + 0.08, 14, 0.86);
+      // "theta eats.": the THETA block thumps, "eats every day" pops and hops on "eats."
+      tl.fromTo("#s14-bt", { y: 0 }, { y: -30, duration: 0.12, ease: "power2.out", immediateRender: false }, w(14) - 0.04);
+      tl.fromTo("#s14-bt", { y: -30 }, { y: 0, duration: 0.12, ease: "power2.in", immediateRender: false }, w(14) + 0.08);
+      tl.fromTo("#s14-btq", { scaleY: 0.8, scaleX: 1.12 }, { scaleY: 1, scaleX: 1, duration: 0.3, ease: "back.out(3)", immediateRender: false }, w(14) + 0.2);
+      pop("#s14-eat", w(14) - 0.06, 0.36);
+      hop("#s14-eath", w(15) + 0.04, 12, 0.86);
+
+      // continuous layer: the diorama bob
+      const bob = document.getElementById("s14-bob");
+      function frame(t) { bob.style.transform = "translateY(" + (-8 * Math.sin((t / 3) * Math.PI * 2)).toFixed(2) + "px)"; }
+      const st = { t: 0 };
+      tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: () => frame(st.t) }, 0);
+      frame(0);
+      window.__timelines["s14"] = tl;
+    })();
+  </script>
+</template>

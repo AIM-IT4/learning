@@ -1,0 +1,12 @@
+{
+ "tempo": 1.0,
+ "max_pause": 0.5,
+ "keep": 0.42,
+ "parts": [
+  [
+   "all",
+   "/home/user/Films/d2q-day10/voice/take1.wav"
+  ]
+ ],
+ "gaps": []
+}

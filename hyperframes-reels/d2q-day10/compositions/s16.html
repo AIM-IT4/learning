@@ -1,0 +1,188 @@
+<template>
+  <style>
+    @font-face { font-family: "Fredoka"; font-weight: 400; src: url("assets/fonts/fredoka-400.woff2"); }
+    @font-face { font-family: "Fredoka"; font-weight: 700; src: url("assets/fonts/fredoka-700.woff2"); }
+    @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
+    @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
+    #root { position: absolute; inset: 0; overflow: hidden; perspective: 2400px; perspective-origin: 540px 1150px; }
+    #s16-flip { position: absolute; inset: 0; transform-origin: 540px 1150px; }
+    #s16-cam { position: absolute; inset: 0; transform-origin: 540px 700px; }
+    #s16-bob { position: absolute; inset: 0; }
+    #s16-dio { position: absolute; left: 0; top: -8px; width: 1080px; height: 1935px; }
+    .s16-t { font-family: "Fredoka", "D2QSans", "JetBrains Mono", sans-serif; font-weight: 700; color: #0b1b3a; white-space: nowrap; }
+    .s16-pw { position: absolute; opacity: 0; transform-origin: 50% 100%; }
+    .s16-hop { position: absolute; inset: 0; transform-origin: 50% 100%; }
+    .s16-card { position: absolute; inset: 0; background: #ffffff; border-radius: 28px; box-shadow: 0 10px 0 #2563eb, 0 24px 36px rgba(30,64,175,0.22); }
+
+    /* ---- the phone screen: a flat 420×828 portrait UI, mapped onto the screen lying on the platform ---- */
+    #s16-scr { position: absolute; left: 0; top: 0; width: 420px; height: 828px; transform-origin: 0 0; overflow: hidden; border-radius: 40px; background: #ffffff; }
+    #s16-hdr { position: absolute; left: 0; top: 0; width: 420px; height: 100px; background: #eff6ff; border-bottom: 3px solid #dbeafe; }
+    #s16-hav { position: absolute; left: 24px; top: 20px; width: 60px; height: 60px; border-radius: 16px; }
+    #s16-hnm { position: absolute; left: 100px; top: 0; font-size: 36px; line-height: 100px; }
+    #s16-ub { position: absolute; right: 22px; top: 122px; height: 88px; padding: 0 28px; border-radius: 44px 44px 12px 44px; background: #2563eb;
+              box-shadow: 0 7px 0 #1e40af; font-size: 54px; line-height: 88px; color: #ffffff; opacity: 0; transform-origin: 100% 100%; }
+    #s16-db { position: absolute; left: 22px; top: 232px; width: 340px; padding: 16px 22px; border-radius: 28px 28px 28px 10px; background: #f1f5f9;
+              border: 3px solid #e2e8f0; font-size: 31px; line-height: 38px; white-space: normal; opacity: 0; transform-origin: 0% 100%; }
+    #s16-dcv { position: absolute; left: 24px; top: 438px; width: 236px; height: 236px; border-radius: 24px; overflow: hidden; border: 6px solid #ffffff;
+               box-shadow: 0 8px 0 #2563eb, 0 14px 22px rgba(30,64,175,0.25); opacity: 0; transform-origin: 0% 100%; }
+    #s16-dcv img { display: block; width: 100%; height: 100%; }
+    #s16-cmp { position: absolute; left: 0; top: 700px; width: 420px; height: 128px; border-top: 3px solid #e2e8f0; background: #ffffff; }
+    #s16-in { position: absolute; left: 18px; top: 16px; width: 300px; height: 96px; border-radius: 48px; background: #f1f5f9; border: 3px solid #dbe3ee; }
+    #s16-ph { position: absolute; left: 28px; top: 0; font-size: 32px; line-height: 90px; color: #94a3b8; font-weight: 400; }
+    #s16-ty { position: absolute; left: 24px; top: 0; height: 90px; display: flex; align-items: center; font-size: 62px; line-height: 1; }
+    #s16-ty span { display: none; }
+    #s16-car { display: block; width: 6px; height: 58px; border-radius: 3px; background: #2563eb; margin-left: 4px; }
+    #s16-sb { position: absolute; left: 332px; top: 22px; width: 82px; height: 82px; border-radius: 50%; background: #2563eb; box-shadow: 0 7px 0 #1e40af; }
+    #s16-sb svg { position: absolute; left: 0; top: 0; }
+
+    /* ---- the floating DM: the reply pops up out of the phone as a big chat bubble ---- */
+    #s16-dm { left: 64px; top: 704px; width: 952px; height: 212px; transform-origin: 40% 100%; }
+    #s16-dav { position: absolute; left: 0; top: 112px; width: 96px; height: 96px; border-radius: 26px; overflow: hidden; box-shadow: 0 8px 0 #1e40af, 0 16px 24px rgba(30,64,175,0.25); }
+    #s16-dav img { display: block; width: 96px; height: 96px; }
+    #s16-dbb { position: absolute; left: 116px; top: 0; width: 836px; height: 208px; }
+    #s16-dbb .s16-card { border-radius: 32px 32px 32px 10px; }
+    #s16-dnm { position: absolute; left: 30px; top: 20px; font-size: 28px; line-height: 30px; color: #2563eb; }
+    #s16-dtx { position: absolute; left: 30px; top: 60px; font-size: 42px; line-height: 50px; }
+    #s16-dtx b { color: #2563eb; }
+    #s16-fcv { position: absolute; left: 650px; top: 18px; width: 168px; height: 168px; }
+    #s16-fcvi { position: absolute; inset: 0; border-radius: 20px; overflow: hidden; border: 6px solid #ffffff; transform: rotate(4deg);
+                box-shadow: 0 9px 0 #2563eb, 0 16px 26px rgba(30,64,175,0.28); }
+    #s16-fcvi img { display: block; width: 100%; height: 100%; }
+
+    /* ---- the three action pills ---- */
+    .s16-pill { position: absolute; left: 0; right: 0; top: 0; height: 84px; display: flex; align-items: center; justify-content: center; gap: 12px; border-radius: 42px;
+                background: #2563eb; border: 5px solid #ffffff; box-shadow: 0 9px 0 #1e40af, 0 20px 30px rgba(15,23,42,0.22);
+                font-size: 40px; line-height: 1; color: #ffffff; letter-spacing: 0.02em; }
+    #s16-p1 { left: 138px; top: 596px; width: 214px; height: 84px; }
+    #s16-p2 { left: 372px; top: 596px; width: 248px; height: 84px; }
+    #s16-p3 { left: 640px; top: 596px; width: 290px; height: 84px; }
+
+    /* ---- the profile signboard (no counts) ---- */
+    #s16-pro { left: 80px; top: 1294px; width: 920px; height: 226px; }
+    #s16-lg { position: absolute; left: 30px; top: 25px; width: 170px; height: 170px; border-radius: 42px; overflow: hidden;
+              box-shadow: 0 9px 0 #1e40af, 0 18px 26px rgba(15,23,42,0.25); }
+    #s16-lg img { display: block; width: 170px; height: 170px; }
+    #s16-pn { position: absolute; left: 236px; top: 24px; font-size: 66px; line-height: 72px; }
+    #s16-ph2 { position: absolute; left: 240px; top: 100px; font-size: 36px; line-height: 40px; color: #475569; }
+    #s16-site { position: absolute; left: 236px; top: 150px; height: 56px; display: flex; align-items: center; gap: 10px; padding: 0 24px 0 16px; border-radius: 28px;
+                background: #dbeafe; font-size: 32px; line-height: 1; color: #1e40af; }
+    /* ---- the next-day sticker ---- */
+    #s16-day { left: 690px; top: 1226px; width: 320px; height: 104px; }
+    #s16-dayr { position: absolute; inset: 0; transform: rotate(-6deg); }
+    #s16-dayc { position: absolute; inset: 0; border-radius: 52px; background: #2563eb; border: 8px solid #ffffff; box-shadow: 0 13px 0 #1e40af, 0 28px 44px rgba(15,23,42,0.28); }
+    #s16-dayt { position: absolute; left: 0; right: 0; top: 0; display: flex; align-items: center; justify-content: center; gap: 14px; font-size: 54px; line-height: 104px; color: #ffffff; }
+  </style>
+  <div id="root" data-composition-id="s16" data-width="1080" data-height="1920">
+    <div id="s16-flip">
+      <div id="s16-cam">
+        <div id="s16-bob">
+          <img id="s16-dio" src="assets/plates/i16.png" alt="" />
+          <div id="s16-scr">
+            <div id="s16-hdr"><img id="s16-hav" src="assets/logo.png" alt="" /><div class="s16-t" id="s16-hnm">Desk2Quant</div></div>
+            <div class="s16-t" id="s16-ub">GREEKS</div>
+            <div class="s16-t" id="s16-db">Hey! Here's your free Greeks Cheat Sheet 🎯</div>
+            <div id="s16-dcv"><img src="assets/covers/greeks-cheat-sheet.jpg" alt="" /></div>
+            <div id="s16-cmp">
+              <div id="s16-in">
+                <div class="s16-t" id="s16-ph">Add a comment…</div>
+                <div class="s16-t" id="s16-ty"><span>G</span><span>R</span><span>E</span><span>E</span><span>K</span><span>S</span><i id="s16-car"></i></div>
+              </div>
+              <div id="s16-sb"><svg width="82" height="82" viewBox="0 0 82 82"><path d="M41 60 V24 M26 38 L41 23 L56 38" fill="none" stroke="#ffffff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" /></svg></div>
+            </div>
+          </div>
+          <div class="s16-pw" id="s16-dm"><div class="s16-hop" id="s16-dmh">
+            <div id="s16-dav"><img src="assets/logo.png" alt="" /></div>
+            <div id="s16-dbb"><div class="s16-card"></div>
+              <div class="s16-t" id="s16-dnm">Desk2Quant</div>
+              <div class="s16-t" id="s16-dtx">Hey! Here's your free<br /><b>Greeks Cheat Sheet</b> 🎯</div>
+              <div id="s16-fcv"><div id="s16-fcvi"><img src="assets/covers/greeks-cheat-sheet.jpg" alt="" /></div></div>
+            </div>
+          </div></div>
+          <div class="s16-pw" id="s16-p1"><div class="s16-hop"><div class="s16-pill s16-t">
+            <svg width="40" height="40" viewBox="0 0 40 40"><path d="M11 5 H29 V35 L20 27 L11 35 Z" fill="none" stroke="#ffffff" stroke-width="5" stroke-linejoin="round" /></svg>SAVE</div></div></div>
+          <div class="s16-pw" id="s16-p2"><div class="s16-hop"><div class="s16-pill s16-t">
+            <svg width="40" height="40" viewBox="0 0 40 40"><path d="M6 21 L34 7 L25 35 L19 23 Z M19 23 L34 7" fill="none" stroke="#ffffff" stroke-width="4.5" stroke-linejoin="round" stroke-linecap="round" /></svg>SHARE</div></div></div>
+          <div class="s16-pw" id="s16-p3"><div class="s16-hop"><div class="s16-pill s16-t">
+            <svg width="40" height="40" viewBox="0 0 40 40"><path d="M20 7 V33 M7 20 H33" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" /></svg>FOLLOW</div></div></div>
+          <div class="s16-pw" id="s16-pro"><div class="s16-hop"><div class="s16-card"></div>
+            <div id="s16-lg"><img src="assets/logo.png" alt="" /></div>
+            <div class="s16-t" id="s16-pn">Desk2Quant</div>
+            <div class="s16-t" id="s16-ph2">@desk2quant</div>
+            <div class="s16-t" id="s16-site"><svg width="34" height="34" viewBox="0 0 34 34" fill="none"><circle cx="17" cy="17" r="13" stroke="#1e40af" stroke-width="3.4" /><path d="M4 17 H30 M17 4 C10 10 10 24 17 30 M17 4 C24 10 24 24 17 30" stroke="#1e40af" stroke-width="3" stroke-linecap="round" /></svg>desk2quant.com</div>
+          </div></div>
+          <div class="s16-pw" id="s16-day"><div class="s16-hop" id="s16-dayh"><div id="s16-dayr"><div id="s16-dayc"></div>
+            <div class="s16-t" id="s16-dayt">DAY 11<svg width="46" height="46" viewBox="0 0 46 46"><path d="M8 23 H36 M24 11 L36 23 L24 35" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" /></svg></div>
+          </div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      /*DATA*/ const DUR = 7.86; const W = [0.16, 0.6, 0.96, 1.16, 1.36, 1.58, 1.74, 1.88, 2.1, 2.42, 2.64, 3.08, 3.48, 3.8, 4.06, 4.2, 4.36, 4.64, 5.28, 5.44, 5.58]; /*END*/
+      // words: 0 Comment 1 GREEKS, 2 and 3 we'll 4 DM 5 you 6 the 7 free 8 Greeks 9 Cheat 10 Sheet. 11 Save 12 this, 13 share 14 it, 15 and 16 follow 17 Desk2Quant 18 for 19 Day 20 11.
+      const w = (i) => Math.max(0, W.length > i ? W[i] : 0.16 + i * 0.27);
+      const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+
+      // the phone screen face, measured on the plate (frame px): far corner = the screen's top-left, right corner = top-right, left corner = bottom-left
+      function mapTo(el, w0, h0, TL, TR, BL) {
+        const m = [(TR[0] - TL[0]) / w0, (TR[1] - TL[1]) / w0, (BL[0] - TL[0]) / h0, (BL[1] - TL[1]) / h0, TL[0], TL[1]];
+        el.style.transform = "matrix(" + m.map((v) => v.toFixed(5)).join(",") + ")";
+      }
+      mapTo(document.getElementById("s16-scr"), 420, 828, [635.3, 954.1], [817.1, 1054.8], [277.2, 1152.7]);
+
+      const tl = gsap.timeline({ paused: true });
+      // entrance under the tile cascade: settle in from 1.1, then the slow push
+      tl.fromTo("#s16-flip", { scale: 1.1, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.35, ease: "power2.out" }, 0);
+      tl.fromTo("#s16-cam", { scale: 1 }, { scale: 1.04, duration: DUR, ease: "sine.inOut" }, 0);
+      const pop = (sel, t, d, s0) => tl.fromTo(sel, { opacity: 0, scale: s0 || 0.3, y: 26 }, { opacity: 1, scale: 1, y: 0, duration: d || 0.42, ease: "back.out(2.8)" }, t);
+
+      // "Comment GREEKS": the letters type into the comment box (drawn below), then the send button is tapped
+      const TY0 = w(0) + 0.14, TYG = clamp((w(1) + 0.15 - TY0) / 6, 0.06, 0.12);
+      const TAP = Math.max(TY0 + 6 * TYG + 0.08, w(2) - 0.1);
+      tl.fromTo("#s16-sb", { scale: 1 }, { scale: 0.78, duration: 0.07, ease: "power2.in" }, TAP);
+      tl.fromTo("#s16-sb", { scale: 0.78 }, { scale: 1, duration: 0.36, ease: "back.out(3)", immediateRender: false }, TAP + 0.07);
+      // the comment lands in the thread
+      tl.fromTo("#s16-ub", { opacity: 0, scale: 0.3 }, { opacity: 1, scale: 1, duration: 0.36, ease: "back.out(2.8)" }, TAP + 0.1);
+      // "DM": the reply arrives on the phone, with the real cover, and pops up out of it as a big bubble
+      const DM = w(4) - 0.06;
+      tl.fromTo("#s16-db", { opacity: 0, scale: 0.3 }, { opacity: 1, scale: 1, duration: 0.36, ease: "back.out(2.8)" }, DM);
+      tl.fromTo("#s16-dcv", { opacity: 0, scale: 0.3 }, { opacity: 1, scale: 1, duration: 0.36, ease: "back.out(2.8)" }, DM + 0.12);
+      tl.fromTo("#s16-dm", { opacity: 0, scale: 0.2, y: 190 }, { opacity: 1, scale: 1, y: 0, duration: 0.5, ease: "back.out(1.6)" }, DM + 0.04);
+      // "Greeks Cheat Sheet": the cover hops
+      tl.fromTo("#s16-fcv", { y: 0 }, { y: -20, duration: 0.12, ease: "power2.out", immediateRender: false }, w(9) - 0.02);
+      tl.fromTo("#s16-fcv", { y: -20 }, { y: 0, duration: 0.13, ease: "power2.in", immediateRender: false }, w(9) + 0.1);
+      tl.fromTo("#s16-fcv", { scaleY: 0.86, scaleX: 1.08 }, { scaleY: 1, scaleX: 1, duration: 0.3, ease: "back.out(3)", immediateRender: false }, w(9) + 0.23);
+      // "Save", "share", "follow": the three pills pop in turn
+      pop("#s16-p1", w(11) - 0.06);
+      pop("#s16-p2", w(13) - 0.06);
+      pop("#s16-p3", w(16) - 0.06);
+      // "Desk2Quant": the profile board rises up onto the platform and lands with a squash
+      tl.fromTo("#s16-pro", { opacity: 0, scale: 0.3, y: 60 }, { opacity: 1, scale: 1, y: 0, duration: 0.46, ease: "back.out(2.4)" }, w(17) - 0.06);
+      // "Day 11.": the sticker slaps down onto the board's corner
+      tl.fromTo("#s16-day", { opacity: 0, scale: 1.7, y: -90 }, { opacity: 1, scale: 1, y: 0, duration: 0.22, ease: "power3.in" }, w(19) - 0.08);
+      tl.fromTo("#s16-dayh", { scaleY: 0.78, scaleX: 1.12 }, { scaleY: 1, scaleX: 1, duration: 0.36, ease: "back.out(3)", immediateRender: false }, w(19) + 0.14);
+      // the profile board takes the hit
+      tl.fromTo("#s16-pro .s16-hop", { y: 0 }, { y: 7, duration: 0.06, ease: "power2.out", immediateRender: false }, w(19) + 0.14);
+      tl.fromTo("#s16-pro .s16-hop", { y: 7 }, { y: 0, duration: 0.3, ease: "back.out(3)", immediateRender: false }, w(19) + 0.2);
+
+      // continuous layer: the diorama bob, typing, placeholder and caret
+      const bob = document.getElementById("s16-bob");
+      const letters = Array.from(document.querySelectorAll("#s16-ty span"));
+      const ph = document.getElementById("s16-ph"), car = document.getElementById("s16-car");
+      function frame(t) {
+        bob.style.transform = "translateY(" + (-8 * Math.sin((t / 3) * Math.PI * 2)).toFixed(2) + "px)";
+        const sent = t >= TAP + 0.08;
+        let n = 0;
+        letters.forEach((s, k) => { const on = !sent && t >= TY0 + k * TYG; s.style.display = on ? "inline" : "none"; if (on) n++; });
+        ph.style.opacity = n > 0 ? "0" : "1";
+        const typing = t >= TY0 - 0.05 && t < TY0 + 6 * TYG + 0.05;
+        car.style.opacity = sent ? "0" : (typing || Math.floor(t * 2.4) % 2 === 0 ? "1" : "0");
+      }
+      const st = { t: 0 };
+      tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: () => frame(st.t) }, 0);
+      frame(0);
+      window.__timelines["s16"] = tl;
+    })();
+  </script>
+</template>

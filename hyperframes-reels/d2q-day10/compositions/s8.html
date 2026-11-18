@@ -1,0 +1,294 @@
+<template>
+  <style>
+    @font-face { font-family: "Fredoka"; font-weight: 400; src: url("assets/fonts/fredoka-400.woff2"); }
+    @font-face { font-family: "Fredoka"; font-weight: 700; src: url("assets/fonts/fredoka-700.woff2"); }
+    @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
+    @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
+    #root { position: absolute; inset: 0; overflow: hidden; perspective: 2400px; perspective-origin: 540px 1150px; }
+    #s8-flip, #s8-cam, #s8-bob { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #s8-flip { transform-origin: 540px 1150px; }
+    #s8-cam { transform-origin: 540px 1100px; }
+    #s8-cv { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    .s8-t { font-family: "Fredoka", "D2QSans", "JetBrains Mono", sans-serif; font-weight: 700; color: #0b1b3a; white-space: nowrap; }
+    /* text on box faces, mapped with ISO faceMatrix in draw() */
+    .s8-face { position: absolute; left: 0; top: 0; transform-origin: 0 0; display: flex; flex-direction: column; align-items: center;
+               justify-content: flex-start; text-align: center; }
+    #s8-fC { width: 125px; height: 287px; padding-top: 26px; color: #ffffff; }
+    #s8-fC b { display: block; font-size: 34px; line-height: 38px; letter-spacing: 0.06em; }
+    #s8-fC i { display: block; font-style: normal; font-size: 48px; line-height: 56px; }
+    .s8-day { width: 125px; height: 125px; justify-content: center; font-size: 36px; line-height: 40px; color: #1e3a8a; opacity: 0; }
+    /* signboards (placed by draw at projected points; the inner element pops) */
+    .s8-pw { position: absolute; left: 0; top: 0; width: 0; height: 0; }
+    .s8-sb { position: absolute; opacity: 0; }
+    #s8-tm { left: -122px; top: -118px; width: 244px; transform-origin: 50% 100%; }
+    #s8-tm .s8-card { background: rgba(255,255,255,0.92); border: 3px dashed #60a5fa; border-radius: 22px; padding: 4px 16px 8px; text-align: center; }
+    #s8-tm b { display: block; font-size: 30px; line-height: 36px; letter-spacing: 0.06em; color: #3b82f6; }
+    #s8-tm i { display: block; font-style: normal; font-size: 46px; line-height: 50px; color: #2563eb; }
+    /* the NOT FREE tag hangs from the column's corner on a string */
+    #s8-tagw { position: absolute; left: 0; top: 0; width: 0; height: 0; }
+    #s8-tag { position: absolute; left: -232px; top: 0; width: 240px; height: 120px; transform-origin: 232px 0px; opacity: 0; }
+    #s8-tag svg { position: absolute; left: 0; top: 0; overflow: visible; }
+    #s8-tagc { position: absolute; left: 0; top: 34px; width: 214px; height: 76px; border-radius: 22px; background: #e11d48; color: #ffffff;
+               display: flex; align-items: center; justify-content: center; font-size: 40px; letter-spacing: 0.04em;
+               box-shadow: 0 8px 0 #9f1239, 0 20px 30px rgba(159,18,57,0.25); }
+    #s8-tagc::before { content: ""; position: absolute; left: 16px; top: 31px; width: 14px; height: 14px; border-radius: 7px; background: #ffffff; opacity: 0.9; }
+    /* theta pill */
+    #s8-thw { position: absolute; left: 60px; width: 560px; top: 612px; display: flex; justify-content: center; }
+    #s8-th { display: inline-flex; align-items: center; height: 96px; padding: 0 36px 0 32px; border-radius: 48px; background: #e11d48; color: #ffffff;
+             font-size: 52px; box-shadow: 0 10px 0 #9f1239, 0 24px 36px rgba(159,18,57,0.25); transform-origin: 50% 100%; opacity: 0; }
+    #s8-th i { font-style: normal; font-family: "JetBrains Mono", "Fredoka", sans-serif; font-weight: 800; font-size: 52px; margin-right: 14px; }
+    #s8-th span { font-size: 40px; opacity: 0.85; margin-left: 10px; }
+    /* notes */
+    #s8-note { position: absolute; left: 0; right: 0; top: 1474px; display: flex; flex-direction: column; align-items: center; gap: 8px; opacity: 0; }
+    #s8-note span { font-family: "Fredoka", "D2QSans", sans-serif; font-weight: 400; font-size: 30px; line-height: 44px; color: #1e3a8a;
+                    background: rgba(255,255,255,0.86); border-radius: 22px; padding: 0 20px; white-space: nowrap; }
+    #s8-note b { font-weight: 700; color: #e11d48; }
+  </style>
+  <div id="root" data-composition-id="s8" data-width="1080" data-height="1920">
+    <div id="s8-flip">
+      <div id="s8-cam">
+        <div id="s8-bob">
+          <canvas id="s8-cv" width="1080" height="1920"></canvas>
+          <div class="s8-face s8-t" id="s8-fC" data-layout-ignore><b>CALL</b><i>7.97</i></div>
+          <div class="s8-face s8-t s8-day" id="s8-d1" data-layout-ignore>DAY 1</div>
+          <div class="s8-face s8-t s8-day" id="s8-d2" data-layout-ignore>DAY 2</div>
+          <div class="s8-face s8-t s8-day" id="s8-d3" data-layout-ignore>DAY 3</div>
+          <div class="s8-pw" id="s8-pT"><div class="s8-sb s8-t" id="s8-tm"><div class="s8-card"><b>TOMORROW</b><i>7.95</i></div></div></div>
+          <div id="s8-tagw"><div class="s8-t" id="s8-tag">
+            <svg width="240" height="40"><path d="M 232 0 L 196 36" stroke="#0b1b3a" stroke-width="3.5" stroke-linecap="round" fill="none" /><circle cx="232" cy="0" r="6" fill="#0b1b3a" /></svg>
+            <div id="s8-tagc">NOT FREE</div></div></div>
+          <div id="s8-note"><span>slice = <b>0.0158</b> a day · drawn 25× thicker</span><span>column height: 1.00 = 0.75 units</span></div>
+          <div id="s8-thw"><div class="s8-t" id="s8-th"><i>θ</i>= −0.0158<span>/ day</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      /*DATA*/ const DUR = 4.55; const W = [0.16, 0.29, 0.53, 0.73, 1.43, 1.63, 1.85, 2.05, 2.27, 2.61, 2.91, 3.09, 3.76, 4.13]; /*END*/
+      // words: 0 But 1 nothing 2 is 3 free. 4 Every 5 day, 6 the 7 call 8 loses 9 a 10 little 11 value. 12 That's 13 theta.
+      const w = (i) => Math.max(0, W.length > i ? W[i] : 0.16 + i * 0.32);
+// ISO KIT v1: isometric toy-world drawing on a 2D canvas, matching the Flow dioramas' look.
+// Copy this block verbatim into a scene's <script> (inside its IIFE). World units: x to the right-back, y to the left-back,
+// z up. P(x, y, z) -> frame px. Visible faces of a box: top, the face at y+d (front-left) and the face at x+w (front-right).
+// Draw back to front: sort what you draw by (x + y) ascending, then z ascending (painter's order).
+const ISO = (function () {
+  const C30 = Math.cos(Math.PI / 6), S30 = 0.5;
+  const MAT = {
+    white: { top: "#ffffff", left: "#e3ebfb", right: "#c9d8f5" },
+    blue:  { top: "#7fb0ff", left: "#3b82f6", right: "#2563eb" },
+    navy:  { top: "#4f6fe0", left: "#1e40af", right: "#1e3a8a" },
+    sky:   { top: "#dbeafe", left: "#bfdbfe", right: "#93c5fd" },
+    rose:  { top: "#fda4af", left: "#f43f5e", right: "#e11d48" },
+    gold:  { top: "#fde68a", left: "#f59e0b", right: "#d97706" },
+    grey:  { top: "#f1f5f9", left: "#cbd5e1", right: "#94a3b8" },
+    wood:  { top: "#f3c58f", left: "#d99a5b", right: "#b97a3f" },
+  };
+  function make(g, ox, oy, u) {
+    const P = (x, y, z) => [ox + (x - y) * C30 * u, oy + (x + y) * S30 * u - (z || 0) * u];
+    function poly(pts, fill, stroke, lw) {
+      g.beginPath(); pts.forEach(([a, b], i) => (i ? g.lineTo(a, b) : g.moveTo(a, b))); g.closePath();
+      if (fill) { g.fillStyle = fill; g.fill(); }
+      if (stroke) { g.strokeStyle = stroke; g.lineWidth = lw || 1.5; g.stroke(); }
+    }
+    function box(x, y, z, w, d, h, mat, edge) {
+      if (h <= 0 || w <= 0 || d <= 0) return;
+      edge = edge === undefined ? "rgba(15,35,90,0.14)" : edge;
+      poly([P(x, y + d, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x, y + d, z + h)], mat.left, edge);
+      poly([P(x + w, y, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x + w, y, z + h)], mat.right, edge);
+      poly([P(x, y, z + h), P(x + w, y, z + h), P(x + w, y + d, z + h), P(x, y + d, z + h)], mat.top, edge);
+    }
+    // a soft contact shadow on the floor plane z
+    function shadow(x, y, z, w, d, a) {
+      const c = P(x + w / 2, y + d / 2, z); const rx = (w + d) * C30 * u * 0.55, ry = (w + d) * S30 * u * 0.55;
+      const gr = g.createRadialGradient(c[0], c[1], 0, c[0], c[1], rx);
+      gr.addColorStop(0, `rgba(30,64,175,${a || 0.18})`); gr.addColorStop(1, "rgba(30,64,175,0)");
+      g.save(); g.translate(c[0], c[1]); g.scale(1, ry / rx); g.translate(-c[0], -c[1]);
+      g.fillStyle = gr; g.beginPath(); g.arc(c[0], c[1], rx, 0, 6.2832); g.fill(); g.restore();
+    }
+    // the floating platform: white top slab, blue band, white band, blue base (like the dioramas), its top at z = 0
+    function platform(x, y, w, d) {
+      box(x, y, -1.5, w, d, 0.42, MAT.blue);
+      box(x, y, -1.08, w, d, 0.3, MAT.white);
+      box(x, y, -0.78, w, d, 0.28, MAT.blue);
+      box(x, y, -0.5, w, d, 0.5, MAT.white);
+    }
+    // a 2D affine matrix that maps a flat w x h DOM element onto a face given three projected corners (TL, TR, BL)
+    function faceMatrix(tl, tr, bl, w, h) {
+      const a = (tr[0] - tl[0]) / w, b = (tr[1] - tl[1]) / w, c = (bl[0] - tl[0]) / h, d = (bl[1] - tl[1]) / h;
+      return `matrix(${a.toFixed(5)},${b.toFixed(5)},${c.toFixed(5)},${d.toFixed(5)},${tl[0].toFixed(2)},${tl[1].toFixed(2)})`;
+    }
+    return { P, poly, box, shadow, platform, faceMatrix, u };
+  }
+  return { make, MAT };
+})();
+
+      const tl = gsap.timeline({ paused: true });
+      const g = document.getElementById("s8-cv").getContext("2d");
+      const K = ISO.make(g, 540, 900, 48), P = K.P, M = ISO.MAT;
+      const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+      const prog = (t, a, d) => clamp((t - a) / d, 0, 1);
+      const backOut = (p, s) => { const q = p - 1; return 1 + (s + 1) * q * q * q + s * q * q; };
+      const squash = (t, t0, amp) => (t < t0 ? 0 : amp * Math.exp(-(t - t0) * 9) * Math.cos((t - t0) * 21));
+      function mulberry32(a) { return function () { a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+
+      // ---- the set (scale: 1.00 of value = 0.75 units of height) ----
+      const SC = 0.75, CALL = 7.9656, TMRW = 7.9498, DECAY = 0.015768;
+      const COL = { x: 2.1, y: 2.9, w: 2.6, d: 2.6 };                         // the CALL value column
+      const GH = { x: 5.0, y: 0.0, w: 2.6, d: 2.6 };                          // TOMORROW 7.95, a ghost outline beside it
+      const HG = { cx: 9.3, cy: 1.0 };                                         // the hourglass
+      const SL = 0.3;                                                          // slice thickness as drawn (true: 0.0158 × 0.75 = 0.012, so 25×)
+      const TILES = [{ x: 1.9, y: 6.4 }, { x: 4.6, y: 6.4 }, { x: 7.3, y: 6.4 }];   // where Day 1, 2, 3 land
+      const tDay = [w(4) - 0.04, w(4) + 0.54, w(4) + 1.12];                   // the peels, from "Every"
+      const FLY = 0.62;
+      const tGh = w(8) - 0.08;                                                 // the ghost rises on "loses"
+
+      const fC = document.getElementById("s8-fC"), dayEl = [1, 2, 3].map((k) => document.getElementById("s8-d" + k));
+      const pT = document.getElementById("s8-pT"), tagw = document.getElementById("s8-tagw"), bob = document.getElementById("s8-bob");
+      const pin = (el, p) => { el.style.left = p[0].toFixed(1) + "px"; el.style.top = p[1].toFixed(1) + "px"; };
+
+      // hourglass sand grains (seeded)
+      const rnd = mulberry32(808), grains = [];
+      for (let i = 0; i < 26; i++) grains.push({ ph: rnd(), dx: (rnd() - 0.5) * 7, v: 0.85 + rnd() * 0.4 });
+
+      function dashedBox(b, color, alpha) {
+        const { x, y, w: bw, d, h } = b;
+        g.save(); g.globalAlpha = alpha; g.setLineDash([9, 7]); g.lineWidth = 3; g.strokeStyle = color; g.lineJoin = "round";
+        const pts = [P(x, y + d, 0), P(x + bw, y + d, 0), P(x + bw, y, 0), P(x + bw, y, h), P(x, y, h), P(x, y + d, h)];
+        g.beginPath(); pts.forEach(([a, c2], i) => (i ? g.lineTo(a, c2) : g.moveTo(a, c2))); g.closePath(); g.stroke();
+        g.beginPath(); const m = P(x + bw, y + d, h); g.moveTo(...P(x, y + d, h)); g.lineTo(...m); g.lineTo(...P(x + bw, y, h));
+        g.moveTo(...m); g.lineTo(...P(x + bw, y + d, 0)); g.stroke(); g.restore();
+      }
+
+      function hourglass(t) {
+        const H = 3.4, s = 1.3, x0 = HG.cx - s / 2, y0 = HG.cy - s / 2;
+        K.shadow(x0, y0, 0, s, s, 0.2);
+        K.box(x0, y0, 0, s, s, 0.28, M.wood);
+        // back posts
+        K.box(x0 + 0.06, y0 + 0.06, 0.28, 0.14, 0.14, H - 0.56, M.wood);
+        // glass bulbs (screen space, round)
+        const base = P(HG.cx, HG.cy, 0.28), top = P(HG.cx, HG.cy, H - 0.28), neck = [base[0], (base[1] + top[1]) / 2];
+        const hb = (base[1] - top[1]) / 2, rw = 34;
+        const bulb = (y0b, dir) => {          // dir = -1 top bulb, +1 bottom bulb
+          g.beginPath(); g.moveTo(neck[0] - 4, neck[1]);
+          g.bezierCurveTo(neck[0] - 6, neck[1] + dir * hb * 0.25, neck[0] - rw, neck[1] + dir * hb * 0.35, neck[0] - rw, neck[1] + dir * hb * 0.7);
+          g.bezierCurveTo(neck[0] - rw, neck[1] + dir * hb * 0.92, neck[0] - rw * 0.7, y0b, neck[0], y0b);
+          g.bezierCurveTo(neck[0] + rw * 0.7, y0b, neck[0] + rw, neck[1] + dir * hb * 0.92, neck[0] + rw, neck[1] + dir * hb * 0.7);
+          g.bezierCurveTo(neck[0] + rw, neck[1] + dir * hb * 0.35, neck[0] + 6, neck[1] + dir * hb * 0.25, neck[0] + 4, neck[1]);
+          g.closePath();
+        };
+        // sand: the top empties, the bottom fills, as a pure function of t
+        const f = 0.62 - 0.1 * (t / DUR);
+        g.save(); bulb(top[1], -1); g.clip();
+        g.fillStyle = "#3b82f6"; g.fillRect(neck[0] - rw - 2, neck[1] - hb * f, rw * 2 + 4, hb * f + 2);
+        g.restore();
+        g.save(); bulb(base[1], 1); g.clip();
+        const lvl = hb * (0.36 + 0.1 * (t / DUR));
+        g.fillStyle = "#2563eb"; g.beginPath(); g.moveTo(neck[0] - rw - 2, base[1] + 2); g.lineTo(neck[0] - rw - 2, base[1] - lvl + 10);
+        g.quadraticCurveTo(neck[0], base[1] - lvl - 16, neck[0] + rw + 2, base[1] - lvl + 10); g.lineTo(neck[0] + rw + 2, base[1] + 2); g.closePath(); g.fill();
+        // the stream and falling grains
+        g.fillStyle = "#3b82f6"; g.fillRect(neck[0] - 1.5, neck[1], 3, hb - lvl - 6);
+        grains.forEach((q) => {
+          const p = (t * 1.6 * q.v + q.ph) % 1, yy = neck[1] + p * (hb - lvl - 4);
+          g.beginPath(); g.arc(neck[0] + q.dx * p, yy, 2.4, 0, 6.2832); g.fill();
+        });
+        g.restore();
+        // glass outline and shine
+        g.save(); bulb(top[1], -1); g.fillStyle = "rgba(219,234,254,0.35)"; g.fill(); g.strokeStyle = "rgba(37,99,235,0.55)"; g.lineWidth = 3; g.stroke(); g.restore();
+        g.save(); bulb(base[1], 1); g.fillStyle = "rgba(219,234,254,0.25)"; g.fill(); g.strokeStyle = "rgba(37,99,235,0.55)"; g.lineWidth = 3; g.stroke(); g.restore();
+        g.save(); g.strokeStyle = "rgba(255,255,255,0.85)"; g.lineWidth = 4; g.lineCap = "round";
+        g.beginPath(); g.moveTo(neck[0] - rw + 9, neck[1] - hb * 0.62); g.lineTo(neck[0] - rw + 9, neck[1] - hb * 0.3); g.stroke();
+        g.beginPath(); g.moveTo(neck[0] - rw + 9, neck[1] + hb * 0.35); g.lineTo(neck[0] - rw + 9, neck[1] + hb * 0.66); g.stroke(); g.restore();
+        // front posts and the top cap
+        K.box(x0 + s - 0.2, y0 + s - 0.2, 0.28, 0.14, 0.14, H - 0.56, M.wood);
+        K.box(x0, y0, H - 0.28, s, s, 0.28, M.wood);
+      }
+
+      // a slice's state for day k at time t: null before its peel; else its box, flying, landed
+      function slice(k, t, colH) {
+        const t0 = tDay[k];
+        if (t < t0) return null;
+        const T = TILES[k];
+        const pe = prog(t, t0, 0.16);                                     // peel: the layer grows out of the top and lifts
+        const pf = prog(t, t0 + 0.16, FLY - 0.16);                        // fly: arc over and fall to its tile
+        const th = SL * pe;
+        let x = COL.x, y = COL.y, z = colH + 0.2 * pe;
+        if (pf > 0) {
+          const e = 1 - Math.pow(1 - pf, 2);
+          x = COL.x + (T.x - COL.x) * e; y = COL.y + (T.y - COL.y) * e;
+          z = (colH + 0.2) * (1 - pf * pf) + 1.4 * Math.sin(Math.PI * pf) * (1 - pf);
+        }
+        const sq = squash(t, t0 + FLY, 0.16);
+        return { x, y, z: Math.max(0, z), w: COL.w, d: COL.d, h: th * (1 - sq), sq, landed: t >= t0 + FLY };
+      }
+
+      function draw(t) {
+        g.clearRect(0, 0, 1080, 1920);
+        bob.style.transform = "translateY(" + (-8 * Math.sin((2 * Math.PI * t) / 3)).toFixed(2) + "px)";
+        K.shadow(0, 0, -1.6, 10, 10, 0.2);
+        K.platform(0, 0, 10, 10);
+
+        // the column grows in, then loses its true daily decay per peel (0.0158 × 0.75 = 0.012 units: honest, nearly invisible)
+        const nPeeled = tDay.filter((t0) => t >= t0 + 0.16).length;
+        const colH = (CALL - DECAY * nPeeled) * SC * backOut(prog(t, 0.08, 0.5), 1.5);
+        const ghH = TMRW * SC * backOut(prog(t, tGh, 0.5), 1.7), ghA = prog(t, tGh, 0.2);
+
+        // painter's order
+        const items = [];
+        items.push({ s: COL.x + COL.y + 2.6, z: 0, f: () => { K.shadow(COL.x, COL.y, 0, COL.w, COL.d, 0.22); K.box(COL.x, COL.y, 0, COL.w, COL.d, colH, M.blue); } });
+        items.push({ s: GH.x + GH.y + 2.6, z: 0, f: () => {
+          if (ghA <= 0) return;
+          const b = { x: GH.x, y: GH.y, w: GH.w, d: GH.d, h: ghH };
+          g.save(); g.globalAlpha = 0.32 * ghA; K.box(b.x, b.y, 0, b.w, b.d, b.h, { top: "#cfe0fd", left: "#93c5fd", right: "#7fb0ff" }, null); g.restore();
+          dashedBox(b, "#2563eb", 0.9 * ghA);
+        } });
+        items.push({ s: HG.cx + HG.cy, z: 0, f: () => hourglass(t) });
+        const sls = [0, 1, 2].map((k) => slice(k, t, colH));
+        sls.forEach((b, k) => {
+          if (!b || b.h <= 0.002) return;
+          items.push({ s: b.x + b.y + 2.6 + (b.landed ? 0 : 0.01), z: b.z, f: () => {
+            if (b.landed) K.shadow(b.x, b.y, 0, b.w, b.d, 0.12);
+            const e = b.sq * 0.4, bw = b.w * (1 + e), bd = b.d * (1 + e);
+            K.box(b.x - (bw - b.w) / 2, b.y - (bd - b.d) / 2, b.z, bw, bd, b.h, M.blue);
+          } });
+        });
+        items.sort((a, b) => a.s - b.s || a.z - b.z).forEach((it) => it.f());
+
+        // face text: CALL 7.97 on the column's front-left face (its upper part)
+        const fz = Math.max(colH, 0.01);
+        fC.style.transform = K.faceMatrix(P(COL.x, COL.y + COL.d, fz), P(COL.x + COL.w, COL.y + COL.d, fz), P(COL.x, COL.y + COL.d, fz - 5.98), 125, 287);
+        fC.style.opacity = clamp((t - 0.3) / 0.2, 0, 1).toFixed(3);
+        // DAY n printed on each slice's top face (reading up and to the right)
+        sls.forEach((b, k) => {
+          const el = dayEl[k];
+          if (!b) { el.style.opacity = "0"; return; }
+          const zt = b.z + b.h;
+          el.style.transform = K.faceMatrix(P(b.x, b.y + b.d, zt), P(b.x, b.y, zt), P(b.x + b.w, b.y + b.d, zt), 125, 125);
+          el.style.opacity = clamp((t - tDay[k] - 0.06) / 0.12, 0, 1).toFixed(3);
+        });
+        // signboards and the tag ride on the set
+        pin(pT, P(GH.x, GH.y, ghH));
+        pin(tagw, P(COL.x, COL.y + COL.d, colH));
+      }
+      const st = { t: 0 };
+      tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: () => draw(st.t) }, 0);
+      draw(0);
+
+      // camera: cube flip in and out, slow push
+      tl.fromTo("#s8-flip", { rotationY: -90, scale: 0.94 }, { rotationY: 0, scale: 1, duration: 0.36, ease: "power3.out" }, 0);
+      tl.fromTo("#s8-flip", { rotationY: 0 }, { rotationY: 90, duration: 0.26, ease: "power2.in", immediateRender: false }, DUR - 0.26);
+      tl.fromTo("#s8-cam", { scale: 1 }, { scale: 1.04, duration: DUR, ease: "sine.inOut" }, 0);
+
+      // "free.": the NOT FREE tag swings in on its string
+      tl.fromTo("#s8-tag", { opacity: 0, rotation: -64 }, { opacity: 1, rotation: 0, duration: 0.62, ease: "elastic.out(1.1, 0.42)" }, w(3) - 0.1);
+      // "loses": TOMORROW 7.95 beside it
+      tl.fromTo("#s8-tm", { opacity: 0, scale: 0.3, y: 20 }, { opacity: 1, scale: 1, y: 0, duration: 0.36, ease: "back.out(2.8)" }, tGh + 0.12);
+      // notes
+      tl.fromTo("#s8-note", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, tDay[0] + 0.3);
+      // "theta.": the pill
+      tl.fromTo("#s8-th", { opacity: 0, scale: 0.25, y: 34, rotation: -8 }, { opacity: 1, scale: 1, y: 0, rotation: -2, duration: 0.32, ease: "back.out(2.8)" }, w(11) - 0.04);
+      window.__timelines["s8"] = tl;
+    })();
+  </script>
+</template>

@@ -1,0 +1,374 @@
+<template>
+  <style>
+    @font-face { font-family: "Fredoka"; font-weight: 400; src: url("assets/fonts/fredoka-400.woff2"); }
+    @font-face { font-family: "Fredoka"; font-weight: 700; src: url("assets/fonts/fredoka-700.woff2"); }
+    @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
+    @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
+    #root { position: absolute; inset: 0; overflow: hidden; perspective: 2400px; perspective-origin: 540px 1150px; }
+    #s7-flip, #s7-cam, #s7-bob { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #s7-flip { transform-origin: 540px 1150px; }
+    #s7-cam { transform-origin: 540px 1060px; }
+    #s7-cv { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    .s7-t { font-family: "Fredoka", "D2QSans", "JetBrains Mono", sans-serif; font-weight: 700; color: #0b1b3a; white-space: nowrap; }
+    /* chart labels on the board face (placed by draw at projected points) */
+    .s7-tk { position: absolute; left: 0; top: 0; width: 90px; margin-left: -45px; text-align: center; font-size: 30px; line-height: 32px; opacity: 0; }
+    #s7-ty { position: absolute; left: 0; top: 0; font-size: 30px; line-height: 32px; color: #ffffff; letter-spacing: 0.08em; opacity: 0; }
+    #s7-tx { position: absolute; left: 0; top: 0; width: 400px; margin-left: -200px; text-align: center; font-size: 30px; line-height: 32px;
+             color: #ffffff; letter-spacing: 0.08em; }
+    /* text printed on the hedge plank's front face (mapped with ISO faceMatrix in draw) */
+    #s7-pl { position: absolute; left: 0; top: 0; width: 330px; height: 34px; transform-origin: 0 0; display: flex; align-items: center;
+             justify-content: center; font-size: 30px; line-height: 34px; letter-spacing: 0.03em; color: #1e3a8a; opacity: 0; }
+    /* signboards: .s7-pw placed by draw(); .s7-sb pops (GSAP) */
+    .s7-pw { position: absolute; left: 0; top: 0; width: 0; height: 0; }
+    .s7-ctr { position: absolute; left: -300px; width: 600px; top: 0; display: flex; justify-content: center; }
+    .s7-sb { flex: none; opacity: 0; transform-origin: 50% 50%; }
+    .s7-card { background: #ffffff; border-radius: 24px; box-shadow: 0 10px 0 #2563eb, 0 24px 36px rgba(30,64,175,0.22);
+               padding: 6px 18px 10px; text-align: center; }
+    .s7-card.s7-r { box-shadow: 0 10px 0 #e11d48, 0 24px 36px rgba(159,18,57,0.22); }
+    .s7-v { display: block; font-size: 46px; line-height: 52px; color: #2563eb; }
+    .s7-card.s7-r .s7-v { color: #e11d48; }
+    .s7-v i { font-style: normal; font-family: "JetBrains Mono", "Fredoka", sans-serif; font-weight: 800; font-size: 40px; margin-right: 8px; }
+    .s7-k { display: block; font-size: 30px; line-height: 32px; color: #0b1b3a; }
+    #s7-gam { display: inline-flex; align-items: center; height: 84px; padding: 0 30px 0 28px; border-radius: 42px; background: #2563eb; color: #ffffff;
+              font-size: 46px; box-shadow: 0 10px 0 #1e40af, 0 24px 36px rgba(30,64,175,0.25); }
+    #s7-gam i { font-style: normal; font-family: "JetBrains Mono", "Fredoka", sans-serif; font-weight: 800; font-size: 44px; margin-right: 12px; }
+  </style>
+  <div id="root" data-composition-id="s7" data-width="1080" data-height="1920">
+    <div id="s7-flip">
+      <div id="s7-cam">
+        <div id="s7-bob">
+          <canvas id="s7-cv" width="1080" height="1920"></canvas>
+          <div class="s7-t s7-tk" id="s7-k0">80</div>
+          <div class="s7-t s7-tk" id="s7-k1">90</div>
+          <div class="s7-t s7-tk" id="s7-k2">100</div>
+          <div class="s7-t s7-tk" id="s7-k3">110</div>
+          <div class="s7-t s7-tk" id="s7-k4">120</div>
+          <div class="s7-t" id="s7-ty">CALL PRICE</div>
+          <div class="s7-t" id="s7-tx" data-layout-ignore>STOCK PRICE</div>
+          <div class="s7-t" id="s7-pl" data-layout-ignore>HEDGE · SLOPE 0.54</div>
+          <div class="s7-pw" id="s7-p1"><div class="s7-ctr"><div class="s7-sb" id="s7-d1"><div class="s7-card s7-t">
+            <span class="s7-v"><i>Δ</i>0.58</span><span class="s7-k">at 102</span></div></div></div></div>
+          <div class="s7-pw" id="s7-p2"><div class="s7-ctr"><div class="s7-sb" id="s7-d2"><div class="s7-card s7-r s7-t">
+            <span class="s7-v"><i>Δ</i>0.50</span><span class="s7-k">at 98</span></div></div></div></div>
+          <div class="s7-pw" id="s7-p3"><div class="s7-ctr"><div class="s7-sb" id="s7-d3"><div class="s7-t" id="s7-gam"><i>Γ</i>= 0.0198</div></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      /*DATA*/ const DUR = 8.39; const W = [0.16, 0.56, 0.7, 1.0, 1.26, 1.46, 1.6, 2.15, 2.32, 2.44, 2.62, 3.2, 3.48, 3.58, 3.82, 4.5, 4.68, 5.3, 5.42, 5.52, 6.08, 6.28, 7.1, 7.3, 7.62, 7.9]; /*END*/
+      // words: 0 Because 1 the 2 call's 3 price 4 is 5 a 6 curve, 7 not 8 a 9 straight 10 line. 11 When 12 the 13 stock 14 rises,
+      //        15 delta 16 grows. 17 When 18 it 19 falls, 20 delta 21 shrinks. 22 That 23 bend 24 is 25 gamma.
+      const w = (i) => Math.max(0, W.length > i ? W[i] : 0.16 + i * 0.32);
+// ISO KIT v1: isometric toy-world drawing on a 2D canvas, matching the Flow dioramas' look.
+// Copy this block verbatim into a scene's <script> (inside its IIFE). World units: x to the right-back, y to the left-back,
+// z up. P(x, y, z) -> frame px. Visible faces of a box: top, the face at y+d (front-left) and the face at x+w (front-right).
+// Draw back to front: sort what you draw by (x + y) ascending, then z ascending (painter's order).
+const ISO = (function () {
+  const C30 = Math.cos(Math.PI / 6), S30 = 0.5;
+  const MAT = {
+    white: { top: "#ffffff", left: "#e3ebfb", right: "#c9d8f5" },
+    blue:  { top: "#7fb0ff", left: "#3b82f6", right: "#2563eb" },
+    navy:  { top: "#4f6fe0", left: "#1e40af", right: "#1e3a8a" },
+    sky:   { top: "#dbeafe", left: "#bfdbfe", right: "#93c5fd" },
+    rose:  { top: "#fda4af", left: "#f43f5e", right: "#e11d48" },
+    gold:  { top: "#fde68a", left: "#f59e0b", right: "#d97706" },
+    grey:  { top: "#f1f5f9", left: "#cbd5e1", right: "#94a3b8" },
+    wood:  { top: "#f3c58f", left: "#d99a5b", right: "#b97a3f" },
+  };
+  function make(g, ox, oy, u) {
+    const P = (x, y, z) => [ox + (x - y) * C30 * u, oy + (x + y) * S30 * u - (z || 0) * u];
+    function poly(pts, fill, stroke, lw) {
+      g.beginPath(); pts.forEach(([a, b], i) => (i ? g.lineTo(a, b) : g.moveTo(a, b))); g.closePath();
+      if (fill) { g.fillStyle = fill; g.fill(); }
+      if (stroke) { g.strokeStyle = stroke; g.lineWidth = lw || 1.5; g.stroke(); }
+    }
+    function box(x, y, z, w, d, h, mat, edge) {
+      if (h <= 0 || w <= 0 || d <= 0) return;
+      edge = edge === undefined ? "rgba(15,35,90,0.14)" : edge;
+      poly([P(x, y + d, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x, y + d, z + h)], mat.left, edge);
+      poly([P(x + w, y, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x + w, y, z + h)], mat.right, edge);
+      poly([P(x, y, z + h), P(x + w, y, z + h), P(x + w, y + d, z + h), P(x, y + d, z + h)], mat.top, edge);
+    }
+    // a soft contact shadow on the floor plane z
+    function shadow(x, y, z, w, d, a) {
+      const c = P(x + w / 2, y + d / 2, z); const rx = (w + d) * C30 * u * 0.55, ry = (w + d) * S30 * u * 0.55;
+      const gr = g.createRadialGradient(c[0], c[1], 0, c[0], c[1], rx);
+      gr.addColorStop(0, `rgba(30,64,175,${a || 0.18})`); gr.addColorStop(1, "rgba(30,64,175,0)");
+      g.save(); g.translate(c[0], c[1]); g.scale(1, ry / rx); g.translate(-c[0], -c[1]);
+      g.fillStyle = gr; g.beginPath(); g.arc(c[0], c[1], rx, 0, 6.2832); g.fill(); g.restore();
+    }
+    // the floating platform: white top slab, blue band, white band, blue base (like the dioramas), its top at z = 0
+    function platform(x, y, w, d) {
+      box(x, y, -1.5, w, d, 0.42, MAT.blue);
+      box(x, y, -1.08, w, d, 0.3, MAT.white);
+      box(x, y, -0.78, w, d, 0.28, MAT.blue);
+      box(x, y, -0.5, w, d, 0.5, MAT.white);
+    }
+    // a 2D affine matrix that maps a flat w x h DOM element onto a face given three projected corners (TL, TR, BL)
+    function faceMatrix(tl, tr, bl, w, h) {
+      const a = (tr[0] - tl[0]) / w, b = (tr[1] - tl[1]) / w, c = (bl[0] - tl[0]) / h, d = (bl[1] - tl[1]) / h;
+      return `matrix(${a.toFixed(5)},${b.toFixed(5)},${c.toFixed(5)},${d.toFixed(5)},${tl[0].toFixed(2)},${tl[1].toFixed(2)})`;
+    }
+    return { P, poly, box, shadow, platform, faceMatrix, u };
+  }
+  return { make, MAT };
+})();
+
+      // the call price curve: curve_S = 80 … 120 step 0.25, curve_C (numbers.json)
+      const CC = [1.1859,1.2251,1.2652,1.3063,1.3484,1.3914,1.4354,1.4804,1.5265,1.5735,1.6216,1.6707,1.7209,1.7721,1.8244,1.8778,1.9323,1.9879,2.0446,2.1024,2.1613,2.2214,2.2826,2.345,2.4086,2.4733,2.5392,2.6062,2.6745,2.744,2.8147,2.8866,2.9597,3.034,3.1096,3.1864,3.2644,3.3437,3.4243,3.506,3.5891,3.6734,3.759,3.8459,3.934,4.0234,4.1141,4.2061,4.2994,4.394,4.4898,4.5869,4.6854,4.7851,4.8861,4.9885,5.0921,5.197,5.3032,5.4107,5.5195,5.6296,5.741,5.8537,5.9677,6.083,6.1996,6.3174,6.4366,6.557,6.6787,6.8017,6.926,7.0515,7.1783,7.3064,7.4357,7.5663,7.6981,7.8312,7.9656,8.1011,8.238,8.376,8.5153,8.6558,8.7975,8.9404,9.0845,9.2298,9.3763,9.524,9.6729,9.8229,9.9742,10.1265,10.2801,10.4347,10.5906,10.7475,10.9056,11.0648,11.2251,11.3865,11.549,11.7126,11.8773,12.0431,12.2099,12.3778,12.5467,12.7167,12.8877,13.0597,13.2328,13.4068,13.5819,13.758,13.935,14.113,14.292,14.472,14.6529,14.8347,15.0175,15.2012,15.3858,15.5713,15.7578,15.9451,16.1333,16.3224,16.5123,16.7031,16.8947,17.0872,17.2805,17.4747,17.6696,17.8654,18.0619,18.2593,18.4574,18.6563,18.856,19.0564,19.2575,19.4594,19.662,19.8654,20.0694,20.2742,20.4796,20.6858,20.8926,21.1001,21.3082,21.517,21.7265,21.9366,22.1473];
+      const Cof = (S) => { const f = Math.max(0, Math.min(160, (S - 80) / 0.25)), i = Math.min(159, Math.floor(f)), k = f - i; return CC[i] + (CC[i + 1] - CC[i]) * k; };
+      // delta of the call (S, K 100, vol 20%, T 1, r 0): N(d1); N via erf (A&S 7.1.26)
+      const ncdf = (x) => { const s = x < 0 ? -1 : 1, z = Math.abs(x) / Math.SQRT2, q = 1 / (1 + 0.3275911 * z);
+        const e = 1 - (((((1.061405429 * q - 1.453152027) * q) + 1.421413741) * q - 0.284496736) * q + 0.254829592) * q * Math.exp(-z * z);
+        return 0.5 * (1 + s * e); };
+      const DEL = (S) => ncdf((Math.log(S / 100) + 0.02) / 0.2);
+      const C0 = 7.9656, D0 = 0.5398;                         // the hedge line: tangent at 100, through (100, 7.97), slope 0.54
+      const HL = (S) => C0 + D0 * (S - 100);
+
+      const tl = gsap.timeline({ paused: true });
+      const g = document.getElementById("s7-cv").getContext("2d");
+      const K = ISO.make(g, 540, 900, 48), P = K.P, M = ISO.MAT;
+      const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+      const prog = (t, a, d) => clamp((t - a) / d, 0, 1);
+      const sine = (p) => 0.5 - 0.5 * Math.cos(Math.PI * p);
+
+      // ---- the wall chart: a board standing on the platform along the diagonal x + y = 9, so its face looks straight at us ----
+      const R0 = 11, QH = 5.6, HB = 10.6, BT = 0.45;
+      let dz = 0;                                               // the board's drop offset (world z), set per frame
+      const BP = (q, z, e) => P(R0 / 2 + (q + (e || 0)) / Math.SQRT2, R0 / 2 + (-q + (e || 0)) / Math.SQRT2, z + dz);
+      const EXT = 24 * Math.SQRT2;                              // 1 unit out of the face toward us = this many px straight down
+      // chart mapping on the face: stock 80 → 120 across, call price −2.5 → 23 up
+      const QS = (S) => (S - 100) * 0.2425, ZC = (C) => 2.0 + 0.2734 * (C + 5.5);    // plot: stock 80 → 120, call price −5.5 → 23.5
+      const F = (S, C, e) => BP(QS(S), ZC(C), e);
+      const SA = 82, SB = 118;                                  // the hedge plank's span
+      const PLT = 34;                                           // plank thickness (px, straight down from the line)
+
+      // beats
+      const tR0 = w(6) - 0.4, tR1 = w(6) + 0.46;                // the ribbon draws on through "curve,"
+      const tP0 = w(9) - 0.12, tP1 = w(10);                     // the plank falls and lands on "line."
+      const tBall = w(11) - 0.04, tBallL = tBall + 0.3;         // the ball drops onto the curve at 100
+      const tU0 = w(14) + 0.02, tU1 = w(14) + 0.58;             // rolls to 102 on "rises,"
+      const tD0 = w(19) - 0.02, tD1 = w(19) + 0.64;             // rolls to 98 on "falls,"
+      const tBr = w(22) - 0.02;                                 // the bend bracket on "That"
+      const tG = w(23) - 0.06;                                  // Γ on "bend" (readable before the flip; "gamma." pops in the caption)
+
+      const els = {};
+      ["k0", "k1", "k2", "k3", "k4", "ty", "tx", "pl", "p1", "p2", "p3"].forEach((k) => { els[k] = document.getElementById("s7-" + k); });
+      const pin = (el, p) => { el.style.left = p[0].toFixed(1) + "px"; el.style.top = p[1].toFixed(1) + "px"; };
+      const bob = document.getElementById("s7-bob");
+
+      function line(pts, color, lw, dash) {
+        g.save(); g.strokeStyle = color; g.lineWidth = lw; g.lineCap = "round"; g.lineJoin = "round"; if (dash) g.setLineDash(dash);
+        g.beginPath(); pts.forEach(([a, b], i) => (i ? g.lineTo(a, b) : g.moveTo(a, b))); g.stroke(); g.restore();
+      }
+      const add = (p, v, k) => [p[0] + v[0] * k, p[1] + v[1] * k];
+      // a band along screen points pts with unit normals nrm (pointing up/left), from offset o1 to o2 (px) along the normal
+      function band(pts, nrm, o1, o2, dy1, dy2, fill) {
+        const A = pts.map((p, i) => [p[0] + nrm[i][0] * o1, p[1] + nrm[i][1] * o1 + dy1]);
+        const B2 = pts.map((p, i) => [p[0] + nrm[i][0] * o2, p[1] + nrm[i][1] * o2 + dy2]).reverse();
+        K.poly(A.concat(B2), fill);
+      }
+      function normals(pts) {
+        return pts.map((p, i) => {
+          const a = pts[Math.max(0, i - 1)], b = pts[Math.min(pts.length - 1, i + 1)];
+          const dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy) || 1;
+          return [dy / L, -dx / L];                             // rotate the tangent so the normal points up
+        });
+      }
+
+      // the gold ball: a toy sphere with a stripe that turns as it rolls
+      function ball(c, r, roll, sq) {
+        g.save(); g.translate(c[0], c[1] + r * sq * 0.5); g.scale(1 + sq * 0.6, 1 - sq);
+        const gr = g.createRadialGradient(-r * 0.35, -r * 0.4, r * 0.1, 0, 0, r);
+        gr.addColorStop(0, "#fff6d5"); gr.addColorStop(0.35, "#fcd34d"); gr.addColorStop(0.8, "#f59e0b"); gr.addColorStop(1, "#d97706");
+        g.fillStyle = gr; g.beginPath(); g.arc(0, 0, r, 0, 6.2832); g.fill();
+        g.beginPath(); g.arc(0, 0, r, 0, 6.2832); g.clip();
+        g.rotate(roll); g.strokeStyle = "rgba(255,255,255,0.75)"; g.lineWidth = r * 0.28;
+        g.beginPath(); g.ellipse(0, 0, r * 0.98, r * 0.42, 0, 0, 6.2832); g.stroke();
+        g.restore();
+      }
+
+      // the rolling ball's position along the stock axis
+      function ballS(t) {
+        if (t < tU0) return 100;
+        if (t < tU1) return 100 + 2 * sine(prog(t, tU0, tU1 - tU0));
+        if (t < tD0) return 102;
+        return 102 - 4 * sine(prog(t, tD0, tD1 - tD0));
+      }
+
+      function draw(t) {
+        g.clearRect(0, 0, 1080, 1920);
+        bob.style.transform = "translateY(" + (-8 * Math.sin((2 * Math.PI * t) / 3)).toFixed(2) + "px)";
+        // board drop with a bounce
+        const tL = 0.42;
+        dz = t < 0.04 ? 0.5 : t < tL ? 0.5 * (1 - Math.pow((t - 0.04) / (tL - 0.04), 2)) : (t < tL + 0.22 ? 0.15 * 4 * ((t - tL) / 0.22) * (1 - (t - tL) / 0.22) : 0);
+
+        K.shadow(0, 0, -1.6, 10, 10, 0.2);
+        K.platform(0, 0, 10, 10);
+        // the board's shadow on the floor
+        {
+          const c = P(R0 / 2 + 0.5, R0 / 2 + 0.5, 0), k = clamp(1 - dz, 0.4, 1);
+          g.save(); g.translate(c[0], c[1]); g.scale(1, 0.12);
+          const gr = g.createRadialGradient(0, 0, 0, 0, 0, 380 * k);
+          gr.addColorStop(0, "rgba(30,64,175,0.22)"); gr.addColorStop(1, "rgba(30,64,175,0)");
+          g.fillStyle = gr; g.beginPath(); g.arc(0, 0, 380 * k, 0, 6.2832); g.fill(); g.restore();
+        }
+        // the board: back slab top, blue frame, white panel
+        K.poly([BP(-QH, HB, 0), BP(QH, HB, 0), BP(QH, HB, -BT), BP(-QH, HB, -BT)], M.blue.top, "rgba(15,35,90,0.14)");
+        K.poly([BP(-QH, 0, 0), BP(QH, 0, 0), BP(QH, HB, 0), BP(-QH, HB, 0)], M.blue.left);
+        K.poly([BP(-QH + 0.3, 1.25, 0), BP(QH - 0.3, 1.25, 0), BP(QH - 0.3, 9.95, 0), BP(-QH + 0.3, 9.95, 0)], "#f6f9ff");
+        // the plinth it stands on (front face and top), toy-like
+        K.poly([BP(-QH - 0.08, 0.55, 0), BP(QH + 0.08, 0.55, 0), BP(QH + 0.08, 0.55, 0.68), BP(-QH - 0.08, 0.55, 0.68)], M.navy.top);
+        K.poly([BP(-QH - 0.08, 0, 0.68), BP(QH + 0.08, 0, 0.68), BP(QH + 0.08, 0.55, 0.68), BP(-QH - 0.08, 0.55, 0.68)], M.navy.left);
+
+        // grid and axes
+        const ga = prog(t, 0.36, 0.3);
+        if (ga > 0) {
+          g.save(); g.globalAlpha = ga;
+          [5, 10, 15, 20].forEach((C) => line([F(80, C), F(120, C)], "#e3ebfb", 2.5));
+          line([F(80, 0), F(120, 0)], "#cfdcf5", 2.5);
+          [90, 100, 110, 120].forEach((S) => line([F(S, -5.5), F(S, 23.5)], "#eef3fd", 2.5));
+          line([F(80, 23.5), F(80, -5.5), F(121, -5.5)], "#1e3a8a", 4);
+          [80, 90, 100, 110, 120].forEach((S) => line([F(S, -5.5), add(F(S, -5.5), [0, 1], 8)], "#1e3a8a", 4));
+          g.restore();
+        }
+
+        // the gap between the curve and the hedge line, shaded sky blue once the plank is down
+        const gapA = prog(t, tP1 + 0.02, 0.4);
+        if (gapA > 0) {
+          const top = [], bot = [];
+          for (let S = SA; S <= SB + 1e-6; S += 0.25) { top.push(F(S, Cof(S))); bot.push(F(S, HL(S))); }
+          g.save(); g.globalAlpha = gapA; K.poly(top.concat(bot.reverse()), "rgba(147,197,253,0.78)"); g.restore();
+        }
+
+        // the hedge plank (white), falling onto its line: top edge = the tangent line at 100
+        const pz = t < tP0 ? null : t < tP1 ? 2.6 * (1 - Math.pow((t - tP0) / (tP1 - tP0), 2)) : 0;
+        const psq = t > tP1 ? 0.22 * Math.exp(-(t - tP1) * 10) * Math.cos((t - tP1) * 24) : 0;
+        if (pz !== null) {
+          g.save(); g.globalAlpha = prog(t, tP0, 0.08);
+          const E2 = 0.26 * EXT, T2 = PLT * (1 - psq), lift = -pz * 48;
+          const a1 = add(F(SA, HL(SA)), [0, 1], lift), a2 = add(F(SB, HL(SB)), [0, 1], lift);
+          g.save(); g.shadowColor = "rgba(30,64,175,0.28)"; g.shadowBlur = 16; g.shadowOffsetY = 10;
+          K.poly([add(a1, [0, 1], E2), add(a2, [0, 1], E2), add(a2, [0, 1], E2 + T2), add(a1, [0, 1], E2 + T2)], "#ffffff");
+          g.restore();
+          K.poly([a1, a2, add(a2, [0, 1], E2), add(a1, [0, 1], E2)], "#dbe5f7", "#9fb6e3", 2);                        // top side
+          K.poly([add(a1, [0, 1], E2), add(a2, [0, 1], E2), add(a2, [0, 1], E2 + T2), add(a1, [0, 1], E2 + T2)], "#ffffff", "#9fb6e3", 2.5);
+          // the label printed on the plank's face
+          const s2w = 330 / (0.2425 * 58.79), s1 = 100 - s2w / 2, s2 = 100 + s2w / 2;
+          const b1 = add(add(F(s1, HL(s1)), [0, 1], lift), [0, 1], E2), b2 = add(add(F(s2, HL(s2)), [0, 1], lift), [0, 1], E2);
+          els.pl.style.transform = K.faceMatrix(b1, b2, add(b1, [0, 1], T2), 330, 34);
+          els.pl.style.opacity = String(prog(t, tP0, 0.08));
+          g.restore();
+        } else els.pl.style.opacity = "0";
+
+        // the call price ribbon (blue), extruded out of the board, drawing on from 80 to 120
+        const pR = sine(prog(t, tR0, tR1 - tR0));
+        if (pR > 0) {
+          const Send = 80 + 40 * pR, pts = [];
+          for (let S = 80; S < Send; S += 0.25) pts.push(F(S, Cof(S)));
+          pts.push(F(Send, Cof(Send)));
+          if (pts.length > 1) {
+            const n = normals(pts), E1 = 0.42 * EXT, hw = 8;
+            g.save(); g.shadowColor = "rgba(30,64,175,0.3)"; g.shadowBlur = 14; g.shadowOffsetY = 10;
+            band(pts, n, hw, -hw, E1, E1, "#2563eb"); g.restore();
+            band(pts, n, hw, hw, 0, E1, "#93c5fd");             // top side (faces up)
+            band(pts, n, hw, -hw, E1, E1, "#2563eb");           // front face
+            const e = pts[pts.length - 1];                        // a round cap where it is drawing
+            g.fillStyle = "#3b82f6"; g.beginPath(); g.arc(e[0], e[1] + E1 * 0.5, hw + 3, 0, 6.2832); g.fill();
+          }
+        }
+
+        // markers left on the curve where delta was read (102, 98), with leaders to their signboards
+        const m1 = prog(t, w(15) - 0.08, 0.2), m2 = prog(t, w(20) - 0.06, 0.2);
+        const mk = (S, a, to) => {
+          if (a <= 0) return;
+          const p = add(F(S, Cof(S)), [0, 1], 0.21 * EXT);
+          g.save(); g.globalAlpha = a; line([p, to], "#1e3a8a", 2.5, [6, 6]);
+          g.fillStyle = "#f59e0b"; g.strokeStyle = "#ffffff"; g.lineWidth = 3;
+          g.beginPath(); g.arc(p[0], p[1], 8, 0, 6.2832); g.fill(); g.stroke(); g.restore();
+        };
+        const D1 = [752, 892], D2 = [352, 812], G3 = [500, 712];         // signboard top-centres
+        mk(102, m1, [D1[0] - 86, D1[1] + 22]);
+        mk(98, m2, [D2[0] + 86, D2[1] + 46]);
+
+        // the bend bracket between 96 and 104, on "bend"
+        const bp = prog(t, tBr, 0.32);
+        if (bp > 0) {
+          const pts = [];
+          for (let S = 96; S <= 104 + 1e-6; S += 0.25) pts.push(F(S, Cof(S)));
+          const n = normals(pts), off = pts.map((p, i) => add(p, n[i], 30));
+          const k = Math.max(2, Math.round(off.length * bp));
+          line(off.slice(0, k), "#2563eb", 6);
+          if (bp >= 1) {
+            line([off[0], add(pts[0], n[0], 14)], "#2563eb", 6);
+            line([off[off.length - 1], add(pts[pts.length - 1], n[n.length - 1], 14)], "#2563eb", 6);
+            const mid = off[Math.floor(off.length / 2)], mn = n[Math.floor(off.length / 2)];
+            line([mid, add(mid, mn, 12)], "#2563eb", 6);
+          }
+          const gs = prog(t, tG, 0.2);
+          if (gs > 0) { const mid = off[Math.floor(off.length / 2)]; g.save(); g.globalAlpha = gs; line([add(mid, [0, -1], 12), [G3[0] + 20, G3[1] + 80]], "#2563eb", 5); g.restore(); }
+        }
+
+        // the gold ball and its tangent stick
+        if (t >= tBall) {
+          const S = ballS(t), C = Cof(S);
+          const pts = [F(S - 0.25, Cof(S - 0.25)), F(S, C), F(S + 0.25, Cof(S + 0.25))], n = normals(pts)[1];
+          const contact = add(add(F(S, C), n, 8), [0, 1], 0.21 * EXT);
+          // the tangent stick: slope = delta at S
+          const st = prog(t, tBallL, 0.25);
+          if (st > 0) {
+            const d = DEL(S), L = 9 * st;
+            const pa = F(S - L, C - d * L), pb = F(S + L, C + d * L);
+            const off = [contact[0] - F(S, C)[0], contact[1] - F(S, C)[1]];
+            const A = add(pa, off, 1), B = add(pb, off, 1);
+            line([A, B], "#d97706", 9); line([A, B], "#fbbf24", 5);
+          }
+          // drop in with bounces, then roll
+          const r = 25;
+          let lift = 0, sq = 0;
+          if (t < tBallL) { const p = (t - tBall) / (tBallL - tBall); lift = 220 * (1 - p * p); }
+          else if (t < tBallL + 0.24) { const p = (t - tBallL) / 0.24; lift = 60 * 4 * p * (1 - p); }
+          else if (t < tBallL + 0.38) { const p = (t - tBallL - 0.24) / 0.14; lift = 14 * 4 * p * (1 - p); }
+          if (t >= tBallL && t < tBallL + 0.1) sq = 0.22 * (1 - (t - tBallL) / 0.1);
+          if (t >= tBallL + 0.24 && t < tBallL + 0.31) sq = 0.1 * (1 - (t - tBallL - 0.24) / 0.07);
+          const roll = (S - 100) * 14.26 / r;   // px travelled / radius
+          const c = add(add(contact, n, r), [0, -1], lift);
+          ball(c, r, roll, sq);
+        }
+
+        // DOM labels ride with the board
+        [80, 90, 100, 110, 120].forEach((S, i) => pin(els["k" + i], add(F(S, -5.5), [0, 1], 4)));
+        pin(els.ty, add(BP(-QH + 0.45, 10.275, 0), [0, -16], 1));
+        pin(els.tx, add(BP(0, 0.55, 0), [0, -33], 1));
+        pin(els.p1, D1); pin(els.p2, D2); pin(els.p3, G3);
+      }
+      const st = { t: 0 };
+      tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: () => draw(st.t) }, 0);
+      draw(0);
+
+      // camera: enter under the tile cascade (scale + fade), slow push, cube flip out
+      tl.fromTo("#s7-flip", { scale: 1.1, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.35, ease: "power2.out" }, 0);
+      tl.fromTo("#s7-cam", { scale: 1 }, { scale: 1.04, duration: DUR, ease: "sine.inOut" }, 0);
+      tl.fromTo("#s7-flip", { rotationY: 0 }, { rotationY: 90, duration: 0.26, ease: "power2.in", immediateRender: false }, DUR - 0.26);
+
+      // axis labels
+      ["#s7-k0", "#s7-k1", "#s7-k2", "#s7-k3", "#s7-k4"].forEach((s, i) => {
+        tl.fromTo(s, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.24, ease: "back.out(2.6)" }, 0.5 + i * 0.06);
+      });
+      tl.fromTo("#s7-ty", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.3, ease: "back.out(2.6)" }, w(3) - 0.06);
+      // signboards
+      const pop = (sel, t) => tl.fromTo(sel, { opacity: 0, scale: 0.3, y: 20 }, { opacity: 1, scale: 1, y: 0, duration: 0.36, ease: "back.out(2.8)" }, t);
+      const hop = (sel, t) => {
+        tl.fromTo(sel, { y: 0 }, { y: -14, duration: 0.11, ease: "power2.out", immediateRender: false }, t);
+        tl.fromTo(sel, { y: -14 }, { y: 0, duration: 0.12, ease: "power2.in", immediateRender: false }, t + 0.11);
+        tl.fromTo(sel, { scaleX: 1.07, scaleY: 0.86 }, { scaleX: 1, scaleY: 1, duration: 0.3, ease: "back.out(3)", immediateRender: false }, t + 0.23);
+      };
+      pop("#s7-d1", w(15) - 0.08); hop("#s7-d1", w(16));
+      pop("#s7-d2", w(20) - 0.06); hop("#s7-d2", w(21));
+      tl.fromTo("#s7-d3", { opacity: 0, scale: 0.25, rotation: -10 }, { opacity: 1, scale: 1, rotation: -3, duration: 0.3, ease: "back.out(2.8)" }, tG);
+      window.__timelines["s7"] = tl;
+    })();
+  </script>
+</template>

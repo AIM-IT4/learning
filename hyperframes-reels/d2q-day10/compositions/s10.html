@@ -1,0 +1,289 @@
+<template>
+  <style>
+    @font-face { font-family: "Fredoka"; font-weight: 400; src: url("assets/fonts/fredoka-400.woff2"); }
+    @font-face { font-family: "Fredoka"; font-weight: 700; src: url("assets/fonts/fredoka-700.woff2"); }
+    @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
+    @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
+    #root { position: absolute; inset: 0; overflow: hidden; perspective: 2400px; perspective-origin: 540px 1150px; }
+    #s10-flip, #s10-cam, #s10-bob { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #s10-flip { transform-origin: 540px 1150px; }
+    #s10-cam { transform-origin: 540px 860px; }
+    #s10-cv { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    .s10-t { font-family: "Fredoka", "D2QSans", "JetBrains Mono", sans-serif; font-weight: 700; color: #0b1b3a; white-space: nowrap; }
+    .s10-pw { position: absolute; opacity: 0; transform-origin: 50% 100%; }
+    .s10-hop { position: absolute; inset: 0; transform-origin: 50% 100%; }
+    .s10-card { position: absolute; inset: 0; background: #ffffff; border-radius: 28px; box-shadow: 0 10px 0 #2563eb, 0 24px 36px rgba(30,64,175,0.22); }
+    .s10-card.r { box-shadow: 0 10px 0 #e11d48, 0 24px 36px rgba(159,18,57,0.22); }
+    .s10-g { font-family: "JetBrains Mono", "D2QSans", sans-serif; font-weight: 800; }
+    /* RENT, mapped onto the rose front face of the bell wall */
+    #s10-rent { position: absolute; left: 0; top: 0; width: 176px; height: 77px; transform-origin: 0 0; opacity: 0; display: flex; align-items: center;
+                justify-content: center; font-size: 58px; line-height: 1; letter-spacing: 0.08em; color: #ffffff; }
+    /* PAYS pills over the two tails */
+    .s10-pay { position: absolute; width: 170px; height: 76px; opacity: 0; transform-origin: 50% 100%; }
+    .s10-payi { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; border-radius: 38px; background: #2563eb;
+                box-shadow: 0 8px 0 #1e40af, 0 18px 28px rgba(30,64,175,0.25); font-size: 42px; line-height: 1; letter-spacing: 0.06em; color: #ffffff; transform-origin: 50% 100%; }
+    .s10-payi svg { position: absolute; left: 67px; top: 78px; width: 36px; height: 22px; overflow: visible; }
+    #s10-payL { left: 226px; top: 958px; }
+    #s10-payR { left: 684px; top: 958px; }
+    /* axis tick labels */
+    .s10-tk { position: absolute; top: 1150px; width: 120px; margin-left: -60px; text-align: center; font-size: 30px; line-height: 34px; opacity: 0; }
+    .s10-tk.b { color: #2563eb; }
+    /* the breakeven banner, resting on the two posts */
+    #s10-ban { left: 288px; top: 614px; width: 504px; height: 124px; }
+    #s10-ban1 { position: absolute; left: 0; right: 0; top: 12px; text-align: center; font-size: 50px; line-height: 56px; }
+    #s10-ban1 b { color: #2563eb; }
+    #s10-ban2 { position: absolute; left: 0; right: 0; top: 68px; text-align: center; font-size: 38px; line-height: 44px; color: #334155; }
+    /* the marker's readout: rides with the gold ball along the axis; flips from the 0.5% day to the 2% day */
+    #s10-mkw { position: absolute; left: 404px; top: 1206px; width: 360px; height: 112px; }
+    #s10-mk { position: absolute; inset: 0; opacity: 0; transform-origin: 50% 0%; }
+    .s10-mf { position: absolute; inset: 0; }
+    .s10-mv { position: absolute; left: 0; right: 0; top: 8px; text-align: center; font-size: 58px; line-height: 62px; }
+    .s10-ml { position: absolute; left: 0; right: 0; top: 70px; text-align: center; font-size: 30px; line-height: 34px; color: #334155; }
+    #s10-mf0 .s10-mv { color: #e11d48; }
+    #s10-mf1 .s10-mv { color: #2563eb; }
+    #s10-mf1 { opacity: 0; }
+    #s10-ttl { position: absolute; left: 70px; top: 1490px; width: 940px; text-align: center; font-size: 30px; line-height: 34px; color: #334155; opacity: 0; font-weight: 400; }
+  </style>
+  <div id="root" data-composition-id="s10" data-width="1080" data-height="1920">
+    <div id="s10-flip">
+      <div id="s10-cam">
+        <div id="s10-bob">
+          <canvas id="s10-cv" width="1080" height="1920"></canvas>
+          <div class="s10-t" id="s10-rent" data-layout-ignore>RENT</div>
+          <div class="s10-pay" id="s10-payL"><div class="s10-payi s10-t">PAYS<svg viewBox="0 0 36 22"><path d="M0 0 L36 0 L18 20 Z" fill="#1e40af" /></svg></div></div>
+          <div class="s10-pay" id="s10-payR"><div class="s10-payi s10-t">PAYS<svg viewBox="0 0 36 22"><path d="M0 0 L36 0 L18 20 Z" fill="#1e40af" /></svg></div></div>
+          <div class="s10-t s10-tk" id="s10-tk0" style="left: 188px;">−4%</div>
+          <div class="s10-t s10-tk" id="s10-tk1" style="left: 540px;">0%</div>
+          <div class="s10-t s10-tk" id="s10-tk2" style="left: 892px;">+4%</div>
+          <div class="s10-t s10-tk b" id="s10-tk3" style="left: 429px;">−1.26%</div>
+          <div class="s10-t s10-tk b" id="s10-tk4" style="left: 651px;">+1.26%</div>
+          <div class="s10-pw" id="s10-ban"><div class="s10-hop" id="s10-banh"><div class="s10-card"></div>
+            <div class="s10-t" id="s10-ban1">BREAKEVEN <b>±1.26%</b></div>
+            <div class="s10-t" id="s10-ban2">= <span class="s10-g">σ</span> / √252</div></div></div>
+          <div id="s10-mkw" data-layout-ignore><div id="s10-mk">
+            <div class="s10-mf" id="s10-mf0"><div class="s10-card r"></div><div class="s10-t s10-mv">−₹13.33</div><div class="s10-t s10-ml">0.5% day · 1,000 calls</div></div>
+            <div class="s10-mf" id="s10-mf1"><div class="s10-card"></div><div class="s10-t s10-mv">+₹23.42</div><div class="s10-t s10-ml">2% day · 1,000 calls</div></div>
+          </div></div>
+          <div class="s10-t" id="s10-ttl">daily moves at 20% vol · normal, sd 1.26%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      /*DATA*/ const DUR = 5.24; const W = [0.16, 0.54, 0.7, 0.8, 0.9, 1.22, 1.76, 1.88, 2.0, 2.24, 2.54, 2.72, 2.84, 3.94, 4.18, 4.28, 4.66, 4.82, 4.9]; /*END*/
+      // words: 0 So 1 when 2 do 3 you 4 actually 5 win? 6 When 7 the 8 stock 9 moves 10 more 11 than 12 1.26% 13 in 14 a 15 day, 16 up 17 or 18 down.
+      const w = (i) => Math.max(0, W.length > i ? W[i] : 0.16 + i * 0.27);
+// ISO KIT v1: isometric toy-world drawing on a 2D canvas, matching the Flow dioramas' look.
+// Copy this block verbatim into a scene's <script> (inside its IIFE). World units: x to the right-back, y to the left-back,
+// z up. P(x, y, z) -> frame px. Visible faces of a box: top, the face at y+d (front-left) and the face at x+w (front-right).
+// Draw back to front: sort what you draw by (x + y) ascending, then z ascending (painter's order).
+const ISO = (function () {
+  const C30 = Math.cos(Math.PI / 6), S30 = 0.5;
+  const MAT = {
+    white: { top: "#ffffff", left: "#e3ebfb", right: "#c9d8f5" },
+    blue:  { top: "#7fb0ff", left: "#3b82f6", right: "#2563eb" },
+    navy:  { top: "#4f6fe0", left: "#1e40af", right: "#1e3a8a" },
+    sky:   { top: "#dbeafe", left: "#bfdbfe", right: "#93c5fd" },
+    rose:  { top: "#fda4af", left: "#f43f5e", right: "#e11d48" },
+    gold:  { top: "#fde68a", left: "#f59e0b", right: "#d97706" },
+    grey:  { top: "#f1f5f9", left: "#cbd5e1", right: "#94a3b8" },
+    wood:  { top: "#f3c58f", left: "#d99a5b", right: "#b97a3f" },
+  };
+  function make(g, ox, oy, u) {
+    const P = (x, y, z) => [ox + (x - y) * C30 * u, oy + (x + y) * S30 * u - (z || 0) * u];
+    function poly(pts, fill, stroke, lw) {
+      g.beginPath(); pts.forEach(([a, b], i) => (i ? g.lineTo(a, b) : g.moveTo(a, b))); g.closePath();
+      if (fill) { g.fillStyle = fill; g.fill(); }
+      if (stroke) { g.strokeStyle = stroke; g.lineWidth = lw || 1.5; g.stroke(); }
+    }
+    function box(x, y, z, w, d, h, mat, edge) {
+      if (h <= 0 || w <= 0 || d <= 0) return;
+      edge = edge === undefined ? "rgba(15,35,90,0.14)" : edge;
+      poly([P(x, y + d, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x, y + d, z + h)], mat.left, edge);
+      poly([P(x + w, y, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x + w, y, z + h)], mat.right, edge);
+      poly([P(x, y, z + h), P(x + w, y, z + h), P(x + w, y + d, z + h), P(x, y + d, z + h)], mat.top, edge);
+    }
+    // a soft contact shadow on the floor plane z
+    function shadow(x, y, z, w, d, a) {
+      const c = P(x + w / 2, y + d / 2, z); const rx = (w + d) * C30 * u * 0.55, ry = (w + d) * S30 * u * 0.55;
+      const gr = g.createRadialGradient(c[0], c[1], 0, c[0], c[1], rx);
+      gr.addColorStop(0, `rgba(30,64,175,${a || 0.18})`); gr.addColorStop(1, "rgba(30,64,175,0)");
+      g.save(); g.translate(c[0], c[1]); g.scale(1, ry / rx); g.translate(-c[0], -c[1]);
+      g.fillStyle = gr; g.beginPath(); g.arc(c[0], c[1], rx, 0, 6.2832); g.fill(); g.restore();
+    }
+    // the floating platform: white top slab, blue band, white band, blue base (like the dioramas), its top at z = 0
+    function platform(x, y, w, d) {
+      box(x, y, -1.5, w, d, 0.42, MAT.blue);
+      box(x, y, -1.08, w, d, 0.3, MAT.white);
+      box(x, y, -0.78, w, d, 0.28, MAT.blue);
+      box(x, y, -0.5, w, d, 0.5, MAT.white);
+    }
+    // a 2D affine matrix that maps a flat w x h DOM element onto a face given three projected corners (TL, TR, BL)
+    function faceMatrix(tl, tr, bl, w, h) {
+      const a = (tr[0] - tl[0]) / w, b = (tr[1] - tl[1]) / w, c = (bl[0] - tl[0]) / h, d = (bl[1] - tl[1]) / h;
+      return `matrix(${a.toFixed(5)},${b.toFixed(5)},${c.toFixed(5)},${d.toFixed(5)},${tl[0].toFixed(2)},${tl[1].toFixed(2)})`;
+    }
+    return { P, poly, box, shadow, platform, faceMatrix, u };
+  }
+  return { make, MAT };
+})();
+
+      const tl = gsap.timeline({ paused: true });
+      const g = document.getElementById("s10-cv").getContext("2d");
+      const K = ISO.make(g, 540, 900, 48), M = ISO.MAT, P = K.P;
+      const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+      const outBack = (p, s) => { if (p <= 0) return 0; if (p >= 1) return 1; p -= 1; return p * p * ((s + 1) * p + s) + 1; };
+      const inOut = (p) => { p = clamp(p, 0, 1); return p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2; };
+      const land = (dt) => (dt < 0 ? 1 : 1 - 0.2 * Math.exp(-dt / 0.08) * Math.cos(dt * 26));
+      const mix = (a, b, k) => { const A = parseInt(a.slice(1), 16), B = parseInt(b.slice(1), 16);
+        const c = [16, 8, 0].map((sh) => Math.round(((A >> sh) & 255) * (1 - k) + ((B >> sh) & 255) * k));
+        return "rgb(" + c.join(",") + ")"; };
+
+      // ---- the bell: normal density of daily moves, sd = 20%/sqrt(252) = 1.26% (1.2599%), drawn from -4% to +4% ----
+      // it stands in the vertical diagonal plane x + y = const, which projects flat-on to the camera: 88 px per 1% across, peak height 7 units
+      const SD = 1.2599, BE = 1.26, PXP = 88, HPK = 7.0, CB = 8.6, CF = 9.6;
+      const XS = (s) => 540 + PXP * s;
+      const at = (s, c, z) => { const dxy = (PXP * s) / (0.8660254 * 48); return P((c + dxy) / 2, (c - dxy) / 2, z); };
+      const dens = (s) => Math.exp(-0.5 * (s / SD) * (s / SD));
+      const SS = []; for (let i = 0; i <= 160; i++) SS.push(-4 + i * 0.05);
+      [-BE, BE].forEach((b) => SS.push(b)); SS.sort((a, b) => a - b);
+      // the wall rises out of the platform from the middle outward, with a back.out overshoot
+      const G0 = 0.08;
+      const grow = (s, t) => outBack((t - G0 - Math.abs(s) * 0.05) / 0.5, 1.7);
+      function drawBell(t) {
+        const pts = SS.map((s) => { const h = HPK * dens(s) * grow(s, t); return { s, h, b: at(s, CB, h), f: at(s, CF, h), f0: at(s, CF, 0) }; });
+        if (grow(0, t) <= 0) return;
+        K.shadow(1.3, 1.3, 0, 7.4, 7.4, 0.12 * clamp(grow(0, t), 0, 1));
+        const inRent = (s) => Math.abs(s) < BE - 1e-9;
+        // the front face, split at +/-1.26%
+        [[-4, -BE, false], [-BE, BE, true], [BE, 4, false]].forEach(([a, b, rent]) => {
+          const seg = pts.filter((p) => p.s >= a - 1e-9 && p.s <= b + 1e-9);
+          const outline = seg.map((p) => p.f).concat(seg.slice().reverse().map((p) => p.f0));
+          const top = Math.min(...seg.map((p) => p.f[1])), bot = seg[0].f0[1];
+          const gr = g.createLinearGradient(0, top, 0, bot);
+          gr.addColorStop(0, rent ? "#fb5d7a" : "#4b8df8"); gr.addColorStop(1, rent ? "#e11d48" : "#2563eb");
+          K.poly(outline, gr);
+        });
+        // the ribbon along the top edge, shaded by its slope (left flank toward the lit side, right flank toward the shade)
+        for (let i = 0; i < pts.length - 1; i++) {
+          const p = pts[i], q = pts[i + 1], sm = (p.s + q.s) / 2;
+          if (q.s - p.s < 1e-6) continue;
+          const rent = inRent(sm), m = rent ? M.rose : M.blue;
+          const slope = (q.h - p.h) / ((q.s - p.s) * 1.4966), k = clamp(Math.abs(slope) / 2.6, 0, 1) * 0.75;
+          K.poly([p.b, q.b, q.f, p.f], mix(m.top, slope > 0 ? m.left : m.right, k));
+        }
+        // crisp edges: the ribbon's front edge, the split lines
+        g.lineWidth = 2; g.strokeStyle = "rgba(255,255,255,0.55)";
+        g.beginPath(); pts.forEach((p, i) => (i ? g.lineTo(p.f[0], p.f[1]) : g.moveTo(p.f[0], p.f[1]))); g.stroke();
+        g.lineWidth = 1.5; g.strokeStyle = "rgba(15,35,90,0.16)";
+        g.beginPath(); pts.forEach((p, i) => (i ? g.lineTo(p.b[0], p.b[1]) : g.moveTo(p.b[0], p.b[1]))); g.stroke();
+        [-BE, BE].forEach((b) => { const p = pts.find((q) => Math.abs(q.s - b) < 1e-9);
+          K.poly([p.f, p.f0, [p.f0[0] + 0.01, p.f0[1]], [p.f[0] + 0.01, p.f[1]]], null, "rgba(255,255,255,0.85)", 3); });
+        return pts;
+      }
+
+      // ---- the floor axis in front of the wall: a line and a tick at every 1% ----
+      const CA = 10.0;
+      function drawAxis(t) {
+        const a = clamp((t - 0.3) / 0.25, 0, 1); if (a <= 0) return;
+        g.globalAlpha = a;
+        const l = at(-4, CA, 0), r = at(4, CA, 0);
+        g.lineWidth = 3; g.strokeStyle = "#1e3a8a"; g.beginPath(); g.moveTo(l[0], l[1]); g.lineTo(r[0], r[1]); g.stroke();
+        for (let s = -4; s <= 4; s++) { const p0 = at(s, CA - 0.25, 0), p1 = at(s, CA + 0.25, 0);
+          g.lineWidth = s === 0 ? 4 : 3; g.beginPath(); g.moveTo(p0[0], p0[1]); g.lineTo(p1[0], p1[1]); g.stroke(); }
+        g.globalAlpha = 1;
+      }
+
+      // ---- the breakeven posts at +/-1.26%: rise on "1.26%" ----
+      const POST_T = w(12) - 0.2, PH = 8.6, CP = 9.92;
+      function drawPost(s, t) {
+        const k = outBack((t - POST_T - (s > 0 ? 0.05 : 0)) / 0.42, 1.8); if (k <= 0) return;
+        const dxy = (PXP * s) / (0.8660254 * 48), xc = (CP + dxy) / 2, yc = (CP - dxy) / 2;
+        K.shadow(xc - 0.3, yc - 0.3, 0, 0.6, 0.6, 0.25);
+        K.box(xc - 0.12, yc - 0.12, 0, 0.24, 0.24, PH * k, M.navy);
+        K.box(xc - 0.22, yc - 0.22, PH * k, 0.44, 0.44, 0.2, M.white);
+      }
+
+      // ---- the gold marker on the axis: a 0.5% day from the start; it jumps to a 2% day on "day, up" ----
+      const BALL_IN = 0.42, J0 = w(15) + 0.04, J1 = Math.max(J0 + 0.24, w(16) - 0.02), CM = 10.3, BR = 0.56;
+      function markerS(t) { return 0.5 + 1.5 * inOut((t - J0) / (J1 - J0)); }
+      function drawBall(t) {
+        if (t < BALL_IN - 0.24) return null;
+        const s = markerS(t);
+        let z = 0;
+        if (t < BALL_IN) { const p = (t - (BALL_IN - 0.24)) / 0.24; z = 2.4 * (1 - p * p); }
+        if (t > J0 && t < J1) { const p = (t - J0) / (J1 - J0); z = 2.0 * 4 * p * (1 - p); }
+        const sq = Math.min(land(t - BALL_IN), land(t - J1));
+        const fl = at(s, CM, 0);
+        // contact shadow
+        const sh = clamp(1 - z / 3, 0.3, 1);
+        g.fillStyle = "rgba(30,64,175," + (0.22 * sh).toFixed(3) + ")";
+        g.beginPath(); g.ellipse(fl[0], fl[1], 32 * sh, 11 * sh, 0, 0, 6.2832); g.fill();
+        const rx = BR * 48 * (1 + (1 - sq) * 0.6), ry = BR * 48 * sq, cx = fl[0], cy = fl[1] - z * 48 - ry;
+        const gr = g.createRadialGradient(cx - rx * 0.35, cy - ry * 0.4, 2, cx, cy, rx * 1.05);
+        gr.addColorStop(0, "#fff7d6"); gr.addColorStop(0.35, "#fcd34d"); gr.addColorStop(0.8, "#f59e0b"); gr.addColorStop(1, "#d97706");
+        g.fillStyle = gr; g.beginPath(); g.ellipse(cx, cy, rx, ry, 0, 0, 6.2832); g.fill();
+        g.lineWidth = 2; g.strokeStyle = "rgba(146,64,14,0.35)"; g.stroke();
+        return { x: cx, s };
+      }
+
+      const rentEl = document.getElementById("s10-rent"), mkw = document.getElementById("s10-mkw");
+      const st = { t: 0 }, bob = document.getElementById("s10-bob");
+      function draw() {
+        const t = st.t;
+        g.clearRect(0, 0, 1080, 1920);
+        bob.style.transform = "translateY(" + (-8 * Math.sin((2 * Math.PI * (t + 1.1)) / 3)).toFixed(2) + "px)";
+        K.shadow(0, 0, -1.6, 10, 10, 0.22);
+        K.platform(0, 0, 10, 10);
+        drawBell(t);
+        // RENT rides on the rose face as the wall grows (mapped onto the face's plane)
+        const k0 = grow(0, t), zt = 4.8 * k0, zb = 3.2 * k0;
+        if (k0 > 0.05) {
+          rentEl.style.transform = K.faceMatrix(at(-1.0, CF, zt), at(1.0, CF, zt), at(-1.0, CF, zb), 176, 77);
+          rentEl.style.opacity = clamp((t - 0.34) / 0.12, 0, 1).toFixed(3);
+        } else rentEl.style.opacity = "0";
+        drawAxis(t);
+        drawPost(-BE, t); drawPost(BE, t);
+        const b = drawBall(t);
+        if (b) mkw.style.transform = "translateX(" + (b.x - 584).toFixed(2) + "px)";
+      }
+
+      // ---- the cube flip in and out, the slow push ----
+      tl.fromTo("#s10-flip", { rotationY: -90, scale: 0.94 }, { rotationY: 0, scale: 1, duration: 0.36, ease: "power3.out" }, 0);
+      tl.fromTo("#s10-flip", { rotationY: 0 }, { rotationY: 90, duration: 0.26, ease: "power2.in", immediateRender: false }, DUR - 0.26);
+      tl.fromTo("#s10-cam", { scale: 1 }, { scale: 1.04, duration: DUR, ease: "sine.inOut" }, 0);
+
+      const pop = (sel, t, d) => tl.fromTo(sel, { opacity: 0, scale: 0.3, y: 26 }, { opacity: 1, scale: 1, y: 0, duration: d || 0.4, ease: "back.out(2.8)" }, t);
+      const hop = (sel, t, h, sq) => {
+        tl.fromTo(sel, { y: 0 }, { y: -h, duration: 0.12, ease: "power2.out", immediateRender: false }, t);
+        tl.fromTo(sel, { y: -h }, { y: 0, duration: 0.13, ease: "power2.in", immediateRender: false }, t + 0.12);
+        tl.fromTo(sel, { scaleY: sq, scaleX: 1 + (1 - sq) * 0.6 }, { scaleY: 1, scaleX: 1, duration: 0.32, ease: "back.out(3)", immediateRender: false }, t + 0.25);
+      };
+      // axis labels fade up with the axis; the +/-1.26% labels come with the posts
+      ["#s10-tk0", "#s10-tk1", "#s10-tk2"].forEach((id, i) => tl.fromTo(id, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.25, ease: "power2.out" }, 0.36 + i * 0.04));
+      tl.fromTo("#s10-ttl", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, 0.62);
+      // the marker readout pops under the ball: a quiet 0.5% day costs ₹13.33 per 1,000 calls
+      tl.fromTo("#s10-mk", { opacity: 0, scale: 0.3, y: -20 }, { opacity: 1, scale: 1, y: 0, duration: 0.4, ease: "back.out(2.6)" }, BALL_IN + 0.04);
+      // "win?": the tails say PAYS
+      pop("#s10-payL", w(5) - 0.06, 0.36);
+      pop("#s10-payR", w(5) + 0.02, 0.36);
+      hop("#s10-payL .s10-payi", w(9) + 0.02, 12, 0.88);
+      hop("#s10-payR .s10-payi", w(9) + 0.08, 12, 0.88);
+      // "1.26%": the posts rise, the banner lands on them, the boundary labels appear
+      tl.fromTo("#s10-ban", { opacity: 0, scale: 0.3, y: 26 }, { opacity: 1, scale: 1, y: 0, duration: 0.4, ease: "back.out(1.9)" }, w(12) - 0.06);
+      tl.fromTo("#s10-banh", { scaleY: 0.86, scaleX: 1.06 }, { scaleY: 1, scaleX: 1, duration: 0.32, ease: "back.out(3)", immediateRender: false }, w(12) + 0.3);
+      ["#s10-tk3", "#s10-tk4"].forEach((id, i) => tl.fromTo(id, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.25, ease: "back.out(2)" }, w(12) + 0.04 + i * 0.05));
+      tl.fromTo("#s10-tk1", { opacity: 1 }, { opacity: 0.55, duration: 0.2, immediateRender: false }, w(12));
+      // "day, up": the ball jumps to the 2% day; the readout flips to +₹23.42 as it lands
+      tl.fromTo("#s10-mf0", { opacity: 1, rotationX: 0 }, { opacity: 0, rotationX: 90, transformPerspective: 600, duration: 0.07, ease: "power2.in", immediateRender: false }, J1 - 0.1);
+      tl.fromTo("#s10-mf1", { opacity: 0, rotationX: -90 }, { opacity: 1, rotationX: 0, transformPerspective: 600, duration: 0.22, ease: "back.out(2.2)" }, J1 - 0.04);
+      tl.fromTo("#s10-mk", { y: 0 }, { y: 14, duration: 0.08, ease: "power2.out", immediateRender: false }, J1);
+      tl.fromTo("#s10-mk", { y: 14 }, { y: 0, duration: 0.26, ease: "back.out(3)", immediateRender: false }, J1 + 0.08);
+
+      tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: draw }, 0);
+      draw();
+      window.__timelines["s10"] = tl;
+    })();
+  </script>
+</template>

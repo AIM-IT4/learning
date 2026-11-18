@@ -1,0 +1,285 @@
+<template>
+  <style>
+    @font-face { font-family: "Fredoka"; font-weight: 400; src: url("assets/fonts/fredoka-400.woff2"); }
+    @font-face { font-family: "Fredoka"; font-weight: 700; src: url("assets/fonts/fredoka-700.woff2"); }
+    @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
+    @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
+    #root { position: absolute; inset: 0; overflow: hidden; perspective: 2400px; perspective-origin: 540px 1150px; }
+    #s4-flip, #s4-cam, #s4-bob { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #s4-flip { transform-origin: 540px 1150px; }
+    #s4-cam { transform-origin: 540px 900px; }
+    #s4-cv { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    .s4-t { font-family: "Fredoka", "D2QSans", "JetBrains Mono", sans-serif; color: #0b1b3a; white-space: nowrap; }
+    .s4-t i { font-style: normal; font-family: "JetBrains Mono", sans-serif; font-weight: 800; }
+    /* signboards hang on projected points: .s4-anc sits on the point, .s4-ctr centres the board above (or below) it */
+    .s4-anc { position: absolute; left: 0; top: 0; width: 0; height: 0; }
+    .s4-ctr { position: absolute; left: -330px; width: 660px; bottom: 0; display: flex; justify-content: center; }
+    .s4-ctr.s4-dn { bottom: auto; top: 0; }
+    .s4-sb { position: relative; background: #ffffff; border-radius: 26px; box-shadow: 0 10px 0 #2563eb, 0 24px 36px rgba(30,64,175,0.22);
+             opacity: 0; transform-origin: 50% 100%; }
+    .s4-sb.s4-r { box-shadow: 0 10px 0 #e11d48, 0 24px 36px rgba(159,18,57,0.22); }
+    /* the delta meter */
+    #s4-meter { padding: 16px 28px 26px; }
+    #s4-mrow { display: flex; align-items: center; gap: 14px; height: 74px; }
+    #s4-mtag { height: 46px; padding: 0 16px; border-radius: 23px; background: #2563eb; color: #ffffff; font-weight: 700; font-size: 30px; line-height: 46px;
+               letter-spacing: 0.06em; }
+    #s4-mlab { font-weight: 700; font-size: 54px; line-height: 74px; }
+    #s4-mval { display: block; width: 134px; font-weight: 700; font-size: 66px; line-height: 74px; color: #0b1b3a; }
+    #s4-mbar { position: relative; width: 100%; height: 20px; margin-top: 8px; border-radius: 10px; background: #e3ebfb; overflow: hidden; }
+    #s4-mfill { position: absolute; left: 0; top: 0; bottom: 0; width: 0; border-radius: 10px; background: #f43f5e; }
+    #s4-mtick { position: absolute; left: 0; right: 0; top: 0; bottom: 0;
+                background: repeating-linear-gradient(90deg, rgba(255,255,255,0) 0, rgba(255,255,255,0) calc(10% - 2px), rgba(255,255,255,0.9) calc(10% - 2px), rgba(255,255,255,0.9) 10%); }
+    /* the unit label */
+    #s4-unit { height: 66px; padding: 0 28px; border-radius: 33px; font-weight: 700; font-size: 34px; line-height: 66px; transform-origin: 50% 0%; }
+    #s4-unit b { color: #2563eb; }
+    /* the short tray's count */
+    #s4-short { padding: 10px 28px 14px; text-align: center; transform-origin: 50% 0%; }
+    #s4-sv { font-weight: 700; font-size: 52px; line-height: 60px; color: #e11d48; }
+    #s4-sc { font-weight: 400; font-size: 30px; line-height: 34px; }
+    /* SHORT on the tray's side, mapped onto the face */
+    #s4-tface { position: absolute; left: 0; top: 0; transform-origin: 0 0; display: flex; align-items: center; justify-content: center;
+                font-weight: 700; font-size: 30px; letter-spacing: 0.22em; color: #e11d48; }
+    /* NET delta = 0 */
+    #s4-net { display: flex; align-items: center; gap: 14px; height: 84px; padding: 0 30px 0 34px; border-radius: 42px; background: #2563eb; color: #ffffff;
+              font-weight: 700; font-size: 46px; line-height: 84px; letter-spacing: 0.03em; box-shadow: 0 10px 0 #1e40af, 0 24px 36px rgba(30,64,175,0.25);
+              opacity: 0; transform-origin: 50% 100%; }
+    #s4-net i { color: #ffffff; }
+    #s4-net svg { width: 46px; height: 46px; }
+    #s4-chk { stroke-dasharray: 26; stroke-dashoffset: 26; }
+  </style>
+  <div id="root" data-composition-id="s4" data-width="1080" data-height="1920">
+    <div id="s4-flip">
+      <div id="s4-cam">
+        <div id="s4-bob">
+          <canvas id="s4-cv" width="1080" height="1920"></canvas>
+          <div class="s4-t" id="s4-tface" data-layout-ignore>SHORT</div>
+          <div class="s4-anc" id="s4-am"><div class="s4-ctr"><div class="s4-sb s4-t" id="s4-meter">
+            <div id="s4-mrow"><span id="s4-mtag">CALL</span><span id="s4-mlab"><i>Δ</i> =</span><span id="s4-mval">0.00</span></div>
+            <div id="s4-mbar"><div id="s4-mfill"></div><div id="s4-mtick"></div></div>
+          </div></div></div>
+          <div class="s4-anc" id="s4-au"><div class="s4-ctr s4-dn"><div class="s4-sb s4-t" id="s4-unit"><b>100</b> cubes = 1 share</div></div></div>
+          <div class="s4-anc" id="s4-as"><div class="s4-ctr s4-dn"><div class="s4-sb s4-r s4-t" id="s4-short"><div id="s4-sv">−0.54 sh</div><div id="s4-sc">0 cubes</div></div></div></div>
+          <div class="s4-anc" id="s4-an"><div class="s4-ctr"><div class="s4-t" id="s4-net">NET <i>Δ</i> = 0<svg viewBox="0 0 24 24"><path id="s4-chk" d="M4.5 12.5 L10 18 L19.5 6.5" fill="none" stroke="#ffffff" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" /></svg></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      /*DATA*/ const DUR = 4.95; const W = [0.16, 0.33, 0.61, 0.91, 2.13, 2.35, 2.49, 2.77, 2.99, 3.39, 4.37]; /*END*/
+      // words: 0 Its 1 delta 2 is 3 0.54, 4 so 5 you 6 hedge 7 by 8 shorting 9 0.54 10 shares.
+// ISO KIT v1: isometric toy-world drawing on a 2D canvas, matching the Flow dioramas' look.
+// Copy this block verbatim into a scene's <script> (inside its IIFE). World units: x to the right-back, y to the left-back,
+// z up. P(x, y, z) -> frame px. Visible faces of a box: top, the face at y+d (front-left) and the face at x+w (front-right).
+// Draw back to front: sort what you draw by (x + y) ascending, then z ascending (painter's order).
+const ISO = (function () {
+  const C30 = Math.cos(Math.PI / 6), S30 = 0.5;
+  const MAT = {
+    white: { top: "#ffffff", left: "#e3ebfb", right: "#c9d8f5" },
+    blue:  { top: "#7fb0ff", left: "#3b82f6", right: "#2563eb" },
+    navy:  { top: "#4f6fe0", left: "#1e40af", right: "#1e3a8a" },
+    sky:   { top: "#dbeafe", left: "#bfdbfe", right: "#93c5fd" },
+    rose:  { top: "#fda4af", left: "#f43f5e", right: "#e11d48" },
+    gold:  { top: "#fde68a", left: "#f59e0b", right: "#d97706" },
+    grey:  { top: "#f1f5f9", left: "#cbd5e1", right: "#94a3b8" },
+    wood:  { top: "#f3c58f", left: "#d99a5b", right: "#b97a3f" },
+  };
+  function make(g, ox, oy, u) {
+    const P = (x, y, z) => [ox + (x - y) * C30 * u, oy + (x + y) * S30 * u - (z || 0) * u];
+    function poly(pts, fill, stroke, lw) {
+      g.beginPath(); pts.forEach(([a, b], i) => (i ? g.lineTo(a, b) : g.moveTo(a, b))); g.closePath();
+      if (fill) { g.fillStyle = fill; g.fill(); }
+      if (stroke) { g.strokeStyle = stroke; g.lineWidth = lw || 1.5; g.stroke(); }
+    }
+    function box(x, y, z, w, d, h, mat, edge) {
+      if (h <= 0 || w <= 0 || d <= 0) return;
+      edge = edge === undefined ? "rgba(15,35,90,0.14)" : edge;
+      poly([P(x, y + d, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x, y + d, z + h)], mat.left, edge);
+      poly([P(x + w, y, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x + w, y, z + h)], mat.right, edge);
+      poly([P(x, y, z + h), P(x + w, y, z + h), P(x + w, y + d, z + h), P(x, y + d, z + h)], mat.top, edge);
+    }
+    // a soft contact shadow on the floor plane z
+    function shadow(x, y, z, w, d, a) {
+      const c = P(x + w / 2, y + d / 2, z); const rx = (w + d) * C30 * u * 0.55, ry = (w + d) * S30 * u * 0.55;
+      const gr = g.createRadialGradient(c[0], c[1], 0, c[0], c[1], rx);
+      gr.addColorStop(0, `rgba(30,64,175,${a || 0.18})`); gr.addColorStop(1, "rgba(30,64,175,0)");
+      g.save(); g.translate(c[0], c[1]); g.scale(1, ry / rx); g.translate(-c[0], -c[1]);
+      g.fillStyle = gr; g.beginPath(); g.arc(c[0], c[1], rx, 0, 6.2832); g.fill(); g.restore();
+    }
+    // the floating platform: white top slab, blue band, white band, blue base (like the dioramas), its top at z = 0
+    function platform(x, y, w, d) {
+      box(x, y, -1.5, w, d, 0.42, MAT.blue);
+      box(x, y, -1.08, w, d, 0.3, MAT.white);
+      box(x, y, -0.78, w, d, 0.28, MAT.blue);
+      box(x, y, -0.5, w, d, 0.5, MAT.white);
+    }
+    // a 2D affine matrix that maps a flat w x h DOM element onto a face given three projected corners (TL, TR, BL)
+    function faceMatrix(tl, tr, bl, w, h) {
+      const a = (tr[0] - tl[0]) / w, b = (tr[1] - tl[1]) / w, c = (bl[0] - tl[0]) / h, d = (bl[1] - tl[1]) / h;
+      return `matrix(${a.toFixed(5)},${b.toFixed(5)},${c.toFixed(5)},${d.toFixed(5)},${tl[0].toFixed(2)},${tl[1].toFixed(2)})`;
+    }
+    return { P, poly, box, shadow, platform, faceMatrix, u };
+  }
+  return { make, MAT };
+})();
+
+      const w = (i) => Math.max(0, W.length > i ? W[i] : 0.3 + i * 0.4);
+      const tl = gsap.timeline({ paused: true });
+      const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+      const cubicOut = (p) => 1 - Math.pow(1 - clamp(p, 0, 1), 3);
+      const smooth = (p) => { p = clamp(p, 0, 1); return p * p * (3 - 2 * p); };
+      const bounceOut = (p) => {
+        p = clamp(p, 0, 1); const n = 7.5625, d = 2.75;
+        if (p < 1 / d) return n * p * p;
+        if (p < 2 / d) { p -= 1.5 / d; return n * p * p + 0.75; }
+        if (p < 2.5 / d) { p -= 2.25 / d; return n * p * p + 0.9375; }
+        p -= 2.625 / d; return n * p * p + 0.984375;
+      };
+      const squash = (t, ti, amt, dur) => { const p = (t - ti) / dur; return p < 0 || p > 1 ? 1 : 1 - amt * Math.sin(p * Math.PI * 3) * Math.exp(-p * 4.2); };
+      const hop = (t, t0, d, h) => { const p = (t - t0) / d; return p < 0 || p > 1 ? 0 : h * Math.sin(Math.PI * p); };
+      function mulberry32(a) { return function () { a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+
+      // ---- the world: 100 share cubes (10 x 10) on the main platform; a small rose SHORT tray floats at its front-right ----
+      const U = 44, OX = 512, OY = 870;
+      const g = document.getElementById("s4-cv").getContext("2d");
+      const K = ISO.make(g, OX, OY, U), MAT = ISO.MAT, P = K.P;
+      const CS = 0.7, SP = 0.9, O0 = 0.6;                       // cube size, spacing, first offset
+      const TR = { x: 11.4, y: 3.2, w: 3.3, d: 6.0 };            // the tray (holds 3 x 6 x 3 = 54 cubes)
+      const rnd = mulberry32(1054);
+      const cubes = [];
+      for (let i = 0; i < 10; i++) for (let j = 0; j < 10; j++) {
+        cubes.push({ i, j, x: O0 + i * SP, y: O0 + j * SP, d0: 0.02 + (i + j) * 0.009 + rnd() * 0.04, h0: 3.4 + rnd() * 1.8, k: -1 });
+      }
+      // 54 cubes = 0.54 share: rows i = 9..5 (50 cubes) and 4 more from row 4, nearest the tray first
+      const order = [];
+      for (let i = 9; i >= 5; i--) for (let j = 0; j < 10; j++) order.push(i * 10 + j);
+      for (let j = 0; j < 4; j++) order.push(40 + j);
+      order.forEach((idx, k) => { cubes[idx].k = k; });
+      // their slots on the tray: bottom layer first, each layer back to front
+      const slots = [];
+      for (let c = 0; c < 3; c++) {
+        const layer = [];
+        for (let a = 0; a < 3; a++) for (let b = 0; b < 6; b++) layer.push({ a, b, x: TR.x + 0.4 + a * SP, y: TR.y + 0.4 + b * SP, z: c * 0.74 });
+        layer.sort((p, q) => p.a + p.b - (q.a + q.b) || p.a - q.a);
+        slots.push(...layer);
+      }
+
+      // ---- beats ----
+      const R0 = Math.max(0.42, w(1) + 0.06), R1 = Math.max(R0 + 0.3, w(3));       // the meter rolls 0.00 -> 0.54 and lands on "0.54,"
+      const T0 = Math.max(R1 + 0.5, w(6) - 0.16), TD = 0.6;                         // the tray drops in on "hedge"
+      const F0 = Math.max(T0 + TD, w(8) - 0.02), FS = 0.008, FD = 0.5;             // the 54 lift and arc over on "shorting"
+      const tS = Math.max(F0 + 0.2, w(9) - 0.04);                                   // −0.54 sh on "0.54"
+      const tN = Math.max(F0 + 53 * FS + FD - 0.05, w(9) + 0.4);                    // NET Δ = 0 as the last cube lands
+      const meterVal = (t) => 0.54 * cubicOut((t - R0) / (R1 - R0));
+      const roseAt = (k) => { // time at which the k-th cube turns rose (inverse of the meter roll)
+        const p = (k + 1) / 54, e = 1 - Math.cbrt(1 - p); return R0 + e * (R1 - R0);
+      };
+
+      // entrance flip and a slow push
+      tl.fromTo("#s4-flip", { rotationY: -90, scale: 0.94 }, { rotationY: 0, scale: 1, duration: 0.36, ease: "power3.out" }, 0);
+      tl.fromTo("#s4-cam", { scale: 1 }, { scale: 1.04, duration: DUR, ease: "none" }, 0);
+      // signboards
+      tl.fromTo("#s4-meter", { opacity: 0, scale: 0.3, y: 30 }, { opacity: 1, scale: 1, y: 0, duration: 0.32, ease: "back.out(2.6)" }, R0 - 0.14);
+      tl.fromTo("#s4-meter", { scaleX: 1, scaleY: 1 }, { scaleX: 1.06, scaleY: 0.86, duration: 0.07, ease: "power2.out", immediateRender: false }, R1);
+      tl.fromTo("#s4-meter", { scaleX: 1.06, scaleY: 0.86 }, { scaleX: 1, scaleY: 1, duration: 0.34, ease: "back.out(3)", immediateRender: false }, R1 + 0.07);
+      tl.fromTo("#s4-unit", { opacity: 0, scale: 0.3, y: -20 }, { opacity: 1, scale: 1, y: 0, duration: 0.32, ease: "back.out(2.6)" }, 0.46);
+      tl.fromTo("#s4-short", { opacity: 0, scale: 0.3, y: -24 }, { opacity: 1, scale: 1, y: 0, duration: 0.32, ease: "back.out(2.6)" }, tS);
+      tl.fromTo("#s4-net", { opacity: 0, scale: 0.5, y: -64, rotation: -8 }, { opacity: 1, scale: 1, y: 0, rotation: -2, duration: 0.26, ease: "power2.in" }, tN - 0.26);
+      tl.fromTo("#s4-net", { scaleX: 1, scaleY: 1 }, { scaleX: 1.1, scaleY: 0.82, duration: 0.07, ease: "power2.out", immediateRender: false }, tN);
+      tl.fromTo("#s4-net", { scaleX: 1.1, scaleY: 0.82 }, { scaleX: 1, scaleY: 1, duration: 0.32, ease: "back.out(3)", immediateRender: false }, tN + 0.07);
+      tl.fromTo("#s4-chk", { strokeDashoffset: 26 }, { strokeDashoffset: 0, duration: 0.2, ease: "power2.out" }, tN + 0.06);
+
+      // anchors (fixed points of the world; the bob and push move them with the canvas)
+      const place = (id, p) => { const e = document.getElementById(id); e.style.left = p[0].toFixed(1) + "px"; e.style.top = p[1].toFixed(1) + "px"; };
+      place("s4-am", P(-0.6, 3.6, 3.9));
+      place("s4-au", P(4.2, 10, -1.5));
+      place("s4-as", P(TR.x + 1.8, TR.y + TR.d, -1.8));
+      place("s4-an", P(6.1, -1.6, 5.0));
+      const mval = document.getElementById("s4-mval"), mfill = document.getElementById("s4-mfill"), scount = document.getElementById("s4-sc");
+      const tface = document.getElementById("s4-tface"), bob = document.getElementById("s4-bob");
+      const TFW = TR.d * U, TFH = 0.9 * U;
+      tface.style.width = TFW + "px"; tface.style.height = TFH + "px";
+
+      function floorShadow() {
+        const cx = OX + 120, cy = OY + 10 * U + 150, rx = 470, ry = 125;
+        g.save(); g.translate(cx, cy); g.scale(1, ry / rx);
+        const gr = g.createRadialGradient(0, 0, 0, 0, 0, rx);
+        gr.addColorStop(0, "rgba(37,99,235,0.30)"); gr.addColorStop(0.55, "rgba(37,99,235,0.12)"); gr.addColorStop(1, "rgba(37,99,235,0)");
+        g.fillStyle = gr; g.beginPath(); g.arc(0, 0, rx, 0, 6.2832); g.fill(); g.restore();
+      }
+      function tray(zt) {
+        K.box(TR.x, TR.y, zt - 1.75, TR.w, TR.d, 0.35, MAT.rose);
+        K.box(TR.x, TR.y, zt - 1.4, TR.w, TR.d, 0.2, MAT.white);
+        K.box(TR.x, TR.y, zt - 1.2, TR.w, TR.d, 0.3, MAT.rose);
+        K.box(TR.x, TR.y, zt - 0.9, TR.w, TR.d, 0.9, MAT.white);
+      }
+      const cubeBox = (c) => {
+        const s = c.sx || 1, hz = CS * (c.sz || 1), wz = CS * s;
+        K.box(c.x + (CS - wz) / 2, c.y + (CS - wz) / 2, c.z, wz, wz, hz, c.mat);
+      };
+      const paint = (list) => { list.sort((a, b) => a.x + a.y - (b.x + b.y) || a.z - b.z); list.forEach(cubeBox); };
+
+      function draw(t) {
+        bob.style.transform = "translateY(" + (-8 * Math.sin((2 * Math.PI * (t + 1.1)) / 3)).toFixed(2) + "px)";
+        g.clearRect(0, 0, 1080, 1920);
+        floorShadow();
+        K.shadow(0, 0, -1.6, 10, 10, 0.2);
+        K.platform(0, 0, 10, 10);
+        // the meter readout and the matching count of rose cubes
+        const v = meterVal(t), nRose = Math.floor(v * 100 + 1e-6);
+        mval.textContent = v.toFixed(2);
+        mfill.style.width = (v * 100).toFixed(2) + "%";
+        const mainList = [], trayList = [];
+        let landed = 0;
+        for (const c of cubes) {
+          const rose = c.k >= 0 && c.k < nRose;
+          let x = c.x, y = c.y, z = 0, sz = 1;
+          // drop in with a bounce
+          const pd = (t - c.d0) / 0.38;
+          if (pd < 0) continue;
+          if (pd < 1) z = c.h0 * (1 - bounceOut(pd));
+          sz *= squash(t, c.d0 + 0.38 / 2.75, 0.22, 0.32);
+          if (c.k >= 0) {
+            z += hop(t, roseAt(c.k), 0.2, 0.3) + hop(t, R1 + 0.02, 0.32, 0.4);
+            const ts = F0 + c.k * FS, q = (t - ts) / FD, s = slots[c.k];
+            if (q >= 0) {
+              if (q < 1) {
+                const e = smooth(q);
+                x = c.x + (s.x - c.x) * e; y = c.y + (s.y - c.y) * e;
+                z = s.z * e + (3.4 + 0.1 * (c.k % 7)) * 4 * e * (1 - e);
+              } else {
+                x = s.x; y = s.y; z = s.z; landed++;
+                sz = squash(t, ts + FD, 0.24, 0.3);
+              }
+            }
+          }
+          const item = { x, y, z, sz, sx: 1 + (1 - sz) * 0.5, mat: rose ? MAT.rose : MAT.blue };
+          (x > 10.3 ? trayList : mainList).push(item);
+        }
+        paint(mainList);
+        // the SHORT tray drops in on "hedge"
+        const pt = (t - T0) / TD;
+        if (pt >= 0) {
+          const zt = 7 * (1 - bounceOut(pt));
+          K.shadow(TR.x, TR.y, zt - 1.8, TR.w, TR.d, 0.16);
+          tray(zt);
+          tface.style.opacity = "1";
+          tface.style.transform = K.faceMatrix(P(TR.x + TR.w, TR.y + TR.d, zt), P(TR.x + TR.w, TR.y, zt), P(TR.x + TR.w, TR.y + TR.d, zt - 0.9), TFW, TFH);
+        } else {
+          tface.style.opacity = "0";
+          tface.style.transform = "translate(-2000px,0)";
+        }
+        paint(trayList);
+        scount.textContent = landed + (landed === 1 ? " cube" : " cubes");
+      }
+      const st = { t: 0 };
+      tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: () => draw(st.t) }, 0);
+      draw(0);
+
+      // exit: cube flip into s5
+      tl.fromTo("#s4-flip", { rotationY: 0 }, { rotationY: 90, duration: 0.26, ease: "power2.in", immediateRender: false }, DUR - 0.26);
+      window.__timelines["s4"] = tl;
+    })();
+  </script>
+</template>
