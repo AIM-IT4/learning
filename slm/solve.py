@@ -37,14 +37,17 @@ def load(run_dir, device="cpu"):
 
 
 @torch.no_grad()
-def solve(model, tok, question, max_new=900, device="cpu"):
-    """Returns (written answer, final number or None, tool calls, error or None)."""
+def generate(model, tok, question, max_new=900, device="cpu"):
+    """Write an answer step by step. Yields ("text", new_text) as the model writes,
+    ("tool", expression, result) when a tool runs, and finally
+    ("end", full_text, final_number_or_None, tool_calls, error_or_None)."""
     ids = tok.encode(f"Q: {question}\nA:").ids
     eos = tok.token_to_id("<|eos|>")
     caches = [{} for _ in model.blocks]
     logits = model(torch.tensor([ids], device=device), caches=caches, pos=0)
-    pos, out, forced, calls, error = len(ids), [], [], [], None
+    pos, out, forced, calls, error, shown = len(ids), [], [], [], None, ""
     while len(out) < max_new and pos < model.cfg.max_seq:
+        from_tool = bool(forced)
         if forced:
             nxt = forced.pop(0)
         else:
@@ -54,9 +57,15 @@ def solve(model, tok, question, max_new=900, device="cpu"):
         out.append(nxt)
         logits = model(torch.tensor([[nxt]], device=device), caches=caches, pos=pos)
         pos += 1
-        if forced:
-            continue
         text = tok.decode(out, skip_special_tokens=False)
+        if from_tool:                                                # the tool event already showed this text
+            if not forced:
+                shown = text
+            continue
+        delta = text[len(shown):] if text.startswith(shown) else text
+        if delta:
+            yield ("text", delta)
+            shown = text
         if "\nQ:" in text or re.search(r"####\s*-?[\d,]*\.?\d+\s*\n", text):
             break
         expr = tools.pending_call(text)
@@ -68,9 +77,17 @@ def solve(model, tok, question, max_new=900, device="cpu"):
                 break
             calls.append(expr)
             forced = tok.encode(result).ids
+            yield ("tool", expr, result)
     text = tok.decode(out, skip_special_tokens=False).split("\nQ:")[0]
     m = ANSWER.search(text)
-    return text, (m.group(1).replace(",", "") if m else None), calls, error
+    yield ("end", text, (m.group(1).replace(",", "") if m else None), calls, error)
+
+
+def solve(model, tok, question, max_new=900, device="cpu"):
+    """Returns (written answer, final number or None, tool calls, error or None)."""
+    for event in generate(model, tok, question, max_new, device):
+        if event[0] == "end":
+            return event[1:]
 
 
 def correct(pred, gold):
