@@ -1,0 +1,18 @@
+{
+ "tempo": 1.0,
+ "max_pause": 0.5,
+ "keep": 0.42,
+ "parts": [
+  [
+   "a",
+   "voice/charon/take3a.wav"
+  ],
+  [
+   "b",
+   "voice/charon/take3b.wav"
+  ]
+ ],
+ "gaps": [
+  0.8
+ ]
+}

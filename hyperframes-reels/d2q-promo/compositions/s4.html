@@ -75,7 +75,7 @@
   </div>
   <script>
     (function () {
-      /*DATA*/ const DUR = 7.75; const W = [0.16, 0.37, 0.85, 1.66, 1.85, 1.97, 2.23, 2.91, 3.03, 3.15, 3.43, 3.75, 4.845, 5.053, 5.47, 6.26]; /*END*/
+      /*DATA*/ const DUR = 7.5; const W = [0.16, 0.39, 0.87, 1.56, 1.71, 1.85, 2.07, 2.57, 2.77, 2.87, 3.15, 3.35, 4.546, 4.774, 5.23, 5.96]; /*END*/
       // words: 0 One 1 simulated 2 path. 3 Hedge 4 it 5 five 6 times, 7 and 8 the 9 error 10 is 11 2.32 | 12 Two 13 hundred 14 times: 15 0.07
       const w = (i) => Math.max(0, W.length > i ? W[i] : 0.16 + i * 0.32);
       // v2's beats: the path draws from "One" to "Hedge", ticks on "five", a rose pulse from "error" to "Two",
