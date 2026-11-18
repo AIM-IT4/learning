@@ -1,0 +1,226 @@
+<template>
+  <style>
+    @font-face { font-family: "Inter"; font-weight: 100 900; src: url("assets/fonts/Inter.ttf"); }
+    @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: Inter, sans-serif; color: #0f172a; }
+    #s7-cam { position: absolute; inset: 0; transform-origin: 540px 900px; }
+    #s7-scene { position: absolute; inset: 0; }
+    #s7-aura { position: absolute; left: 10px; top: 400px; width: 1060px; height: 1200px; border-radius: 50%;
+               background: radial-gradient(closest-side, rgba(8,169,162,0.34), rgba(8,169,162,0.10) 58%, rgba(8,169,162,0) 100%); opacity: 0.2; }
+    #s7-floor { position: absolute; left: 100px; top: 1648px; width: 880px; height: 86px; border-radius: 50%;
+                background: radial-gradient(ellipse at center, rgba(15,23,42,0.20), rgba(15,23,42,0) 70%); }
+    .s7-foot { position: absolute; top: 1676px; width: 120px; height: 30px; border-radius: 50%;
+               background: radial-gradient(ellipse at center, rgba(15,23,42,0.34), rgba(15,23,42,0) 70%); }
+    /* quad monitor mount: pole, cross bar, base */
+    #s7-pole { position: absolute; left: 518px; top: 640px; width: 44px; height: 870px; border-radius: 12px;
+               background: linear-gradient(90deg, #7c8ba1 0%, #e2e8f0 30%, #ffffff 46%, #cbd5e1 70%, #64748b 100%);
+               box-shadow: 0 10px 20px rgba(15,23,42,0.18); }
+    #s7-bar { position: absolute; left: 250px; top: 960px; width: 580px; height: 36px; border-radius: 10px;
+              background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 55%, #7c8ba1 100%); }
+    #s7-base { position: absolute; left: 420px; top: 1484px; width: 240px; height: 42px; border-radius: 50%;
+               background: radial-gradient(ellipse at 45% 35%, #ffffff 0%, #e2e8f0 50%, #94a3b8 100%);
+               box-shadow: 0 6px 12px rgba(15,23,42,0.22), inset 0 -3px 0 rgba(100,116,139,0.35); }
+    /* monitors */
+    .s7-mon { position: absolute; width: 440px; height: 481px; }
+    .s7-glow { position: absolute; left: -90px; top: -90px; width: 620px; height: 661px; border-radius: 50%;
+               background: radial-gradient(closest-side, rgba(8,169,162,0.60), rgba(8,169,162,0.22) 55%, rgba(8,169,162,0) 100%); opacity: 0; }
+    .s7-bob { position: absolute; inset: 0; }
+    .s7-bezel { position: absolute; inset: 0; border-radius: 28px; border: 2px solid #0b1220;
+                background: linear-gradient(180deg, #4b5a70 0%, #1e293b 8%, #0f172a 100%);
+                box-shadow: 0 30px 56px rgba(15,23,42,0.30), 0 8px 16px rgba(15,23,42,0.16), inset 0 2px 0 rgba(255,255,255,0.30), inset 0 -4px 0 rgba(0,0,0,0.35); }
+    .s7-scr { position: absolute; left: 15px; top: 15px; width: 406px; height: 406px; border-radius: 14px; overflow: hidden;
+              background: linear-gradient(150deg, #253248 0%, #0b1220 52%, #172235 100%); box-shadow: inset 0 0 0 2px rgba(0,0,0,0.55); }
+    .s7-pw { position: absolute; left: 163px; top: 163px; width: 80px; height: 80px; }
+    .s7-cov { position: absolute; inset: 0; opacity: 0; }
+    .s7-cov img { display: block; width: 100%; height: 100%; }
+    .s7-flash { position: absolute; inset: 0; opacity: 0;
+                background: linear-gradient(180deg, rgba(103,214,207,0) 0%, rgba(230,246,244,0.92) 38%, #ffffff 50%, rgba(230,246,244,0.92) 62%, rgba(103,214,207,0) 100%); }
+    .s7-glass { position: absolute; inset: 0;
+                background: linear-gradient(122deg, rgba(255,255,255,0.17) 0%, rgba(255,255,255,0.05) 33%, rgba(255,255,255,0) 34%, rgba(255,255,255,0) 100%); }
+    .s7-sweep { position: absolute; left: 0; top: -60px; width: 150px; height: 530px;
+                background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.5), rgba(255,255,255,0)); }
+    .s7-chin { position: absolute; left: 0; right: 0; top: 421px; height: 56px; }
+    .s7-off, .s7-on { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 12px;
+                      font: 700 30px/1 Inter, sans-serif; letter-spacing: -0.01em; white-space: nowrap; }
+    .s7-off { color: #7c8ba1; }
+    .s7-on { color: #ffffff; opacity: 0; }
+    .s7-off i, .s7-on i { display: block; width: 13px; height: 13px; border-radius: 7px; }
+    .s7-off i { background: #e2e8f0; opacity: 0; }
+    .s7-on i { background: #2ee6dc; box-shadow: 0 0 10px 3px rgba(8,169,162,0.85); }
+    .s7-ring { position: absolute; left: -7px; top: -7px; width: 454px; height: 495px; border-radius: 34px; border: 3px solid #4fd1c9;
+               box-shadow: 0 0 34px rgba(8,169,162,0.70), inset 0 0 18px rgba(8,169,162,0.40); opacity: 0; }
+    /* desk */
+    #s7-desk { position: absolute; left: 0; top: 1480px; }
+    #s7-tick { position: absolute; left: 92px; top: 1567px; width: 896px; height: 40px; border-radius: 11px; overflow: hidden;
+               background: linear-gradient(180deg, #0b1220 0%, #1e293b 100%); box-shadow: inset 0 2px 4px rgba(0,0,0,0.5), 0 1px 0 #ffffff; opacity: 0.25; }
+    #s7-tickin { position: absolute; left: 0; top: 0; white-space: pre; font: 600 26px/40px "JetBrains Mono", monospace; color: #5fe0d8;
+                 text-shadow: 0 0 8px rgba(8,169,162,0.75); }
+  </style>
+  <div id="root" data-composition-id="s7" data-width="1080" data-height="1920">
+    <div id="s7-cam">
+      <div id="s7-aura"></div>
+      <div id="s7-scene">
+        <div id="s7-floor"></div>
+        <div class="s7-foot" style="left:64px;"></div>
+        <div class="s7-foot" style="left:896px;"></div>
+        <svg id="s7-desk" width="1080" height="240" viewBox="0 0 1080 240" fill="none">
+          <defs>
+            <linearGradient id="s7-gtop" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dfe6ef"/><stop offset="1" stop-color="#ffffff"/></linearGradient>
+            <linearGradient id="s7-gfront" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="0.45" stop-color="#e5ebf2"/><stop offset="1" stop-color="#b3c0d0"/></linearGradient>
+            <linearGradient id="s7-gleg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8a98ad"/><stop offset="0.42" stop-color="#f8fafc"/><stop offset="1" stop-color="#718096"/></linearGradient>
+            <linearGradient id="s7-gmug" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#067a75"/><stop offset="0.38" stop-color="#2cc7bf"/><stop offset="1" stop-color="#067a75"/></linearGradient>
+          </defs>
+          <rect x="104" y="128" width="40" height="80" rx="9" fill="url(#s7-gleg)"/>
+          <rect x="936" y="128" width="40" height="80" rx="9" fill="url(#s7-gleg)"/>
+          <path d="M116 20 H964 L1020 80 H60 Z" fill="url(#s7-gtop)" stroke="#d6dfeb" stroke-width="2" stroke-linejoin="round"/>
+          <!-- mug -->
+          <path d="M238 38 C262 38 262 66 238 66" stroke="#067a75" stroke-width="7" fill="none"/>
+          <rect x="194" y="30" width="46" height="46" rx="9" fill="url(#s7-gmug)"/>
+          <ellipse cx="217" cy="31" rx="23" ry="6" fill="#0b4f4c"/>
+          <rect x="200" y="40" width="7" height="28" rx="3.5" fill="#ffffff" opacity="0.45"/>
+          <!-- keyboard + mouse -->
+          <rect x="372" y="46" width="336" height="30" rx="8" fill="#ffffff" stroke="#c3cedb" stroke-width="2"/>
+          <line x1="384" y1="55" x2="698" y2="55" stroke="#d3dce8" stroke-width="5" stroke-dasharray="15 5"/>
+          <line x1="390" y1="62" x2="692" y2="62" stroke="#d3dce8" stroke-width="5" stroke-dasharray="15 5"/>
+          <line x1="430" y1="69" x2="650" y2="69" stroke="#d3dce8" stroke-width="5"/>
+          <ellipse cx="786" cy="60" rx="21" ry="14" fill="#ffffff" stroke="#c3cedb" stroke-width="2"/>
+          <line x1="786" y1="47" x2="786" y2="57" stroke="#c3cedb" stroke-width="2"/>
+          <!-- front edge -->
+          <rect x="58" y="78" width="964" height="56" rx="14" fill="url(#s7-gfront)" stroke="#c3cedb" stroke-width="2"/>
+          <line x1="68" y1="81" x2="1012" y2="81" stroke="#ffffff" stroke-width="3"/>
+        </svg>
+        <div id="s7-tick"><div id="s7-tickin"></div></div>
+        <div id="s7-rig">
+          <div id="s7-pole"></div>
+          <div id="s7-bar"></div>
+          <div id="s7-base"></div>
+          <div class="s7-mon" id="s7-m0" style="left:84px; top:486px;">
+            <div class="s7-glow"></div>
+            <div class="s7-bob">
+              <div class="s7-bezel">
+                <div class="s7-scr">
+                  <svg class="s7-pw" viewBox="0 0 80 80" fill="none"><path d="M26 22 A24 24 0 1 0 54 22" stroke="#3a4a63" stroke-width="7" stroke-linecap="round"/><path d="M40 12 V38" stroke="#3a4a63" stroke-width="7" stroke-linecap="round"/></svg>
+                  <div class="s7-cov"><img src="assets/covers/greek-explainer-lab.jpg" alt="" /></div>
+                  <div class="s7-flash"></div>
+                  <div class="s7-glass"></div>
+                  <div class="s7-sweep"></div>
+                </div>
+                <div class="s7-chin"><div class="s7-off"><i></i>Greeks</div><div class="s7-on"><i></i>Greeks</div></div>
+              </div>
+              <div class="s7-ring"></div>
+            </div>
+          </div>
+          <div class="s7-mon" id="s7-m1" style="left:556px; top:486px;">
+            <div class="s7-glow"></div>
+            <div class="s7-bob">
+              <div class="s7-bezel">
+                <div class="s7-scr">
+                  <svg class="s7-pw" viewBox="0 0 80 80" fill="none"><path d="M26 22 A24 24 0 1 0 54 22" stroke="#3a4a63" stroke-width="7" stroke-linecap="round"/><path d="M40 12 V38" stroke="#3a4a63" stroke-width="7" stroke-linecap="round"/></svg>
+                  <div class="s7-cov"><img src="assets/covers/pnl-attribution-desk-diagnostics.jpg" alt="" /></div>
+                  <div class="s7-flash"></div>
+                  <div class="s7-glass"></div>
+                  <div class="s7-sweep"></div>
+                </div>
+                <div class="s7-chin"><div class="s7-off"><i></i>P&amp;L explain</div><div class="s7-on"><i></i>P&amp;L explain</div></div>
+              </div>
+              <div class="s7-ring"></div>
+            </div>
+          </div>
+          <div class="s7-mon" id="s7-m2" style="left:84px; top:989px;">
+            <div class="s7-glow"></div>
+            <div class="s7-bob">
+              <div class="s7-bezel">
+                <div class="s7-scr">
+                  <svg class="s7-pw" viewBox="0 0 80 80" fill="none"><path d="M26 22 A24 24 0 1 0 54 22" stroke="#3a4a63" stroke-width="7" stroke-linecap="round"/><path d="M40 12 V38" stroke="#3a4a63" stroke-width="7" stroke-linecap="round"/></svg>
+                  <div class="s7-cov"><img src="assets/covers/xva-calculus-lab.jpg" alt="" /></div>
+                  <div class="s7-flash"></div>
+                  <div class="s7-glass"></div>
+                  <div class="s7-sweep"></div>
+                </div>
+                <div class="s7-chin"><div class="s7-off"><i></i>XVA</div><div class="s7-on"><i></i>XVA</div></div>
+              </div>
+              <div class="s7-ring"></div>
+            </div>
+          </div>
+          <div class="s7-mon" id="s7-m3" style="left:556px; top:989px;">
+            <div class="s7-glow"></div>
+            <div class="s7-bob">
+              <div class="s7-bezel">
+                <div class="s7-scr">
+                  <svg class="s7-pw" viewBox="0 0 80 80" fill="none"><path d="M26 22 A24 24 0 1 0 54 22" stroke="#3a4a63" stroke-width="7" stroke-linecap="round"/><path d="M40 12 V38" stroke="#3a4a63" stroke-width="7" stroke-linecap="round"/></svg>
+                  <div class="s7-cov"><img src="assets/covers/model-validation-case-studies.jpg" alt="" /></div>
+                  <div class="s7-flash"></div>
+                  <div class="s7-glass"></div>
+                  <div class="s7-sweep"></div>
+                </div>
+                <div class="s7-chin"><div class="s7-off"><i></i>Model validation</div><div class="s7-on"><i></i>Model validation</div></div>
+              </div>
+              <div class="s7-ring"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      /*DATA*/ const DUR = 4.85; const W = [0.18, 0.32, 0.42, 0.86, 1.53, 2.04, 2.86, 3.73, 4.02]; /*END*/
+      // words: 0 Then 1 the 2 desk: 3 Greeks, 4 P&L 5 explain, 6 XVA, 7 model 8 validation.
+      const w = (i) => (W.length > i ? W[i] : 0.18 + i * 0.42);
+      const ON = [w(3), w(4), w(6), w(7)];          // each monitor lights on its word
+      const DESK = w(2);                             // "desk": the desk powers up (ticker + standby lights)
+      const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+      const tl = gsap.timeline({ paused: true });
+
+      // camera: slow push-in over the whole scene
+      tl.fromTo("#s7-cam", { scale: 1 }, { scale: 1.05, duration: DUR, ease: "none" }, 0);
+      // arrival: the desk rig slides up and settles, the monitors land one after another with a little overshoot
+      tl.fromTo("#s7-scene", { opacity: 0, y: 110 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 0.02);
+      for (let i = 0; i < 4; i++) {
+        tl.fromTo("#s7-m" + i, { scale: 0.88 }, { scale: 1, duration: 0.5, ease: "back.out(1.7)" }, 0.04 + i * 0.045);
+      }
+      // "desk": the ticker on the desk edge wakes up
+      tl.fromTo("#s7-tick", { opacity: 0.25 }, { opacity: 1, duration: 0.25, ease: "power2.out" }, DESK - 0.04);
+
+      // each monitor powers on: a bright scan line opens to the full screen, the cover fades through it, a glint sweeps
+      // the glass, the label lights, the teal ring + glow come up, and the monitor gives a small bounce
+      ON.forEach((t, i) => {
+        const m = "#s7-m" + i;
+        tl.fromTo(m + " .s7-flash", { opacity: 0, scaleY: 0.03 }, { opacity: 1, scaleY: 1, duration: 0.11, ease: "power2.out" }, t - 0.04);
+        tl.fromTo(m + " .s7-flash", { opacity: 1 }, { opacity: 0, duration: 0.3, ease: "power2.out", immediateRender: false }, t + 0.08);
+        tl.fromTo(m + " .s7-cov", { opacity: 0, scale: 1.14 }, { opacity: 1, scale: 1, duration: 0.42, ease: "power3.out" }, t);
+        tl.fromTo(m + " .s7-sweep", { x: -260, rotation: 16 }, { x: 560, rotation: 16, duration: 0.75, ease: "power2.inOut" }, t + 0.12);
+        tl.fromTo(m + " .s7-off", { opacity: 1 }, { opacity: 0, duration: 0.18 }, t);
+        tl.fromTo(m + " .s7-on", { opacity: 0 }, { opacity: 1, duration: 0.18 }, t);
+        tl.fromTo(m + " .s7-ring", { opacity: 0 }, { opacity: 1, duration: 0.25, ease: "power2.out" }, t);
+        tl.fromTo(m + " .s7-bob", { scale: 1 }, { scale: 1.032, duration: 0.11, ease: "power2.out" }, t);
+        tl.fromTo(m + " .s7-bob", { scale: 1.032 }, { scale: 1, duration: 0.5, ease: "back.out(3.2)", immediateRender: false }, t + 0.11);
+      });
+
+      // continuous layer: glow pulses on lit monitors, the room glow grows with each one, standby lights blink, ticker scrolls
+      const glows = Array.from(document.querySelectorAll("#s7-rig .s7-glow"));
+      const leds = Array.from(document.querySelectorAll("#s7-rig .s7-off i"));
+      const aura = document.getElementById("s7-aura"), tickIn = document.getElementById("s7-tickin");
+      const S = "GREEKS  •  P&L EXPLAIN  •  XVA  •  MODEL VALIDATION  •  ";
+      tickIn.textContent = S.repeat(3);
+      const PERIOD = S.length * 26 * 0.6;            // JetBrains Mono advance is 0.6 em
+      function draw(t) {
+        let lit = 0;
+        glows.forEach((g, i) => {
+          const u = clamp((t - ON[i] + 0.02) / 0.3, 0, 1);
+          lit += u;
+          g.style.opacity = (u * (0.8 + 0.2 * Math.sin((t - ON[i]) * 5.6))).toFixed(3);
+        });
+        aura.style.opacity = (0.16 + 0.12 * lit + 0.05 * Math.sin(t * 2.6)).toFixed(3);
+        leds.forEach((l, i) => {
+          const awake = t >= DESK;
+          l.style.opacity = !awake ? "0.25" : (Math.sin((t - DESK) * 10 + i * 1.3) > -0.2 ? "1" : "0.3");
+        });
+        tickIn.style.transform = "translateX(" + (-((t * 115) % PERIOD)).toFixed(1) + "px)";
+      }
+      const st = { t: 0 };
+      tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: () => draw(st.t) }, 0);
+      window.__timelines["s7"] = tl;
+    })();
+  </script>
+</template>

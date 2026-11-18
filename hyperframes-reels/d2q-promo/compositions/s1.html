@@ -1,0 +1,306 @@
+<template>
+  <style>
+    @font-face { font-family: "Inter"; font-weight: 100 900; src: url("assets/fonts/Inter.ttf"); }
+    @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: Inter, sans-serif; color: #0f172a; }
+    #s1-cam { position: absolute; inset: 0; transform-origin: 540px 1100px; }
+    #s1-glow { position: absolute; left: 0; top: 620px; width: 1080px; height: 960px; border-radius: 50%;
+               background: radial-gradient(ellipse at center, rgba(8,169,162,0.22), rgba(8,169,162,0) 66%); }
+    .s1-shadow { position: absolute; border-radius: 50%; background: radial-gradient(ellipse at center, rgba(15,23,42,0.22), rgba(15,23,42,0) 70%); }
+    #s1-cshadow { left: 170px; top: 1412px; width: 740px; height: 80px; }
+    #s1-sfloor { left: 150px; top: 1618px; width: 780px; height: 100px; }
+
+    /* ---------- the tablet: bezel, screen, formula, stylus ---------- */
+    #s1-card { position: absolute; left: 60px; top: 690px; width: 960px; height: 700px; transform-origin: 480px 0px; z-index: 3; }
+    #s1-bob { position: absolute; inset: 0; }
+    #s1-bezel { position: absolute; inset: 0; border-radius: 56px; border: 2px solid #d6dfeb;
+                background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 55%, #e2e8f0 100%);
+                box-shadow: 0 40px 80px rgba(15,23,42,0.20), 0 10px 22px rgba(15,23,42,0.10), inset 0 3px 0 #ffffff, inset 0 -4px 10px rgba(15,23,42,0.06); }
+    #s1-camdot { position: absolute; left: 474px; top: 10px; width: 12px; height: 12px; border-radius: 6px; background: #94a3b8;
+                 box-shadow: inset 0 2px 3px rgba(15,23,42,0.45); }
+    #s1-screen { position: absolute; left: 26px; top: 32px; width: 908px; height: 640px; border-radius: 34px; overflow: hidden;
+                 background: radial-gradient(ellipse 70% 60% at 50% 46%, rgba(8,169,162,0.22), rgba(8,169,162,0) 70%),
+                             linear-gradient(180deg, #1e2b45 0%, #131d33 60%, #0f172a 100%);
+                 box-shadow: inset 0 0 0 2px rgba(255,255,255,0.06), inset 0 16px 30px rgba(255,255,255,0.05); }
+    #s1-grid { position: absolute; inset: 0; background-image: radial-gradient(circle at 1.5px 1.5px, rgba(255,255,255,0.09) 1.5px, transparent 2px); background-size: 36px 36px; }
+    #s1-glare { position: absolute; inset: 0; background: linear-gradient(125deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.03) 32%, rgba(255,255,255,0) 46%); }
+    #s1-sheen { position: absolute; left: -300px; top: -160px; width: 200px; height: 960px;
+                background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.13), rgba(255,255,255,0)); }
+    #s1-lab { position: absolute; left: 40px; top: 32px; font: 600 28px/48px Inter, sans-serif; color: #94a3b8; letter-spacing: 0.01em; }
+    #s1-lab i { display: inline-block; width: 14px; height: 14px; border-radius: 7px; background: #08a9a2; margin-right: 14px; vertical-align: 2px;
+                box-shadow: 0 0 12px rgba(8,169,162,0.9); }
+    #s1-ok { position: absolute; right: 34px; top: 30px; height: 52px; padding: 0 22px; border-radius: 26px; background: rgba(8,169,162,0.22);
+             border: 2px solid rgba(103,214,207,0.65); font: 700 27px/48px Inter, sans-serif; color: #67d6cf; opacity: 0; }
+    .s1-line { position: absolute; left: 0; width: 908px; height: 150px; }
+    .s1-t { position: absolute; top: 0; height: 150px; padding-left: 4px; font: 600 120px/150px Inter, sans-serif; color: #67d6cf; white-space: nowrap;
+            clip-path: inset(-30% 100% -30% -8%); text-shadow: 0 0 24px rgba(8,169,162,0.35); }
+    .s1-t i { font-style: italic; }
+    .s1-t sub, .s1-t sup { font-size: 0.58em; line-height: 0; position: relative; vertical-align: baseline; }
+    .s1-t sub { top: 0.34em; margin-left: 0.08em; }
+    .s1-t sup { top: -0.8em; margin-left: 3px; }
+    .s1-dt { font-weight: 600; margin-right: 8px; }
+    #s1-hl { position: absolute; left: 488px; top: 22px; width: 288px; height: 116px; border-radius: 22px; background: rgba(8,169,162,0.30);
+             border: 3px solid #67d6cf; box-shadow: 0 0 30px rgba(8,169,162,0.55); opacity: 0; transform-origin: 50% 50%; }
+    #s1-und { position: absolute; left: 0; top: 0; width: 908px; height: 640px; overflow: visible; }
+    #s1-pen { position: absolute; left: 0; top: 0; width: 0; height: 0; transform-origin: 0 0; }
+    #s1-pen svg { position: absolute; left: -22px; top: -332px; overflow: visible; filter: drop-shadow(12px 18px 10px rgba(15,23,42,0.32)); }
+
+    /* ---------- the balance: pedestal, fulcrum, beam, dishes, loads ---------- */
+    #s1-scale { position: absolute; inset: 0; z-index: 4; }
+    #s1-ped { position: absolute; left: 260px; top: 1546px; width: 560px; height: 120px; }
+    #s1-pedbody { position: absolute; left: 0; top: 46px; width: 560px; height: 64px; border-radius: 0 0 280px 280px / 0 0 40px 40px;
+                  background: linear-gradient(90deg, #cbd5e1 0%, #f8fafc 38%, #e2e8f0 62%, #94a3b8 100%); }
+    #s1-pedtop { position: absolute; left: 0; top: 0; width: 560px; height: 92px; border-radius: 50%;
+                 background: radial-gradient(ellipse at 45% 40%, #ffffff 0%, #e8eef5 55%, #cbd5e1 100%);
+                 box-shadow: 0 0 0 3px rgba(8,169,162,0.45), 0 0 30px rgba(8,169,162,0.30); }
+    #s1-ful { position: absolute; left: 360px; top: 1230px; width: 360px; height: 380px; overflow: visible; }
+    .s1-j { position: absolute; left: 0; top: 0; width: 0; height: 0; transform-origin: 0 0; }
+    .s1-dish { position: absolute; left: -130px; top: -140px; overflow: visible; }
+    .s1-load { position: absolute; left: -72px; top: -252px; overflow: visible; transform-origin: 72px 150px; filter: drop-shadow(0 12px 12px rgba(15,23,42,0.28)); }
+    #s1-beam { position: absolute; left: 540px; top: 1250px; width: 0; height: 0; transform-origin: 0 0; }
+    #s1-needle { position: absolute; left: -5px; top: 24px; width: 10px; height: 94px; border-radius: 5px; background: linear-gradient(90deg, #0f172a, #475569, #0f172a); }
+    #s1-ntip { position: absolute; left: -12px; top: 106px; width: 24px; height: 24px; border-radius: 12px; border: 2px solid #ffffff;
+               background: radial-gradient(circle at 35% 30%, #67d6cf, #08a9a2 60%, #067a75); box-shadow: 0 4px 8px rgba(15,23,42,0.25); }
+    #s1-bar { position: absolute; left: -372px; top: -15px; width: 744px; height: 30px; border-radius: 15px; border: 2px solid #c3cedb;
+              background: linear-gradient(180deg, #ffffff 0%, #eef2f7 45%, #cbd5e1 100%);
+              box-shadow: 0 12px 20px rgba(15,23,42,0.18), inset 0 2px 0 #ffffff; }
+    #s1-barline { position: absolute; left: -330px; top: -3px; width: 660px; height: 6px; border-radius: 3px;
+                  background: linear-gradient(90deg, rgba(8,169,162,0), rgba(8,169,162,0.65) 18%, rgba(8,169,162,0.65) 82%, rgba(8,169,162,0)); }
+    .s1-knob { position: absolute; top: -19px; width: 38px; height: 38px; border-radius: 50%; border: 2px solid #b6c2d1;
+               background: radial-gradient(circle at 35% 30%, #ffffff 0%, #e2e8f0 50%, #94a3b8 100%); box-shadow: 0 6px 10px rgba(15,23,42,0.2); }
+    #s1-hub { position: absolute; left: 504px; top: 1214px; width: 72px; height: 72px; border-radius: 50%; border: 2px solid #c3cedb;
+              background: radial-gradient(circle at 35% 30%, #ffffff 0%, #eef2f7 45%, #b6c2d1 100%);
+              box-shadow: 0 0 0 6px rgba(8,169,162,0.30), 0 10px 18px rgba(15,23,42,0.22), inset 0 2px 0 #ffffff; }
+    #s1-hubdot { position: absolute; left: 24px; top: 24px; width: 20px; height: 20px; border-radius: 10px; background: radial-gradient(circle at 35% 30%, #67d6cf, #067a75); }
+    #s1-pulse { position: absolute; left: 504px; top: 1214px; width: 72px; height: 72px; border-radius: 50%; border: 5px solid #08a9a2; opacity: 0; }
+  </style>
+  <div id="root" data-composition-id="s1" data-width="1080" data-height="1920">
+    <div id="s1-cam">
+      <div id="s1-glow"></div>
+      <div id="s1-cshadow" class="s1-shadow"></div>
+      <div id="s1-sfloor" class="s1-shadow"></div>
+      <div id="s1-scale">
+        <svg width="0" height="0" style="position:absolute"><defs>
+          <linearGradient id="s1-gFul" x1="0" x2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="0.49" stop-color="#eef2f7"/><stop offset="0.5" stop-color="#d3dbe6"/><stop offset="1" stop-color="#aebbcc"/></linearGradient>
+          <linearGradient id="s1-gFulV" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity="0"/><stop offset="1" stop-color="#64748b" stop-opacity="0.25"/></linearGradient>
+          <linearGradient id="s1-gRim" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e2e8f0"/><stop offset="1" stop-color="#ffffff"/></linearGradient>
+          <linearGradient id="s1-gFace" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="0.55" stop-color="#eef2f7"/><stop offset="1" stop-color="#c7d1de"/></linearGradient>
+          <linearGradient id="s1-gPost" x1="0" x2="1"><stop offset="0" stop-color="#94a3b8"/><stop offset="0.4" stop-color="#f8fafc"/><stop offset="1" stop-color="#94a3b8"/></linearGradient>
+          <linearGradient id="s1-gTeal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8ce6df"/><stop offset="0.5" stop-color="#08a9a2"/><stop offset="1" stop-color="#067a75"/></linearGradient>
+          <linearGradient id="s1-gNavy" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#64748b"/><stop offset="0.45" stop-color="#1e293b"/><stop offset="1" stop-color="#0f172a"/></linearGradient>
+        </defs></svg>
+        <div id="s1-ped"><div id="s1-pedbody"></div><div id="s1-pedtop"></div></div>
+        <svg id="s1-ful" viewBox="0 0 360 380">
+          <path d="M168 40 Q180 14 192 40 L338 342 Q347 362 326 362 L34 362 Q13 362 22 342 Z" fill="url(#s1-gFul)" stroke="#c3cedb" stroke-width="2"/>
+          <path d="M168 40 Q180 14 192 40 L338 342 Q347 362 326 362 L34 362 Q13 362 22 342 Z" fill="url(#s1-gFulV)"/>
+          <path d="M171 46 L30 340" stroke="#ffffff" stroke-width="4" stroke-linecap="round" opacity="0.9"/>
+          <path d="M127.4 132.4 A 122 122 0 0 0 232.6 132.4" fill="none" stroke="#cbd5e1" stroke-width="3"/>
+          <g stroke="#94a3b8" stroke-width="5" stroke-linecap="round">
+            <path d="M139.3 111.3 L131.2 129.6"/><path d="M159.2 117.8 L155.1 137.4"/><path d="M200.8 117.8 L204.9 137.4"/><path d="M220.7 111.3 L228.8 129.6"/>
+          </g>
+          <path d="M180 120 L180 140" stroke="#08a9a2" stroke-width="6" stroke-linecap="round"/>
+          <path id="s1-tick0" d="M180 118 L180 142" stroke="#67d6cf" stroke-width="9" stroke-linecap="round" opacity="0" style="filter: drop-shadow(0 0 6px #08a9a2)"/>
+        </svg>
+        <div id="s1-dLb" class="s1-j"><svg class="s1-dish" width="260" height="150" viewBox="-130 -140 260 150">
+          <rect x="-7" y="-50" width="14" height="50" rx="7" fill="url(#s1-gPost)"/>
+          <ellipse cx="0" cy="-112" rx="120" ry="22" fill="url(#s1-gRim)" stroke="#c3cedb" stroke-width="2"/>
+          <ellipse cx="0" cy="-110" rx="104" ry="15" fill="#d5dde7"/>
+          <ellipse cx="0" cy="-102" rx="66" ry="9" fill="rgba(15,23,42,0.25)"/>
+        </svg></div>
+        <div id="s1-dRb" class="s1-j"><svg class="s1-dish" width="260" height="150" viewBox="-130 -140 260 150">
+          <rect x="-7" y="-50" width="14" height="50" rx="7" fill="url(#s1-gPost)"/>
+          <ellipse cx="0" cy="-112" rx="120" ry="22" fill="url(#s1-gRim)" stroke="#c3cedb" stroke-width="2"/>
+          <ellipse cx="0" cy="-110" rx="104" ry="15" fill="#d5dde7"/>
+          <ellipse id="s1-shR" cx="0" cy="-102" rx="66" ry="9" fill="rgba(15,23,42,0.25)" opacity="0"/>
+        </svg></div>
+        <div id="s1-ldL" class="s1-j"><svg class="s1-load" width="144" height="150" viewBox="0 0 144 150">
+          <path d="M50 46 C50 4 94 4 94 46" fill="none" stroke="#334155" stroke-width="14" stroke-linecap="round"/>
+          <path d="M12 150 L132 150 L114 52 Q112 42 102 42 L42 42 Q32 42 30 52 Z" fill="url(#s1-gNavy)" stroke="#0f172a" stroke-width="2"/>
+          <path d="M36 54 L48 54 L36 140 L24 140 Z" fill="#ffffff" opacity="0.22"/>
+          <text x="72" y="128" text-anchor="middle" font-family="Inter, sans-serif" font-weight="800" font-style="italic" font-size="64" fill="#ffffff">C</text>
+        </svg></div>
+        <div id="s1-wt" class="s1-j"><svg id="s1-wts" class="s1-load" width="144" height="150" viewBox="0 0 144 150">
+          <path d="M50 46 C50 4 94 4 94 46" fill="none" stroke="#067a75" stroke-width="14" stroke-linecap="round"/>
+          <path d="M12 150 L132 150 L114 52 Q112 42 102 42 L42 42 Q32 42 30 52 Z" fill="url(#s1-gTeal)" stroke="#067a75" stroke-width="2"/>
+          <path d="M36 54 L48 54 L36 140 L24 140 Z" fill="#ffffff" opacity="0.35"/>
+          <text x="72" y="130" text-anchor="middle" font-family="Inter, sans-serif" font-weight="800" font-size="70" fill="#ffffff">Δ</text>
+        </svg></div>
+        <div id="s1-dLf" class="s1-j"><svg class="s1-dish" width="260" height="150" viewBox="-130 -140 260 150">
+          <path d="M -120 -112 A 120 22 0 0 0 120 -112 L 104 -56 A 104 18 0 0 1 -104 -56 Z" fill="url(#s1-gFace)" stroke="#c3cedb" stroke-width="2"/>
+          <path d="M -118 -110 A 118 21 0 0 0 118 -110" fill="none" stroke="#ffffff" stroke-width="3"/>
+          <text x="0" y="-52" text-anchor="middle" font-family="Inter, sans-serif" font-weight="800" font-size="30" fill="#0f172a">short call</text>
+        </svg></div>
+        <div id="s1-dRf" class="s1-j"><svg class="s1-dish" width="260" height="150" viewBox="-130 -140 260 150">
+          <path d="M -120 -112 A 120 22 0 0 0 120 -112 L 104 -56 A 104 18 0 0 1 -104 -56 Z" fill="url(#s1-gFace)" stroke="#c3cedb" stroke-width="2"/>
+          <path d="M -118 -110 A 118 21 0 0 0 118 -110" fill="none" stroke="#ffffff" stroke-width="3"/>
+          <text x="0" y="-52" text-anchor="middle" font-family="Inter, sans-serif" font-weight="800" font-size="30" fill="#0f172a">stock</text>
+          <ellipse id="s1-ring" cx="0" cy="-112" rx="120" ry="22" fill="none" stroke="#67d6cf" stroke-width="5" opacity="0"/>
+        </svg></div>
+        <div id="s1-beam">
+          <div id="s1-needle"></div><div id="s1-ntip"></div>
+          <div id="s1-bar"></div><div id="s1-barline"></div>
+          <div class="s1-knob" style="left:-379px"></div><div class="s1-knob" style="left:341px"></div>
+        </div>
+        <div id="s1-pulse"></div>
+        <div id="s1-hub"><div id="s1-hubdot"></div></div>
+      </div>
+      <div id="s1-card"><div id="s1-bob">
+        <div id="s1-bezel"></div>
+        <div id="s1-camdot"></div>
+        <div id="s1-screen">
+          <div id="s1-grid"></div>
+          <div id="s1-glare"></div>
+          <div id="s1-sheen"></div>
+          <div id="s1-lab"><i></i>European call price</div>
+          <div id="s1-ok">✓ derived</div>
+          <div class="s1-line" style="top:168px">
+            <div id="s1-hl"></div>
+            <span class="s1-t" id="s1-t0" style="left:142px;width:100px"><i>C</i></span>
+            <span class="s1-t" id="s1-t1" style="left:242px;width:122px;text-align:center;padding-left:0">=</span>
+            <span class="s1-t" id="s1-t2" style="left:364px;width:92px"><i>S</i></span>
+            <span class="s1-t" id="s1-t3" style="left:456px;width:310px"><b class="s1-dt">·</b>N(<i>d</i><sub>1</sub>)</span>
+          </div>
+          <div class="s1-line" style="top:352px">
+            <span class="s1-t" id="s1-t4" style="left:81px;width:104px">−</span>
+            <span class="s1-t" id="s1-t5" style="left:185px;width:92px"><i>K</i></span>
+            <span class="s1-t" id="s1-t6" style="left:277px;width:228px"><b class="s1-dt">·</b>e<sup>−<i>rT</i></sup></span>
+            <span class="s1-t" id="s1-t7" style="left:505px;width:322px"><b class="s1-dt">·</b>N(<i>d</i><sub>2</sub>)</span>
+          </div>
+          <svg id="s1-und" viewBox="0 0 908 640"><path id="s1-undp" d="M 81 540 Q 454 552 827 520" pathLength="100" fill="none" stroke="#08a9a2" stroke-width="9" stroke-linecap="round" opacity="0"/></svg>
+        </div>
+        <div id="s1-pen"><svg width="44" height="336" viewBox="0 0 44 336">
+          <defs>
+            <linearGradient id="s1-gPb" x1="0" x2="1"><stop offset="0" stop-color="#cbd5e1"/><stop offset="0.35" stop-color="#ffffff"/><stop offset="0.7" stop-color="#e2e8f0"/><stop offset="1" stop-color="#94a3b8"/></linearGradient>
+            <linearGradient id="s1-gPt" x1="0" x2="1"><stop offset="0" stop-color="#067a75"/><stop offset="0.4" stop-color="#67d6cf"/><stop offset="1" stop-color="#067a75"/></linearGradient>
+            <linearGradient id="s1-gPc" x1="0" x2="1"><stop offset="0" stop-color="#334155"/><stop offset="0.4" stop-color="#64748b"/><stop offset="1" stop-color="#0f172a"/></linearGradient>
+            <linearGradient id="s1-gPm" x1="0" x2="1"><stop offset="0" stop-color="#94a3b8"/><stop offset="0.45" stop-color="#f1f5f9"/><stop offset="1" stop-color="#64748b"/></linearGradient>
+          </defs>
+          <path d="M22 332 L13 296 L31 296 Z" fill="url(#s1-gPm)"/>
+          <rect x="10" y="262" width="24" height="36" rx="5" fill="url(#s1-gPt)"/>
+          <rect x="7" y="44" width="30" height="224" rx="14" fill="url(#s1-gPb)" stroke="#cbd5e1" stroke-width="1.5"/>
+          <rect x="7" y="4" width="30" height="58" rx="14" fill="url(#s1-gPc)"/>
+          <rect x="31" y="14" width="7" height="86" rx="3.5" fill="url(#s1-gPm)"/>
+          <rect x="13" y="70" width="5" height="184" rx="2.5" fill="#ffffff" opacity="0.85"/>
+        </svg></div>
+      </div></div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      /*DATA*/ const DUR = 3.117; const W = [0.15, 0.27, 0.37, 0.65, 0.81, 1.33, 2.068, 2.188, 2.308, 2.428, 2.648, 2.808]; /*END*/
+      // words: 0 You 1 can 2 derive 3 the 4 Black–Scholes 5 model. | 6 But 7 can 8 you 9 hedge 10 with 11 it?
+      const w = (i) => (W.length > i ? W[i] : 0.15 + i * 0.31);
+      const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+      const mix = (a, b, k) => a + (b - a) * k;
+      const eio = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+      const P = { write1: Math.max(0.5, w(5) - 0.08), und0: w(5) - 0.03, und1: w(5) + 0.25, ok: w(5) + 0.06, sheen: w(5) + 0.1,
+        penOut: w(5) + 0.3, shrink: w(6) - 0.12, arrive: w(6) + 0.05, tilt: w(6) + Math.min(0.3, 0.35 * (w(9) - w(6))),
+        drop: w(9) - 0.18, land: w(9), hl: w(10), pulse: w(11) };
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo("#s1-cam", { scale: 1 }, { scale: 1.05, duration: DUR, ease: "none" }, 0);
+      // the tablet is already sliding in on frame 1; at "But" it shrinks upward to make room for the balance
+      tl.fromTo("#s1-card", { y: 250, scale: 0.9, rotation: -2.5 }, { y: 0, scale: 1, rotation: 0, duration: 0.62, ease: "power3.out" }, 0);
+      tl.fromTo("#s1-card", { y: 0, scale: 1 }, { y: -204, scale: 0.56, duration: 0.42, ease: "power3.inOut", immediateRender: false }, P.shrink);
+      tl.fromTo("#s1-cshadow", { opacity: 0.35, scaleX: 0.75 }, { opacity: 1, scaleX: 1, duration: 0.62, ease: "power3.out" }, 0);
+      tl.fromTo("#s1-cshadow", { opacity: 1 }, { opacity: 0, duration: 0.3, immediateRender: false }, P.shrink);
+      tl.fromTo("#s1-lab", { opacity: 1 }, { opacity: 0, duration: 0.2, immediateRender: false }, P.shrink);
+      tl.fromTo("#s1-ok", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, P.ok);
+      tl.fromTo("#s1-ok", { opacity: 1 }, { opacity: 0, duration: 0.2, immediateRender: false }, P.shrink);
+      tl.fromTo("#s1-glow", { y: 0 }, { y: 150, duration: 0.6, ease: "power2.inOut" }, P.shrink);
+      tl.fromTo("#s1-scale", { y: 450 }, { y: 0, duration: 0.5, ease: "back.out(1.1)" }, P.arrive);
+      tl.fromTo("#s1-scale", { opacity: 0 }, { opacity: 1, duration: 0.15, ease: "power1.out" }, P.arrive);
+      tl.fromTo("#s1-sfloor", { opacity: 0, scaleX: 0.4 }, { opacity: 1, scaleX: 1, duration: 0.5, ease: "power2.out" }, P.arrive + 0.1);
+      tl.fromTo("#s1-hl", { opacity: 0, scaleX: 0.5 }, { opacity: 1, scaleX: 1, duration: 0.28, ease: "back.out(1.6)" }, P.hl);
+
+      // ---- the formula writes itself term by term; the stylus follows the write front
+      const TERMS = [[0, 142, 100], [0, 242, 122], [0, 364, 92], [0, 456, 310], [1, 81, 104], [1, 185, 92], [1, 277, 228], [1, 505, 322]];
+      const LY = [168, 352];
+      const tEls = TERMS.map((_, k) => document.getElementById("s1-t" + k));
+      const total = TERMS.reduce((s, x) => s + x[2], 0), GAP = 0.03, BRK = 0.07;
+      const avail = Math.max(0.3, P.write1 - GAP * 6 - BRK);
+      let tc = 0;
+      const SCH = TERMS.map((tm, k) => { tc += k === 4 ? BRK : k > 0 ? GAP : 0; const d = (avail * tm[2]) / total; const s = [tc, tc + d]; tc += d; return s; });
+      const KF = [];
+      TERMS.forEach((tm, k) => { KF.push([SCH[k][0], tm[1] + 8, LY[tm[0]] + 98, 1]); KF.push([SCH[k][1], tm[1] + tm[2] - 10, LY[tm[0]] + 98, 0]); });
+      KF.push([P.und0, 81, 540, 1]); KF.push([P.und1, 827, 520, 0]); KF.push([P.penOut + 0.32, 990, 250, 0]);
+      function penAt(t) {
+        if (t <= KF[0][0]) return [KF[0][1], KF[0][2]];
+        for (let i = 0; i < KF.length - 1; i++) {
+          const a = KF[i], b = KF[i + 1];
+          if (t < b[0]) {
+            const u = clamp((t - a[0]) / Math.max(1e-3, b[0] - a[0]), 0, 1), e = a[3] ? u : eio(u);
+            const n = Math.max(1, Math.round(Math.abs(b[1] - a[1]) / 45));
+            return [mix(a[1], b[1], e), mix(a[2], b[2], e) + (a[3] ? 7 * Math.sin(u * Math.PI * n) : 0)];
+          }
+        }
+        const z = KF[KF.length - 1]; return [z[1], z[2]];
+      }
+      const hex = (c) => [parseInt(c.slice(1, 3), 16), parseInt(c.slice(3, 5), 16), parseInt(c.slice(5, 7), 16)];
+      const mixc = (c1, c2, k) => { const a = hex(c1), b = hex(c2); return "rgb(" + a.map((v, i) => Math.round(mix(v, b[i], k))).join(",") + ")"; };
+      const $ = (id) => document.getElementById(id);
+      ["s1-undp"].forEach((id) => { const e = document.getElementById(id); e.setAttribute("stroke-dasharray", "100 100"); e.setAttribute("stroke-dashoffset", "100"); });
+      const pen = $("s1-pen"), und = $("s1-undp"), sheen = $("s1-sheen"), bob = $("s1-bob"), glow = $("s1-glow");
+
+      // ---- the balance: beam angle is a pure function of t (tip left with a wobble, then swing level with an overshoot)
+      const A = -13, PX = 540, PY = 1250, L = 360;
+      function step(u, wn, z) { if (u <= 0) return 0; const wd = wn * Math.sqrt(1 - z * z); return 1 - Math.exp(-z * wn * u) * (Math.cos(wd * u) + ((z * wn) / wd) * Math.sin(wd * u)); }
+      function angle(t) {
+        if (t < P.land) return A * step(t - P.tilt, 11, 0.45);
+        const aL = A * step(P.land - P.tilt, 11, 0.45);
+        return aL * (1 - step(t - P.land, 10, 0.42));
+      }
+      function ends(a) { const r = (a * Math.PI) / 180, c = Math.cos(r), s = Math.sin(r); return [PX - L * c, PY - L * s, PX + L * c, PY + L * s]; }
+      const beam = $("s1-beam"), dLb = $("s1-dLb"), dLf = $("s1-dLf"), dRb = $("s1-dRb"), dRf = $("s1-dRf"), ldL = $("s1-ldL"), wt = $("s1-wt"), wts = $("s1-wts");
+      const shR = $("s1-shR"), ring = $("s1-ring"), tick0 = $("s1-tick0"), pulse = $("s1-pulse");
+      const place = (el, x, y, r) => { el.style.transform = "translate(" + x.toFixed(1) + "px," + y.toFixed(1) + "px) rotate(" + r.toFixed(2) + "deg)"; };
+
+      function draw(t) {
+        // formula ink
+        TERMS.forEach((tm, k) => {
+          const u = clamp((t - SCH[k][0]) / (SCH[k][1] - SCH[k][0]), 0, 1), el = tEls[k];
+          el.style.clipPath = u >= 1 ? "none" : "inset(-30% " + (100 - 100 * u).toFixed(1) + "% -30% -8%)";
+          el.style.color = mixc("#67d6cf", "#f8fafc", clamp((t - SCH[k][1]) / 0.35, 0, 1));
+        });
+        const up = clamp((t - P.und0) / (P.und1 - P.und0), 0, 1);
+        und.setAttribute("stroke-dashoffset", (100 - 100 * up).toFixed(2)); und.setAttribute("opacity", up > 0 ? "1" : "0");
+        const pp = penAt(t), po = 1 - clamp((t - P.penOut) / 0.3, 0, 1);
+        pen.style.transform = "translate(" + (26 + pp[0]).toFixed(1) + "px," + (32 + pp[1]).toFixed(1) + "px) rotate(28deg)";
+        pen.style.opacity = po.toFixed(3);
+        sheen.style.transform = "translateX(" + (1500 * eio(clamp((t - P.sheen) / 0.6, 0, 1))).toFixed(1) + "px) rotate(18deg)";
+        bob.style.transform = "translateY(" + (-6 * Math.sin((t * 2 * Math.PI) / 2.4)).toFixed(2) + "px)";
+        glow.style.opacity = (0.8 + 0.2 * Math.sin(t * 3.4)).toFixed(3);
+
+        // balance
+        const a = angle(t), av = (a - angle(t - 0.04)) / 0.04, rock = clamp(-0.05 * av, -5, 5);
+        const [lx, ly, rx, ry] = ends(a);
+        beam.style.transform = "rotate(" + a.toFixed(2) + "deg)";
+        place(dLb, lx, ly, rock); place(dLf, lx, ly, rock); place(ldL, lx, ly, rock);
+        place(dRb, rx, ry, rock); place(dRf, rx, ry, rock);
+        // the Δ weight falls onto the right dish and rides it
+        let wx = rx, wy = 742, sx = 1, sy = 1, op = 0, rr = 0;
+        if (t >= P.drop && t < P.land) {
+          const u = (t - P.drop) / (P.land - P.drop), yl = ends(angle(P.land))[3];
+          const lift = 450 * (1 - gsap.parseEase('back.out(1.1)')(clamp((t - P.arrive) / 0.5, 0, 1))); wy = mix(780 - lift, yl, u * u);   // review A: fall in screen space op = clamp((t - P.drop) / 0.07, 0, 1); sy = 1 + 0.07 * u; sx = 1 - 0.03 * u;
+        } else if (t >= P.land) {
+          const v = t - P.land, k = Math.exp(-v / 0.07);
+          wy = ry; op = 1; rr = rock; sy = 1 - 0.13 * k * Math.cos(v * 30); sx = 1 + 0.09 * k * Math.cos(v * 30);
+        }
+        place(wt, wx, wy, rr); wt.style.opacity = op.toFixed(3);
+        wts.style.transform = "scale(" + sx.toFixed(3) + "," + sy.toFixed(3) + ")";
+        const lv = t - P.land;
+        wts.style.filter = lv >= 0 ? "drop-shadow(0 12px 12px rgba(15,23,42,0.28)) drop-shadow(0 0 " + (12 + 6 * Math.sin(lv * 7)).toFixed(1) + "px rgba(8,169,162,0.65))" : "drop-shadow(0 12px 12px rgba(15,23,42,0.28))";
+        shR.setAttribute("opacity", lv >= 0 ? "1" : "0");
+        const rp = clamp(lv / 0.4, 0, 1);
+        ring.setAttribute("opacity", lv >= 0 && rp < 1 ? (1 - rp).toFixed(3) : "0");
+        ring.setAttribute("transform", "translate(0 -112) scale(" + (0.7 + 0.6 * rp).toFixed(3) + ") translate(0 112)");
+        tick0.setAttribute("opacity", clamp((t - P.land - 0.35) / 0.2, 0, 1).toFixed(3));
+        const pq = clamp((t - P.pulse) / 0.55, 0, 1);
+        pulse.style.opacity = t >= P.pulse && pq < 1 ? (0.9 * (1 - pq)).toFixed(3) : "0";
+        pulse.style.transform = "scale(" + (1 + 2.2 * pq).toFixed(3) + ")";
+      }
+      const st = { t: 0 };
+      tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: () => draw(st.t) }, 0);
+      window.__timelines["s1"] = tl;
+    })();
+  </script>
+</template>

@@ -1,0 +1,349 @@
+{
+  "version": 2,
+  "title": "Desk2Quant: Can you hedge with it?",
+  "logline": "You can derive Black–Scholes, but can you hedge with it? One notebook drops the hedging error from 2.32 to 0.07, then Desk2Quant is introduced as the place that trains the desk side; comment FREE for all 10 free resources.",
+  "style": "product-promo",
+  "engine": "hyperframes",
+  "format": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30,
+    "duration_s": 45.09
+  },
+  "music": {
+    "source": "library",
+    "file": "build/assets/bgm.wav",
+    "bpm": 128,
+    "offset": 0,
+    "license": "synthesised in code (no samples)",
+    "note": "pulse bed at about -29 LUFS under the voice"
+  },
+  "voice": {
+    "who": "Manish (saved, consented voice), English",
+    "takes": "one per line, speech-checked with faster-whisper",
+    "final": "voice/out/vo.wav, 43.5 s, natural speed; line 1 retaken (seed 11) as 'the Black Shoals model' after 'Black Scholes' was heard as 'black skulls'"
+  },
+  "look": {
+    "medium": "2D vector motion graphics with glossy drawn props",
+    "palette": [
+      "#eef3f8",
+      "#e6f6f4",
+      "#0f172a",
+      "#08a9a2",
+      "#f43f5e"
+    ],
+    "typography": "Inter 800/900 (captions, hero words), JetBrains Mono (numbers)",
+    "texture": "dot grid + drifting teal squares",
+    "color_arc": "paper and mint alternate every cut; teal accent; rose only for error"
+  },
+  "borrowed_from_reference": [
+    "one sentence, one scene, one acting object",
+    "word-by-word captions with a hero-word slam over the dimmed line",
+    "light/alternate scene on every cut with pixel-staircase wipes",
+    "rolling counter as the proof",
+    "coin flip on a mirrored tagline",
+    "persuasion arc: hook, audience, proof, reframe, reveal, First/Then/Then, objection, tagline, comment-for-DM",
+    "slow push-ins, one pull-out, one orbit"
+  ],
+  "characters": [],
+  "shots": [
+    {
+      "id": "S1",
+      "lines": [
+        "L1",
+        "L2"
+      ],
+      "start_s": 0.0,
+      "end_s": 4.0,
+      "summary": "hook prop acts the claim: glossy Black–Scholes tablet; a teal Δ weight levels a balance beam; 'hedge' slams",
+      "ref_shot": 1,
+      "ref_what": "reference shot #1",
+      "camera": {
+        "move": "dolly_in",
+        "pace": "slow"
+      },
+      "hero": false
+    },
+    {
+      "id": "S2",
+      "lines": [
+        "L3"
+      ],
+      "start_s": 4.0,
+      "end_s": 7.5,
+      "summary": "audience call-out: interview desk, empty chair, FINAL ROUND nameplate, stopwatch; 'interview' slams",
+      "ref_shot": 3,
+      "ref_what": "reference shot #3",
+      "camera": {
+        "move": "dolly_in",
+        "pace": "slow"
+      },
+      "hero": false
+    },
+    {
+      "id": "S3",
+      "lines": [
+        "L4",
+        "L5"
+      ],
+      "start_s": 7.5,
+      "end_s": 14.6,
+      "summary": "P1: delta-hedging notebook, slider 5→200, error 2.32→0.07, 'one simulated path' label; '0.07' slams",
+      "ref_shot": 4,
+      "ref_what": "reference shot #4",
+      "camera": {
+        "move": "dolly_in",
+        "pace": "slow"
+      },
+      "hero": true
+    },
+    {
+      "id": "S4",
+      "lines": [
+        "L6",
+        "L7"
+      ],
+      "start_s": 14.6,
+      "end_s": 19.6,
+      "summary": "reframe: formula cards pile up, pressure gauge into the red; 'pressure' slams",
+      "ref_shot": 5,
+      "ref_what": "reference shot #5",
+      "camera": {
+        "move": "pull_out",
+        "pace": "slow"
+      },
+      "hero": false
+    },
+    {
+      "id": "S5",
+      "lines": [
+        "L8"
+      ],
+      "start_s": 19.6,
+      "end_s": 22.8,
+      "summary": "reveal: real logo on a pedestal + real notes flat-lay card; 'Desk2Quant' slams",
+      "ref_shot": 6,
+      "ref_what": "reference shot #6",
+      "camera": {
+        "move": "dolly_in",
+        "pace": "slow"
+      },
+      "hero": false
+    },
+    {
+      "id": "S6",
+      "lines": [
+        "L9"
+      ],
+      "start_s": 22.8,
+      "end_s": 25.6,
+      "summary": "First: binder + laptop with Python; 'code' slams",
+      "ref_shot": 7,
+      "ref_what": "reference shot #7",
+      "camera": {
+        "move": "static",
+        "pace": "still"
+      },
+      "hero": false
+    },
+    {
+      "id": "S7",
+      "lines": [
+        "L10"
+      ],
+      "start_s": 25.6,
+      "end_s": 29.6,
+      "summary": "Then the desk: four real covers light up per word (Greeks, P&L explain, XVA, model validation); 'desk' slams",
+      "ref_shot": 9,
+      "ref_what": "reference shot #9",
+      "camera": {
+        "move": "dolly_in",
+        "pace": "slow"
+      },
+      "hero": false
+    },
+    {
+      "id": "S8",
+      "lines": [
+        "L11"
+      ],
+      "start_s": 29.6,
+      "end_s": 32.6,
+      "summary": "Then the interview: Problem Book cover + counter 0→1000+; '1000+' slams",
+      "ref_shot": 10,
+      "ref_what": "reference shot #10",
+      "camera": {
+        "move": "static",
+        "pace": "still"
+      },
+      "hero": false
+    },
+    {
+      "id": "S9",
+      "lines": [
+        "L12"
+      ],
+      "start_s": 32.6,
+      "end_s": 36.0,
+      "summary": "objection: START flag, free covers fan out; 'free' slams",
+      "ref_shot": 11,
+      "ref_what": "reference shot #11",
+      "camera": {
+        "move": "pull_out",
+        "pace": "slow"
+      },
+      "hero": false
+    },
+    {
+      "id": "S10",
+      "lines": [
+        "L13",
+        "L14"
+      ],
+      "start_s": 36.0,
+      "end_s": 41.2,
+      "summary": "P2: silver coin flips textbook→desk (real logo), risk chips orbit; 'model.' then 'breaks' slam",
+      "ref_shot": 18,
+      "ref_what": "reference shot #18",
+      "camera": {
+        "move": "dolly_in+orbit",
+        "pace": "slow"
+      },
+      "hero": true
+    },
+    {
+      "id": "S11",
+      "lines": [
+        "L15"
+      ],
+      "start_s": 41.2,
+      "end_s": 45.6,
+      "summary": "CTA: comment box types FREE, DM preview, logo + handle (no counts)",
+      "ref_shot": 19,
+      "ref_what": "reference shot #19",
+      "camera": {
+        "move": "static",
+        "pace": "still"
+      },
+      "hero": false
+    }
+  ],
+  "assets": [
+    {
+      "id": "A1",
+      "kind": "image",
+      "purpose": "real site logo",
+      "status": "fetched",
+      "url": "https://desk2quant.com/assets/images/desk2quant-logo.png",
+      "file": "build/assets/logo.png",
+      "license": "own brand"
+    },
+    {
+      "id": "A2",
+      "kind": "image",
+      "purpose": "real product covers (11)",
+      "status": "fetched",
+      "url": "https://desk2quant.com/assets/images/covers/",
+      "file": "build/assets/covers/",
+      "license": "own brand"
+    },
+    {
+      "id": "A3",
+      "kind": "image",
+      "purpose": "real notes flat-lay photo",
+      "status": "fetched",
+      "url": "https://desk2quant.com/assets/images/desk2quant-real-notes-flatlay.jpg",
+      "file": "build/assets/flatlay.jpg",
+      "license": "own brand"
+    },
+    {
+      "id": "A4",
+      "kind": "font",
+      "purpose": "Inter, JetBrains Mono (the site's fonts)",
+      "status": "fetched",
+      "source": "google/fonts",
+      "file": "build/assets/fonts/",
+      "license": "OFL"
+    },
+    {
+      "id": "A5",
+      "kind": "sfx",
+      "purpose": "whoosh, pop, ping, typing, key-press, impact",
+      "status": "fetched",
+      "source": "HyperFrames media-use skill",
+      "file": "build/assets/sfx/",
+      "license": "see media-use CREDITS.md"
+    }
+  ],
+  "peaks": [
+    {
+      "id": "P1",
+      "ref_peak": "P1",
+      "shots": [
+        "S3"
+      ],
+      "build_from_s": 7.6,
+      "hold_s": [
+        11.95,
+        12.95
+      ],
+      "hit_s": 13.1,
+      "hold_after_s": 0.55,
+      "build": "staircase error path at 5 rebalances climbs to 2.32 (rose)",
+      "hit": "giant teal 0.07 over the dimmed line; counter and path agree",
+      "after": "hero shrinks back; ping",
+      "sound": "slider ticks, ping on the hit",
+      "techniques": [
+        "rolling counter",
+        "hero-word slam",
+        "colour flip rose→teal"
+      ],
+      "emotion": "the difference practice makes, as a number",
+      "key_frame": "out/check/snap2/frame-03-at-13.35s.png",
+      "key_frame_note": "wins on clarity; the reference wins on mood (dark glow), which our light palette rule trades away"
+    },
+    {
+      "id": "P2",
+      "ref_peak": "P2",
+      "shots": [
+        "S10"
+      ],
+      "build_from_s": 36.1,
+      "hold_s": [
+        38.35,
+        38.65
+      ],
+      "hit_s": 39.9,
+      "hold_after_s": 0.55,
+      "build": "textbook side of the coin; 'model.' slams",
+      "hit": "coin flips to the real logo, risk chips burst into orbit, 'breaks' slams",
+      "after": "pixel disintegrate into the CTA",
+      "sound": "whoosh on the flip, thump on 'breaks'",
+      "techniques": [
+        "coin flip",
+        "orbiting chips",
+        "hero-word slam"
+      ],
+      "emotion": "the textbook side hands over to the desk side",
+      "key_frame": "out/check/snap2/frame-06-at-40.15s.png",
+      "key_frame_note": "as full as the reference's avatar burst; fewer, larger items"
+    }
+  ],
+  "style_frames": [
+    "out/check/key_1_vs_ref.jpg",
+    "out/check/key_2_vs_ref.jpg",
+    "out/check/snap2/contact-sheet.jpg"
+  ],
+  "required_inputs": [],
+  "rules": [
+    "no mention of how it was made, on screen or in the caption",
+    "no sales counts, ratings or follower counts",
+    "every number from the live site; 'one simulated path' labelled",
+    "light site palette; fill the frame",
+    "nothing posts without approval"
+  ],
+  "changelog": [
+    "v1: plan from the reference breakdown and the live site's facts (18 Nov 2026)",
+    "v2: line 1 is 'You can derive the Black–Scholes model.' (speech check); timing from the measured voice; film 45.1 s; layered build (bg, 11 scenes, overlay)"
+  ]
+}

@@ -1,0 +1,135 @@
+<template>
+  <style>
+    @font-face { font-family: "Inter"; font-weight: 100 900; src: url("assets/fonts/Inter.ttf"); }
+    @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: Inter, sans-serif; color: #0f172a; }
+    #s5-cam { position: absolute; inset: 0; transform-origin: 540px 1080px; }
+    #s5-glow { position: absolute; left: 40px; top: 560px; width: 1000px; height: 1000px; border-radius: 50%;
+               background: radial-gradient(circle, rgba(8,169,162,0.30) 0%, rgba(8,169,162,0.12) 38%, rgba(8,169,162,0) 66%); }
+
+    /* ---- the notes photo, a tilted glossy print ---- */
+    #s5-photo { position: absolute; left: 94px; top: 528px; width: 892px; height: 604px; opacity: 0; transform-origin: 50% 60%; }
+    #s5-print { position: absolute; inset: 0; border-radius: 22px; padding: 16px; background: linear-gradient(180deg, #ffffff 0%, #f6f9fc 100%);
+                border: 2px solid #d6dfeb; box-shadow: 0 34px 64px rgba(15,23,42,0.20), 0 8px 18px rgba(15,23,42,0.10), inset 0 2px 0 #ffffff; }
+    #s5-print img { display: block; width: 856px; height: 568px; border-radius: 10px; object-fit: cover; }
+    #s5-psheen { position: absolute; left: 16px; top: 16px; width: 856px; height: 568px; border-radius: 10px;
+                 background: linear-gradient(122deg, rgba(255,255,255,0.42) 0%, rgba(255,255,255,0.10) 26%, rgba(255,255,255,0) 40%, rgba(255,255,255,0) 100%); }
+
+    /* ---- pedestal (as in s10) ---- */
+    #s5-floor { position: absolute; left: 160px; top: 1440px; width: 760px; height: 104px; border-radius: 50%;
+                background: radial-gradient(ellipse at center, rgba(15,23,42,0.22), rgba(15,23,42,0) 70%); }
+    #s5-ped { position: absolute; left: 240px; top: 1250px; width: 600px; height: 220px; }
+    #s5-pedbody { position: absolute; left: 0; top: 64px; width: 600px; height: 136px; border-radius: 0 0 300px 300px / 0 0 72px 72px;
+                  background: linear-gradient(90deg, #cbd5e1 0%, #f8fafc 38%, #e2e8f0 62%, #94a3b8 100%); }
+    #s5-pedtop { position: absolute; left: 0; top: 0; width: 600px; height: 130px; border-radius: 50%;
+                 background: radial-gradient(ellipse at 45% 40%, #ffffff 0%, #e8eef5 55%, #cbd5e1 100%);
+                 box-shadow: 0 0 0 4px rgba(8,169,162,0.55), 0 0 40px rgba(8,169,162,0.45); }
+    #s5-pring { position: absolute; left: -6px; top: -6px; width: 612px; height: 142px; border-radius: 50%; border: 3px solid rgba(8,169,162,0.65); }
+    #s5-lshadow { position: absolute; left: 140px; top: 46px; width: 320px; height: 44px; border-radius: 50%;
+                  background: radial-gradient(ellipse at center, rgba(15,23,42,0.42), rgba(15,23,42,0) 70%); }
+
+    /* ---- the logo, a thick glossy tile ---- */
+    #s5-logo { position: absolute; left: 280px; top: 800px; width: 520px; height: 540px; transform-origin: 50% 90%; }
+    #s5-bob { position: absolute; inset: 0; }
+    #s5-limg { position: absolute; left: 0; top: 0; width: 520px; height: 520px;
+               filter: drop-shadow(0 34px 36px rgba(15,23,42,0.30)) drop-shadow(0 0 36px rgba(8,169,162,0.30)); }
+    .s5-mask { position: absolute; left: 0; top: 0; width: 520px; height: 520px; overflow: hidden;
+               -webkit-mask-image: url("assets/logo.png"); mask-image: url("assets/logo.png");
+               -webkit-mask-size: 100% 100%; mask-size: 100% 100%; }
+    #s5-ledge { top: 16px; background: #5c5c5c; }
+    #s5-lsheen { background: linear-gradient(168deg, rgba(255,255,255,0.34) 0%, rgba(255,255,255,0.12) 26%, rgba(255,255,255,0) 44%, rgba(255,255,255,0) 82%, rgba(255,255,255,0.10) 100%); }
+    #s5-band { position: absolute; left: -260px; top: -120px; width: 200px; height: 760px;
+               background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.55) 50%, rgba(255,255,255,0) 100%); }
+
+    /* ---- name card ---- */
+    #s5-name { position: absolute; left: 120px; top: 1546px; width: 840px; height: 144px; border-radius: 32px; opacity: 0;
+               background: linear-gradient(180deg, #ffffff 0%, #f4f8fb 100%); border: 2px solid #d6dfeb;
+               box-shadow: 0 24px 46px rgba(15,23,42,0.16), 0 6px 14px rgba(15,23,42,0.08), inset 0 2px 0 #ffffff; }
+    #s5-badge { position: absolute; left: 26px; top: 22px; width: 96px; height: 96px; border-radius: 50%;
+                background: radial-gradient(circle at 35% 28%, #67d6cf 0%, #08a9a2 55%, #067a75 100%);
+                box-shadow: 0 8px 18px rgba(8,169,162,0.40), inset 0 2px 2px rgba(255,255,255,0.55); display: flex; align-items: center; justify-content: center; }
+    #s5-nm { position: absolute; left: 148px; top: 24px; font: 800 50px/1.1 Inter, sans-serif; letter-spacing: -0.02em; color: #0f172a; white-space: nowrap; }
+    #s5-role { position: absolute; left: 150px; top: 86px; font: 600 31px/1.1 Inter, sans-serif; letter-spacing: -0.005em; color: #475569; white-space: nowrap; opacity: 0; }
+    #s5-role b { color: #067a75; font-weight: 700; }
+    #s5-rk { position: relative; display: inline-block; }
+    #s5-ul { position: absolute; left: 0; right: 0; bottom: -7px; height: 5px; border-radius: 3px; background: linear-gradient(90deg, #67d6cf, #08a9a2); transform-origin: 0 50%; }
+  </style>
+  <div id="root" data-composition-id="s5" data-width="1080" data-height="1920">
+    <div id="s5-cam">
+      <div id="s5-glow"></div>
+      <div id="s5-photo">
+        <div id="s5-print"><img src="assets/flatlay.jpg" alt="" /><div id="s5-psheen"></div></div>
+      </div>
+      <div id="s5-floor"></div>
+      <div id="s5-ped">
+        <div id="s5-pedbody"></div>
+        <div id="s5-pedtop"><div id="s5-lshadow"></div></div>
+        <div id="s5-pring"></div>
+      </div>
+      <div id="s5-logo">
+        <div id="s5-bob">
+          <div id="s5-ledge" class="s5-mask"></div>
+          <img id="s5-limg" src="assets/logo.png" alt="" />
+          <div id="s5-lsheen" class="s5-mask"></div>
+          <div id="s5-lglint" class="s5-mask"><div id="s5-band"></div></div>
+        </div>
+      </div>
+      <div id="s5-name">
+        <div id="s5-badge">
+          <svg width="58" height="58" viewBox="0 0 58 58" fill="none">
+            <path d="M29 6 L53 19 H5 Z" fill="#ffffff" stroke="#ffffff" stroke-width="3" stroke-linejoin="round" />
+            <path d="M12 24 V42 M23 24 V42 M35 24 V42 M46 24 V42" stroke="#ffffff" stroke-width="6" stroke-linecap="round" />
+            <rect x="5" y="46" width="48" height="7" rx="3" fill="#ffffff" />
+          </svg>
+        </div>
+        <div id="s5-nm">Amit Kumar Jha</div>
+        <div id="s5-role"><span id="s5-rk">Practising bank quant<span id="s5-ul"></span></span> · <b>IIT Jodhpur</b></div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      /*DATA*/ const DUR = 4.317; const W = [0.18, 0.96, 1.63, 2.02, 2.53, 2.74, 2.96, 3.1, 3.34, 3.72]; /*END*/
+      // words: 0 Desk2Quant 1 trains 2 exactly 3 that. | 4 Built 5 by 6 a 7 practising 8 bank 9 quant.
+      const w = (i) => (W.length > i ? W[i] : 0.2 + i * 0.3);
+      const tl = gsap.timeline({ paused: true });
+
+      // slow push-in throughout
+      tl.fromTo("#s5-cam", { scale: 1 }, { scale: 1.06, duration: DUR, ease: "none" }, 0);
+
+      // the logo on its pedestal rises in during the first 0.3 s
+      tl.fromTo("#s5-ped", { opacity: 0, y: 220 }, { opacity: 1, y: 0, duration: 0.42, ease: "power3.out" }, 0);
+      tl.fromTo("#s5-floor", { opacity: 0, scaleX: 0.5 }, { opacity: 1, scaleX: 1, duration: 0.45, ease: "power2.out" }, 0.05);
+      tl.fromTo("#s5-logo", { opacity: 0, y: 320, scale: 0.84 }, { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "back.out(1.35)" }, 0.03);
+      tl.fromTo("#s5-glow", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.6, ease: "power2.out" }, 0.05);
+
+      // W[1] "trains": the real notes photo appears behind the logo
+      tl.fromTo("#s5-photo", { opacity: 0, y: 90, scale: 0.72, rotation: -15 }, { opacity: 1, y: 0, scale: 1, rotation: -5, duration: 0.5, ease: "back.out(1.4)" }, w(1) - 0.04);
+      tl.fromTo("#s5-photo", { rotation: -5 }, { rotation: -3.6, duration: Math.max(0.3, DUR - w(1) - 0.46), ease: "sine.inOut", immediateRender: false }, w(1) + 0.46);
+
+      // W[2] "exactly": a glint runs across the tile
+      tl.fromTo("#s5-band", { x: 0, rotation: 18 }, { x: 1000, rotation: 18, duration: 0.55, ease: "power2.inOut" }, w(2) - 0.05);
+
+      // W[4] "Built": the name card slides in with its role line; W[7] "practising": the role is underlined
+      tl.fromTo("#s5-name", { opacity: 0, x: 980 }, { opacity: 1, x: 0, duration: 0.5, ease: "back.out(1.05)" }, w(4) - 0.06);
+      tl.fromTo("#s5-badge", { scale: 0.4, rotation: -30 }, { scale: 1, rotation: 0, duration: 0.45, ease: "back.out(2)" }, w(4) + 0.12);
+      tl.fromTo("#s5-role", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, w(4) + 0.22);
+      tl.fromTo("#s5-ul", { scaleX: 0 }, { scaleX: 1, duration: 0.4, ease: "power2.inOut" }, Math.max(w(7) - 0.04, w(4) + 0.5));
+
+      // secondary motion: the tile hovers and bobs, its shadow breathes, the teal ring pulses
+      const bob = document.getElementById("s5-bob"), lsh = document.getElementById("s5-lshadow"), ring = document.getElementById("s5-pring");
+      function draw(t) {
+        const b = Math.sin(t * 2.7);
+        bob.style.transform = "translateY(" + (-12 + 9 * b).toFixed(2) + "px)";
+        lsh.style.transform = "scale(" + (1 - 0.08 * b).toFixed(3) + ")";
+        lsh.style.opacity = (0.95 - 0.2 * b).toFixed(3);
+        const ph = ((t * 0.9) % 1 + 1) % 1;
+        ring.style.transform = "scale(" + (1 + 0.16 * ph).toFixed(3) + ")";
+        ring.style.opacity = (0.9 * (1 - ph)).toFixed(3);
+      }
+      const st = { t: 0 };
+      tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: () => draw(st.t) }, 0);
+      window.__timelines["s5"] = tl;
+    })();
+  </script>
+</template>

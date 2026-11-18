@@ -1,0 +1,16 @@
+{
+  "medium": "2d-vector",
+  "style": "product-promo",
+  "engine": "hyperframes",
+  "confidence": 0.85,
+  "why": [
+    "A product sold feature by feature, with UI cards, and the brand logo and CTA at the end: the product-promo identifying features.",
+    "Voiceover-led with word-level kinetic captions and one illustrated metaphor per sentence. That is faceless-explainer technique, also on HyperFrames.",
+    "The glossy props are 3D-looking renders composited flat. They are recreated in 2D (SVG and CSS gradients, soft shadows), as video-clone's 2D-only rule requires, and said so."
+  ],
+  "alternatives": [
+    { "style": "faceless-explainer", "why": "same engine; fits the VO plus captions plus one-idea-per-scene rhythm" },
+    { "style": "motion-graphics", "why": "kinetic type is the lead, but the reference has a voiceover and runs 68 s" }
+  ],
+  "new_style_proposed": false
+}

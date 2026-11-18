@@ -1,0 +1,62 @@
+[
+ [
+  "p01",
+  "You can derive the Black Scholes model."
+ ],
+ [
+  "p02",
+  "But can you hedge with it?"
+ ],
+ [
+  "p03",
+  "If you're preparing for a quant interview, this changes how you study."
+ ],
+ [
+  "p04",
+  "One simulated path. Hedge it five times, and the error is two point three two."
+ ],
+ [
+  "p05",
+  "Two hundred times: zero point zero seven."
+ ],
+ [
+  "p06",
+  "Everyone memorises formulas."
+ ],
+ [
+  "p07",
+  "But formulas were never the hard part. Explaining them under pressure is."
+ ],
+ [
+  "p08",
+  "Desk to Quant trains exactly that. Built by a practising bank quant."
+ ],
+ [
+  "p09",
+  "First, notes with the code that runs them."
+ ],
+ [
+  "p10",
+  "Then the desk: Greeks, P and L explain, X V A, model validation."
+ ],
+ [
+  "p11",
+  "Then the interview: a thousand problems, with solutions."
+ ],
+ [
+  "p12",
+  "Don't know where to start? Ten resources are free."
+ ],
+ [
+  "p13",
+  "Textbooks teach you the model."
+ ],
+ [
+  "p14",
+  "The desk teaches you what breaks it."
+ ],
+ [
+  "p15",
+  "Comment free, and we'll DM you all ten."
+ ]
+]

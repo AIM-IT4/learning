@@ -1,0 +1,86 @@
+{
+ "tempo": 1.0,
+ "max_pause": 0.35,
+ "keep": 0.25,
+ "parts": [
+  [
+   "p01",
+   "voice/takes_p01/p01f_s11.wav"
+  ],
+  [
+   "p02",
+   "voice/takes_s11/p02.wav"
+  ],
+  [
+   "p03",
+   "voice/takes_s11/p03.wav"
+  ],
+  [
+   "p04",
+   "voice/takes_s11/p04.wav"
+  ],
+  [
+   "p05",
+   "voice/takes_s11/p05.wav",
+   {
+    "max_pause": 9
+   }
+  ],
+  [
+   "p06",
+   "voice/takes_s11/p06.wav"
+  ],
+  [
+   "p07",
+   "voice/takes_s11/p07.wav"
+  ],
+  [
+   "p08",
+   "voice/takes_s11/p08.wav"
+  ],
+  [
+   "p09",
+   "voice/takes_s11/p09.wav"
+  ],
+  [
+   "p10",
+   "voice/takes_s11/p10.wav"
+  ],
+  [
+   "p11",
+   "voice/takes_s11/p11.wav"
+  ],
+  [
+   "p12",
+   "voice/takes_s11/p12.wav"
+  ],
+  [
+   "p13",
+   "voice/takes_s11/p13.wav"
+  ],
+  [
+   "p14",
+   "voice/takes_s11/p14.wav"
+  ],
+  [
+   "p15",
+   "voice/takes_s11/p15.wav"
+  ]
+ ],
+ "gaps": [
+  0.2,
+  0.3,
+  0.3,
+  0.25,
+  0.35,
+  0.2,
+  0.3,
+  0.3,
+  0.3,
+  0.3,
+  0.3,
+  0.3,
+  0.3,
+  0.8
+ ]
+}

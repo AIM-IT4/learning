@@ -1,0 +1,96 @@
+<template>
+  <style>
+    @font-face { font-family: "Inter"; font-weight: 100 900; src: url("assets/fonts/Inter.ttf"); }
+    @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
+    #root { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+    #ov-brand { position: absolute; left: 0; right: 0; top: 40px; height: 64px; display: flex; justify-content: center; align-items: center; gap: 14px; }
+    #ov-brand img { width: 56px; height: 56px; }
+    #ov-brand span { font: 700 34px/1 Inter, sans-serif; color: #0f172a; letter-spacing: -0.01em; }
+    #ov-foot { position: absolute; left: 0; right: 0; top: 1792px; text-align: center; font: 600 26px/1 "JetBrains Mono", monospace; color: #5b6b82; letter-spacing: 0.06em; }
+    #ov-caps { position: absolute; left: 50px; top: 140px; width: 980px; height: 300px; }
+    .ov-cap { position: absolute; left: 0; top: 0; width: 980px; height: 300px; display: flex; align-items: center; justify-content: center; opacity: 0; }
+    .ov-cap p { margin: 0; text-align: center; font: 800 68px/1.07 Inter, sans-serif; letter-spacing: -0.035em; color: #0f172a; }
+    .ov-cap .w { display: inline-block; opacity: 0; }
+    .ov-cap .a { color: #08a9a2; }
+    .ov-cap .r { color: #f43f5e; }
+    .ov-hero { position: absolute; left: 0; width: 1080px; top: 140px; height: 300px; display: flex; align-items: center; justify-content: center;
+               font: 900 230px/1 Inter, sans-serif; letter-spacing: -0.055em; color: #08a9a2; opacity: 0; white-space: nowrap;
+               text-shadow: 0 10px 30px rgba(8,169,162,0.25); }
+    #ov-wipe { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+  </style>
+  <div id="root" data-composition-id="ov" data-width="1080" data-height="1920">
+    <div id="ov-caps"></div>
+    <div id="ov-heroes"></div>
+    <div id="ov-brand"><img src="assets/logo.png" alt="" /><span>Desk2Quant</span></div>
+    <div id="ov-foot">desk2quant.com</div>
+    <canvas id="ov-wipe" width="1080" height="1920"></canvas>
+  </div>
+  <script>
+    (function () {
+      /*DATA*/ const DUR = 45.49; const LINES = [{"id": "L1", "tok": ["You", "can", "derive", "the", "Black–Scholes", "model."], "acc": [4], "rose": [], "on": [0.15, 0.27, 0.37, 0.65, 0.81, 1.33], "hero": null}, {"id": "L2", "tok": ["But", "can", "you", "hedge", "with", "it?"], "acc": [3], "rose": [], "on": [2.068, 2.188, 2.308, 2.428, 2.648, 2.808], "hero": {"i": 3, "size": 250}}, {"id": "L3", "tok": ["If", "you're", "preparing", "for", "a", "quant", "interview,", "this", "changes", "how", "you", "study."], "acc": [6], "rose": [], "on": [3.297, 3.437, 3.577, 3.897, 4.077, 4.197, 4.457, 5.097, 5.317, 5.637, 5.897, 6.037], "hero": {"i": 6, "size": 170}}, {"id": "L4", "tok": ["One", "simulated", "path.", "Hedge", "it", "five", "times,", "and", "the", "error", "is", "2.32"], "acc": [], "rose": [11], "on": [6.906, 7.126, 7.586, 8.056, 8.366, 8.466, 8.666, 9.406, 9.526, 9.626, 9.846, 10.046], "hero": null}, {"id": "L5", "tok": ["Two", "hundred", "times:", "0.07"], "acc": [3], "rose": [], "on": [11.348, 11.481, 11.748, 12.848], "hero": {"i": 3, "size": 300}}, {"id": "L6", "tok": ["Everyone", "memorises", "formulas."], "acc": [], "rose": [], "on": [14.531, 14.891, 15.351], "hero": null}, {"id": "L7", "tok": ["But", "formulas", "were", "never", "the", "hard", "part.", "Explaining", "them", "under", "pressure", "is."], "acc": [10], "rose": [], "on": [16.356, 16.496, 16.836, 17.076, 17.276, 17.416, 17.596, 18.056, 18.496, 18.656, 18.876, 19.256], "hero": {"i": 10, "size": 180}}, {"id": "L8", "tok": ["Desk2Quant", "trains", "exactly", "that.", "Built", "by", "a", "practising", "bank", "quant."], "acc": [0], "rose": [], "on": [20.04, 20.82, 21.49, 21.88, 22.39, 22.6, 22.82, 22.96, 23.2, 23.58], "hero": {"i": 0, "size": 150}}, {"id": "L9", "tok": ["First,", "notes", "with", "the", "code", "that", "runs", "them."], "acc": [4], "rose": [], "on": [24.357, 25.097, 25.337, 25.517, 25.617, 25.817, 25.977, 26.237], "hero": {"i": 4, "size": 260}}, {"id": "L10", "tok": ["Then", "the", "desk:", "Greeks,", "P&L", "explain,", "XVA,", "model", "validation."], "acc": [2], "rose": [], "on": [26.841, 26.981, 27.081, 27.521, 28.191, 28.701, 29.521, 30.391, 30.681], "hero": {"i": 2, "size": 260}}, {"id": "L11", "tok": ["Then", "the", "interview:", "1000+", "problems,", "with", "solutions."], "acc": [3], "rose": [], "on": [31.691, 31.831, 31.971, 32.641, 33.051, 33.941, 34.071], "hero": {"i": 3, "size": 260}}, {"id": "L12", "tok": ["Don't", "know", "where", "to", "start?", "10", "resources", "are", "free."], "acc": [8], "rose": [], "on": [35.129, 35.389, 35.529, 35.689, 35.849, 36.329, 36.489, 36.929, 37.229], "hero": {"i": 8, "size": 270}}, {"id": "L13", "tok": ["Textbooks", "teach", "you", "the", "model."], "acc": [4], "rose": [], "on": [38.009, 38.389, 38.669, 38.829, 38.929], "hero": {"i": 4, "size": 250}}, {"id": "L14", "tok": ["The", "desk", "teaches", "you", "what", "breaks", "it."], "acc": [5], "rose": [], "on": [39.563, 39.683, 39.923, 40.263, 40.503, 40.743, 41.023], "hero": {"i": 5, "size": 260}}, {"id": "L15", "tok": ["Comment", "FREE,", "and", "we'll", "DM", "you", "all", "ten."], "acc": [1], "rose": [], "on": [42.035, 42.235, 42.835, 42.935, 43.155, 43.335, 43.535, 43.715], "hero": null}]; const CUTS = [[3.117, "B"], [6.726, "A"], [14.351, "B"], [19.86, "A"], [24.177, "B"], [26.661, "A"], [31.511, "B"], [34.949, "A"], [37.829, "B"], [41.855, "A"]]; /*END*/
+      const tl = gsap.timeline({ paused: true });
+      const capsEl = document.getElementById("ov-caps"), heroesEl = document.getElementById("ov-heroes");
+
+      // ---------------- captions: one sentence at a time, each word on its spoken onset; hero word slams over the dimmed line
+      LINES.forEach((L, li) => {
+        const cap = document.createElement("div"); cap.className = "ov-cap"; cap.id = "ov-c" + L.id;
+        const p = document.createElement("p"); cap.appendChild(p);
+        const spans = L.tok.map((w, i) => {
+          const s = document.createElement("span");
+          s.className = "w" + (L.acc.includes(i) ? " a" : "") + (L.rose.includes(i) ? " r" : "");
+          s.textContent = w; p.appendChild(s);
+          if (i < L.tok.length - 1) p.appendChild(document.createTextNode(" "));
+          return s;
+        });
+        capsEl.appendChild(cap);
+        const t0 = L.on[0];
+        const next = li + 1 < LINES.length ? LINES[li + 1].on[0] : DUR + 1;
+        const hideT = next - 0.1;
+        const H = L.hero, th = H ? L.on[H.i] : null;
+        const backT = H ? Math.min(th + 0.6, hideT - 0.3) : null;
+        tl.fromTo(cap, { opacity: 0 }, { opacity: 1, duration: 0.01 }, t0 - 0.08);
+        spans.forEach((s, i) => {
+          const at = H && i === H.i ? backT + 0.04 : L.on[i] - 0.04;
+          tl.fromTo(s, { opacity: 0, y: 22, filter: "blur(8px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.2, ease: "power2.out" }, at);
+        });
+        if (H) {
+          const h = document.createElement("div"); h.className = "ov-hero"; h.id = "ov-h" + L.id;
+          const raw = L.tok[H.i];
+          h.textContent = raw.replace(/[,:?!]+$/, "").replace(/\.$/, (m) => (/[a-z]\.$/i.test(raw) ? "." : ""));
+          h.style.fontSize = H.size + "px";
+          heroesEl.appendChild(h);
+          tl.fromTo(cap, { opacity: 1 }, { opacity: 0.22, duration: 0.12, immediateRender: false }, th - 0.06);
+          tl.fromTo(h, { opacity: 0, scale: 1.75, filter: "blur(16px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out", immediateRender: false }, th - 0.02);
+          tl.fromTo(h, { opacity: 1, scale: 1, y: 0 }, { opacity: 0, scale: 0.4, y: -30, duration: 0.24, ease: "power2.in", immediateRender: false }, backT);
+          tl.fromTo(cap, { opacity: 0.22 }, { opacity: 1, duration: 0.2, immediateRender: false }, backT + 0.02);
+        }
+        if (li + 1 < LINES.length) tl.fromTo(cap, { opacity: 1 }, { opacity: 0, duration: 0.01, immediateRender: false }, hideT);
+      });
+
+      // ---------------- pixel-staircase wipe on every cut: covers the frame just before the cut, uncovers just after
+      const g = document.getElementById("ov-wipe").getContext("2d");
+      const st = { t: 0 };
+      function draw() {
+        const t = st.t;
+        g.clearRect(0, 0, 1080, 1920);
+        const T = 30, C = 36, R = 64, K = C + R;
+        CUTS.forEach(([tc, bg]) => {
+          const a = tc - 0.2, b = tc + 0.24;
+          if (t < a || t > b) return;
+          const fill = bg === "B" ? "#e6f6f4" : "#eef3f8";
+          for (let r = 0; r < R; r++) for (let c = 0; c < C; c++) {
+            const k = c + (R - 1 - r) + ((c * 7 + r * 13) % 5);
+            let cov, edge;
+            if (t < tc) { const e = ((t - a) / (tc - a)) * (K + 6); cov = k < e; edge = cov && k > e - 3; }
+            else { const e = ((t - tc) / (b - tc)) * (K + 6); cov = k >= e; edge = cov && k < e + 3; }
+            if (!cov) continue;
+            g.fillStyle = edge ? "#08a9a2" : fill;
+            g.fillRect(c * T, r * T, T, T);
+          }
+        });
+      }
+      tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: draw }, 0);
+      window.__timelines["ov"] = tl;
+    })();
+  </script>
+</template>

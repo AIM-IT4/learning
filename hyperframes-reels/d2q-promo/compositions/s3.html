@@ -1,0 +1,150 @@
+<template>
+  <style>
+    @font-face { font-family: "Inter"; font-weight: 100 900; src: url("assets/fonts/Inter.ttf"); }
+    @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: Inter, sans-serif; color: #0f172a; }
+    #s3-floor { position: absolute; left: 150px; top: 1546px; width: 780px; height: 80px; border-radius: 50%;
+                background: radial-gradient(ellipse at center, rgba(15,23,42,0.20), rgba(15,23,42,0) 70%); }
+    #s3-cam { position: absolute; inset: 0; transform-origin: 540px 1040px; }
+    #s3-nb { position: absolute; left: 66px; top: 500px; width: 948px; height: 1040px; border-radius: 42px;
+             background: linear-gradient(180deg, #ffffff 0%, #f7fafc 100%); border: 2px solid #d6dfeb;
+             box-shadow: 0 34px 70px rgba(15,23,42,0.14), 0 8px 18px rgba(15,23,42,0.07), inset 0 2px 0 #ffffff; }
+    #s3-head { position: absolute; left: 0; top: 0; width: 948px; height: 88px; border-bottom: 2px solid #e6edf5; }
+    .s3-dot { position: absolute; top: 34px; width: 20px; height: 20px; border-radius: 10px; }
+    #s3-file { position: absolute; left: 132px; top: 0; font: 600 27px/88px "JetBrains Mono", monospace; color: #475569; }
+    #s3-tag { position: absolute; right: 30px; top: 22px; height: 44px; padding: 0 18px; border-radius: 22px; background: #e6f6f4;
+              font: 700 21px/44px Inter, sans-serif; color: #067a75; }
+    #s3-chart { position: absolute; left: 34px; top: 112px; width: 880px; height: 440px; }
+    #s3-one { position: absolute; right: 58px; top: 128px; height: 44px; padding: 0 18px; border-radius: 22px; background: #fff1f2;
+              border: 2px solid #fda4af; font: 700 21px/40px "JetBrains Mono", monospace; color: #e11d48; letter-spacing: 0.02em; }
+    #s3-sllab { position: absolute; left: 50px; top: 600px; font: 700 28px/60px Inter, sans-serif; color: #475569; }
+    #s3-track { position: absolute; left: 270px; top: 623px; width: 600px; height: 14px; border-radius: 7px; background: #e2e8f0; }
+    #s3-fill { position: absolute; left: 0; top: 0; height: 14px; width: 0; border-radius: 7px; background: linear-gradient(90deg, #67d6cf, #08a9a2); }
+    #s3-knob { position: absolute; left: 248px; top: 607px; width: 46px; height: 46px; border-radius: 23px; background: #ffffff;
+               border: 7px solid #08a9a2; box-shadow: 0 6px 14px rgba(8,169,162,0.35); }
+    #s3-slv { position: absolute; left: 221px; top: 548px; width: 100px; text-align: center; font: 800 32px/1 "JetBrains Mono", monospace; color: #0f172a; }
+    #s3-errlab { position: absolute; left: 50px; top: 712px; font: 700 28px/1 Inter, sans-serif; color: #475569; }
+    #s3-err { position: absolute; left: 40px; top: 752px; font: 800 210px/1 "JetBrains Mono", monospace; letter-spacing: -0.04em; color: #f43f5e; opacity: 0; }
+    #s3-cover { position: absolute; right: 50px; top: 730px; width: 230px; height: 230px; border-radius: 20px; overflow: hidden;
+                box-shadow: 0 14px 30px rgba(15,23,42,0.18); border: 2px solid #ffffff; }
+    #s3-cover img { width: 100%; height: 100%; display: block; }
+  </style>
+  <div id="root" data-composition-id="s3" data-width="1080" data-height="1920">
+    <div id="s3-floor"></div>
+    <div id="s3-cam">
+      <div id="s3-nb">
+        <div id="s3-head">
+          <div class="s3-dot" style="left:34px; background:#f43f5e;"></div>
+          <div class="s3-dot" style="left:64px; background:#f59e0b;"></div>
+          <div class="s3-dot" style="left:94px; background:#08a9a2;"></div>
+          <div id="s3-file">delta_hedging.ipynb</div>
+          <div id="s3-tag">Stochastic Calculus Visual Lab</div>
+        </div>
+        <canvas id="s3-chart" width="880" height="440"></canvas>
+        <div id="s3-one">one simulated path</div>
+        <div id="s3-sllab">rebalances</div>
+        <div id="s3-track"><div id="s3-fill"></div></div>
+        <div id="s3-knob"></div>
+        <div id="s3-slv">5</div>
+        <div id="s3-errlab">final hedging error</div>
+        <div id="s3-err">2.32</div>
+        <div id="s3-cover"><img src="assets/covers/stochastic-calculus-visual-lab.jpg" alt="" /></div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      /*DATA*/ const DUR = 7.625; const W = [0.18, 0.4, 0.86, 1.33, 1.64, 1.74, 1.94, 2.68, 2.8, 2.9, 3.12, 3.32, 4.622, 4.755, 5.022, 6.122]; /*END*/
+      // words: 0 One 1 simulated 2 path. 3 Hedge 4 it 5 five 6 times, 7 and 8 the 9 error 10 is 11 2.32 | 12 Two 13 hundred 14 times: 15 0.07
+      const w = (i) => (W.length > i ? W[i] : 0.2 + i * 0.42);
+      // the knob, the path and the error move together from "Two" and land on "zero point zero seven"
+      const P = { chart0: w(0), chart1: w(3), errIn: w(11) - 0.1, slide0: w(12), slide1: w(15) - 0.05 };
+      P.count0 = P.slide0; P.count1 = P.slide1;
+      P.ticks0 = w(5); P.pulse0 = w(9); P.pulse1 = w(12);        // "five" -> ticks; "error" .. "Two" -> pulse
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo("#s3-nb", { opacity: 0, y: 90 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 0.05);
+      tl.fromTo("#s3-cam", { scale: 1 }, { scale: 1.045, duration: DUR, ease: "none" }, 0);
+      tl.fromTo("#s3-one", { opacity: 0, x: 20 }, { opacity: 1, x: 0, duration: 0.3, ease: "power2.out" }, w(1));
+      tl.fromTo("#s3-cover", { opacity: 0, rotation: 8, y: 30 }, { opacity: 1, rotation: 0, y: 0, duration: 0.45, ease: "back.out(1.5)" }, w(2) + 0.3);
+      // the hit on "zero point zero seven" (critic: the card reacts): the card bumps, the number glows
+      tl.fromTo("#s3-cam", { y: 0 }, { y: -10, duration: 0.1, ease: "power2.out", yoyo: true, repeat: 1, immediateRender: false }, w(15) - 0.03);
+      tl.fromTo("#s3-err", { textShadow: "0 0 0px rgba(8,169,162,0)" }, { textShadow: "0 0 40px rgba(8,169,162,0.9)", duration: 0.14, ease: "power2.out", yoyo: true, repeat: 1, repeatDelay: 0.25, immediateRender: false }, w(15) - 0.03);
+      // the knob answers "five"
+      tl.fromTo("#s3-knob", { scale: 1 }, { scale: 1.3, duration: 0.14, ease: "power2.out", yoyo: true, repeat: 1, immediateRender: false }, w(5) - 0.04);
+      tl.fromTo("#s3-slv", { scale: 1, color: "#0f172a" }, { scale: 1.35, color: "#067a75", duration: 0.16, ease: "power2.out", yoyo: true, repeat: 1, immediateRender: false }, w(5) - 0.04);
+
+      const nr = (function (a) { return function () { a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; })(77);
+      const NOISE = Array.from({ length: 400 }, () => (nr() + nr() + nr() - 1.5) / 0.75);
+      const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+      const ease = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+      const mix = (a, b, k) => a + (b - a) * k;
+      const hex = (c) => [parseInt(c.slice(1, 3), 16), parseInt(c.slice(3, 5), 16), parseInt(c.slice(5, 7), 16)];
+      const mixc = (c1, c2, k) => { const a = hex(c1), b = hex(c2); return "rgb(" + a.map((v, i) => Math.round(mix(v, b[i], k))).join(",") + ")"; };
+      const chart = document.getElementById("s3-chart").getContext("2d");
+      const err = document.getElementById("s3-err"), knob = document.getElementById("s3-knob"), fill = document.getElementById("s3-fill"), slv = document.getElementById("s3-slv");
+      // the notebook's two real readings: 5 rebalances -> 2.32, 200 -> 0.07; in between a power law joins them
+      const nAt = (t) => 5 * Math.pow(40, ease(clamp((t - P.slide0) / (P.slide1 - P.slide0), 0, 1)));
+      const errAt = (N) => 2.32 * Math.pow(N / 5, Math.log(0.07 / 2.32) / Math.log(40));
+      function drawChart(t) {
+        chart.clearRect(0, 0, 880, 440);
+        const L = 70, R = 850, Tp = 40, Bt = 372, y0 = -0.4, y1 = 2.8;
+        const Y = (v) => Bt - ((v - y0) / (y1 - y0)) * (Bt - Tp);
+        chart.strokeStyle = "#e6edf5"; chart.lineWidth = 2;
+        for (let gl = 0; gl <= 2.5; gl += 0.5) { chart.beginPath(); chart.moveTo(L, Y(gl)); chart.lineTo(R, Y(gl)); chart.stroke(); }
+        chart.setLineDash([10, 10]); chart.strokeStyle = "#94a3b8"; chart.beginPath(); chart.moveTo(L, Y(0)); chart.lineTo(R, Y(0)); chart.stroke(); chart.setLineDash([]);
+        chart.fillStyle = "#64748b"; chart.font = "600 22px 'JetBrains Mono', monospace";
+        chart.fillText("0", 34, Y(0) + 8); chart.fillText("2", 34, Y(2) + 8); chart.fillText("time to expiry →", L + 6, Bt + 34);
+        const N = nAt(t), E = errAt(N);
+        const rev = clamp((t - P.chart0) / (P.chart1 - P.chart0), 0, 1);
+        if (rev <= 0) return;
+        const steps = Math.max(1, Math.round(N));
+        chart.strokeStyle = mixc("#f43f5e", "#08a9a2", clamp((2.32 - E) / 1.6, 0, 1)); chart.lineWidth = 6; chart.lineJoin = "round";
+        chart.beginPath();
+        const M = 400, upto = Math.floor(M * rev);
+        for (let i = 0; i <= upto; i++) {
+          const x = i / M, xq = Math.floor(x * steps) / steps, j = Math.min(M - 1, Math.floor(xq * M));
+          const v = E * (xq + 0.55 * NOISE[j] * Math.sin(Math.PI * xq));
+          if (i === 0) chart.moveTo(L + x * (R - L), Y(v)); else chart.lineTo(L + x * (R - L), Y(v));
+        }
+        chart.stroke();
+        const endCol = chart.strokeStyle;
+        if (rev >= 1) { chart.fillStyle = endCol; chart.beginPath(); chart.arc(R, Y(E), 11, 0, 6.2832); chart.fill(); }
+        // the rebalances themselves: one tick per hedge on the time axis, popping in on "five", a dense comb at 200
+        const shown = t < P.slide0 ? Math.min(5, Math.floor(clamp((t - P.ticks0) / 0.5, 0, 1) * 5.999)) : steps;
+        for (let k = 1; k <= shown; k++) {
+          const x = L + (k / steps) * (R - L);
+          const pop = t < P.slide0 ? clamp((t - P.ticks0 - (k - 1) * 0.1) / 0.15, 0, 1) : 1;
+          chart.strokeStyle = "rgba(8,169,162," + (steps > 40 ? 0.55 : 0.9) * pop + ")";
+          chart.lineWidth = steps > 40 ? 2 : 4;
+          chart.beginPath(); chart.moveTo(x, Bt + 2); chart.lineTo(x, Bt - (steps > 40 ? 10 : 18 * pop)); chart.stroke();
+          if (steps <= 40) { chart.setLineDash([6, 8]); chart.strokeStyle = "rgba(8,169,162," + 0.25 * pop + ")"; chart.lineWidth = 2;
+            chart.beginPath(); chart.moveTo(x, Bt - 18); chart.lineTo(x, Tp); chart.stroke(); chart.setLineDash([]); }
+        }
+        // a rose pulse on the path's end while the error is named
+        if (rev >= 1 && t > P.pulse0 && t < P.pulse1) {
+          const ph = ((t - P.pulse0) % 0.55) / 0.55;
+          chart.strokeStyle = "rgba(244,63,94," + (0.6 * (1 - ph)).toFixed(3) + ")"; chart.lineWidth = 4;
+          chart.beginPath(); chart.arc(R, Y(E), 14 + 30 * ph, 0, 6.2832); chart.stroke();
+        }
+      }
+      function drawSlider(t) {
+        const p = ease(clamp((t - P.slide0) / (P.slide1 - P.slide0), 0, 1));
+        knob.style.transform = "translateX(" + (p * 600).toFixed(1) + "px)";
+        slv.style.transform = "translateX(" + (p * 600).toFixed(1) + "px)";
+        fill.style.width = (p * 600).toFixed(1) + "px";
+        slv.textContent = String(Math.round(nAt(t)));
+        const c = clamp((t - P.count0) / (P.count1 - P.count0), 0, 1);
+        const E = c >= 1 ? 0.07 : 2.32 * Math.pow(0.07 / 2.32, ease(c));
+        let s = E.toFixed(2);
+        if (c > 0.04 && c < 0.86) { const f = Math.floor(t * 30); s = s.slice(0, -2) + ((f * 7) % 10) + ((f * 3 + 5) % 10); }
+        err.textContent = s;
+        err.style.color = mixc("#f43f5e", "#08a9a2", clamp((2.32 - E) / 1.2, 0, 1));
+        err.style.opacity = String(clamp((t - P.errIn) / 0.25, 0, 1));
+      }
+      const st = { t: 0 };
+      tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: () => { drawChart(st.t); drawSlider(st.t); } }, 0);
+      window.__timelines["s3"] = tl;
+    })();
+  </script>
+</template>

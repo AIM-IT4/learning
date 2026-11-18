@@ -1,0 +1,242 @@
+<template>
+  <style>
+    @font-face { font-family: "Inter"; font-weight: 100 900; src: url("assets/fonts/Inter.ttf"); }
+    @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: Inter, sans-serif; color: #0f172a; }
+    #s8-cam { position: absolute; inset: 0; transform-origin: 540px 760px; }
+    #s8-glow { position: absolute; left: 0px; top: 560px; width: 760px; height: 760px; border-radius: 50%;
+               background: radial-gradient(closest-side, rgba(8,169,162,0.38), rgba(8,169,162,0.12) 60%, rgba(8,169,162,0) 100%); }
+    #s8-floor { position: absolute; left: 140px; top: 1548px; width: 800px; height: 96px; border-radius: 50%;
+                background: radial-gradient(ellipse at center, rgba(15,23,42,0.22), rgba(15,23,42,0) 70%); }
+    /* problem cards */
+    .s8-card { position: absolute; left: -120px; top: -155px; width: 240px; height: 310px; opacity: 0; }
+    .s8-cin { position: absolute; inset: 0; border-radius: 24px; background: linear-gradient(180deg, #ffffff 0%, #f3f7fa 100%);
+              border: 2px solid #d6dfeb; box-shadow: 0 18px 36px rgba(15,23,42,0.16), 0 4px 10px rgba(15,23,42,0.08), inset 0 2px 0 #ffffff; }
+    .s8-box { position: absolute; left: 18px; top: 21px; width: 34px; height: 34px; border-radius: 17px; border: 3px solid #cbd5e1; background: #ffffff; }
+    .s8-tick { position: absolute; left: 16px; top: 19px; width: 38px; height: 38px; border-radius: 19px; background: linear-gradient(180deg, #14b8b0, #067a75);
+               box-shadow: 0 4px 10px rgba(8,169,162,0.45); }
+    .s8-tick svg { position: absolute; left: 7px; top: 8px; }
+    .s8-card b { position: absolute; left: 62px; top: 22px; font: 800 28px/34px Inter, sans-serif; letter-spacing: -0.015em; color: #0f172a; white-space: nowrap; }
+    .s8-ln { position: absolute; left: 22px; height: 12px; border-radius: 6px; background: #e2e8f0; }
+    #s8-c0 { left: -165px; top: -190px; width: 330px; height: 380px; }
+    #s8-c0 b { font-size: 32px; left: 66px; top: 22px; }
+    .s8-sol { position: absolute; left: 30px; height: 14px; border-radius: 7px; background: linear-gradient(90deg, #08a9a2, #67d6cf); transform-origin: 0 50%; }
+    .s8-dot { position: absolute; left: 22px; width: 18px; height: 18px; border-radius: 9px; background: #08a9a2; }
+    #s8-stamp { position: absolute; left: 15px; top: 162px; width: 300px; height: 78px; border-radius: 16px; display: flex; align-items: center; justify-content: center; gap: 10px;
+                background: linear-gradient(180deg, #17bdb5 0%, #08a9a2 100%); border: 3px solid #067a75; opacity: 0;
+                box-shadow: inset 0 0 0 4px #17bdb5, inset 0 0 0 7px rgba(255,255,255,0.88), 0 12px 24px rgba(8,169,162,0.38);
+                font: 800 29px/1 Inter, sans-serif; color: #ffffff; letter-spacing: -0.01em; white-space: nowrap; }
+    #s8-ink { position: absolute; left: 15px; top: 162px; width: 300px; height: 78px; border-radius: 22px; border: 6px solid #08a9a2; opacity: 0; }
+    /* display stand with the odometer */
+    #s8-ped { position: absolute; left: 120px; top: 1252px; width: 840px; height: 322px; }
+    #s8-ptop { position: absolute; left: 0; top: 0; width: 840px; height: 46px; background: linear-gradient(180deg, #f1f5f9 0%, #ffffff 100%);
+               clip-path: polygon(46px 0, 794px 0, 840px 46px, 0 46px); }
+    #s8-pfront { position: absolute; left: 0; top: 44px; width: 840px; height: 278px; border-radius: 6px 6px 34px 34px; border: 2px solid #d6dfeb;
+                 background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 45%, #d9e1eb 100%);
+                 box-shadow: 0 30px 60px rgba(15,23,42,0.18), 0 8px 18px rgba(15,23,42,0.10), inset 0 3px 0 #ffffff, inset 0 -6px 0 rgba(148,163,184,0.25); }
+    #s8-lip { position: absolute; left: 30px; top: 40px; width: 780px; height: 7px; border-radius: 4px;
+              background: linear-gradient(90deg, rgba(103,214,207,0), #4fd1c9 18%, #2ee6dc 50%, #4fd1c9 82%, rgba(103,214,207,0));
+              box-shadow: 0 0 20px rgba(8,169,162,0.7); }
+    #s8-bshad { position: absolute; left: 30px; top: 2px; width: 470px; height: 40px; border-radius: 50%;
+                background: radial-gradient(ellipse at center, rgba(15,23,42,0.30), rgba(15,23,42,0) 70%); }
+    #s8-disp { position: absolute; left: 80px; top: 64px; width: 680px; height: 196px; border-radius: 24px; border: 2px solid #0b1220;
+               background: linear-gradient(180deg, #1e293b 0%, #0b1220 100%); box-shadow: inset 0 3px 10px rgba(0,0,0,0.6), 0 2px 0 #ffffff; }
+    .s8-reel { position: absolute; top: 12px; width: 116px; height: 172px; border-radius: 12px; overflow: hidden;
+               background: linear-gradient(180deg, #0b1220 0%, #273449 50%, #0b1220 100%); }
+    .s8-strip { position: absolute; left: 0; top: 0; width: 116px; }
+    .s8-strip div { height: 172px; font: 800 150px/172px "JetBrains Mono", monospace; color: #ffffff; text-align: center; }
+    .s8-shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(5,10,20,0.7) 0%, rgba(5,10,20,0) 26%, rgba(255,255,255,0.05) 48%, rgba(5,10,20,0) 74%, rgba(5,10,20,0.7) 100%); }
+    #s8-plus { position: absolute; left: 541px; top: 12px; width: 100px; height: 172px; font: 800 150px/172px "JetBrains Mono", monospace; color: #2ee6dc;
+               text-align: center; text-shadow: 0 0 22px rgba(8,169,162,0.85); opacity: 0; }
+    #s8-dflash { position: absolute; left: -6px; top: -6px; width: 688px; height: 204px; border-radius: 28px; border: 4px solid #4fd1c9;
+                 box-shadow: 0 0 34px rgba(8,169,162,0.75); opacity: 0; }
+    #s8-lab { position: absolute; left: 0; width: 840px; top: 274px; text-align: center; font: 800 30px/1 Inter, sans-serif; letter-spacing: 0.28em; color: #067a75; opacity: 0; }
+    /* the book */
+    #s8-bob { position: absolute; left: 110px; top: 664px; width: 540px; height: 540px; }
+    #s8-book { position: absolute; inset: 0; }
+    #s8-back { position: absolute; left: 28px; top: 28px; width: 500px; height: 500px; border-radius: 14px; background: linear-gradient(135deg, #334155 0%, #0f172a 70%);
+               box-shadow: 0 36px 64px rgba(15,23,42,0.30), 0 10px 22px rgba(15,23,42,0.16); }
+    #s8-pages { position: absolute; left: 0; top: 0; }
+    #s8-front { position: absolute; left: 0; top: 0; width: 500px; height: 500px; border-radius: 10px; overflow: hidden; border: 2px solid rgba(15,23,42,0.16);
+                box-shadow: inset 0 2px 0 rgba(255,255,255,0.9); }
+    #s8-front img { display: block; width: 100%; height: 100%; }
+    #s8-spine { position: absolute; left: 0; top: 0; width: 46px; height: 100%;
+                background: linear-gradient(90deg, rgba(15,23,42,0.30) 0%, rgba(15,23,42,0.08) 50%, rgba(255,255,255,0.55) 62%, rgba(255,255,255,0) 100%); }
+    #s8-gloss { position: absolute; inset: 0; background: linear-gradient(128deg, rgba(255,255,255,0.42) 0%, rgba(255,255,255,0.10) 30%, rgba(255,255,255,0) 31%, rgba(255,255,255,0) 100%); }
+    #s8-glint { position: absolute; left: 0; top: -80px; width: 140px; height: 680px;
+                background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.65), rgba(255,255,255,0)); }
+  </style>
+  <div id="root" data-composition-id="s8" data-width="1080" data-height="1920">
+    <div id="s8-cam">
+      <div id="s8-glow"></div>
+      <div id="s8-floor"></div>
+      <div id="s8-fan">
+        <div class="s8-card" id="s8-c4"><div class="s8-cin">
+          <div class="s8-box"></div><div class="s8-tick"><svg width="24" height="22" viewBox="0 0 24 22" fill="none"><path d="M3 11.5 L9.5 18 L21 4" stroke="#fff" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <b>Problem 5</b>
+          <div class="s8-ln" style="top:80px; width:190px;"></div><div class="s8-ln" style="top:106px; width:160px;"></div>
+          <div class="s8-ln" style="top:132px; width:196px;"></div><div class="s8-ln" style="top:158px; width:120px;"></div><div class="s8-ln" style="top:184px; width:170px;"></div>
+        </div></div>
+        <div class="s8-card" id="s8-c3"><div class="s8-cin">
+          <div class="s8-box"></div><div class="s8-tick"><svg width="24" height="22" viewBox="0 0 24 22" fill="none"><path d="M3 11.5 L9.5 18 L21 4" stroke="#fff" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <b>Problem 4</b>
+          <div class="s8-ln" style="top:80px; width:176px;"></div><div class="s8-ln" style="top:106px; width:196px;"></div>
+          <div class="s8-ln" style="top:132px; width:140px;"></div><div class="s8-ln" style="top:158px; width:186px;"></div><div class="s8-ln" style="top:184px; width:110px;"></div>
+        </div></div>
+        <div class="s8-card" id="s8-c2"><div class="s8-cin">
+          <div class="s8-box"></div><div class="s8-tick"><svg width="24" height="22" viewBox="0 0 24 22" fill="none"><path d="M3 11.5 L9.5 18 L21 4" stroke="#fff" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <b>Problem 3</b>
+          <div class="s8-ln" style="top:80px; width:196px;"></div><div class="s8-ln" style="top:106px; width:150px;"></div>
+          <div class="s8-ln" style="top:132px; width:180px;"></div><div class="s8-ln" style="top:158px; width:196px;"></div><div class="s8-ln" style="top:184px; width:130px;"></div>
+        </div></div>
+        <div class="s8-card" id="s8-c1"><div class="s8-cin">
+          <div class="s8-box"></div><div class="s8-tick"><svg width="24" height="22" viewBox="0 0 24 22" fill="none"><path d="M3 11.5 L9.5 18 L21 4" stroke="#fff" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <b>Problem 2</b>
+          <div class="s8-ln" style="top:80px; width:160px;"></div><div class="s8-ln" style="top:106px; width:196px;"></div>
+          <div class="s8-ln" style="top:132px; width:170px;"></div><div class="s8-ln" style="top:158px; width:136px;"></div><div class="s8-ln" style="top:184px; width:190px;"></div>
+        </div></div>
+        <div class="s8-card" id="s8-c0"><div class="s8-cin" id="s8-c0in">
+          <div class="s8-box"></div><div class="s8-tick" id="s8-t0"><svg width="24" height="22" viewBox="0 0 24 22" fill="none"><path d="M3 11.5 L9.5 18 L21 4" stroke="#fff" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <b>Problem 1</b>
+          <div class="s8-ln" style="top:84px; width:270px;"></div><div class="s8-ln" style="top:110px; width:226px;"></div><div class="s8-ln" style="top:136px; width:250px;"></div>
+          <div class="s8-dot" style="top:263px;"></div><div class="s8-sol" style="left:52px; top:265px; width:230px;"></div>
+          <div class="s8-dot" style="top:295px;"></div><div class="s8-sol" style="left:52px; top:297px; width:190px;"></div>
+          <div class="s8-dot" style="top:327px;"></div><div class="s8-sol" style="left:52px; top:329px; width:244px;"></div>
+          <div id="s8-ink"></div>
+          <div id="s8-stamp"><svg width="30" height="26" viewBox="0 0 30 26" fill="none"><path d="M3 13.5 L11 21.5 L27 4" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>worked solution</div>
+        </div></div>
+      </div>
+      <div id="s8-ped">
+        <div id="s8-ptop"></div>
+        <div id="s8-bshad"></div>
+        <div id="s8-pfront"></div>
+        <div id="s8-lip"></div>
+        <div id="s8-disp">
+          <div class="s8-reel" style="left:39px;"><div class="s8-strip" id="s8-r3"></div><div class="s8-shade"></div></div>
+          <div class="s8-reel" style="left:163px;"><div class="s8-strip" id="s8-r2"></div><div class="s8-shade"></div></div>
+          <div class="s8-reel" style="left:287px;"><div class="s8-strip" id="s8-r1"></div><div class="s8-shade"></div></div>
+          <div class="s8-reel" style="left:411px;"><div class="s8-strip" id="s8-r0"></div><div class="s8-shade"></div></div>
+          <div id="s8-plus">+</div>
+          <div id="s8-dflash"></div>
+        </div>
+        <div id="s8-lab">PROBLEMS</div>
+      </div>
+      <div id="s8-bob">
+        <div id="s8-book">
+          <div id="s8-back"></div>
+          <svg id="s8-pages" width="540" height="540" viewBox="0 0 540 540" fill="none">
+            <defs><linearGradient id="s8-gpg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fffdf6"/><stop offset="1" stop-color="#e9e1cf"/></linearGradient></defs>
+            <path d="M500 10 L524 34 L524 524 L34 524 L10 500 L500 500 Z" fill="url(#s8-gpg)" stroke="#d8ccb2" stroke-width="1.5" stroke-linejoin="round"/>
+            <g id="s8-pl" stroke="#d9cfba" stroke-width="1.3"></g>
+          </svg>
+          <div id="s8-front">
+            <img src="assets/covers/quant-interview-problem-book.jpg" alt="" />
+            <div id="s8-spine"></div>
+            <div id="s8-gloss"></div>
+            <div id="s8-glint"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      /*DATA*/ const DUR = 3.438; const W = [0.18, 0.32, 0.46, 1.13, 1.54, 2.43, 2.56]; /*END*/
+      // words: 0 Then 1 the 2 interview: 3 1000+ 4 problems, 5 with 6 solutions.
+      const w = (i) => (W.length > i ? W[i] : 0.18 + i * 0.4);
+      const T1 = w(1), T3 = w(3);                      // the counter rolls from "the" and lands exactly on "1000+"
+      const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+      const tl = gsap.timeline({ paused: true });
+
+      // page-edge lines of the book block (static, built once)
+      const pl = document.getElementById("s8-pl");
+      [0.17, 0.33, 0.5, 0.67, 0.83].forEach((k) => {
+        const d = 24 * k;
+        const a = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        a.setAttribute("d", "M" + (500 + d) + " " + (12 + d) + " V" + (500 + d) + " M" + (12 + d) + " " + (500 + d) + " H" + (500 + d));
+        pl.appendChild(a);
+      });
+      // odometer reels: 0-9 then 0 again so 9 can roll into 0
+      for (let k = 0; k < 4; k++) {
+        const s = document.getElementById("s8-r" + k);
+        for (let d = 0; d <= 10; d++) { const e = document.createElement("div"); e.textContent = String(d % 10); s.appendChild(e); }
+      }
+
+      // camera: gentle push-in
+      tl.fromTo("#s8-cam", { scale: 1 }, { scale: 1.04, duration: DUR, ease: "none" }, 0);
+      // W0: the book arrives big, with a little overshoot, and a glint runs across its glossy cover
+      const B0 = Math.max(0.02, w(0) - 0.14);
+      tl.fromTo("#s8-book", { opacity: 0, y: 170, scale: 0.8, rotation: -13 }, { opacity: 1, y: 0, scale: 1, rotation: -4, duration: 0.55, ease: "back.out(1.3)" }, B0);
+      tl.fromTo("#s8-glint", { x: -200, rotation: 18 }, { x: 640, rotation: 18, duration: 0.8, ease: "power2.inOut" }, B0 + 0.3);
+      tl.fromTo("#s8-ped", { opacity: 0, y: 90 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 0.02);
+      tl.fromTo("#s8-floor", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 0.05);
+
+      // the problem cards deal out from behind the book while the counter climbs; the top card comes last
+      const CARDS = [["#s8-c4", 255, 676, -15], ["#s8-c3", 455, 651, -5], ["#s8-c2", 655, 668, 6], ["#s8-c1", 845, 736, 15], ["#s8-c0", 836, 1002, 6]];   // review C: +36 px, out of the caption zone
+      const gap = clamp((w(4) - T1 - 0.5) / 4, 0.06, 0.2);
+      CARDS.forEach(([id, x, y, r], k) => {
+        const t = T1 + 0.05 + k * gap;
+        tl.fromTo(id, { x: 372, y: 930, rotation: -4, scale: 0.78 }, { x: x, y: y, rotation: r, scale: 1, duration: 0.5, ease: "back.out(1.25)" }, t);
+        tl.fromTo(id, { opacity: 0 }, { opacity: 1, duration: 0.08 }, t);
+      });
+
+      // the counter lands: the "+" pops in, the display flashes; "problems" lights under it
+      tl.fromTo("#s8-plus", { opacity: 0, scale: 0.2 }, { opacity: 1, scale: 1, duration: 0.32, ease: "back.out(3)" }, T3 - 0.02);
+      tl.fromTo("#s8-dflash", { opacity: 0 }, { opacity: 1, duration: 0.1, ease: "power2.out" }, T3 - 0.02);
+      tl.fromTo("#s8-dflash", { opacity: 1 }, { opacity: 0.35, duration: 0.6, ease: "power2.out", immediateRender: false }, T3 + 0.1);
+      tl.fromTo("#s8-disp", { scale: 1 }, { scale: 1.05, duration: 0.09, ease: "power2.out" }, T3 - 0.02);
+      tl.fromTo("#s8-disp", { scale: 1.05 }, { scale: 1, duration: 0.4, ease: "back.out(3)", immediateRender: false }, T3 + 0.07);
+      tl.fromTo("#s8-lab", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, w(4) - 0.05);
+
+      // W5 "with": the teal stamp slams onto the top card, the card jolts, an ink ring spreads, its box ticks
+      const ST = w(5) - 0.16;
+      tl.fromTo("#s8-stamp", { opacity: 0, scale: 2.3, rotation: -24 }, { opacity: 1, scale: 1, rotation: -9, duration: 0.18, ease: "power3.in" }, ST);
+      tl.fromTo("#s8-ink", { opacity: 0, scale: 0.9, rotation: -9 }, { opacity: 0.75, scale: 0.9, rotation: -9, duration: 0.01 }, ST + 0.17);
+      tl.fromTo("#s8-ink", { opacity: 0.75, scale: 0.9 }, { opacity: 0, scale: 1.5, duration: 0.45, ease: "power2.out", immediateRender: false }, ST + 0.18);
+      tl.fromTo("#s8-c0in", { y: 0 }, { y: 9, duration: 0.06, ease: "power2.out" }, ST + 0.18);
+      tl.fromTo("#s8-c0in", { y: 9 }, { y: 0, duration: 0.35, ease: "back.out(3)", immediateRender: false }, ST + 0.24);
+      tl.fromTo("#s8-t0", { scale: 0 }, { scale: 1, duration: 0.3, ease: "back.out(2.5)" }, ST + 0.18);
+      // W6 "solutions": the worked lines write in on the top card, and every other card gets its tick
+      document.querySelectorAll("#s8-c0 .s8-sol").forEach((el, k) => {
+        tl.fromTo(el, { scaleX: 0 }, { scaleX: 1, duration: 0.28, ease: "power2.out" }, w(6) - 0.05 + k * 0.08);
+      });
+      document.querySelectorAll("#s8-c0 .s8-dot").forEach((el, k) => {
+        tl.fromTo(el, { scale: 0 }, { scale: 1, duration: 0.22, ease: "back.out(2.5)" }, w(6) - 0.07 + k * 0.08);
+      });
+      ["#s8-c1", "#s8-c2", "#s8-c3", "#s8-c4"].forEach((id, k) => {
+        tl.fromTo(id + " .s8-tick", { scale: 0 }, { scale: 1, duration: 0.26, ease: "back.out(2.5)" }, w(6) - 0.06 + k * 0.05);
+      });
+
+      // continuous layer: odometer reels with motion blur, book float + its shadow, glow and rim pulse
+      const reels = [0, 1, 2, 3].map((k) => document.getElementById("s8-r" + k));
+      const bob = document.getElementById("s8-bob"), bshad = document.getElementById("s8-bshad");
+      const glow = document.getElementById("s8-glow"), lip = document.getElementById("s8-lip");
+      const ease3 = (p) => 1 - Math.pow(1 - p, 3);
+      const valAt = (t) => 1000 * ease3(clamp((t - T1) / (T3 - T1), 0, 1));
+      function draw(t) {
+        const v = valAt(t), dv = (valAt(t + 0.004) - valAt(t - 0.004)) / 0.008;
+        for (let k = 0; k < 4; k++) {
+          const P = Math.pow(10, k);
+          let pos;
+          if (k === 0) pos = v % 10;
+          else { const n = Math.floor(v / P), lower = v - n * P; pos = (n % 10) + clamp(lower - (P - 1), 0, 1); }
+          const r = reels[k];
+          r.style.transform = "translateY(" + (-pos * 172).toFixed(1) + "px)";
+          const travel = (dv / P) * 172 / 30;           // px per frame
+          r.style.filter = travel > 8 ? "blur(" + Math.min(5, travel * 0.05 + 1).toFixed(1) + "px)" : "none";
+          r.style.opacity = k > 0 && v < P - 0.5 ? "0.28" : "1";
+        }
+        const fy = Math.sin(t * 3.4) * 9;
+        bob.style.transform = "translateY(" + fy.toFixed(1) + "px)";
+        const sc = 1 - fy / 120;
+        bshad.style.transform = "scale(" + sc.toFixed(3) + ")";
+        bshad.style.opacity = (0.85 + fy / 60).toFixed(3);
+        glow.style.opacity = (0.8 + 0.2 * Math.sin(t * 4.2)).toFixed(3);
+        lip.style.opacity = (t >= T3 ? 0.95 : 0.55) + 0.05 * Math.sin(t * 6);
+      }
+      const st = { t: 0 };
+      tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: () => draw(st.t) }, 0);
+      window.__timelines["s8"] = tl;
+    })();
+  </script>
+</template>

@@ -1,0 +1,30 @@
+[
+  {
+    "id": "P1",
+    "from": 10.2,
+    "hit": 12.19,
+    "to": 13.6,
+    "strip": "analysis/peak_1.jpg",
+    "build": "A pixel-staircase wipe turns light to dark. 'In two weeks,' builds word by word while the elevator counter scrambles up from 3,100,000.",
+    "hold": "The counter locks on 3,300,000 (11.9 s) and the caption dims to grey for a beat.",
+    "hit_what": "A giant green '3.3' slams in over the dimmed caption (12.19). It is replaced by a giant 'million' (12.60), then both shrink inline into '🚀 3.3 million' (12.94).",
+    "after": "'views.' lands (13.43) and an eye icon appears in the elevator car; held about 0.2 s before the next line.",
+    "sound": "The voice stresses 'three point three million'. The bed carries on; no break.",
+    "techniques": ["rolling counter with scrambled digits", "hero-word slam then shrink into the line", "caption dims while the hero word holds", "pixel-staircase wipe into a dark scene", "green glow behind the subject"],
+    "why_it_works": "A concrete, outsized number arrives twice, as the counter and as a giant word, so the proof feels physical."
+  },
+  {
+    "id": "P2",
+    "from": 61.7,
+    "hit": 63.55,
+    "to": 64.1,
+    "strip": "analysis/peak_3.jpg",
+    "build": "Pixel wipe to dark. A silver coin carrying the product's icon floats on a pedestal. 'Your job is the' builds, then a giant green 'product.' slams (62.39).",
+    "hold": "'Its job' builds over a quick coin flip (63.06, motion-blurred).",
+    "hit_what": "The coin lands brand-side and audience avatars burst out to orbit it as a giant green 'audience.' slams in (63.55).",
+    "after": "The avatars keep orbiting while the hero word shrinks into the line (63.97). Then the whole scene breaks into pixels and the launch/CTA scene assembles (64.05).",
+    "sound": "The two lines in mirrored rhythm ('Your job is the product. Its job is the audience.'). The bed continues.",
+    "techniques": ["mirrored two-line tagline", "coin flip as the turn (your side, then its side)", "burst of orbiting avatars on the hit", "hero-word slam", "pixel-disintegrate transition"],
+    "why_it_works": "The flip turns the slogan into an object: the viewer sees their job hand over to the tool at the exact word."
+  }
+]
