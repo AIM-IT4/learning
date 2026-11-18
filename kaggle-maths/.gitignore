@@ -1,0 +1,7 @@
+# Training outputs and downloaded models are large; keep them out of git.
+out/
+maths-model/
+checkpoints/
+*.safetensors
+# Holds your Kaggle username; create your own (see README).
+kernel-metadata.json
