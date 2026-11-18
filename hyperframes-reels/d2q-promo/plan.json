@@ -336,7 +336,7 @@
   ],
   "required_inputs": [],
   "rules": [
-    "no AI or tool mentions on screen or in the caption",
+    "no mention of how it was made, on screen or in the caption",
     "no sales counts, ratings or follower counts",
     "every number from the live site; 'one simulated path' labelled",
     "light site palette; fill the frame",
