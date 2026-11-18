@@ -1,0 +1,374 @@
+{
+ "ours/stage1": {
+  "params": 14896512,
+  "tools": {
+   "quant_level1": {
+    "n": 200,
+    "accuracy": 1.0,
+    "sec_per_problem": 0.52
+   },
+   "quant_level2": {
+    "n": 200,
+    "accuracy": 0.245,
+    "sec_per_problem": 0.7
+   },
+   "quant_level3": {
+    "n": 200,
+    "accuracy": 0.505,
+    "sec_per_problem": 0.98
+   },
+   "quant_exam": {
+    "n": 40,
+    "accuracy": 0.2,
+    "sec_per_problem": 1.49,
+    "practised": 0.2593,
+    "new_tasks": 0.0769
+   },
+   "maths_seen": {
+    "n": 171,
+    "accuracy": 0.9825,
+    "sec_per_problem": 0.1
+   },
+   "maths_new_wording": {
+    "n": 200,
+    "accuracy": 0.485,
+    "sec_per_problem": 0.13
+   },
+   "gsm8k": {
+    "n": 300,
+    "accuracy": 0.0,
+    "sec_per_problem": 0.52
+   }
+  }
+ },
+ "HuggingFaceTB/SmolLM2-135M-Instruct": {
+  "params": 134515008,
+  "own": {
+   "quant_level1": {
+    "n": 200,
+    "accuracy": 0.0,
+    "sec_per_problem": 1.98
+   },
+   "quant_level2": {
+    "n": 200,
+    "accuracy": 0.01,
+    "sec_per_problem": 1.96
+   },
+   "quant_level3": {
+    "n": 200,
+    "accuracy": 0.02,
+    "sec_per_problem": 1.98
+   },
+   "quant_exam": {
+    "n": 40,
+    "accuracy": 0.0,
+    "sec_per_problem": 2.28,
+    "practised": 0.0,
+    "new_tasks": 0.0
+   },
+   "maths_seen": {
+    "n": 171,
+    "accuracy": 0.0117,
+    "sec_per_problem": 1.95
+   },
+   "maths_new_wording": {
+    "n": 200,
+    "accuracy": 0.01,
+    "sec_per_problem": 1.95
+   },
+   "gsm8k": {
+    "n": 300,
+    "accuracy": 0.0067,
+    "sec_per_problem": 1.9
+   }
+  },
+  "tools": {
+   "quant_level1": {
+    "n": 200,
+    "accuracy": 0.0,
+    "sec_per_problem": 1.87
+   },
+   "quant_level2": {
+    "n": 200,
+    "accuracy": 0.01,
+    "sec_per_problem": 1.88
+   },
+   "quant_level3": {
+    "n": 200,
+    "accuracy": 0.0,
+    "sec_per_problem": 1.91
+   },
+   "quant_exam": {
+    "n": 40,
+    "accuracy": 0.0,
+    "sec_per_problem": 2.15,
+    "practised": 0.0,
+    "new_tasks": 0.0
+   }
+  }
+ },
+ "HuggingFaceTB/SmolLM2-360M-Instruct": {
+  "params": 361821120,
+  "own": {
+   "quant_level1": {
+    "n": 200,
+    "accuracy": 0.0,
+    "sec_per_problem": 2.1
+   },
+   "quant_level2": {
+    "n": 200,
+    "accuracy": 0.01,
+    "sec_per_problem": 2.1
+   },
+   "quant_level3": {
+    "n": 200,
+    "accuracy": 0.01,
+    "sec_per_problem": 2.11
+   },
+   "quant_exam": {
+    "n": 40,
+    "accuracy": 0.0,
+    "sec_per_problem": 2.55,
+    "practised": 0.0,
+    "new_tasks": 0.0
+   },
+   "maths_seen": {
+    "n": 171,
+    "accuracy": 0.1287,
+    "sec_per_problem": 2.01
+   },
+   "maths_new_wording": {
+    "n": 200,
+    "accuracy": 0.025,
+    "sec_per_problem": 2.13
+   },
+   "gsm8k": {
+    "n": 300,
+    "accuracy": 0.06,
+    "sec_per_problem": 2.05
+   }
+  },
+  "tools": {
+   "quant_level1": {
+    "n": 200,
+    "accuracy": 0.095,
+    "sec_per_problem": 2.57
+   },
+   "quant_level2": {
+    "n": 200,
+    "accuracy": 0.025,
+    "sec_per_problem": 2.58
+   },
+   "quant_level3": {
+    "n": 200,
+    "accuracy": 0.0,
+    "sec_per_problem": 2.75
+   },
+   "quant_exam": {
+    "n": 40,
+    "accuracy": 0.05,
+    "sec_per_problem": 2.87,
+    "practised": 0.0741,
+    "new_tasks": 0.0
+   }
+  }
+ },
+ "Qwen/Qwen2.5-0.5B-Instruct": {
+  "params": 494032768,
+  "own": {
+   "quant_level1": {
+    "n": 200,
+    "accuracy": 0.01,
+    "sec_per_problem": 1.65
+   },
+   "quant_level2": {
+    "n": 200,
+    "accuracy": 0.0,
+    "sec_per_problem": 1.68
+   },
+   "quant_level3": {
+    "n": 200,
+    "accuracy": 0.01,
+    "sec_per_problem": 1.65
+   },
+   "quant_exam": {
+    "n": 40,
+    "accuracy": 0.075,
+    "sec_per_problem": 1.91,
+    "practised": 0.0741,
+    "new_tasks": 0.0769
+   },
+   "maths_seen": {
+    "n": 171,
+    "accuracy": 0.6199,
+    "sec_per_problem": 0.91
+   },
+   "maths_new_wording": {
+    "n": 200,
+    "accuracy": 0.515,
+    "sec_per_problem": 1.06
+   },
+   "gsm8k": {
+    "n": 300,
+    "accuracy": 0.3367,
+    "sec_per_problem": 1.27
+   }
+  },
+  "tools": {
+   "quant_level1": {
+    "n": 200,
+    "accuracy": 0.14,
+    "sec_per_problem": 0.83
+   },
+   "quant_level2": {
+    "n": 200,
+    "accuracy": 0.085,
+    "sec_per_problem": 1.41
+   },
+   "quant_level3": {
+    "n": 200,
+    "accuracy": 0.0,
+    "sec_per_problem": 1.29
+   },
+   "quant_exam": {
+    "n": 40,
+    "accuracy": 0.1,
+    "sec_per_problem": 2.0,
+    "practised": 0.1111,
+    "new_tasks": 0.0769
+   }
+  }
+ },
+ "Qwen/Qwen3-0.6B": {
+  "params": 596049920,
+  "own": {
+   "quant_level1": {
+    "n": 200,
+    "accuracy": 0.015,
+    "sec_per_problem": 7.77
+   },
+   "quant_level2": {
+    "n": 200,
+    "accuracy": 0.025,
+    "sec_per_problem": 7.76
+   },
+   "quant_level3": {
+    "n": 200,
+    "accuracy": 0.005,
+    "sec_per_problem": 7.86
+   },
+   "quant_exam": {
+    "n": 40,
+    "accuracy": 0.075,
+    "sec_per_problem": 8.07,
+    "practised": 0.037,
+    "new_tasks": 0.1538
+   },
+   "maths_seen": {
+    "n": 171,
+    "accuracy": 0.9123,
+    "sec_per_problem": 7.21
+   },
+   "maths_new_wording": {
+    "n": 200,
+    "accuracy": 0.835,
+    "sec_per_problem": 7.18
+   },
+   "gsm8k": {
+    "n": 300,
+    "accuracy": 0.67,
+    "sec_per_problem": 7.65
+   }
+  },
+  "tools": {
+   "quant_level1": {
+    "n": 200,
+    "accuracy": 0.105,
+    "sec_per_problem": 3.19
+   },
+   "quant_level2": {
+    "n": 200,
+    "accuracy": 0.05,
+    "sec_per_problem": 1.86
+   },
+   "quant_level3": {
+    "n": 200,
+    "accuracy": 0.0,
+    "sec_per_problem": 0.89
+   },
+   "quant_exam": {
+    "n": 40,
+    "accuracy": 0.125,
+    "sec_per_problem": 3.55,
+    "practised": 0.0741,
+    "new_tasks": 0.2308
+   }
+  }
+ },
+ "Qwen/Qwen2.5-Math-1.5B-Instruct": {
+  "params": 1543714304,
+  "own": {
+   "quant_level1": {
+    "n": 200,
+    "accuracy": 0.105,
+    "sec_per_problem": 2.26
+   },
+   "quant_level2": {
+    "n": 200,
+    "accuracy": 0.135,
+    "sec_per_problem": 2.2
+   },
+   "quant_level3": {
+    "n": 200,
+    "accuracy": 0.025,
+    "sec_per_problem": 2.26
+   },
+   "quant_exam": {
+    "n": 40,
+    "accuracy": 0.2,
+    "sec_per_problem": 2.44,
+    "practised": 0.1481,
+    "new_tasks": 0.3077
+   },
+   "maths_seen": {
+    "n": 171,
+    "accuracy": 0.9825,
+    "sec_per_problem": 0.85
+   },
+   "maths_new_wording": {
+    "n": 200,
+    "accuracy": 0.95,
+    "sec_per_problem": 0.88
+   },
+   "gsm8k": {
+    "n": 300,
+    "accuracy": 0.8567,
+    "sec_per_problem": 1.39
+   }
+  },
+  "tools": {
+   "quant_level1": {
+    "n": 200,
+    "accuracy": 0.105,
+    "sec_per_problem": 2.31
+   },
+   "quant_level2": {
+    "n": 200,
+    "accuracy": 0.075,
+    "sec_per_problem": 2.03
+   },
+   "quant_level3": {
+    "n": 200,
+    "accuracy": 0.0,
+    "sec_per_problem": 3.57
+   },
+   "quant_exam": {
+    "n": 40,
+    "accuracy": 0.175,
+    "sec_per_problem": 2.22,
+    "practised": 0.1481,
+    "new_tasks": 0.2308
+   }
+  }
+ }
+}
