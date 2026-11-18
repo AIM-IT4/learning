@@ -1,7 +1,10 @@
 """Bundle our code into a self-contained Kaggle script kernel.
 
-    python kaggle/build_kernel.py speed  --user KAGGLE_USERNAME --out /tmp/kernel-speed
-    python kaggle/build_kernel.py stage1 --user KAGGLE_USERNAME --out /tmp/kernel-stage1
+    python kaggle/build_kernel.py speed       --user KAGGLE_USERNAME --out /tmp/kernel-speed
+    python kaggle/build_kernel.py stage1      --user KAGGLE_USERNAME --out /tmp/kernel-stage1
+    python kaggle/build_kernel.py stage2_data --user KAGGLE_USERNAME --out /tmp/kernel-data   # CPU only
+    python kaggle/build_kernel.py stage2_a    --user KAGGLE_USERNAME --out /tmp/kernel-2a     # reading, session 1
+    python kaggle/build_kernel.py stage2_b    --user KAGGLE_USERNAME --out /tmp/kernel-2b     # reading ends, practice, tests
     kaggle kernels push -p /tmp/kernel-stage1 --accelerator NvidiaTeslaT4 -t 7200
 
 The kernel embeds our source files, so the repo stays the single source of truth and
@@ -16,9 +19,22 @@ HERE = pathlib.Path(__file__).resolve().parent
 SLM = HERE.parent
 CORE = ["model.py", "train.py"]
 FULL = CORE + ["prepare.py", "mathgen.py", "quantgen.py", "calc.py", "qltools.py", "tools.py", "solve.py"]
-JOBS = {  # job: (template in this folder, kernel title, kernel slug, files to embed, needs internet)
-    "speed": ("speed_test.py", "SLM Speed Test", "slm-speed-test", CORE, False),
-    "stage1": ("stage1.py", "SLM Stage 1", "slm-stage-1", FULL, True),
+READ = {"name": "read", "data": "data2/read", "lr": 6e-4, "warmup": 1000, "out": "run"}
+JOBS = {
+    "speed": dict(template="speed_test.py", title="SLM Speed Test", slug="slm-speed-test", files=CORE,
+                  internet=False, gpu=True),
+    "stage1": dict(template="stage1.py", title="SLM Stage 1", slug="slm-stage-1", files=FULL, internet=True, gpu=True),
+    "stage2_data": dict(template="stage2_data.py", title="SLM Stage 2 Data", slug="slm-stage-2-data", files=FULL,
+                        internet=True, gpu=False),
+    "stage2_a": dict(template="stage2_train.py", title="SLM Stage 2 A", slug="slm-stage-2-a", files=FULL,
+                     internet=True, gpu=True, sources=["slm-stage-2-data"],
+                     config={"steps": [dict(READ, minutes=680)], "eval": False}),
+    "stage2_b": dict(template="stage2_train.py", title="SLM Stage 2 B", slug="slm-stage-2-b", files=FULL,
+                     internet=True, gpu=True, sources=["slm-stage-2-data", "slm-stage-2-a"],
+                     config={"steps": [dict(READ, minutes=330, resume="run/ckpt.pt"),
+                                       {"name": "practice", "data": "data2/practice", "lr": 3e-4, "warmup": 300,
+                                        "minutes": 240, "init": "run/model.pt", "out": "run-practice"}],
+                             "eval": True}),
 }
 
 
@@ -29,19 +45,23 @@ def main():
     p.add_argument("--out", required=True, help="folder to write the kernel into")
     a = p.parse_args()
 
-    template, title, slug, files, internet = JOBS[a.job]
-    code = {name: base64.b64encode((SLM / name).read_bytes()).decode() for name in files}
-    src = (HERE / template).read_text()
+    job = JOBS[a.job]
+    code = {name: base64.b64encode((SLM / name).read_bytes()).decode() for name in job["files"]}
+    src = (HERE / job["template"]).read_text()
     assert src.count("CODE = {}") == 1
+    src = src.replace("CODE = {}", "CODE = " + json.dumps(code), 1)
+    if "config" in job:
+        assert src.count("CONFIG = {}") == 1
+        src = src.replace("CONFIG = {}", "CONFIG = " + repr(job["config"]), 1)     # a Python literal, not JSON
     out = pathlib.Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
-    (out / template).write_text(src.replace("CODE = {}", "CODE = " + json.dumps(code), 1))
-    meta = {"id": f"{a.user}/{slug}", "title": title, "code_file": template, "language": "python",
-            "kernel_type": "script", "is_private": True, "enable_gpu": True, "enable_tpu": False,
-            "enable_internet": internet, "dataset_sources": [], "competition_sources": [],
-            "kernel_sources": [], "model_sources": []}
+    (out / job["template"]).write_text(src)
+    meta = {"id": f"{a.user}/{job['slug']}", "title": job["title"], "code_file": job["template"], "language": "python",
+            "kernel_type": "script", "is_private": True, "enable_gpu": job["gpu"], "enable_tpu": False,
+            "enable_internet": job["internet"], "dataset_sources": [], "competition_sources": [],
+            "kernel_sources": [f"{a.user}/{s}" for s in job.get("sources", [])], "model_sources": []}
     (out / "kernel-metadata.json").write_text(json.dumps(meta, indent=2))
-    print(f"wrote {out / template} ({sum(len(v) for v in code.values()) // 1024} KB of embedded code)")
+    print(f"wrote {out / job['template']} ({sum(len(v) for v in code.values()) // 1024} KB of embedded code)")
 
 
 if __name__ == "__main__":

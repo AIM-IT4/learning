@@ -46,6 +46,7 @@ def get_args():
     p.add_argument("--log-every", type=int, default=10)
     p.add_argument("--resume", action="store_true", help="continue from OUT/ckpt.pt if it exists")
     p.add_argument("--resume-from", help="continue from this checkpoint file (e.g. a previous session's output)")
+    p.add_argument("--init-from", help="start a new stage from these model weights (model.pt or ckpt.pt)")
     p.add_argument("--compile", action="store_true", help="torch.compile the model (GPU)")
     p.add_argument("--seed", type=int, default=1337)
     return p.parse_args()
@@ -125,6 +126,11 @@ def main():
     raw = GPT(cfg).to(device)
     opt = make_optimizer(raw, a.lr, on_gpu)
     step, tokens_seen, elapsed_before = 0, 0, 0.0
+    if a.init_from:
+        weights = load_checkpoint(a.init_from, device)
+        raw.load_state_dict(weights["model"])
+        if master:
+            print(f"starting from the weights in {a.init_from}", flush=True)
     start = a.resume_from or (os.path.join(a.out, "ckpt.pt") if a.resume else None)
     if start and os.path.exists(start):
         ck = load_checkpoint(start, device)
