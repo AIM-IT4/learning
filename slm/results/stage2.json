@@ -1,0 +1,162 @@
+{
+ "model": "stage2 (100m preset)",
+ "training": {
+  "reading": {
+   "steps": 15379,
+   "tokens": 2015756288,
+   "session_min": 134.53,
+   "params": 97536768,
+   "preset": "100m",
+   "world": 2,
+   "micro_batch": 8,
+   "seq": 1024,
+   "compile": true,
+   "dtype": "torch.float16",
+   "device": "cuda:0",
+   "median_step_s": 3.1189,
+   "tok_s": 42025,
+   "gpu": "Tesla T4",
+   "peak_mem_gb": 6.3,
+   "val_loss": 2.5512
+  },
+  "practice": {
+   "steps": 3131,
+   "tokens": 410386432,
+   "session_min": 161.1,
+   "params": 97536768,
+   "preset": "100m",
+   "world": 2,
+   "micro_batch": 8,
+   "seq": 1024,
+   "compile": true,
+   "dtype": "torch.float16",
+   "device": "cuda:0",
+   "median_step_s": 3.0497,
+   "tok_s": 42979,
+   "gpu": "Tesla T4",
+   "peak_mem_gb": 6.3,
+   "val_loss": 0.1359
+  }
+ },
+ "scores": {
+  "maths_new_wording": {
+   "n": 250,
+   "accuracy": 0.48,
+   "bad_tool_calls": 0,
+   "by_task": {
+    "ages": 0.0,
+    "average": 0.0,
+    "change": 0.0,
+    "compound_amount": 1.0,
+    "density": 1.0,
+    "discount": 1.0,
+    "distance": 0.0,
+    "distance_accel": 0.0,
+    "expected_value": 0.0,
+    "final_velocity": 0.0,
+    "fraction_left": 0.0,
+    "kinetic_energy": 1.0,
+    "ohms_law": 0.0,
+    "percent_of": 0.364,
+    "probability": 1.0,
+    "profit_percent": 0.0,
+    "ratio_share": 1.0,
+    "rect_area": 1.0,
+    "rect_perimeter": 1.0,
+    "savings": 1.0,
+    "simple_interest": 0.667,
+    "speed": 0.125,
+    "two_items": 0.143,
+    "unit_price": 0.7,
+    "value_range": 0.545,
+    "weight": 1.0,
+    "work_together": 1.0
+   }
+  },
+  "maths_seen": {
+   "n": 176,
+   "accuracy": 0.9943,
+   "bad_tool_calls": 0,
+   "by_task": {
+    "ages": 1.0,
+    "average": 1.0,
+    "change": 1.0,
+    "compound_amount": 1.0,
+    "density": 1.0,
+    "discount": 1.0,
+    "distance": 1.0,
+    "distance_accel": 1.0,
+    "expected_value": 1.0,
+    "final_velocity": 1.0,
+    "fraction_left": 1.0,
+    "kinetic_energy": 1.0,
+    "ohms_law": 1.0,
+    "percent_of": 1.0,
+    "profit_percent": 1.0,
+    "ratio_share": 1.0,
+    "rect_area": 1.0,
+    "rect_perimeter": 1.0,
+    "savings": 1.0,
+    "simple_interest": 1.0,
+    "speed": 1.0,
+    "two_items": 1.0,
+    "unit_price": 1.0,
+    "value_range": 0.875,
+    "work_together": 1.0
+   }
+  },
+  "quant_level1": {
+   "n": 408,
+   "accuracy": 1.0,
+   "bad_tool_calls": 0,
+   "by_task": {
+    "american": 1.0,
+    "bond_duration": 1.0,
+    "bond_price": 1.0,
+    "bond_ytm": 1.0,
+    "forward": 1.0,
+    "greek": 1.0,
+    "implied_vol": 1.0,
+    "option_price": 1.0,
+    "parity": 1.0,
+    "var": 1.0,
+    "vasicek": 1.0
+   }
+  },
+  "quant_level2": {
+   "n": 500,
+   "accuracy": 0.476,
+   "bad_tool_calls": 7,
+   "by_task": {
+    "american": 0.22,
+    "bond_duration": 0.231,
+    "bond_price": 0.077,
+    "bond_ytm": 0.067,
+    "convert": 1.0,
+    "forward": 0.769,
+    "greek": 0.635,
+    "implied_vol": 0.625,
+    "option_price": 0.317,
+    "parity": 0.0,
+    "swap_par": 1.0,
+    "var": 1.0,
+    "vasicek": 0.793,
+    "zero_bond": 0.0
+   }
+  },
+  "quant_level3": {
+   "n": 500,
+   "accuracy": 0.322,
+   "bad_tool_calls": 19,
+   "by_task": {
+    "american": 0.122,
+    "bond_duration": 0.064,
+    "greek": 0.44,
+    "implied_vol": 0.296,
+    "option_price": 0.464,
+    "parity": 0.281,
+    "swap_par": 0.0
+   }
+  }
+ }
+}
