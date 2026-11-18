@@ -57,6 +57,22 @@ Lightning + a face-repair pass, Depth Anything V2, faster-whisper, demucs): no F
 Ask: "make a painted reel for this song" and attach the song. Source: `painted-song-reel/` (SKILL.md, scripts,
 reference); first use runs its `scripts/setup.sh` (packages, fonts, about 9 GB of models).
 
+## This repo's own skill: `reelmimic`
+ReelMimic's workflow ([edenfunf/reelmimic](https://github.com/edenfunf/reelmimic), MIT, pinned at `0eab75a`) run
+inside the chat. You send a reel, a YouTube link or a file, plus a one-line brief.
+
+1. It measures the reference: shots, pacing, BPM, transitions, palette, camera moves and the climax.
+2. It picks the matching 2D engine.
+3. It shows a plan with style frames for approval, led by our climax frame beside the reference's.
+4. It builds with parallel builder agents and fresh reviewer agents: a cast gate, a review of every shot, and a final
+   critic. Every fix needs before/after crops.
+5. It delivers only when every shot scores at least 4 beside the reference.
+
+Quality modes: fast (about 80 min for 30 s), standard, and fine (about 3–4 h for 30 s).
+
+To use it, ask: "reelmimic this reel: <link>, make one about …". Source: `reelmimic/SKILL.md`, which drives
+`video-clone` and the engine skills. The original web app (localhost:4318, with its own hooks) is not installed.
+
 ## Make them available
 
 - **This machine / any running session:** `bash video-skills/install-video-skills.sh` (installs into

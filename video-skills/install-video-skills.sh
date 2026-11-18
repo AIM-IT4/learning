@@ -17,6 +17,9 @@
 #   sarpstar/cinecode               MIT  cinecode (one sentence -> a short film, ad or music video with sound; its own
 #                                         hooks run its local guard only while the skill is in use)
 #   ./painted-song-reel (this repo)       painted-song-reel (painted music-video reel for any song, local painter)
+#   ./reelmimic (this repo)               reelmimic (ReelMimic's workflow in the chat: reference video -> same-style
+#                                         video, plan gate, parallel builders, fresh reviewers; reelmimic at 0eab75a,
+#                                         reviewed 2026-11-18: since 74fc0c5 only a timeout fix in lyria-recipe.py)
 #
 # Not installed: reelmimic's .claude/settings.json hooks (they drive its own app) and Joker-chichi/claude-mv-skill
 # (a copy of painted-animation with extra intake rules). Telemetry of the bundled media tools is switched off.
@@ -31,7 +34,7 @@ fetch() {   # owner/repo  commit  dir  [sparse patterns...]
   GIT_LFS_SKIP_SMUDGE=1 git -C "$TMP/$3" fetch -q --depth 1 $F origin "$2"
   git -C "$TMP/$3" -c advice.detachedHead=false checkout -q FETCH_HEAD
 }
-fetch edenfunf/reelmimic              74fc0c507242c64f215b88b2408bcdbacef3bcd0 reelmimic
+fetch edenfunf/reelmimic              0eab75a6395086f6dd7fab6099e7d43cbb6b3aa3 reelmimic
 fetch heygen-com/hyperframes          256675f92c44827ac3309cac615f46424dfca895 hyperframes '/skills/'
 fetch Alisa0808/vox-director          6a85a7c341610442a6a5b1885e6e0217ab82a11f voxdirector '/*' '!/assets/' '!/*.skill'
 fetch CK42BB/vox-explainer-skill      7003225dc3ed1dee9e2ef8b91b05b82c04691aa9 voxexplainer
@@ -67,9 +70,14 @@ put "$TMP/painted/skills/kinetic-reel" kinetic-reel
 put "$TMP/reimagined/skills/music-video-reimagined" music-video-reimagined
 put "$TMP/animate/plugins/animate/skills/animate" animate
 put "$TMP/cinecode" cinecode   # one sentence -> a film with sound (reviewed 2026-11-14 at c8a3e75)
-# this repo's own skill: painted-song-reel (a painted music-video reel for any song; see painted-song-reel/SKILL.md)
+# this repo's own skills: painted-song-reel (a painted music-video reel for any song) and reelmimic (ReelMimic's
+# reference-video -> same-style video workflow run in the chat; it drives video-clone and the engines above)
 HERE="$(cd "$(dirname "$0")" && pwd)"
 if [ -d "$HERE/painted-song-reel" ]; then put "$HERE/painted-song-reel" painted-song-reel; fi
+if [ -d "$HERE/reelmimic" ]; then put "$HERE/reelmimic" reelmimic; fi
+# video-clone's analysis needs PySceneDetect (the rest of requirements-reelmimic.txt is in the cloud image);
+# opencc only converts Chinese lyrics
+python3 -m pip install -q scenedetect opencc-python-reimplemented 2>/dev/null || echo "pip: install scenedetect for video-clone"
 
 # telemetry off for the HyperFrames / media-use / Remotion tools these skills call
 python3 - <<'EOF'

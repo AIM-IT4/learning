@@ -3,7 +3,7 @@
 # environment menu in the session title bar -> Edit -> Setup script). Every NEW session then starts with:
 #   1. the video skills in ~/.claude/skills (anime-cel, paper-cutout, painted-animation, the current HyperFrames
 #      skills, vox-director and vox-explainer, ...)
-#   2. painted-song-reel (this repo's skill: a painted music-video reel for any song), fetched from GitHub
+#   2. painted-song-reel and reelmimic (this repo's skills), fetched from GitHub
 #   3. flow-mcp (Google Flow through Chrome; the Google sign-in is not kept between sessions)
 # Each part runs even if another fails.
 
@@ -40,7 +40,7 @@ fetch() {   # owner/repo  commit  dir  [sparse patterns...]
   GIT_LFS_SKIP_SMUDGE=1 git -C "$TMP/$3" fetch -q --depth 1 $F origin "$2"
   git -C "$TMP/$3" -c advice.detachedHead=false checkout -q FETCH_HEAD
 }
-fetch edenfunf/reelmimic              74fc0c507242c64f215b88b2408bcdbacef3bcd0 reelmimic
+fetch edenfunf/reelmimic              0eab75a6395086f6dd7fab6099e7d43cbb6b3aa3 reelmimic
 fetch heygen-com/hyperframes          256675f92c44827ac3309cac615f46424dfca895 hyperframes '/skills/'
 fetch Alisa0808/vox-director          6a85a7c341610442a6a5b1885e6e0217ab82a11f voxdirector '/*' '!/assets/' '!/*.skill'
 fetch CK42BB/vox-explainer-skill      7003225dc3ed1dee9e2ef8b91b05b82c04691aa9 voxexplainer
@@ -79,6 +79,8 @@ put "$TMP/cinecode" cinecode   # one sentence -> a film with sound (reviewed 202
 # this repo's own skill: painted-song-reel (a painted music-video reel for any song; see painted-song-reel/SKILL.md)
 HERE="$(cd "$(dirname "$0")" && pwd)"
 if [ -d "$HERE/painted-song-reel" ]; then put "$HERE/painted-song-reel" painted-song-reel; fi
+# video-clone's analysis needs PySceneDetect (the rest of its requirements is in the cloud image)
+python3 -m pip install -q scenedetect opencc-python-reimplemented 2>/dev/null || echo "pip: install scenedetect for video-clone"
 
 # telemetry off for the HyperFrames / media-use / Remotion tools these skills call
 python3 - <<'EOF'
@@ -92,20 +94,22 @@ EOF
 echo "installed: $(ls "$DEST" | wc -l) skills in $DEST"
 ) || echo "video skills: install failed"
 
-# ======================================================================== 2. painted-song-reel
-# This repo's own skill (AIM-IT4/learning is public): a painted music-video reel for any song. Its models (about 9 GB)
-# are fetched the first time it is used (its scripts/setup.sh), not here.
+# ======================================================================== 2. painted-song-reel + reelmimic
+# This repo's own skills (AIM-IT4/learning is public): painted-song-reel (a painted music-video reel for any song; its
+# models, about 9 GB, are fetched the first time it is used by its scripts/setup.sh, not here) and reelmimic
+# (ReelMimic's reference-video -> same-style video workflow, run in the chat on top of video-clone).
 ( set -e
 T=$(mktemp -d); trap 'rm -rf "$T"' EXIT
 git init -q "$T/l"; cd "$T/l"
 git remote add origin https://github.com/AIM-IT4/learning
-git sparse-checkout set video-skills/painted-song-reel
+git sparse-checkout set video-skills/painted-song-reel video-skills/reelmimic
 git fetch -q --depth 1 --filter=blob:none origin ccr-713d3cac-20zpd5 || git fetch -q --depth 1 --filter=blob:none origin main
 git -c advice.detachedHead=false checkout -q FETCH_HEAD
-mkdir -p "$HOME/.claude/skills"; rm -rf "$HOME/.claude/skills/painted-song-reel"
-cp -r video-skills/painted-song-reel "$HOME/.claude/skills/painted-song-reel"
-echo "installed painted-song-reel"
-) || echo "painted-song-reel: install failed"
+mkdir -p "$HOME/.claude/skills"
+for s in painted-song-reel reelmimic; do
+  if [ -d "video-skills/$s" ]; then rm -rf "$HOME/.claude/skills/$s"; cp -r "video-skills/$s" "$HOME/.claude/skills/$s"; echo "installed $s"; fi
+done
+) || echo "painted-song-reel / reelmimic: install failed"
 
 # ======================================================================== 3. flow-mcp
 DIR=/opt/flow-mcp
