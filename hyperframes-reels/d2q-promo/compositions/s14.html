@@ -1,0 +1,176 @@
+<template>
+  <style>
+    @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
+    @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
+    #root { position: absolute; inset: 0; overflow: hidden; }
+    #s14-cam { position: absolute; inset: 0; transform-origin: 536px 1075px; }
+    /* p12 coin (frame): rim ellipse centre (536,1075) rx 368 ry 375; recessed face centre (534,1058) rx 272 ry 256;
+       the glass dish's back rim shows beside the coin at y 1430-1450, so the plate splits along y 1428 plus the coin's outline */
+    #s14-halo { position: absolute; left: 86px; top: 625px; width: 900px; height: 900px; border-radius: 50%; opacity: 0.55;
+                background: radial-gradient(closest-side, rgba(34,197,94,0.42) 0%, rgba(34,197,94,0.16) 55%, rgba(34,197,94,0) 100%); }
+    #s14-back, #s14-front { position: absolute; inset: 0; }
+    #s14-rimpatch { position: absolute; left: 0; top: 0; overflow: visible; }
+    #s14-bob { position: absolute; inset: 0; transform-origin: 536px 1075px; }
+    #s14-coin { position: absolute; inset: 0; transform-origin: 536px 1075px; }
+    #s14-cplate, #s14-pplate { position: absolute; left: -40px; top: 500px; width: 1160px; height: 1160px; }
+    /* the plate is matted against a dark studio backdrop (semi-transparent silver): an opaque backing of that dark keeps
+       the coin solid, so the halo and the chips orbiting behind it never show through the metal */
+    #s14-cback { position: absolute; left: 172px; top: 704px; width: 728px; height: 742px; border-radius: 50%;
+                 background: radial-gradient(closest-side, #13171d 0%, #13171d 97%, rgba(19,23,29,0) 100%); }
+    #s14-edge { position: absolute; left: 518px; top: 702px; width: 36px; height: 746px; border-radius: 18px; opacity: 0;
+                background: repeating-linear-gradient(180deg, rgba(0,0,0,0.22) 0px, rgba(0,0,0,0.22) 2px, rgba(255,255,255,0) 2px, rgba(255,255,255,0) 6px),
+                            linear-gradient(90deg, #5d6670 0%, #e9edf1 38%, #ffffff 50%, #c3cad2 66%, #4a525b 100%);
+                box-shadow: 0 0 30px rgba(34,197,94,0.45); }
+    #s14-glintc { position: absolute; inset: 0; clip-path: ellipse(366px 373px at 536px 1075px); }
+    #s14-glint { position: absolute; left: 0; top: 640px; width: 150px; height: 880px; opacity: 0;
+                 background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.75), rgba(255,255,255,0)); }
+    #s14-facering { position: absolute; left: 262px; top: 802px; width: 544px; height: 512px; border-radius: 50%; border: 5px solid #22c55e; opacity: 0;
+                    box-shadow: 0 0 26px rgba(34,197,94,0.7), inset 0 0 26px rgba(34,197,94,0.5); }
+    .s14-face { position: absolute; left: 294px; top: 808px; width: 480px; height: 500px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 26px; }
+    .s14-face b { font: 900 42px/1 "D2QSans", sans-serif; letter-spacing: 0.2em; margin-right: -0.2em; color: #1f2933;
+                  text-shadow: 0 2px 0 rgba(255,255,255,0.75), 0 -1px 0 rgba(0,0,0,0.18); }
+    #s14-book { filter: drop-shadow(0 2px 0 rgba(255,255,255,0.7)) drop-shadow(0 -1px 0 rgba(0,0,0,0.2)); }
+    #s14-fb { opacity: 0; }
+    #s14-tile { position: relative; width: 214px; height: 214px; border-radius: 50px; box-shadow: 0 14px 26px rgba(17,20,24,0.32), 0 0 0 6px rgba(34,197,94,0.35); }
+    #s14-tile img { display: block; width: 214px; height: 214px; border-radius: 50px; }
+    #s14-uline { width: 74px; height: 9px; border-radius: 5px; background: #22c55e; margin-top: -12px; box-shadow: 0 0 14px rgba(34,197,94,0.7); }
+    #s14-flash { position: absolute; left: 156px; top: 695px; width: 760px; height: 760px; border-radius: 50%; opacity: 0;
+                 background: radial-gradient(circle, rgba(34,197,94,0.6) 0%, rgba(34,197,94,0.24) 40%, rgba(34,197,94,0) 70%); }
+    #s14-ring { position: absolute; left: 236px; top: 775px; width: 600px; height: 600px; border-radius: 50%; border: 8px solid #22c55e; opacity: 0;
+                box-shadow: 0 0 30px rgba(34,197,94,0.6); }
+    .s14-chip { position: absolute; left: 0; top: 0; height: 76px; border-radius: 38px; text-align: center; white-space: nowrap; opacity: 0;
+                border: 1.5px solid rgba(255,255,255,0.16);
+                background: linear-gradient(180deg, rgba(255,255,255,0.13), rgba(255,255,255,0.03)), rgba(16,20,26,0.86);
+                box-shadow: 0 30px 70px rgba(0,0,0,0.45), 0 0 40px rgba(34,197,94,0.18), inset 0 2px 0 rgba(255,255,255,0.16);
+                font: 800 36px/73px "D2QSans", sans-serif; color: #f4f6f7; }
+    .s14-chip i { font-style: normal; color: #22c55e; margin-right: 10px; }
+    .s14-chip.g { font-family: "JetBrains Mono", monospace; color: #22c55e; text-shadow: 0 0 14px rgba(34,197,94,0.6); }
+  </style>
+  <div id="root" data-composition-id="s14" data-width="1080" data-height="1920">
+    <div id="s14-cam">
+      <div id="s14-halo"></div>
+      <div id="s14-back"></div>
+      <svg id="s14-rimpatch" width="1080" height="1920" viewBox="0 0 1080 1920" fill="none">
+        <path d="M402 1437 Q538 1418 676 1435" stroke="rgba(220,235,228,0.5)" stroke-width="3" stroke-linecap="round" />
+      </svg>
+      <div id="s14-bob">
+        <div id="s14-coin">
+          <div id="s14-cback"></div>
+          <img id="s14-cplate" src="assets/plates/p12.png" alt="" />
+          <div id="s14-glintc"><div id="s14-glint"></div></div>
+          <div id="s14-facering"></div>
+          <div id="s14-fa" class="s14-face">
+            <svg id="s14-book" width="280" height="204" viewBox="0 0 280 204" fill="none">
+              <path class="s14-ink" d="M140 46 C107 21 58 17 18 25 V174 C58 166 107 170 140 194 Z" fill="rgba(255,255,255,0.5)" stroke="#1f2933" stroke-width="10" stroke-linejoin="round" />
+              <path class="s14-ink" d="M140 46 C173 21 222 17 262 25 V174 C222 166 173 170 140 194 Z" fill="rgba(255,255,255,0.5)" stroke="#1f2933" stroke-width="10" stroke-linejoin="round" />
+              <path class="s14-ln" d="M46 64 H112 M46 91 H112 M46 118 H100 M168 64 H234 M168 91 H234 M168 118 H222" stroke="#1f2933" stroke-opacity="0.5" stroke-width="8" stroke-linecap="round" />
+              <path id="s14-acc" d="M168 146 H220" stroke="#16a34a" stroke-width="10" stroke-linecap="round" />
+            </svg>
+            <b id="s14-la">TEXTBOOK</b>
+          </div>
+          <div id="s14-fb" class="s14-face">
+            <div id="s14-tile"><img src="assets/logo.png" alt="" /></div>
+            <b>THE DESK</b>
+            <div id="s14-uline"></div>
+          </div>
+        </div>
+        <div id="s14-edge"></div>
+      </div>
+      <img id="s14-pplate" src="assets/plates/p12.png" alt="" />
+      <div id="s14-flash"></div>
+      <div id="s14-ring"></div>
+      <div id="s14-front"></div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      /*DATA*/ const DUR = 3.57; const W = [0.16, 0.68, 0.88, 1.02, 1.1, 1.69, 1.93, 2.15, 2.37, 2.55, 2.67, 2.89]; /*END*/
+      // words: 0 Textbooks 1 teach 2 you 3 the 4 model. | 5 The 6 desk 7 teaches 8 you 9 what 10 breaks 11 it.
+      const w = (i) => Math.max(0, W.length > i ? W[i] : 0.16 + i * 0.25);
+      const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+      const FLIP = w(5) + 0.05, HIT = w(10) - 0.02;
+      const tl = gsap.timeline({ paused: true });
+
+      // split the plate: the coin layer = everything above y 1428 plus the coin's own outline; the pedestal = the rest
+      // (img-local px: frame + (40, -500); coin ellipse centre (576.5,575) rx 372 ry 378; split y 928)
+      const CX = 576.5, CY = 575, RX = 372, RY = 378, YS = 928;
+      const f0 = Math.asin((YS - CY) / RY), arc = [];
+      for (let k = 0; k <= 16; k++) { const f = f0 + (Math.PI - 2 * f0) * k / 16; arc.push([CX + RX * Math.cos(f), CY + RY * Math.sin(f)]); }
+      const pp = (a) => a.map(([x, y]) => x.toFixed(1) + "px " + y.toFixed(1) + "px").join(", ");
+      document.getElementById("s14-cplate").style.clipPath = "polygon(0px 0px, 1160px 0px, 1160px " + YS + "px, " + pp(arc) + ", 0px " + YS + "px)";
+      document.getElementById("s14-pplate").style.clipPath = "polygon(0px " + YS + "px, " + pp(arc.slice().reverse()) + ", 1160px " + YS + "px, 1160px 1160px, 0px 1160px)";
+
+      // camera: settle up from below, then v2's slow rotation drift with a gentle push
+      tl.fromTo("#s14-cam", { y: 60 }, { y: 0, duration: 0.6, ease: "expo.out" }, 0);
+      tl.fromTo("#s14-cam", { scale: 1, rotation: -1.4 }, { scale: 1.06, rotation: 1.4, duration: DUR, ease: "none" }, 0);
+
+      // "Textbooks": the open-book emblem inks itself onto the silver face, the word stamps in under it
+      document.querySelectorAll("#s14-book .s14-ink").forEach((p, k) => {
+        p.setAttribute("stroke-dasharray", "620");
+        tl.fromTo(p, { strokeDashoffset: 620 }, { strokeDashoffset: 0, duration: 0.42, ease: "power2.inOut" }, 0.06 + k * 0.06);
+      });
+      tl.fromTo("#s14-book .s14-ln", { opacity: 0 }, { opacity: 1, duration: 0.2, ease: "power1.out" }, 0.34);
+      tl.fromTo("#s14-acc", { opacity: 0, scaleX: 0 }, { opacity: 1, scaleX: 1, transformOrigin: "0% 50%", duration: 0.22, ease: "power2.out" }, 0.44);
+      tl.fromTo("#s14-la", { opacity: 0, y: 14, scaleX: 1.12 }, { opacity: 1, y: 0, scaleX: 1, duration: 0.32, ease: "power3.out" }, w(0) + 0.02);
+
+      // "model.": the hero slam lands on the coin, a glint crosses it, the face ring flares, the emblem pulses
+      const MD = w(4) - 0.04;
+      tl.fromTo("#s14-glint", { opacity: 0 }, { opacity: 1, duration: 0.04 }, MD - 0.06);
+      tl.fromTo("#s14-glint", { x: 140, rotation: 20 }, { x: 900, rotation: 20, duration: 0.5, ease: "power2.inOut" }, MD - 0.06);
+      tl.fromTo("#s14-facering", { opacity: 0, scale: 0.94 }, { opacity: 0.95, scale: 1, duration: 0.1, ease: "power2.out" }, MD);
+      tl.fromTo("#s14-facering", { opacity: 0.95 }, { opacity: 0, duration: 0.5, ease: "power2.in", immediateRender: false }, MD + 0.12);
+      tl.fromTo("#s14-fa", { scale: 1 }, { scale: 1.07, duration: 0.08, ease: "power2.out" }, MD);
+      tl.fromTo("#s14-fa", { scale: 1.07 }, { scale: 1, duration: 0.36, ease: "back.out(3)", immediateRender: false }, MD + 0.08);
+
+      // "The desk": the coin flips — it squeezes to its edge with motion blur, shows its milled edge, opens on the logo face
+      tl.fromTo("#s14-coin", { scaleX: 1, filter: "blur(0px)" }, { scaleX: 0.02, filter: "blur(6px)", duration: 0.13, ease: "power2.in" }, FLIP);
+      tl.fromTo("#s14-fa", { opacity: 1 }, { opacity: 0, duration: 0.01, immediateRender: false }, FLIP + 0.13);
+      tl.fromTo("#s14-fb", { opacity: 0 }, { opacity: 1, duration: 0.01 }, FLIP + 0.13);
+      tl.fromTo("#s14-coin", { scaleX: 0.02, filter: "blur(6px)" }, { scaleX: 1, filter: "blur(0px)", duration: 0.17, ease: "power2.out", immediateRender: false }, FLIP + 0.14);
+      tl.fromTo("#s14-edge", { opacity: 0, scaleX: 0.3 }, { opacity: 1, scaleX: 1, duration: 0.07, ease: "power2.in" }, FLIP + 0.07);
+      tl.fromTo("#s14-edge", { opacity: 1, scaleX: 1 }, { opacity: 0, scaleX: 0.3, duration: 0.09, ease: "power2.out", immediateRender: false }, FLIP + 0.15);
+      tl.fromTo("#s14-bob", { y: 0 }, { y: -46, duration: 0.15, ease: "power2.out" }, FLIP);
+      tl.fromTo("#s14-bob", { y: -46 }, { y: 0, duration: 0.17, ease: "power2.in", immediateRender: false }, FLIP + 0.15);
+      tl.fromTo("#s14-tile", { scale: 0.8 }, { scale: 1, duration: 0.4, ease: "back.out(2.6)" }, FLIP + 0.14);
+
+      // "breaks": coin punch, glow flash, shockwave; the desk chips are flung out and keep orbiting
+      tl.fromTo("#s14-bob", { scale: 1 }, { scale: 1.12, duration: 0.11, ease: "power2.out" }, HIT);
+      tl.fromTo("#s14-bob", { scale: 1.12 }, { scale: 1, duration: 0.3, ease: "back.out(2.2)", immediateRender: false }, HIT + 0.11);
+      tl.fromTo("#s14-flash", { opacity: 0, scale: 0.8 }, { opacity: 0.85, scale: 1.05, duration: 0.1, ease: "power2.out" }, HIT);
+      tl.fromTo("#s14-flash", { opacity: 0.85 }, { opacity: 0, duration: 0.5, ease: "power2.out", immediateRender: false }, HIT + 0.12);
+      tl.fromTo("#s14-ring", { opacity: 0, scale: 0.92 }, { opacity: 0.9, scale: 0.92, duration: 0.01 }, HIT);
+      tl.fromTo("#s14-ring", { opacity: 0.9, scale: 0.92 }, { opacity: 0, scale: 1.6, duration: 0.6, ease: "power2.out", immediateRender: false }, HIT + 0.01);
+      tl.fromTo("#s14-halo", { opacity: 0.55 }, { opacity: 1, duration: 0.12, ease: "power2.out" }, HIT);
+      tl.fromTo("#s14-halo", { opacity: 1 }, { opacity: 0.78, duration: 0.6, ease: "power2.inOut", immediateRender: false }, HIT + 0.12);
+
+      // desk chips (from v2): front half of the orbit over the coin, back half behind it
+      const CHIPS = [["g", "Δ", 76], ["p", "P&L", 176], ["g", "Γ", 76], ["p", "VaR", 176], ["g", "ν", 76], ["p", "XVA", 176], ["g", "Θ", 76], ["p", "Model risk", 270]];
+      const front = document.getElementById("s14-front"), back = document.getElementById("s14-back");
+      const els = CHIPS.map(([k, label, wd]) => {
+        const c = document.createElement("div"); c.className = "s14-chip" + (k === "g" ? " g" : "");
+        c.innerHTML = k === "g" ? label : "<i>●</i>" + label; c.style.width = wd + "px"; c.dataset.w = wd;
+        front.appendChild(c); return c;
+      });
+      function draw(t) {
+        const t0 = FLIP + 0.13, cx = 536, cy = 1075;
+        els.forEach((c, i) => {
+          if (t < t0) { c.style.opacity = "0"; return; }
+          const u = clamp((t - t0) / 0.55, 0, 1), grow = 1 - Math.pow(1 - u, 3) * (1 - 2.2 * u * (1 - u));
+          const dh = t - HIT, kick = dh <= 0 ? 0 : (dh < 0.16 ? dh / 0.16 : 0.3 + 0.7 * Math.exp(-(dh - 0.16) * 3.2));
+          const spin = 0.85 * (t - t0) + (dh <= 0 ? 0 : 1.1 * (1 - Math.exp(-dh * 4)));
+          const ang = (i / CHIPS.length) * 6.2832 + spin;
+          const R = 500 * grow * (1 + 0.2 * kick), half = +c.dataset.w / 2;
+          const x = Math.max(60 + half, Math.min(1020 - half, cx + 0.88 * R * Math.cos(ang))), y = cy + (0.42 + 0.16 * kick) * R * Math.sin(ang) + 40;
+          const host = Math.sin(ang) > 0 ? front : back;
+          if (c.parentNode !== host) host.appendChild(c);
+          const sc = (0.78 + 0.22 * (Math.sin(ang) + 1) / 2) * (0.4 + 0.6 * grow);
+          c.style.transform = "translate(" + (x - half).toFixed(1) + "px," + (y - 38).toFixed(1) + "px) scale(" + sc.toFixed(3) + ")";
+          c.style.opacity = (clamp(u * 3, 0, 1) * (0.62 + 0.38 * (Math.sin(ang) + 1) / 2)).toFixed(3);   // the far side of the orbit sits back
+        });
+      }
+      const st = { t: 0 };
+      tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: () => draw(st.t) }, 0);
+      window.__timelines["s14"] = tl;
+    })();
+  </script>
+</template>

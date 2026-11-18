@@ -2,133 +2,82 @@
   <style>
     @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
     @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
-    #root { position: absolute; inset: 0; overflow: hidden; font-family: D2QSans, sans-serif; color: #0f172a; }
-    #s5-cam { position: absolute; inset: 0; transform-origin: 540px 1080px; }
-    #s5-glow { position: absolute; left: 40px; top: 560px; width: 1000px; height: 1000px; border-radius: 50%;
-               background: radial-gradient(circle, rgba(8,169,162,0.30) 0%, rgba(8,169,162,0.12) 38%, rgba(8,169,162,0) 66%); }
-
-    /* ---- the notes photo, a tilted glossy print ---- */
-    #s5-photo { position: absolute; left: 94px; top: 528px; width: 892px; height: 604px; opacity: 0; transform-origin: 50% 60%; }
-    #s5-print { position: absolute; inset: 0; border-radius: 22px; padding: 16px; background: linear-gradient(180deg, #ffffff 0%, #f6f9fc 100%);
-                border: 2px solid #d6dfeb; box-shadow: 0 34px 64px rgba(15,23,42,0.20), 0 8px 18px rgba(15,23,42,0.10), inset 0 2px 0 #ffffff; }
-    #s5-print img { display: block; width: 856px; height: 568px; border-radius: 10px; object-fit: cover; }
-    #s5-psheen { position: absolute; left: 16px; top: 16px; width: 856px; height: 568px; border-radius: 10px;
-                 background: linear-gradient(122deg, rgba(255,255,255,0.42) 0%, rgba(255,255,255,0.10) 26%, rgba(255,255,255,0) 40%, rgba(255,255,255,0) 100%); }
-
-    /* ---- pedestal (as in s10) ---- */
-    #s5-floor { position: absolute; left: 160px; top: 1440px; width: 760px; height: 104px; border-radius: 50%;
-                background: radial-gradient(ellipse at center, rgba(15,23,42,0.22), rgba(15,23,42,0) 70%); }
-    #s5-ped { position: absolute; left: 240px; top: 1250px; width: 600px; height: 220px; }
-    #s5-pedbody { position: absolute; left: 0; top: 64px; width: 600px; height: 136px; border-radius: 0 0 300px 300px / 0 0 72px 72px;
-                  background: linear-gradient(90deg, #cbd5e1 0%, #f8fafc 38%, #e2e8f0 62%, #94a3b8 100%); }
-    #s5-pedtop { position: absolute; left: 0; top: 0; width: 600px; height: 130px; border-radius: 50%;
-                 background: radial-gradient(ellipse at 45% 40%, #ffffff 0%, #e8eef5 55%, #cbd5e1 100%);
-                 box-shadow: 0 0 0 4px rgba(8,169,162,0.55), 0 0 40px rgba(8,169,162,0.45); }
-    #s5-pring { position: absolute; left: -6px; top: -6px; width: 612px; height: 142px; border-radius: 50%; border: 3px solid rgba(8,169,162,0.65); }
-    #s5-lshadow { position: absolute; left: 140px; top: 46px; width: 320px; height: 44px; border-radius: 50%;
-                  background: radial-gradient(ellipse at center, rgba(15,23,42,0.42), rgba(15,23,42,0) 70%); }
-
-    /* ---- the logo, a thick glossy tile ---- */
-    #s5-logo { position: absolute; left: 280px; top: 800px; width: 520px; height: 540px; transform-origin: 50% 90%; }
-    #s5-bob { position: absolute; inset: 0; }
-    #s5-limg { position: absolute; left: 0; top: 0; width: 520px; height: 520px;
-               filter: drop-shadow(0 34px 36px rgba(15,23,42,0.30)) drop-shadow(0 0 36px rgba(8,169,162,0.30)); }
-    .s5-mask { position: absolute; left: 0; top: 0; width: 520px; height: 520px; overflow: hidden;
-               -webkit-mask-image: url("assets/logo.png"); mask-image: url("assets/logo.png");
-               -webkit-mask-size: 100% 100%; mask-size: 100% 100%; }
-    #s5-ledge { top: 16px; background: #5c5c5c; }
-    #s5-lsheen { background: linear-gradient(168deg, rgba(255,255,255,0.34) 0%, rgba(255,255,255,0.12) 26%, rgba(255,255,255,0) 44%, rgba(255,255,255,0) 82%, rgba(255,255,255,0.10) 100%); }
-    #s5-band { position: absolute; left: -260px; top: -120px; width: 200px; height: 760px;
-               background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.55) 50%, rgba(255,255,255,0) 100%); }
-
-    /* ---- name card ---- */
-    #s5-name { position: absolute; left: 120px; top: 1546px; width: 840px; height: 144px; border-radius: 32px; opacity: 0;
-               background: linear-gradient(180deg, #ffffff 0%, #f4f8fb 100%); border: 2px solid #d6dfeb;
-               box-shadow: 0 24px 46px rgba(15,23,42,0.16), 0 6px 14px rgba(15,23,42,0.08), inset 0 2px 0 #ffffff; }
-    #s5-badge { position: absolute; left: 26px; top: 22px; width: 96px; height: 96px; border-radius: 50%;
-                background: radial-gradient(circle at 35% 28%, #67d6cf 0%, #08a9a2 55%, #067a75 100%);
-                box-shadow: 0 8px 18px rgba(8,169,162,0.40), inset 0 2px 2px rgba(255,255,255,0.55); display: flex; align-items: center; justify-content: center; }
-    #s5-nm { position: absolute; left: 148px; top: 24px; font: 800 50px/1.1 D2QSans, sans-serif; letter-spacing: -0.02em; color: #0f172a; white-space: nowrap; }
-    #s5-role { position: absolute; left: 150px; top: 86px; font: 600 31px/1.1 D2QSans, sans-serif; letter-spacing: -0.005em; color: #475569; white-space: nowrap; opacity: 0; }
-    #s5-role b { color: #067a75; font-weight: 700; }
-    #s5-rk { position: relative; display: inline-block; }
-    #s5-ul { position: absolute; left: 0; right: 0; bottom: -7px; height: 5px; border-radius: 3px; background: linear-gradient(90deg, #67d6cf, #08a9a2); transform-origin: 0 50%; }
+    #root { position: absolute; inset: 0; overflow: hidden; }
+    #s5-cam { position: absolute; inset: 0; transform-origin: 540px 1150px; }
+    /* p04 shown at 1024 px from (28,690), so the chips have room to rise above it:
+       top card x 268-788, y 820-1075 (face centre ~(533,935)); stack body x 259-818; base y~1612 */
+    #s5-stack { position: absolute; inset: 0; transform-origin: 540px 1600px; }
+    #s5-plate { position: absolute; left: 28px; top: 690px; width: 1024px; height: 1024px; }
+    #s5-flash { position: absolute; left: 300px; top: 838px; width: 470px; height: 190px; border-radius: 50%; opacity: 0;
+                background: radial-gradient(ellipse at center, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.5) 40%, rgba(255,255,255,0) 72%); }
+    /* each chip: a slot centred on (533, 888) that moves in the column and then bursts out, and an inner face that flips up out of the deck */
+    .s5-slot { position: absolute; left: 233px; top: 855px; width: 600px; height: 66px; display: flex; justify-content: center; transform-origin: 300px 33px; }
+    /* a block (not flex) so sub/sup keep their baseline shifts; line-height centres the one line in the pill */
+    .s5-chip { position: relative; flex: none; display: block; height: 66px; padding: 0 28px; white-space: nowrap;
+               transform-origin: 50% 100%; border-radius: 33px; opacity: 0;
+               background: linear-gradient(180deg, #ffffff 0%, #ffffff 45%, #f3f5f8 100%); border: 2px solid #dfe4ea;
+               box-shadow: 0 30px 60px rgba(17,20,24,0.12), 0 8px 18px rgba(17,20,24,0.06), inset 0 2px 0 #ffffff, inset 0 -3px 0 rgba(17,20,24,0.04);
+               font: 700 33px/62px "JetBrains Mono", monospace; letter-spacing: -0.02em; word-spacing: -0.24em; color: #111418; }
+    .s5-chip i { font-style: normal; color: #16a34a; font-weight: 800; }
+    .s5-chip sub, .s5-chip sup { font-size: 0.62em; line-height: 0; }
+    .s5-chip sub { vertical-align: -0.28em; }
+    .s5-chip sup { vertical-align: 0.66em; }
+    .s5-rt { display: inline-block; border-top: 2.5px solid currentColor; line-height: 0.95; padding: 1px 1px 0 1px; margin-left: -1px; }
   </style>
   <div id="root" data-composition-id="s5" data-width="1080" data-height="1920">
     <div id="s5-cam">
-      <div id="s5-glow"></div>
-      <div id="s5-photo">
-        <div id="s5-print"><img src="assets/flatlay.jpg" alt="" /><div id="s5-psheen"></div></div>
-      </div>
-      <div id="s5-floor"></div>
-      <div id="s5-ped">
-        <div id="s5-pedbody"></div>
-        <div id="s5-pedtop"><div id="s5-lshadow"></div></div>
-        <div id="s5-pring"></div>
-      </div>
-      <div id="s5-logo">
-        <div id="s5-bob">
-          <div id="s5-ledge" class="s5-mask"></div>
-          <img id="s5-limg" src="assets/logo.png" alt="" />
-          <div id="s5-lsheen" class="s5-mask"></div>
-          <div id="s5-lglint" class="s5-mask"><div id="s5-band"></div></div>
-        </div>
-      </div>
-      <div id="s5-name">
-        <div id="s5-badge">
-          <svg width="58" height="58" viewBox="0 0 58 58" fill="none">
-            <path d="M29 6 L53 19 H5 Z" fill="#ffffff" stroke="#ffffff" stroke-width="3" stroke-linejoin="round" />
-            <path d="M12 24 V42 M23 24 V42 M35 24 V42 M46 24 V42" stroke="#ffffff" stroke-width="6" stroke-linecap="round" />
-            <rect x="5" y="46" width="48" height="7" rx="3" fill="#ffffff" />
-          </svg>
-        </div>
-        <div id="s5-nm">Amit Kumar Jha</div>
-        <div id="s5-role"><span id="s5-rk">Practising bank quant<span id="s5-ul"></span></span> · <b>IIT Jodhpur</b></div>
-      </div>
+      <div id="s5-stack"><img id="s5-plate" src="assets/plates/p04.png" alt="" /></div>
+      <div id="s5-flash"></div>
+      <div class="s5-slot" id="s5-s0"><div class="s5-chip" id="s5-c0"><i>Δ</i>&nbsp;=&nbsp;N(d<sub>1</sub>)</div></div>
+      <div class="s5-slot" id="s5-s1"><div class="s5-chip" id="s5-c1"><i>Γ</i>&nbsp;=&nbsp;<i>φ</i>(d<sub>1</sub>)/(S<i>σ</i>√<span class="s5-rt">T</span>)</div></div>
+      <div class="s5-slot" id="s5-s2"><div class="s5-chip" id="s5-c2">C&nbsp;−&nbsp;P&nbsp;=&nbsp;S&nbsp;−&nbsp;Ke<sup>−rT</sup></div></div>
+      <div class="s5-slot" id="s5-s3"><div class="s5-chip" id="s5-c3">dS&nbsp;=&nbsp;<i>μ</i>S&nbsp;dt&nbsp;+&nbsp;<i>σ</i>S&nbsp;dW</div></div>
+      <div class="s5-slot" id="s5-s4"><div class="s5-chip" id="s5-c4"><i>Θ</i>,&nbsp;<i>ν</i>,&nbsp;<i>ρ</i>&nbsp;…</div></div>
     </div>
   </div>
   <script>
     (function () {
-      /*DATA*/ const DUR = 4.13; const W = [0.18, 1.04, 1.28, 1.78, 2.34, 2.52, 2.72, 2.86, 3.14, 3.56]; /*END*/
-      // words: 0 Desk2Quant 1 trains 2 exactly 3 that. | 4 Built 5 by 6 a 7 practising 8 bank 9 quant.
-      const w = (i) => (W.length > i ? W[i] : 0.2 + i * 0.3);
+      /*DATA*/ const DUR = 1.64; const W = [0.16, 0.64, 1.04]; /*END*/
+      // words: 0 Everyone 1 memorises 2 formulas.
+      const w = (i) => Math.max(0, W.length > i ? W[i] : 0.16 + i * 0.44);
       const tl = gsap.timeline({ paused: true });
+      // camera: rises from below and settles on the stack, then holds
+      tl.fromTo("#s5-cam", { y: 110, scale: 1.1 }, { y: 0, scale: 1, duration: 0.6, ease: "expo.out" }, 0);
 
-      // slow push-in throughout
-      tl.fromTo("#s5-cam", { scale: 1 }, { scale: 1.06, duration: DUR, ease: "none" }, 0);
-
-      // the logo on its pedestal rises in during the first 0.3 s
-      tl.fromTo("#s5-ped", { opacity: 0, y: 220 }, { opacity: 1, y: 0, duration: 0.42, ease: "power3.out" }, 0);
-      tl.fromTo("#s5-floor", { opacity: 0, scaleX: 0.5 }, { opacity: 1, scaleX: 1, duration: 0.45, ease: "power2.out" }, 0.05);
-      tl.fromTo("#s5-logo", { opacity: 0, y: 320, scale: 0.84 }, { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "back.out(1.35)" }, 0.03);
-      tl.fromTo("#s5-glow", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.6, ease: "power2.out" }, 0.05);
-
-      // W[1] "trains": the real notes photo appears behind the logo
-      tl.fromTo("#s5-photo", { opacity: 0, y: 90, scale: 0.72, rotation: -15 }, { opacity: 1, y: 0, scale: 1, rotation: -5, duration: 0.5, ease: "back.out(1.4)" }, w(1) - 0.04);
-      tl.fromTo("#s5-photo", { rotation: -5 }, { rotation: -3.6, duration: Math.max(0.3, DUR - w(1) - 0.46), ease: "sine.inOut", immediateRender: false }, w(1) + 0.46);
-
-      // W[2] "exactly": a glint runs across the tile
-      tl.fromTo("#s5-band", { x: 0, rotation: 18 }, { x: 1000, rotation: 18, duration: 0.55, ease: "power2.inOut" }, w(2) - 0.05);
-
-      // W[4] "Built": the name card slides in with its role line; W[7] "practising": the role is underlined
-      tl.fromTo("#s5-name", { opacity: 0, x: 980 }, { opacity: 1, x: 0, duration: 0.5, ease: "back.out(1.05)" }, w(4) - 0.06);
-      tl.fromTo("#s5-badge", { scale: 0.4, rotation: -30 }, { scale: 1, rotation: 0, duration: 0.45, ease: "back.out(2)" }, w(4) + 0.12);
-      tl.fromTo("#s5-role", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, w(4) + 0.22);
-      tl.fromTo("#s5-ul", { scaleX: 0 }, { scaleX: 1, duration: 0.4, ease: "power2.inOut" }, Math.max(w(7) - 0.04, w(4) + 0.5));
-
-      // secondary motion: the tile hovers and bobs, its shadow breathes, the teal ring pulses
-      const bob = document.getElementById("s5-bob"), lsh = document.getElementById("s5-lshadow"), ring = document.getElementById("s5-pring");
-      function draw(t) {
-        const b = Math.sin(t * 2.7);
-        bob.style.transform = "translateY(" + (-12 + 9 * b).toFixed(2) + "px)";
-        lsh.style.transform = "scale(" + (1 - 0.08 * b).toFixed(3) + ")";
-        lsh.style.opacity = (0.95 - 0.2 * b).toFixed(3);
-        const ph = ((t * 0.9) % 1 + 1) % 1;
-        ring.style.transform = "scale(" + (1 + 0.16 * ph).toFixed(3) + ")";
-        ring.style.opacity = (0.9 * (1 - ph)).toFixed(3);
+      const N = 5, GAP = 66, CX = 533, CY = 888;
+      // the drill: one chip after another flips up out of the top card, each new one shoving the column up a notch,
+      // a little faster each time, like rote; the fourth lands on "memorises"
+      const BURST = w(2) - 0.03;
+      const span = Math.max(0.5, Math.min(w(1) + 0.14, BURST - 0.2) - 0.06);
+      const T = [0, 0.3, 0.55, 0.78, 1].map((f) => 0.06 + span * f);
+      const tilt = [-2.5, 2, -1.5, 2.5, -1.8];
+      for (let i = 0; i < N; i++) {
+        tl.fromTo("#s5-c" + i, { opacity: 0, y: 46, scale: 0.86, rotationX: -88, transformPerspective: 700 },
+                               { opacity: 1, y: 0, scale: 1, rotationX: 0, duration: 0.22, ease: "back.out(1.6)" }, T[i]);
+        tl.fromTo("#s5-s" + i, { rotation: 0 }, { rotation: tilt[i], duration: 0.22, ease: "power2.out" }, T[i]);
+        for (let k = i + 1; k < N; k++) {
+          tl.fromTo("#s5-s" + i, { y: -GAP * (k - i - 1) }, { y: -GAP * (k - i), duration: 0.16, ease: "power3.out", immediateRender: false }, T[k]);
+        }
+        // the deck kicks and its top card flashes as each card leaves it
+        tl.fromTo("#s5-stack", { y: 0 }, { y: 5, duration: 0.05, ease: "power1.out", immediateRender: i === 0 }, T[i]);
+        tl.fromTo("#s5-stack", { y: 5 }, { y: 0, duration: 0.14, ease: "power2.out", immediateRender: false }, T[i] + 0.05);
+        tl.fromTo("#s5-flash", { opacity: 0 }, { opacity: 0.85, duration: 0.04, ease: "none", immediateRender: i === 0 }, T[i]);
+        tl.fromTo("#s5-flash", { opacity: 0.85 }, { opacity: 0, duration: 0.16, ease: "power2.out", immediateRender: false }, T[i] + 0.04);
       }
-      const st = { t: 0 };
-      tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: () => draw(st.t) }, 0);
+      // "formulas": the whole column bursts out and the chips float around the stack, slightly turned
+      const DEST = [[205, 706, -9], [800, 672, 7], [262, 1150, 6], [806, 1036, -6], [215, 1450, 8]];
+      for (let i = 0; i < N; i++) {
+        const [dx, dy, rot] = DEST[i], at = BURST + 0.012 * i;
+        tl.fromTo("#s5-s" + i, { x: 0, y: -GAP * (N - 1 - i), rotation: tilt[i] },
+                               { x: dx - CX, y: dy - CY, rotation: rot, duration: 0.55, ease: "expo.out", immediateRender: false }, at);
+        tl.fromTo("#s5-c" + i, { scale: 1 }, { scale: 1.12, duration: 0.07, ease: "power2.out", immediateRender: false }, at);
+        tl.fromTo("#s5-c" + i, { scale: 1.12 }, { scale: 1, duration: 0.3, ease: "power2.out", immediateRender: false }, at + 0.07);
+        // a slow float on the face while the slot finishes its flight
+        tl.fromTo("#s5-c" + i, { y: 0, rotation: 0 }, { y: i % 2 ? 10 : -12, rotation: i % 2 ? -1.6 : 1.6,
+                  duration: Math.max(0.1, DUR - at - 0.08), ease: "sine.inOut", immediateRender: false }, at + 0.08);
+      }
+      tl.fromTo("#s5-stack", { scale: 1 }, { scale: 1.035, duration: 0.08, ease: "power2.out", immediateRender: false }, BURST);
+      tl.fromTo("#s5-stack", { scale: 1.035 }, { scale: 1, duration: 0.3, ease: "power2.out", immediateRender: false }, BURST + 0.08);
       window.__timelines["s5"] = tl;
     })();
   </script>

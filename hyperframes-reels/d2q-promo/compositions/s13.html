@@ -1,0 +1,138 @@
+<template>
+  <style>
+    @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
+    @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
+    #root { position: absolute; inset: 0; overflow: hidden; }
+    #s13-cam { position: absolute; inset: 0; transform-origin: 540px 960px; }
+    #s13-glow { position: absolute; left: 90px; top: 600px; width: 900px; height: 760px; border-radius: 50%; opacity: 0;
+                background: radial-gradient(closest-side, rgba(22,163,74,0.16), rgba(22,163,74,0.06) 55%, rgba(22,163,74,0) 100%); }
+    #s13-floor { position: absolute; left: 150px; top: 1150px; width: 780px; height: 170px; border-radius: 50%; opacity: 0;
+                 background: radial-gradient(ellipse at center, rgba(17,20,24,0.18), rgba(17,20,24,0) 70%); }
+    /* the hand of covers: pivot (540,1208), radius 340, -35..+35 deg, 410 px cards */
+    #s13-fan { position: absolute; inset: 0; perspective: 1800px; perspective-origin: 540px 880px; transform-origin: 540px 1000px; }
+    .s13-cv { position: absolute; left: -205px; top: -205px; width: 410px; height: 410px; }
+    .s13-cvin { position: absolute; inset: 0; border-radius: 22px; overflow: hidden; border: 4px solid #ffffff; background: #ffffff;
+                box-shadow: 0 30px 54px rgba(17,20,24,0.20), 0 8px 16px rgba(17,20,24,0.10); }
+    .s13-cvin img { display: block; width: 100%; height: 100%; }
+    .s13-gl { position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.16) 24%, rgba(255,255,255,0) 25%, rgba(255,255,255,0) 100%); }
+    .s13-edge { position: absolute; inset: 0; border-radius: 18px; box-shadow: inset 0 0 0 1.5px rgba(17,20,24,0.10), inset 0 -10px 18px rgba(17,20,24,0.06); }
+    /* counter pill */
+    #s13-pill { position: absolute; left: 330px; top: 1286px; width: 420px; height: 104px; opacity: 0; }
+    #s13-pslab { position: absolute; left: 0; top: 9px; width: 420px; height: 104px; border-radius: 52px; background: linear-gradient(180deg, #d3d9e0, #b7c0ca); }
+    #s13-pin { position: absolute; left: 0; top: 0; width: 420px; height: 104px; border-radius: 52px; border: 2px solid #dfe4ea;
+               background: linear-gradient(180deg, #ffffff 0%, #f2f4f6 100%);
+               box-shadow: 0 30px 60px rgba(17,20,24,0.12), 0 8px 18px rgba(17,20,24,0.06), inset 0 3px 0 #ffffff;
+               display: flex; align-items: center; justify-content: center; gap: 14px; }
+    #s13-num { display: inline-block; width: 78px; text-align: right; font: 900 62px/1 "D2QSans", sans-serif; color: #16a34a; letter-spacing: -0.03em; }
+    #s13-unit { display: inline-block; width: 214px; text-align: left; font: 800 42px/1 "D2QSans", sans-serif; color: #111418; letter-spacing: -0.015em; }
+    /* FREE ribbon */
+    #s13-rib { position: absolute; left: 150px; top: 964px; width: 780px; height: 190px; opacity: 0; transform-origin: 390px 95px; }
+    #s13-rib svg { position: absolute; left: 0; top: 0; overflow: visible; filter: drop-shadow(0 18px 26px rgba(15,122,55,0.38)); }
+    .s13-spark { position: absolute; left: -24px; top: -24px; width: 48px; height: 48px; opacity: 0; }
+  </style>
+  <div id="root" data-composition-id="s13" data-width="1080" data-height="1920">
+    <div id="s13-cam">
+      <div id="s13-glow"></div>
+      <div id="s13-floor"></div>
+      <div id="s13-fan">
+        <div class="s13-cv"><div class="s13-cvin"><img src="assets/covers/quant-roadmap-2026.jpg" alt="" /><div class="s13-gl"></div><div class="s13-edge"></div></div></div>
+        <div class="s13-cv"><div class="s13-cvin"><img src="assets/covers/greeks-cheat-sheet.jpg" alt="" /><div class="s13-gl"></div><div class="s13-edge"></div></div></div>
+        <div class="s13-cv"><div class="s13-cvin"><img src="assets/covers/stochastic-calculus-cheat-sheet.jpg" alt="" /><div class="s13-gl"></div><div class="s13-edge"></div></div></div>
+        <div class="s13-cv"><div class="s13-cvin"><img src="assets/covers/quant-formula-sheet.jpg" alt="" /><div class="s13-gl"></div><div class="s13-edge"></div></div></div>
+        <div class="s13-cv"><div class="s13-cvin"><img src="assets/covers/desk-probability-casebook.jpg" alt="" /><div class="s13-gl"></div><div class="s13-edge"></div></div></div>
+        <div class="s13-cv"><div class="s13-cvin"><img src="assets/covers/market-risk-interview-kit.jpg" alt="" /><div class="s13-gl"></div><div class="s13-edge"></div></div></div>
+        <div class="s13-cv"><div class="s13-cvin"><img src="assets/covers/pause-on-your-desk.jpg" alt="" /><div class="s13-gl"></div><div class="s13-edge"></div></div></div>
+        <div class="s13-cv"><div class="s13-cvin"><img src="assets/covers/the-missing-square.jpg" alt="" /><div class="s13-gl"></div><div class="s13-edge"></div></div></div>
+        <div class="s13-cv"><div class="s13-cvin"><img src="assets/covers/fx-derivatives-50-problems.jpg" alt="" /><div class="s13-gl"></div><div class="s13-edge"></div></div></div>
+        <div class="s13-cv"><div class="s13-cvin"><img src="assets/covers/ats-quant-resume-template.jpg" alt="" /><div class="s13-gl"></div><div class="s13-edge"></div></div></div>
+      </div>
+      <div id="s13-pill"><div id="s13-pslab"></div><div id="s13-pin"><span id="s13-num">1</span><span id="s13-unit">resource</span></div></div>
+      <div id="s13-rib">
+        <svg width="780" height="190" viewBox="0 0 780 190" fill="none">
+          <defs>
+            <linearGradient id="s13-gr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4ade80" /><stop offset="0.5" stop-color="#22c55e" /><stop offset="1" stop-color="#15803d" /></linearGradient>
+            <linearGradient id="s13-grs" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ffffff" stop-opacity="0" /><stop offset="0.5" stop-color="#ffffff" stop-opacity="0.65" /><stop offset="1" stop-color="#ffffff" stop-opacity="0" /></linearGradient>
+            <clipPath id="s13-rclip"><rect x="62" y="22" width="656" height="134" rx="12" /></clipPath>
+          </defs>
+          <path d="M0 62 H112 V178 H0 L40 120 Z" fill="#15803d" />
+          <path d="M780 62 H668 V178 H780 L740 120 Z" fill="#15803d" />
+          <path d="M62 156 L112 178 V156 Z" fill="#0b4f25" />
+          <path d="M718 156 L668 178 V156 Z" fill="#0b4f25" />
+          <rect x="62" y="22" width="656" height="134" rx="12" fill="url(#s13-gr)" stroke="#15803d" stroke-width="3" />
+          <rect x="74" y="30" width="632" height="18" rx="9" fill="#ffffff" fill-opacity="0.32" />
+          <g clip-path="url(#s13-rclip)"><rect id="s13-rshine" x="-160" y="0" width="140" height="190" fill="url(#s13-grs)" /></g>
+          <text x="390" y="128" text-anchor="middle" font-family="D2QSans, sans-serif" font-weight="900" font-size="110" letter-spacing="8" fill="#ffffff">FREE</text>
+        </svg>
+      </div>
+      <svg class="s13-spark" id="s13-sp0" viewBox="0 0 48 48"><path d="M24 0 C26 16 32 22 48 24 C32 26 26 32 24 48 C22 32 16 26 0 24 C16 22 22 16 24 0 Z" fill="#22c55e" /></svg>
+      <svg class="s13-spark" id="s13-sp1" viewBox="0 0 48 48"><path d="M24 0 C26 16 32 22 48 24 C32 26 26 32 24 48 C22 32 16 26 0 24 C16 22 22 16 24 0 Z" fill="#86efac" /></svg>
+      <svg class="s13-spark" id="s13-sp2" viewBox="0 0 48 48"><path d="M24 0 C26 16 32 22 48 24 C32 26 26 32 24 48 C22 32 16 26 0 24 C16 22 22 16 24 0 Z" fill="#16a34a" /></svg>
+    </div>
+  </div>
+  <script>
+    (function () {
+      /*DATA*/ const DUR = 1.34; const W = [0.16, 0.3, 0.76, 0.98]; /*END*/
+      // words: 0 10 1 resources 2 are 3 free.
+      const w = (i) => Math.max(0, W.length > i ? W[i] : 0.16 + i * 0.27);
+      const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+      const tl = gsap.timeline({ paused: true });
+
+      // camera: a zoom-out that settles on the hand of covers, then a slow push
+      tl.fromTo("#s13-cam", { scale: 1.3 }, { scale: 1, duration: 0.6, ease: "expo.out" }, 0);
+      tl.fromTo("#s13-cam", { scale: 1 }, { scale: 1.02, duration: Math.max(0.2, DUR - 0.6), ease: "none", immediateRender: false }, 0.6);
+      tl.fromTo("#s13-glow", { opacity: 0 }, { opacity: 1, duration: 0.45, ease: "power2.out" }, 0.14);
+      tl.fromTo("#s13-floor", { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power2.out" }, 0.15);
+
+      // the ten covers fly up one after another and swing out about a common pivot, like a hand of cards;
+      // each later card lands on top, so every cover keeps its title edge in view
+      const PX = 540, PY = 1208, R = 340, TM = 35;
+      const cards = Array.from(document.querySelectorAll("#s13-fan .s13-cv"));
+      const GAP = clamp((w(2) - 0.36 - 0.04) / 9, 0.03, 0.05);
+      const S0 = cards.map((c, i) => 0.04 + i * GAP);
+      const LAND = S0.map((s) => s + 0.3);
+      const easeOut3 = (p) => 1 - Math.pow(1 - p, 3);
+      const backOut = (p, s) => 1 + (s + 1) * Math.pow(p - 1, 3) + s * Math.pow(p - 1, 2);
+      cards.forEach((c, i) => { c.style.zIndex = String(i + 1); });
+
+      tl.fromTo("#s13-pill", { opacity: 0, scale: 0.5, y: 30 }, { opacity: 1, scale: 1, y: 0, duration: 0.28, ease: "back.out(2)" }, LAND[0] - 0.06);
+
+      // "free.": the ribbon stamps across the fan, the covers feel the hit, sparkles, a shine runs along the ribbon
+      const FT = w(3) - 0.05;
+      tl.fromTo("#s13-rib", { opacity: 0, scale: 1.9, rotation: -15 }, { opacity: 1, scale: 1, rotation: -7, duration: 0.2, ease: "power4.out" }, FT);
+      tl.fromTo("#s13-fan", { scale: 1 }, { scale: 1.035, duration: 0.07, ease: "power2.out" }, FT + 0.08);
+      tl.fromTo("#s13-fan", { scale: 1.035 }, { scale: 1, duration: 0.32, ease: "back.out(3)", immediateRender: false }, FT + 0.15);
+      tl.fromTo("#s13-rshine", { x: -160 }, { x: 900, duration: 0.5, ease: "power2.inOut" }, FT + 0.16);
+      [[156, 958], [930, 912], [902, 1196]].forEach(([x, y], k) => {
+        tl.fromTo("#s13-sp" + k, { x: x, y: y, scale: 0, rotation: 0, opacity: 1 }, { x: x, y: y, scale: 1.25, rotation: 45, opacity: 1, duration: 0.2, ease: "back.out(2)" }, FT + 0.08 + k * 0.04);
+      });
+
+      // continuous layer: card flight + swing, the counter and its bump
+      const num = document.getElementById("s13-num"), unit = document.getElementById("s13-unit"), pin = document.getElementById("s13-pin");
+      function draw(t) {
+        cards.forEach((c, i) => {
+          const th = -TM + (2 * TM * i) / 9;
+          // each card rises in its own lane from the lower left or right (clear of the counter) and swings into the hand
+          const pr = clamp((t - S0[i]) / 0.26, 0, 1), ps = clamp((t - S0[i] - 0.04) / 0.28, 0, 1);
+          const side = i < 5 ? -1 : 1, e = easeOut3(pr);
+          const dy = 1150 * (1 - e), dx = side * (330 + 26 * Math.abs(i - 4.5)) * (1 - e);
+          const a0 = th * 0.4 + side * 14;
+          const a = a0 + (th - a0) * (ps <= 0 ? 0 : backOut(ps, 1.3));
+          const rad = a * Math.PI / 180;
+          const x = PX + dx + R * Math.sin(rad), y = PY + dy - R * Math.cos(rad);
+          const sc = 0.86 + 0.14 * easeOut3(pr);
+          c.style.transform = "translate(" + x.toFixed(1) + "px," + y.toFixed(1) + "px) rotate(" + a.toFixed(2) + "deg) rotateY(" + (a * 0.45).toFixed(2) + "deg) rotateX(10deg) scale(" + sc.toFixed(3) + ")";
+          c.style.visibility = t >= S0[i] ? "visible" : "hidden";
+        });
+        let n = 0, last = -9;
+        LAND.forEach((l) => { if (t >= l) { n++; last = l; } });
+        num.textContent = String(Math.max(1, n));
+        unit.textContent = n > 1 ? "resources" : "resource";
+        const bump = n > 0 ? 0.12 * Math.exp(-(t - last) * 14) : 0;
+        pin.style.transform = "scale(" + (1 + bump).toFixed(3) + ")";
+      }
+      const st = { t: 0 };
+      tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: () => draw(st.t) }, 0);
+      window.__timelines["s13"] = tl;
+    })();
+  </script>
+</template>

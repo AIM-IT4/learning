@@ -2,204 +2,145 @@
   <style>
     @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
     @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
-    #root { position: absolute; inset: 0; overflow: hidden; font-family: D2QSans, sans-serif; color: #0f172a; }
+    #root { position: absolute; inset: 0; overflow: hidden; }
     #s9-cam { position: absolute; inset: 0; transform-origin: 540px 1080px; }
-    #s9-glow { position: absolute; left: 40px; top: 520px; width: 1000px; height: 1000px; border-radius: 50%;
-               background: radial-gradient(closest-side, rgba(8,169,162,0.30), rgba(8,169,162,0.10) 58%, rgba(8,169,162,0) 100%); }
-    #s9-floor { position: absolute; left: 290px; top: 1626px; width: 500px; height: 70px; border-radius: 50%;
-                background: radial-gradient(ellipse at center, rgba(15,23,42,0.26), rgba(15,23,42,0) 70%); }
-    /* signpost */
-    #s9-post { position: absolute; inset: 0; transform-origin: 540px 1645px; }
-    #s9-sway { position: absolute; inset: 0; transform-origin: 540px 1645px; }
-    #s9-btop { position: absolute; left: 400px; top: 1592px; width: 280px; height: 52px; border-radius: 50%;
-               background: radial-gradient(ellipse at 45% 35%, #ffffff 0%, #eef2f7 55%, #cbd5e1 100%);
-               box-shadow: 0 0 0 3px rgba(8,169,162,0.45), 0 0 26px rgba(8,169,162,0.35); }
-    #s9-bbody { position: absolute; left: 400px; top: 1618px; width: 280px; height: 42px; border-radius: 0 0 140px 140px / 0 0 26px 26px;
-                background: linear-gradient(90deg, #cbd5e1 0%, #f8fafc 38%, #e2e8f0 62%, #94a3b8 100%); }
-    #s9-pole { position: absolute; left: 520px; top: 610px; width: 40px; height: 1008px; border-radius: 20px;
-               background: linear-gradient(90deg, #7c8ba1 0%, #e2e8f0 30%, #ffffff 46%, #cbd5e1 70%, #64748b 100%);
-               box-shadow: 6px 0 14px rgba(15,23,42,0.14); }
-    #s9-cap { position: absolute; left: 510px; top: 580px; width: 60px; height: 60px; border-radius: 50%;
-              background: radial-gradient(circle at 35% 30%, #a7f3ee 0%, #14b8b0 45%, #067a75 100%); box-shadow: 0 6px 12px rgba(6,122,117,0.35); }
-    #s9-signp { position: absolute; left: 130px; top: 650px; width: 820px; height: 240px; }
-    #s9-sign { position: absolute; left: 0; top: 0; overflow: visible; filter: drop-shadow(0 24px 30px rgba(15,23,42,0.22)) drop-shadow(0 6px 10px rgba(6,122,117,0.25)); }
-    .s9-q { position: absolute; left: -66px; top: -66px; width: 132px; height: 132px; }
-    .s9-qin { position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle at 38% 30%, #ffffff 0%, #f4f7fb 55%, #dde5ee 100%);
-              border: 2px solid #d6dfeb; box-shadow: 0 16px 30px rgba(15,23,42,0.16), inset 0 2px 0 #ffffff;
-              font: 900 76px/128px D2QSans, sans-serif; color: #08a9a2; text-align: center; }
-    /* the ten free covers */
-    #s9-covers { position: absolute; inset: 0; transform-origin: 540px 1250px; }
-    .s9-cv { position: absolute; left: -78px; top: -78px; width: 156px; height: 156px; }
-    .s9-cvin { position: absolute; inset: 0; border-radius: 16px; overflow: hidden; border: 3px solid #ffffff;
-               box-shadow: 0 16px 30px rgba(15,23,42,0.22), 0 3px 8px rgba(15,23,42,0.12); background: #ffffff; }
-    .s9-cvin img { display: block; width: 100%; height: 100%; }
-    /* counter chip */
-    #s9-chip { position: absolute; left: 380px; top: 968px; width: 320px; height: 80px; opacity: 0; }
-    #s9-chipin { position: absolute; inset: 0; border-radius: 39px; background: linear-gradient(180deg, #ffffff 0%, #f3f7fa 100%); border: 2px solid #d6dfeb;
-                 box-shadow: 0 14px 28px rgba(15,23,42,0.16), inset 0 2px 0 #ffffff; display: flex; align-items: center; justify-content: center; gap: 12px; }
-    #s9-num { font: 800 50px/1 "JetBrains Mono", monospace; color: #08a9a2; }
-    #s9-unit { font: 800 33px/1 D2QSans, sans-serif; color: #0f172a; letter-spacing: -0.01em; }
-    /* FREE ribbon */
-    #s9-rib { position: absolute; left: 150px; top: 1168px; width: 780px; height: 190px; opacity: 0; }
-    #s9-rib svg { position: absolute; left: 0; top: 0; overflow: visible; filter: drop-shadow(0 18px 26px rgba(6,122,117,0.35)); }
-    .s9-spark { position: absolute; left: -22px; top: -22px; width: 44px; height: 44px; }
+    /* green light behind the laptop: it shows through the plate's soft edges, flaring on "code" and "runs" */
+    #s9-glow { position: absolute; left: 60px; top: 640px; width: 960px; height: 760px; border-radius: 50%; opacity: 0.25;
+               background: radial-gradient(ellipse at center, rgba(22,163,74,0.40) 0%, rgba(22,163,74,0.14) 45%, rgba(22,163,74,0) 70%); }
+    #s9-plate { position: absolute; left: -40px; top: 500px; width: 1160px; height: 1160px; }
+    /* the laptop's display, measured on the plate: frame x 218-862, y 765-1186; the editor sits just inside its black bezel */
+    #s9-screen { position: absolute; left: 222px; top: 770px; width: 636px; height: 414px; overflow: hidden; border-radius: 8px;
+                 background: linear-gradient(180deg, #111822 0%, #0b1017 100%); }
+    #s9-bar { position: absolute; left: 0; top: 0; width: 636px; height: 56px; background: #090d12; border-bottom: 2px solid #1b232d; }
+    .s9-dot { position: absolute; top: 21px; width: 14px; height: 14px; border-radius: 50%; }
+    #s9-file { position: absolute; left: 92px; top: 0; font: 600 24px/56px "JetBrains Mono", monospace; color: #9aa4b2; }
+    #s9-runw { position: absolute; left: 484px; top: 8px; width: 136px; height: 40px; }
+    #s9-run0, #s9-run1 { position: absolute; inset: 0; border-radius: 20px; text-align: center; font: 800 26px/38px "D2QSans", sans-serif; white-space: nowrap; }
+    #s9-run0 { background: #1b232d; border: 1px solid #2a3440; color: #7b8794; }
+    #s9-run1 { background: linear-gradient(180deg, #5ee08f 0%, #22c55e 55%, #16a34a 100%); border: 1px solid #16a34a; color: #06140b; opacity: 0;
+               box-shadow: inset 0 2px 0 rgba(255,255,255,0.45), 0 0 18px rgba(34,197,94,0.55); }
+    #s9-ripple { position: absolute; left: 484px; top: 8px; width: 136px; height: 40px; border-radius: 20px; border: 3px solid #4ade80; opacity: 0; }
+    #s9-hl { position: absolute; left: 0; top: 70px; width: 636px; height: 50px; background: rgba(34,197,94,0.10); border-left: 4px solid #22c55e; opacity: 0; }
+    .s9-ln { position: absolute; left: 6px; width: 34px; text-align: right; font: 500 22px/50px "JetBrains Mono", monospace; color: #4b5563; }
+    #s9-code { position: absolute; left: 0; top: 0; width: 636px; height: 290px; }
+    .s9-c { position: absolute; left: 54px; font: 500 26px/50px "JetBrains Mono", monospace; color: #cbd5e1; white-space: pre; }
+    .s9-c .s9-k { color: #4ade80; font-weight: 700; }
+    .s9-c .s9-f { color: #ffffff; font-weight: 700; }
+    .s9-c .s9-n { color: #86efac; font-weight: 700; }
+    .s9-c .s9-p { color: #8b95a3; }
+    #s9-cur { position: absolute; left: 54px; top: 78px; width: 14px; height: 34px; border-radius: 2px; background: #4ade80; box-shadow: 0 0 10px rgba(74,222,128,0.7); }
+    #s9-div { position: absolute; left: 16px; top: 288px; width: 604px; height: 2px; background: #1b232d; }
+    #s9-out { position: absolute; left: 18px; top: 300px; height: 104px; display: flex; align-items: center; gap: 22px; opacity: 0; transform-origin: 0 50%; }
+    #s9-out span { font: 600 26px/1 "JetBrains Mono", monospace; color: #7b8794; }
+    #s9-out b { font: 800 60px/1 "JetBrains Mono", monospace; color: #22c55e; letter-spacing: -0.02em; text-shadow: 0 0 22px rgba(34,197,94,0.55); }
+    #s9-glare { position: absolute; inset: 0; background: linear-gradient(122deg, rgba(255,255,255,0.09) 0%, rgba(255,255,255,0.03) 28%, rgba(255,255,255,0) 42%); }
+    /* the notes: the real cover as a glossy card, tilted in 3D, overlapping the laptop's lower-left corner */
+    #s9-cvp { position: absolute; inset: 0; perspective: 1100px; perspective-origin: 200px 1340px; }
+    #s9-cover { position: absolute; left: 50px; top: 1196px; width: 300px; height: 300px; border-radius: 26px; padding: 9px; background: #ffffff;
+                border: 2px solid #dfe4ea; transform-origin: 50% 50%;
+                box-shadow: 0 30px 60px rgba(17,20,24,0.20), 0 8px 18px rgba(17,20,24,0.10); }
+    #s9-cover img { display: block; width: 100%; height: 100%; border-radius: 18px; }
+    #s9-cover i { position: absolute; inset: 0; border-radius: 26px;
+                  background: linear-gradient(140deg, rgba(255,255,255,0.62) 0%, rgba(255,255,255,0.16) 26%, rgba(255,255,255,0) 44%, rgba(255,255,255,0) 82%, rgba(255,255,255,0.18) 100%); }
   </style>
   <div id="root" data-composition-id="s9" data-width="1080" data-height="1920">
     <div id="s9-cam">
       <div id="s9-glow"></div>
-      <div id="s9-floor"></div>
-      <div id="s9-qs">
-        <div class="s9-q" id="s9-q0"><div class="s9-qin">?</div></div>
-        <div class="s9-q" id="s9-q1"><div class="s9-qin">?</div></div>
-        <div class="s9-q" id="s9-q2"><div class="s9-qin">?</div></div>
-        <div class="s9-q" id="s9-q3"><div class="s9-qin">?</div></div>
-      </div>
-      <div id="s9-post">
-        <div id="s9-bbody"></div>
-        <div id="s9-btop"></div>
-        <div id="s9-sway">
-          <div id="s9-pole"></div>
-          <div id="s9-cap"></div>
-          <div id="s9-signp">
-            <svg id="s9-sign" width="820" height="240" viewBox="0 0 820 240" fill="none">
-              <defs>
-                <linearGradient id="s9-gs" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2fcfc6"/><stop offset="0.5" stop-color="#0eb0a9"/><stop offset="1" stop-color="#067a75"/></linearGradient>
-                <linearGradient id="s9-gh" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity="0.55"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></linearGradient>
-                <linearGradient id="s9-gshine" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ffffff" stop-opacity="0"/><stop offset="0.5" stop-color="#ffffff" stop-opacity="0.55"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></linearGradient>
-                <clipPath id="s9-clip"><path d="M28 6 H650 L812 120 L650 234 H28 Q6 234 6 212 V28 Q6 6 28 6 Z"/></clipPath>
-              </defs>
-              <path d="M28 6 H650 L812 120 L650 234 H28 Q6 234 6 212 V28 Q6 6 28 6 Z" fill="url(#s9-gs)" stroke="#067a75" stroke-width="4" stroke-linejoin="round"/>
-              <path d="M30 14 H646 L725 68 H30 Q14 68 14 52 V30 Q14 14 30 14 Z" fill="url(#s9-gh)"/>
-              <path d="M40 222 H650" stroke="#055f5b" stroke-opacity="0.35" stroke-width="4" stroke-linecap="round"/>
-              <g clip-path="url(#s9-clip)"><rect id="s9-shine" x="-200" y="-20" width="150" height="280" fill="url(#s9-gshine)"/></g>
-              <circle cx="410" cy="38" r="10" fill="#e2e8f0" stroke="#94a3b8" stroke-width="3"/>
-              <circle cx="410" cy="202" r="10" fill="#e2e8f0" stroke="#94a3b8" stroke-width="3"/>
-              <text x="328" y="153" text-anchor="middle" font-family="D2QSans, sans-serif" font-weight="900" font-size="86" letter-spacing="-1.5" fill="#ffffff">START HERE</text>
-            </svg>
-          </div>
+      <img id="s9-plate" src="assets/plates/p08.png" alt="" />
+      <div id="s9-screen">
+        <div id="s9-bar">
+          <div class="s9-dot" style="left:20px; background:#f43f5e;"></div>
+          <div class="s9-dot" style="left:44px; background:#f59e0b;"></div>
+          <div class="s9-dot" style="left:68px; background:#22c55e;"></div>
+          <div id="s9-file">forward.py</div>
         </div>
+        <div id="s9-ripple"></div>
+        <div id="s9-runw" data-layout-allow-overlap><div id="s9-run0">▶ Run</div><div id="s9-run1">▶ Run</div></div>
+        <div id="s9-hl"></div>
+        <div class="s9-ln" style="top:70px" data-layout-ignore>1</div><div class="s9-ln" style="top:120px" data-layout-ignore>2</div><div class="s9-ln" style="top:170px" data-layout-ignore>3</div><div class="s9-ln" style="top:220px" data-layout-ignore>4</div>
+        <div id="s9-code">
+          <div class="s9-c" id="s9-c0" style="top:70px"></div>
+          <div class="s9-c" id="s9-c1" style="top:120px"></div>
+          <div class="s9-c" id="s9-c2" style="top:170px"></div>
+          <div class="s9-c" id="s9-c3" style="top:220px"></div>
+        </div>
+        <div id="s9-cur"></div>
+        <div id="s9-div"></div>
+        <div id="s9-out"><span>Out</span><b>104.08</b></div>
+        <div id="s9-glare"></div>
       </div>
-      <div id="s9-covers">
-        <div class="s9-cv"><div class="s9-cvin"><img src="assets/covers/quant-roadmap-2026.jpg" alt="" /></div></div>
-        <div class="s9-cv"><div class="s9-cvin"><img src="assets/covers/greeks-cheat-sheet.jpg" alt="" /></div></div>
-        <div class="s9-cv"><div class="s9-cvin"><img src="assets/covers/stochastic-calculus-cheat-sheet.jpg" alt="" /></div></div>
-        <div class="s9-cv"><div class="s9-cvin"><img src="assets/covers/quant-formula-sheet.jpg" alt="" /></div></div>
-        <div class="s9-cv"><div class="s9-cvin"><img src="assets/covers/desk-probability-casebook.jpg" alt="" /></div></div>
-        <div class="s9-cv"><div class="s9-cvin"><img src="assets/covers/market-risk-interview-kit.jpg" alt="" /></div></div>
-        <div class="s9-cv"><div class="s9-cvin"><img src="assets/covers/pause-on-your-desk.jpg" alt="" /></div></div>
-        <div class="s9-cv"><div class="s9-cvin"><img src="assets/covers/the-missing-square.jpg" alt="" /></div></div>
-        <div class="s9-cv"><div class="s9-cvin"><img src="assets/covers/fx-derivatives-50-problems.jpg" alt="" /></div></div>
-        <div class="s9-cv"><div class="s9-cvin"><img src="assets/covers/ats-quant-resume-template.jpg" alt="" /></div></div>
+      <div id="s9-cvp">
+        <div id="s9-cover"><img src="assets/covers/equity-derivatives-quant-notes.jpg" alt="" /><i></i></div>
       </div>
-      <div id="s9-chip"><div id="s9-chipin"><span id="s9-num">1</span><span id="s9-unit">resource</span></div></div>
-      <div id="s9-rib">
-        <svg width="780" height="190" viewBox="0 0 780 190" fill="none">
-          <defs>
-            <linearGradient id="s9-gr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2fcfc6"/><stop offset="0.55" stop-color="#08a9a2"/><stop offset="1" stop-color="#067a75"/></linearGradient>
-            <linearGradient id="s9-grs" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ffffff" stop-opacity="0"/><stop offset="0.5" stop-color="#ffffff" stop-opacity="0.6"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></linearGradient>
-            <clipPath id="s9-rclip"><rect x="62" y="22" width="656" height="134" rx="12"/></clipPath>
-          </defs>
-          <path d="M0 62 H112 V178 H0 L40 120 Z" fill="#067a75"/>
-          <path d="M780 62 H668 V178 H780 L740 120 Z" fill="#067a75"/>
-          <path d="M62 156 L112 178 V156 Z" fill="#044e4b"/>
-          <path d="M718 156 L668 178 V156 Z" fill="#044e4b"/>
-          <rect x="62" y="22" width="656" height="134" rx="12" fill="url(#s9-gr)" stroke="#067a75" stroke-width="3"/>
-          <rect x="74" y="30" width="632" height="16" rx="8" fill="#ffffff" fill-opacity="0.28"/>
-          <g clip-path="url(#s9-rclip)"><rect id="s9-rshine" x="-160" y="0" width="140" height="190" fill="url(#s9-grs)"/></g>
-          <text x="390" y="127" text-anchor="middle" font-family="D2QSans, sans-serif" font-weight="900" font-size="108" letter-spacing="8" fill="#ffffff">FREE</text>
-        </svg>
-      </div>
-      <svg class="s9-spark" id="s9-sp0" viewBox="0 0 44 44"><path d="M22 0 C24 15 29 20 44 22 C29 24 24 29 22 44 C20 29 15 24 0 22 C15 20 20 15 22 0 Z" fill="#08a9a2"/></svg>
-      <svg class="s9-spark" id="s9-sp1" viewBox="0 0 44 44"><path d="M22 0 C24 15 29 20 44 22 C29 24 24 29 22 44 C20 29 15 24 0 22 C15 20 20 15 22 0 Z" fill="#67d6cf"/></svg>
-      <svg class="s9-spark" id="s9-sp2" viewBox="0 0 44 44"><path d="M22 0 C24 15 29 20 44 22 C29 24 24 29 22 44 C20 29 15 24 0 22 C15 20 20 15 22 0 Z" fill="#08a9a2"/></svg>
     </div>
   </div>
   <script>
     (function () {
-      /*DATA*/ const DUR = 2.89; const W = [0.18, 0.68, 0.82, 0.98, 1.12, 1.64, 1.78, 2.2, 2.4]; /*END*/
-      // words: 0 Don't 1 know 2 where 3 to 4 start? 5 10 6 resources 7 are 8 free.
-      const w = (i) => (W.length > i ? W[i] : 0.18 + i * 0.35);
-      const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
-      const T5 = w(5), T8 = w(8);
+      /*DATA*/ const DUR = 1.86; const W = [0.16, 0.54, 0.76, 0.9, 1.0, 1.22, 1.34, 1.58]; /*END*/
+      // words: 0 First, 1 notes 2 with 3 the 4 code 5 that 6 runs 7 them.
+      const w = (i) => Math.max(0, W.length > i ? W[i] : 0.16 + i * 0.2);
+      const RUN = w(6), CODE = w(4);
+      const T0 = 0.08, T1 = Math.max(T0 + 0.5, RUN - 0.1);   // typing finishes just before "runs"
       const tl = gsap.timeline({ paused: true });
+      // camera: a whip in from the left with motion blur, then a slow push
+      tl.fromTo("#s9-cam", { x: -140, filter: "blur(10px)" }, { x: 0, filter: "blur(0px)", duration: 0.35, ease: "expo.out" }, 0);
+      tl.fromTo("#s9-cam", { scale: 1 }, { scale: 1.04, duration: Math.max(0.2, DUR - 0.35), ease: "none" }, 0.35);
+      // "notes": the real notes cover slides in at the lower left, tilted in 3D, over the laptop's corner
+      tl.fromTo("#s9-cover", { x: -520, y: 40, rotationY: 58, rotationX: 8, rotation: -18 },
+                { x: 0, y: 0, rotationY: 18, rotationX: 6, rotation: -6, duration: 0.5, ease: "expo.out" }, w(1) - 0.08);
+      // "code": the code lights up, the Run button arms and the laptop's glow flares
+      tl.fromTo("#s9-code", { filter: "brightness(1) drop-shadow(0px 0px 0px rgba(34,197,94,0))" },
+                { filter: "brightness(1.35) drop-shadow(0px 0px 9px rgba(34,197,94,0.85))", duration: 0.1, ease: "power2.out" }, CODE - 0.04);
+      tl.fromTo("#s9-code", { filter: "brightness(1.35) drop-shadow(0px 0px 9px rgba(34,197,94,0.85))" },
+                { filter: "brightness(1) drop-shadow(0px 0px 0px rgba(34,197,94,0))", duration: 0.32, ease: "power2.out", immediateRender: false }, CODE + 0.08);
+      tl.fromTo("#s9-hl", { opacity: 0 }, { opacity: 1, duration: 0.1, ease: "power2.out" }, CODE - 0.04);
+      tl.fromTo("#s9-run1", { opacity: 0 }, { opacity: 1, duration: 0.12, ease: "power2.out" }, CODE - 0.02);
+      tl.fromTo("#s9-runw", { scale: 1 }, { scale: 1.12, duration: 0.1, ease: "power2.out", yoyo: true, repeat: 1 }, CODE - 0.02);
+      tl.fromTo("#s9-glow", { opacity: 0.25 }, { opacity: 1, duration: 0.14, ease: "power2.out" }, CODE - 0.04);
+      tl.fromTo("#s9-glow", { opacity: 1 }, { opacity: 0.55, duration: 0.24, ease: "sine.out", immediateRender: false }, CODE + 0.12);
+      // "runs": the button is pressed, a ripple leaves it, and the real output pops
+      tl.fromTo("#s9-runw", { scale: 1 }, { scale: 0.9, duration: 0.06, ease: "power2.in", yoyo: true, repeat: 1, immediateRender: false }, RUN - 0.08);
+      tl.fromTo("#s9-hl", { opacity: 1 }, { opacity: 0, duration: 0.18, ease: "power1.out", immediateRender: false }, RUN - 0.04);
+      tl.fromTo("#s9-out", { opacity: 0, y: 16, scale: 0.86 }, { opacity: 1, y: 0, scale: 1, duration: 0.24, ease: "back.out(2.2)" }, RUN - 0.03);
+      tl.fromTo("#s9-glow", { opacity: 0.55 }, { opacity: 1, duration: 0.12, ease: "power2.out", immediateRender: false }, RUN - 0.02);
+      tl.fromTo("#s9-glow", { opacity: 1 }, { opacity: 0.6, duration: 0.4, ease: "sine.out", immediateRender: false }, RUN + 0.12);
 
-      // camera: slow pull-out that reveals the arc of covers
-      tl.fromTo("#s9-cam", { scale: 1.06 }, { scale: 1, duration: DUR, ease: "none" }, 0);
-      // the signpost springs up from its base (its sway is drawn below)
-      tl.fromTo("#s9-post", { opacity: 0, y: 240 }, { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" }, 0.02);
-      tl.fromTo("#s9-floor", { opacity: 0 }, { opacity: 1, duration: 0.35 }, 0.05);
-      // "?" bubbles pop around it on Don't / know / where / to
-      const Q = [[190, 1090], [892, 1012], [248, 1392], [838, 1338]];
-      Q.forEach(([x, y], k) => {
-        tl.fromTo("#s9-q" + k, { x: x, y: y, scale: 0, rotation: -20 }, { x: x, y: y, scale: 1, rotation: 0, duration: 0.4, ease: "back.out(2.2)" }, Math.max(0.06, w(k) - 0.02));
-        tl.fromTo("#s9-q" + k, { scale: 1, opacity: 1 }, { scale: 0, opacity: 0, duration: 0.2, ease: "power2.in", immediateRender: false }, T5 - 0.12 + k * 0.03);
-      });
-      // "start?": the sign pumps and a shine crosses it
-      tl.fromTo("#s9-signp", { scale: 1 }, { scale: 1.07, duration: 0.12, ease: "power2.out" }, w(4) - 0.04);
-      tl.fromTo("#s9-signp", { scale: 1.07 }, { scale: 1, duration: 0.45, ease: "back.out(3)", immediateRender: false }, w(4) + 0.08);
-      tl.fromTo("#s9-shine", { x: -200 }, { x: 1060, duration: 0.6, ease: "power2.inOut" }, w(4) - 0.04);
-      // "10": the signpost settles back a touch while the resources arrive under it
-      tl.fromTo("#s9-post", { scale: 1 }, { scale: 0.96, duration: 0.5, ease: "power3.inOut" }, T5 - 0.1);
-
-      // the stack pops in, then the ten covers fly out one after another into an arc hanging under the sign
-      tl.fromTo("#s9-covers", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.2, ease: "back.out(2)" }, T5 - 0.04);
-      // slots: equal arc length along an ellipse hanging under the sign, so the covers spread evenly
-      const RX = 400, RY = 580, CY = 900, SX = 540, SY = 1250, A0 = -76 * Math.PI / 180, A1 = 76 * Math.PI / 180;
-      const PTS = [];
-      let acc = 0, px = 0, py = 0;
-      for (let k = 0; k <= 400; k++) {
-        const a = A0 + (A1 - A0) * k / 400, x = 540 + RX * Math.sin(a), y = CY + RY * Math.cos(a);
-        if (k > 0) acc += Math.hypot(x - px, y - py);
-        PTS.push([a, x, y, acc]); px = x; py = y;
+      // the code (v2's forward-price example), typed in on the timeline
+      const LINES = [
+        [["from", "k"], [" math ", "i"], ["import", "k"], [" ", "i"], ["exp", "f"]],
+        [["def", "k"], [" ", "i"], ["forward", "f"], ["(", "p"], ["S", "i"], [", ", "p"], ["r", "i"], [", ", "p"], ["q", "i"], [", ", "p"], ["T", "i"], ["):", "p"]],
+        [["    ", "i"], ["return", "k"], [" S ", "i"], ["*", "p"], [" ", "i"], ["exp", "f"], ["((", "p"], ["r", "i"], [" - ", "p"], ["q", "i"], [")", "p"], [" * ", "p"], ["T", "i"], [")", "p"]],
+        [["print", "f"], ["(", "p"], ["forward", "f"], ["(", "p"], ["100", "n"], [", ", "p"], ["0.05", "n"], [", ", "p"], ["0.01", "n"], [", ", "p"], ["1", "n"], ["))", "p"]],
+      ];
+      const LEN = LINES.map((L) => L.reduce((a, [s]) => a + s.length, 0));
+      const TOTAL = LEN.reduce((a, b) => a + b, 0);
+      const CH = 15.6;   // JetBrains Mono advance at 26 px
+      const codeEls = [0, 1, 2, 3].map((i) => document.getElementById("s9-c" + i));
+      const cur = document.getElementById("s9-cur"), ripple = document.getElementById("s9-ripple"), hl = document.getElementById("s9-hl");
+      const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+      const shown = [-1, -1, -1, -1];
+      function lineHTML(L, n) {
+        let out = "", left = n;
+        for (const [s, c] of L) { if (left <= 0) break; const part = s.slice(0, left); left -= part.length; out += '<span class="s9-' + c + '">' + part + "</span>"; }
+        return out;
       }
-      const slot = (i) => { const target = acc * i / 9; let k = 0; while (k < 400 && PTS[k + 1][3] <= target) k++; return PTS[k]; };
-      const gapC = clamp((T8 - 0.08 - 0.34 - (T5 + 0.12)) / 9, 0.03, 0.1);
-      const covers = Array.from(document.querySelectorAll("#s9-covers .s9-cv"));
-      const LAND = [];
-      covers.forEach((c, i) => {
-        const [a, x, y] = slot(i);
-        const d = 9 - i;                               // cover 0 sits on top of the stack and flies first
-        c.style.zIndex = String(20 - i);
-        const t0 = T5 + 0.12 + i * gapC;
-        LAND.push(t0 + 0.22);
-        tl.fromTo(c, { x: SX + d * 2, y: SY - d * 4, rotation: (i % 2 ? 4 : -4), scale: 0.92 },
-                     { x: x, y: y, rotation: -a * 180 / Math.PI * 0.1, scale: 1, duration: 0.34, ease: "back.out(1.3)" }, t0);
-      });
-      tl.fromTo("#s9-chip", { opacity: 0, scale: 0.6, y: 20 }, { opacity: 1, scale: 1, y: 0, duration: 0.25, ease: "back.out(2)" }, LAND[0] - 0.04);
-
-      // "free": the ribbon stamps across the arc; the covers feel the hit; sparkles; a shine runs along the ribbon
-      const FT = T8 - 0.03;
-      tl.fromTo("#s9-rib", { opacity: 0, scale: 1.9, rotation: -15 }, { opacity: 1, scale: 1, rotation: -7, duration: 0.22, ease: "power4.out" }, FT);
-      tl.fromTo("#s9-covers", { scale: 1 }, { scale: 1.03, duration: 0.07, ease: "power2.out", immediateRender: false }, FT + 0.12);
-      tl.fromTo("#s9-covers", { scale: 1.03 }, { scale: 1, duration: 0.35, ease: "back.out(3)", immediateRender: false }, FT + 0.19);
-      tl.fromTo("#s9-rshine", { x: -160 }, { x: 900, duration: 0.6, ease: "power2.inOut" }, FT + 0.28);
-      [[150, 1150], [935, 1120], [905, 1390]].forEach(([x, y], k) => {
-        tl.fromTo("#s9-sp" + k, { x: x, y: y, scale: 0, rotation: 0 }, { x: x, y: y, scale: 1.2, rotation: 45, duration: 0.22, ease: "back.out(2)" }, FT + 0.12 + k * 0.05);
-        tl.fromTo("#s9-sp" + k, { scale: 1.2, opacity: 1 }, { scale: 0.7, opacity: 0.85, duration: 0.5, ease: "power2.out", immediateRender: false }, FT + 0.34 + k * 0.05);
-      });
-
-      // continuous layer: damped sway of the signpost, bobbing bubbles and covers, glow pulse, the counter chip
-      const sway = document.getElementById("s9-sway"), glow = document.getElementById("s9-glow");
-      const qin = Array.from(document.querySelectorAll("#s9-qs .s9-qin"));
-      const cvin = covers.map((c) => c.querySelector(".s9-cvin"));
-      const num = document.getElementById("s9-num"), unit = document.getElementById("s9-unit"), chipin = document.getElementById("s9-chipin");
-      const SW0 = 0.04;
       function draw(t) {
-        const tau = Math.max(0, t - SW0);
-        const th = -12 * Math.exp(-3.0 * tau) * Math.cos(6.8 * tau) + 1.1 * Math.sin(2.4 * t + 0.4) * (1 - Math.exp(-2 * tau));
-        sway.style.transform = "rotate(" + th.toFixed(2) + "deg)";
-        qin.forEach((q, k) => { q.style.transform = "translateY(" + (10 * Math.sin(t * 3.1 + k * 1.7)).toFixed(1) + "px)"; });
-        cvin.forEach((c, i) => {
-          const on = clamp((t - LAND[i] - 0.1) / 0.3, 0, 1);
-          c.style.transform = "translateY(" + (on * 7 * Math.sin(t * 2.8 + i * 0.9)).toFixed(1) + "px)";
-        });
-        let n = 0, last = -9;
-        LAND.forEach((l) => { if (t >= l) { n++; last = l; } });
-        num.textContent = String(Math.max(1, n));
-        unit.textContent = n > 1 ? "resources" : "resource";
-        const bump = n > 0 ? 0.1 * Math.exp(-(t - last) * 12) : 0;
-        chipin.style.transform = "scale(" + (1 + bump).toFixed(3) + ")";
-        glow.style.opacity = (0.75 + 0.25 * Math.sin(t * 3.6) + (t > T8 ? 0.15 : 0)).toFixed(3);
+        const n = Math.floor(TOTAL * clamp((t - T0) / (T1 - T0), 0, 1));
+        let rest = n, li = 0, col = 0;
+        for (let i = 0; i < 4; i++) {
+          const k = clamp(rest, 0, LEN[i]);
+          if (k !== shown[i]) { codeEls[i].innerHTML = lineHTML(LINES[i], k); shown[i] = k; }
+          if (k > 0 || i === 0) { li = i; col = k; }
+          rest -= LEN[i];
+        }
+        cur.style.transform = "translate(" + (col * CH).toFixed(1) + "px," + (li * 50).toFixed(1) + "px)";
+        const typing = t >= T0 && t <= T1 + 0.04;
+        cur.style.opacity = t < RUN - 0.04 && (typing || Math.floor(t * 4) % 2 === 0) ? "1" : "0";
+        // the line highlight follows the line being typed
+        hl.style.top = (70 + li * 50) + "px";
+        const rd = t - RUN + 0.04;
+        if (rd >= 0 && rd < 0.42) { const q = rd / 0.42; ripple.style.opacity = (0.95 * (1 - q) * (1 - q)).toFixed(3); ripple.style.transform = "scale(" + (1 + 0.3 * q).toFixed(3) + "," + (1 + 0.6 * q).toFixed(3) + ")"; }
+        else { ripple.style.opacity = "0"; ripple.style.transform = "scale(1,1)"; }
       }
       const st = { t: 0 };
       tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: () => draw(st.t) }, 0);

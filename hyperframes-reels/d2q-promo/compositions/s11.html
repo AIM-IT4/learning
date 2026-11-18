@@ -2,171 +2,201 @@
   <style>
     @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
     @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
-    #root { position: absolute; inset: 0; overflow: hidden; font-family: D2QSans, sans-serif; color: #0f172a; }
-    #s11-cam { position: absolute; inset: 0; transform-origin: 540px 1000px; }
-    #s11-glow { position: absolute; left: -132px; top: -132px; width: 580px; height: 580px; border-radius: 50%;
-                background: radial-gradient(closest-side, rgba(8,169,162,0.42), rgba(8,169,162,0.12) 60%, rgba(8,169,162,0) 100%); }
-    #s11-glow2 { position: absolute; left: 120px; top: 560px; width: 980px; height: 560px; border-radius: 50%;
-                 background: radial-gradient(closest-side, rgba(8,169,162,0.22), rgba(8,169,162,0) 100%); opacity: 0; }
-    .s11-card { position: absolute; border-radius: 40px; border: 2px solid #d6dfeb; background: linear-gradient(180deg, #ffffff 0%, #f6f9fc 100%);
-                box-shadow: 0 30px 60px rgba(15,23,42,0.14), 0 8px 18px rgba(15,23,42,0.07), inset 0 2px 0 #ffffff; }
-    /* comment composer */
-    #s11-cmtw { position: absolute; left: 80px; top: 488px; width: 920px; height: 150px; }
-    #s11-cmt { position: absolute; inset: 0; }
-    #s11-cmtc { left: 0; top: 0; width: 920px; height: 150px; }
-    #s11-av { position: absolute; left: 26px; top: 27px; width: 96px; height: 96px; border-radius: 50%; overflow: hidden;
-              background: linear-gradient(180deg, #e2e8f0 0%, #cbd5e1 100%); box-shadow: inset 0 2px 0 #ffffff, 0 4px 10px rgba(15,23,42,0.12); }
-    #s11-in { position: absolute; left: 140px; top: 23px; width: 652px; height: 104px; border-radius: 52px; background: #f1f5f9; border: 2px solid #e2e8f0;
-              box-shadow: inset 0 3px 6px rgba(15,23,42,0.06); }
-    #s11-ph { position: absolute; left: 36px; top: 0; font: 500 38px/100px D2QSans, sans-serif; color: #94a3b8; white-space: nowrap; }
-    #s11-typed { position: absolute; left: 36px; top: 0; height: 100px; display: flex; align-items: center; font: 800 46px/1 D2QSans, sans-serif; color: #0f172a; letter-spacing: 0.02em; }
-    #s11-typed span { display: none; }
-    #s11-caret { display: block; width: 4px; height: 52px; border-radius: 2px; background: #08a9a2; margin-left: 4px; }
-    #s11-send { position: absolute; left: 806px; top: 27px; width: 96px; height: 96px; border-radius: 50%;
-                background: radial-gradient(circle at 35% 28%, #4fd8d0 0%, #0eb0a9 48%, #067a75 100%);
-                box-shadow: 0 10px 20px rgba(6,122,117,0.35), inset 0 2px 0 rgba(255,255,255,0.45); }
-    #s11-send svg { position: absolute; left: 0; top: 0; }
-    #s11-rip { position: absolute; left: 806px; top: 27px; width: 96px; height: 96px; border-radius: 50%; border: 5px solid #08a9a2; opacity: 0; }
-    /* DM */
-    #s11-dm { position: absolute; left: 80px; top: 676px; width: 920px; height: 360px; opacity: 0; }
-    #s11-name { position: absolute; left: 122px; top: 0; font: 800 34px/40px D2QSans, sans-serif; color: #0f172a; letter-spacing: -0.01em; white-space: nowrap; }
-    #s11-bub { position: absolute; left: 116px; top: 50px; width: 804px; height: 188px; border-radius: 40px 40px 40px 12px; padding: 32px 38px;
-               background: linear-gradient(180deg, #ffffff 0%, #effaf8 100%); border: 2px solid #b9e6e1;
-               box-shadow: 0 24px 46px rgba(15,23,42,0.14), 0 6px 14px rgba(8,169,162,0.12), inset 0 2px 0 #ffffff;
-               font: 600 42px/58px D2QSans, sans-serif; color: #0f172a; letter-spacing: -0.01em; }
-    #s11-dav { position: absolute; left: 0; top: 138px; width: 100px; height: 100px; filter: drop-shadow(0 8px 14px rgba(15,23,42,0.25));
-                background: url("assets/logo.png") center / 100% 100% no-repeat; }
-    #s11-row { position: absolute; left: 0; top: 262px; width: 920px; height: 88px; }
-    .s11-tc { position: absolute; top: 0; width: 84px; height: 84px; opacity: 0; }
-    .s11-tcin { position: absolute; inset: 0; border-radius: 12px; overflow: hidden; border: 2px solid #ffffff; background: #ffffff;
-                box-shadow: 0 8px 16px rgba(15,23,42,0.18); }
-    .s11-tcin img { display: block; width: 100%; height: 100%; }
-    #s11-rline { position: absolute; left: 0; top: 360px; width: 916px; height: 6px; border-radius: 3px; transform-origin: 0 50%;
-                 background: linear-gradient(90deg, #08a9a2, #67d6cf); box-shadow: 0 0 14px rgba(8,169,162,0.6); }
-    /* profile card */
-    #s11-prow { position: absolute; inset: 0; }
-    #s11-pro { position: absolute; left: 80px; top: 1176px; width: 920px; height: 400px; }
-    #s11-proc { left: 0; top: 0; width: 920px; height: 400px; border-radius: 44px; overflow: hidden; }
-    #s11-ban { position: absolute; left: 0; top: 0; width: 920px; height: 110px;
-               background-color: #dff4f1; background-image: radial-gradient(circle at 1.5px 1.5px, #b5e3dd 1.5px, transparent 2px),
-                                 linear-gradient(90deg, #c8eee9 0%, #e6f6f4 60%, #f4fbfa 100%);
-               background-size: 30px 30px, 100% 100%; border-bottom: 2px solid #cdebe7; }
-    #s11-logo { position: absolute; left: 50px; top: 50px; width: 216px; height: 216px; border-radius: 52px; background: #ffffff; border: 2px solid #d6dfeb;
-                box-shadow: 0 16px 32px rgba(15,23,42,0.16); }
-    #s11-logo img { position: absolute; left: 4px; top: 4px; width: 204px; height: 204px; }
-    #s11-pn { position: absolute; left: 300px; top: 128px; font: 900 72px/1 D2QSans, sans-serif; letter-spacing: -0.035em; color: #0f172a; white-space: nowrap; }
-    #s11-ph2 { position: absolute; left: 303px; top: 214px; font: 600 38px/1 D2QSans, sans-serif; color: #64748b; white-space: nowrap; }
-    #s11-site { position: absolute; left: 50px; top: 298px; height: 70px; padding: 0 30px 0 22px; border-radius: 35px; display: flex; align-items: center; gap: 14px;
-                background: #e6f6f4; border: 2px solid #b9e6e1; font: 700 34px/1 "JetBrains Mono", monospace; color: #067a75; white-space: nowrap; }
+    #root { position: absolute; inset: 0; overflow: hidden; }
+    #s11-cam { position: absolute; inset: 0; transform-origin: 540px 1080px; }
+    /* p10 paper stack at the standard placement; its top face: L(145,946) B(470,651) R(918,768) F(618,1082), clip x 583-765 y 611-769 */
+    #s11-plate, #s11-clip { position: absolute; left: -40px; top: 500px; width: 1160px; height: 1160px; }
+    /* a second copy of the plate cut to the binder clip, so the dealt sheets slide under its jaw */
+    #s11-clip { clip-path: polygon(620px 222px, 626px 212px, 664px 160px, 730px 113px, 748px 108px, 764px 108px, 773px 110px, 792px 119px, 796px 126px,
+                                   807px 203px, 808px 224px, 804px 237px, 766px 272px, 756px 271px, 740px 267px, 650px 243px, 625px 236px, 620px 226px); }
+    .s11-sh { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 532px 866px; }
+    .s11-sh svg { position: absolute; left: 0; top: 0; overflow: visible; }
+    /* the counter badge: a chunky glossy tile with a thickness edge */
+    #s11-badge { position: absolute; left: 58px; top: 618px; width: 404px; height: 190px; transform-origin: 202px 110px; opacity: 0; }
+    #s11-bslab { position: absolute; left: 0; top: 13px; width: 404px; height: 190px; border-radius: 42px;
+                 background: linear-gradient(180deg, #cfd6de 0%, #aeb8c4 100%); box-shadow: 0 30px 60px rgba(17,20,24,0.14), 0 8px 18px rgba(17,20,24,0.07); }
+    #s11-bface { position: absolute; left: 0; top: 0; width: 404px; height: 190px; border-radius: 42px; overflow: hidden; border: 2px solid #dfe4ea;
+                 background: linear-gradient(180deg, #ffffff 0%, #f2f4f6 100%); box-shadow: inset 0 3px 0 #ffffff, inset 0 -5px 0 rgba(17,20,24,0.04); }
+    #s11-bgloss { position: absolute; left: 10px; top: 6px; width: 380px; height: 64px; border-radius: 34px 34px 60px 60px;
+                  background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0)); }
+    #s11-num { position: absolute; left: 0; top: 16px; width: 400px; height: 122px; display: flex; justify-content: center; align-items: center; gap: 0; }
+    .s11-reel { position: relative; width: 66px; height: 122px; overflow: hidden;
+                -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 13%, #000 87%, transparent 100%);
+                mask-image: linear-gradient(180deg, transparent 0%, #000 13%, #000 87%, transparent 100%); }
+    .s11-reel.s11-k3 .s11-strip div { text-align: right; padding-right: 3px; }
+    .s11-strip { position: absolute; left: 0; top: 0; width: 66px; }
+    .s11-strip div { height: 122px; font: 900 116px/122px "D2QSans", sans-serif; color: #111418; text-align: center; letter-spacing: -0.02em; }
+    #s11-plus { width: 70px; height: 122px; font: 900 116px/118px "D2QSans", sans-serif; color: #16a34a; text-align: center; opacity: 0;
+                text-shadow: 0 8px 22px rgba(22,163,74,0.30); }
+    #s11-lab { position: absolute; left: 0; top: 140px; width: 400px; text-align: center; font: 800 27px/1 "D2QSans", sans-serif; letter-spacing: 0.26em; color: #5b6573; }
+    #s11-bring { position: absolute; left: -8px; top: -8px; width: 420px; height: 206px; border-radius: 50px; border: 5px solid #16a34a; opacity: 0; }
+    /* the problem book standing in front */
+    #s11-bshadow { position: absolute; left: 560px; top: 1500px; width: 420px; height: 74px; border-radius: 50%;
+                   background: radial-gradient(ellipse at center, rgba(17,20,24,0.26), rgba(17,20,24,0) 70%); opacity: 0; }
+    #s11-book { position: absolute; left: 558px; top: 1086px; width: 424px; height: 424px; transform-origin: 212px 424px; opacity: 0; }
+    #s11-pages { position: absolute; left: 0; top: 0; }
+    #s11-cover { position: absolute; left: 0; top: 0; width: 400px; height: 400px; border-radius: 12px; overflow: hidden; border: 2px solid rgba(17,20,24,0.14);
+                 box-shadow: 0 30px 60px rgba(17,20,24,0.16), 0 8px 18px rgba(17,20,24,0.08), inset 0 2px 0 rgba(255,255,255,0.9); }
+    #s11-cover img { display: block; width: 100%; height: 100%; }
+    #s11-spine { position: absolute; left: 0; top: 0; width: 38px; height: 100%;
+                 background: linear-gradient(90deg, rgba(17,20,24,0.30) 0%, rgba(17,20,24,0.08) 50%, rgba(255,255,255,0.55) 62%, rgba(255,255,255,0) 100%); }
+    #s11-gloss { position: absolute; inset: 0; background: linear-gradient(128deg, rgba(255,255,255,0.46) 0%, rgba(255,255,255,0.12) 30%, rgba(255,255,255,0) 31%, rgba(255,255,255,0) 100%); }
+    #s11-glint { position: absolute; left: 0; top: -80px; width: 120px; height: 560px;
+                 background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.7), rgba(255,255,255,0)); }
+    /* the worked-solution stamp */
+    #s11-stamp { position: absolute; left: 22px; top: 196px; width: 356px; height: 88px; border-radius: 20px; display: flex; align-items: center; justify-content: center; gap: 12px;
+                 background: linear-gradient(180deg, #2fd16b 0%, #16a34a 100%); border: 3px solid #0f7a37; opacity: 0; white-space: nowrap;
+                 box-shadow: inset 0 0 0 4px #22c55e, inset 0 0 0 7px rgba(255,255,255,0.9), 0 14px 26px rgba(22,163,74,0.40);
+                 font: 800 35px/1 "D2QSans", sans-serif; color: #ffffff; letter-spacing: -0.01em; }
+    #s11-ink { position: absolute; left: 22px; top: 196px; width: 356px; height: 88px; border-radius: 26px; border: 7px solid #16a34a; opacity: 0; }
+    .s11-px { position: absolute; left: -12px; top: -12px; width: 24px; height: 24px; border-radius: 4px; background: #22c55e; opacity: 0;
+              box-shadow: 0 6px 12px rgba(22,163,74,0.30); }
   </style>
   <div id="root" data-composition-id="s11" data-width="1080" data-height="1920">
     <div id="s11-cam">
-      <div id="s11-glow2"></div>
-      <div id="s11-prow">
-      <div id="s11-pro">
-        <div class="s11-card" id="s11-proc">
-          <div id="s11-ban"></div>
-          <div id="s11-pn">Desk2Quant</div>
-          <div id="s11-ph2">@desk2quant</div>
-          <div id="s11-site"><svg width="34" height="34" viewBox="0 0 34 34" fill="none"><circle cx="17" cy="17" r="13" stroke="#067a75" stroke-width="3.4"/><path d="M4 17 H30 M17 4 C10 10 10 24 17 30 M17 4 C24 10 24 24 17 30" stroke="#067a75" stroke-width="3" stroke-linecap="round"/></svg>desk2quant.com</div>
+      <img id="s11-plate" src="assets/plates/p10.png" alt="" />
+      <svg width="0" height="0" style="position:absolute">
+        <defs>
+          <filter id="s11-blur" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="13" /></filter>
+          <linearGradient id="s11-pg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff" /><stop offset="1" stop-color="#f1f3f6" /></linearGradient>
+        </defs>
+      </svg>
+      <div id="s11-sheets" data-layout-allow-overlap></div>
+      <img id="s11-clip" src="assets/plates/p10.png" alt="" />
+      <div id="s11-bshadow"></div>
+      <div id="s11-book">
+        <svg id="s11-pages" width="424" height="424" viewBox="0 0 424 424" fill="none">
+          <defs><linearGradient id="s11-gpg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff" /><stop offset="1" stop-color="#e4e8ec" /></linearGradient></defs>
+          <path d="M400 8 L420 28 L420 420 L28 420 L8 400 L400 400 Z" fill="url(#s11-gpg)" stroke="#cdd4dc" stroke-width="1.5" stroke-linejoin="round" />
+          <path d="M404 12 V404 M12 404 H404 M408 16 V408 M16 408 H408 M412 20 V412 M20 412 H412 M416 24 V416 M24 416 H416" stroke="#d3d9e0" stroke-width="1.2" />
+        </svg>
+        <div id="s11-cover">
+          <img src="assets/covers/quant-interview-problem-book.jpg" alt="" />
+          <div id="s11-spine"></div>
+          <div id="s11-gloss"></div>
+          <div id="s11-glint"></div>
+          <div id="s11-ink"></div>
+          <div id="s11-stamp"><svg width="34" height="30" viewBox="0 0 34 30" fill="none"><path d="M3 15.5 L12.5 25 L31 4" stroke="#fff" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" /></svg>Worked solution</div>
         </div>
-        <div id="s11-glow"></div>
-        <div id="s11-logo"><img src="assets/logo.png" alt="" /></div>
       </div>
-      </div>
-      <div id="s11-dm">
-        <div id="s11-name">Desk2Quant</div>
-        <div id="s11-bub">Hey! Here are all 10 free Desk2Quant resources 🎯</div>
-        <div id="s11-dav"></div>
-        <div id="s11-row">
-          <div class="s11-tc" style="left:0px;"><div class="s11-tcin"><img src="assets/covers/quant-roadmap-2026.jpg" alt="" /></div></div>
-          <div class="s11-tc" style="left:92px;"><div class="s11-tcin"><img src="assets/covers/greeks-cheat-sheet.jpg" alt="" /></div></div>
-          <div class="s11-tc" style="left:184px;"><div class="s11-tcin"><img src="assets/covers/stochastic-calculus-cheat-sheet.jpg" alt="" /></div></div>
-          <div class="s11-tc" style="left:276px;"><div class="s11-tcin"><img src="assets/covers/quant-formula-sheet.jpg" alt="" /></div></div>
-          <div class="s11-tc" style="left:368px;"><div class="s11-tcin"><img src="assets/covers/desk-probability-casebook.jpg" alt="" /></div></div>
-          <div class="s11-tc" style="left:460px;"><div class="s11-tcin"><img src="assets/covers/market-risk-interview-kit.jpg" alt="" /></div></div>
-          <div class="s11-tc" style="left:552px;"><div class="s11-tcin"><img src="assets/covers/pause-on-your-desk.jpg" alt="" /></div></div>
-          <div class="s11-tc" style="left:644px;"><div class="s11-tcin"><img src="assets/covers/the-missing-square.jpg" alt="" /></div></div>
-          <div class="s11-tc" style="left:736px;"><div class="s11-tcin"><img src="assets/covers/fx-derivatives-50-problems.jpg" alt="" /></div></div>
-          <div class="s11-tc" style="left:828px;"><div class="s11-tcin"><img src="assets/covers/ats-quant-resume-template.jpg" alt="" /></div></div>
-        </div>
-        <div id="s11-rline"></div>
-      </div>
-      <div id="s11-cmtw">
-        <div id="s11-cmt">
-          <div class="s11-card" id="s11-cmtc">
-            <div id="s11-av"><svg width="96" height="96" viewBox="0 0 96 96" fill="none"><circle cx="48" cy="38" r="17" fill="#ffffff"/><path d="M14 94 C16 70 30 60 48 60 C66 60 80 70 82 94 Z" fill="#ffffff"/></svg></div>
-            <div id="s11-in">
-              <div id="s11-ph">Add a comment…</div>
-              <div id="s11-typed"><span>F</span><span>R</span><span>E</span><span>E</span><i id="s11-caret"></i></div>
-            </div>
-            <div id="s11-rip"></div>
-            <div id="s11-send">
-              <svg id="s11-plane" width="96" height="96" viewBox="0 0 96 96" fill="none"><path d="M48 70 V30 M32 45 L48 29 L64 45" stroke="#ffffff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              <svg id="s11-chk" width="96" height="96" viewBox="0 0 96 96" fill="none"><path d="M30 49 L43 62 L67 36" stroke="#ffffff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </div>
+      <div id="s11-badge">
+        <div id="s11-bslab"></div>
+        <div id="s11-bface">
+          <div id="s11-bgloss"></div>
+          <div id="s11-num">
+            <div class="s11-reel s11-k3"><div class="s11-strip" id="s11-r3"></div></div>
+            <div class="s11-reel"><div class="s11-strip" id="s11-r2"></div></div>
+            <div class="s11-reel"><div class="s11-strip" id="s11-r1"></div></div>
+            <div class="s11-reel"><div class="s11-strip" id="s11-r0"></div></div>
+            <div id="s11-plus">+</div>
           </div>
+          <div id="s11-lab">PROBLEMS</div>
         </div>
+        <div id="s11-bring"></div>
       </div>
+      <div id="s11-pxs"></div>
     </div>
   </div>
   <script>
     (function () {
-      /*DATA*/ const DUR = 3.92; const W = [0.18, 0.74, 1.0, 1.26, 1.44, 1.64, 1.88, 2.1]; /*END*/
-      // words: 0 Comment 1 FREE, 2 and 3 we'll 4 DM 5 you 6 all 7 ten.
-      const w = (i) => (W.length > i ? W[i] : 0.18 + i * 0.44);
+      /*DATA*/ const DUR = 2.67; const W = [0.16, 0.42, 0.52, 1.08, 1.44, 1.92, 2.02]; /*END*/
+      // words: 0 Then 1 the 2 interview: 3 1000+ 4 problems, 5 with 6 solutions.
+      const w = (i) => Math.max(0, W.length > i ? W[i] : 0.16 + i * 0.32);
       const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
-      const HOLD = Math.min(DUR - 0.2, w(7) + 0.5);   // from here on only the soft glow pulse moves
       const tl = gsap.timeline({ paused: true });
 
-      // camera: a slow push-in that comes to rest when the final layout holds
-      tl.fromTo("#s11-cam", { scale: 1 }, { scale: 1.035, duration: HOLD, ease: "power1.inOut" }, 0);
-      // arrival: the comment box slides up and settles mid-frame; the profile card rises below it
-      const LIFT = 200, DROP = 170;            // the comment box and the profile card start together and part for the DM
-      tl.fromTo("#s11-cmt", { opacity: 0, y: 90, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "back.out(1.5)" }, 0.02);
-      tl.fromTo("#s11-pro", { opacity: 0, y: 130 }, { opacity: 1, y: 0, duration: 0.55, ease: "power3.out" }, 0.08);
-
-      // "Comment FREE": the letters type in one by one (drawn below), then the send arrow is tapped
-      const TY0 = w(0) + 0.08, TYG = clamp((w(1) + 0.12 - TY0) / 4, 0.07, 0.16);
-      const TAP = Math.max(TY0 + 4 * TYG + 0.1, w(2) - 0.08);
-      tl.fromTo("#s11-send", { scale: 1 }, { scale: 0.8, duration: 0.08, ease: "power2.in" }, TAP);
-      tl.fromTo("#s11-send", { scale: 0.8 }, { scale: 1, duration: 0.4, ease: "back.out(3)", immediateRender: false }, TAP + 0.08);
-      tl.fromTo("#s11-rip", { opacity: 0, scale: 0.9 }, { opacity: 0.7, scale: 0.9, duration: 0.01 }, TAP + 0.07);
-      tl.fromTo("#s11-rip", { opacity: 0.7, scale: 0.9 }, { opacity: 0, scale: 1.9, duration: 0.5, ease: "power2.out", immediateRender: false }, TAP + 0.08);
-      tl.fromTo("#s11-plane", { opacity: 1 }, { opacity: 0, duration: 0.1 }, TAP + 0.1);
-      tl.fromTo("#s11-chk", { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2.5)" }, TAP + 0.12);
-      // the sent comment glides up to make room for the reply
-      tl.fromTo("#s11-cmtw", { y: LIFT }, { y: 0, duration: 0.55, ease: "power3.inOut" }, TAP + 0.2);
-      tl.fromTo("#s11-prow", { y: -DROP }, { y: 0, duration: 0.55, ease: "power3.inOut" }, TAP + 0.2);
-
-      // "DM": the direct message slides in from the right
-      const DM = w(4) - 0.1;
-      tl.fromTo("#s11-dm", { x: 720, opacity: 0 }, { x: 0, opacity: 1, duration: 0.55, ease: "power3.out" }, DM);
-      tl.fromTo("#s11-glow2", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.out" }, DM + 0.1);
-      // "all": the ten tiny free covers pop in under the bubble
-      document.querySelectorAll("#s11-row .s11-tc").forEach((el, k) => {
-        tl.fromTo(el, { opacity: 0, y: 26, scale: 0.6 }, { opacity: 1, y: 0, scale: 1, duration: 0.3, ease: "back.out(2.2)" }, w(6) - 0.06 + k * 0.035);
+      // ---- the dealt sheets: each one is the stack's top face (a perspective quad) with a printed problem on it
+      const QUAD = "145,946 470,651 918,768 618,1082";
+      // page space (u along the back edge B->R, v along B->L, both 0..1000) mapped onto the face
+      const MAT = "matrix(0.448 0.117 -0.325 0.295 470 651)";
+      const sheetsEl = document.getElementById("s11-sheets");
+      const sheetSvg = (k) =>
+        '<svg width="1080" height="1920" viewBox="0 0 1080 1920" fill="none">' +
+        '<polygon class="s11-shd" points="' + QUAD + '" transform="translate(14 24)" fill="rgba(17,20,24,0.22)" filter="url(#s11-blur)"/>' +
+        '<polygon points="' + QUAD + '" fill="url(#s11-pg)" stroke="#d5dbe2" stroke-width="2" stroke-linejoin="round"/>' +
+        '<g transform="' + MAT + '">' +
+        '<text x="92" y="330" font-family="D2QSans, sans-serif" font-weight="900" font-size="120" fill="#16a34a">Q.</text>' +
+        '<rect x="250" y="262" width="' + (560 - (k % 3) * 60) + '" height="40" rx="20" fill="#dfe4ea"/>' +
+        '<rect x="96" y="410" width="' + (720 - (k % 2) * 90) + '" height="40" rx="20" fill="#e6eaef"/>' +
+        '<rect x="96" y="520" width="' + (640 + (k % 3) * 40) + '" height="40" rx="20" fill="#e6eaef"/>' +
+        '<rect x="96" y="630" width="' + (470 + (k % 2) * 120) + '" height="40" rx="20" fill="#e6eaef"/>' +
+        '<rect x="96" y="760" width="300" height="40" rx="20" fill="#bbf7d0"/>' +
+        "</g></svg>";
+      // [start, from x, from y, from rotation, from scale, flight]
+      const DEAL = [
+        [0.04, -820, -36, -9, 1, 0.34], [0.2, 820, -24, 8, 1, 0.34], [w(2) - 0.18, 0, 560, -4, 1.26, 0.36],
+        [w(3) - 0.06, -820, -20, -7, 1, 0.24], [w(3) + 0.02, 820, -18, 6, 1, 0.24], [w(3) + 0.1, -820, -14, -5, 1, 0.22],
+        [w(3) + 0.18, 820, -12, 5, 1, 0.22], [w(3) + 0.26, 0, 420, -3, 1.2, 0.22],
+      ];
+      DEAL.forEach(([t0, x, y, r, s, d], k) => {
+        const el = document.createElement("div");
+        el.className = "s11-sh"; el.id = "s11-sh" + k; el.innerHTML = sheetSvg(k);
+        sheetsEl.appendChild(el);
+        tl.fromTo(el, { opacity: 0 }, { opacity: 1, duration: 0.04, ease: "none" }, t0);
+        tl.fromTo(el, { x: x, y: y, rotation: r, scale: s }, { x: 0, y: 0, rotation: 0, scale: 1, duration: d, ease: "power3.out" }, t0);
+        // its shadow tightens and vanishes as it lands flat on the pile
+        tl.fromTo(el.querySelector(".s11-shd"), { opacity: 1 }, { opacity: 0, duration: d, ease: "power2.in" }, t0);
       });
-      // "ten": a wave runs along the row and a teal line underlines all ten
-      document.querySelectorAll("#s11-row .s11-tcin").forEach((el, k) => {
-        const t = w(7) - 0.04 + k * 0.03;
-        tl.fromTo(el, { y: 0 }, { y: -14, duration: 0.12, ease: "power2.out" }, t);
-        tl.fromTo(el, { y: -14 }, { y: 0, duration: 0.3, ease: "back.out(2.5)", immediateRender: false }, t + 0.12);
-      });
-      tl.fromTo("#s11-rline", { scaleX: 0 }, { scaleX: 1, duration: 0.45, ease: "power2.out" }, w(7) - 0.04);
 
-      // continuous layer: typing + caret, and the soft glow pulse behind the profile logo (the only motion in the hold)
-      const letters = Array.from(document.querySelectorAll("#s11-typed span"));
-      const ph = document.getElementById("s11-ph"), caret = document.getElementById("s11-caret");
-      const glow = document.getElementById("s11-glow");
+      // camera: tilt-up rise that settles on the stack, then a slow push
+      tl.fromTo("#s11-cam", { y: 120, rotation: 2 }, { y: 0, rotation: 0, duration: 0.7, ease: "expo.out" }, 0);
+      tl.fromTo("#s11-cam", { scale: 1 }, { scale: 1.04, duration: Math.max(0.2, DUR - 0.7), ease: "none" }, 0.7);
+
+      // "interview:": the real problem book stands up in front of the stack, a glint runs over its glossy cover
+      const BK = w(2) - 0.08;
+      tl.fromTo("#s11-book", { opacity: 0, y: 300, rotationX: 62, rotationY: -12, rotation: 3, scale: 0.9, transformPerspective: 1400 },
+                             { opacity: 1, y: 0, rotationX: 0, rotationY: -12, rotation: 3, scale: 1, transformPerspective: 1400, duration: 0.55, ease: "back.out(1.35)" }, BK);
+      tl.fromTo("#s11-bshadow", { opacity: 0, scaleX: 0.6 }, { opacity: 1, scaleX: 1, duration: 0.45, ease: "power2.out" }, BK + 0.1);
+      tl.fromTo("#s11-glint", { x: -180, rotation: 18 }, { x: 560, rotation: 18, duration: 0.7, ease: "power2.inOut" }, BK + 0.42);
+
+      // "1000+": the badge slams in with the caption's hero word and its reels roll to 1000 by "problems"
+      const T3 = w(3), T4 = w(4), C0 = T3 - 0.02, C1 = Math.max(T3 + 0.2, T4 - 0.06);
+      tl.fromTo("#s11-badge", { opacity: 0 }, { opacity: 1, duration: 0.07, ease: "power1.out" }, T3 - 0.05);
+      tl.fromTo("#s11-badge", { scale: 0.35, rotation: -16, y: 40 }, { scale: 1, rotation: -4, y: 0, duration: 0.34, ease: "back.out(2)" }, T3 - 0.05);
+      tl.fromTo("#s11-plus", { opacity: 0, scale: 0.2 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(3)" }, C1 - 0.01);
+      tl.fromTo("#s11-bring", { opacity: 0, scale: 0.96 }, { opacity: 0.9, scale: 0.96, duration: 0.01 }, C1);
+      tl.fromTo("#s11-bring", { opacity: 0.9, scale: 0.96 }, { opacity: 0, scale: 1.1, duration: 0.42, ease: "power2.out", immediateRender: false }, C1 + 0.01);
+      tl.fromTo("#s11-bface", { scale: 1 }, { scale: 1.06, duration: 0.08, ease: "power2.out" }, C1);
+      tl.fromTo("#s11-bface", { scale: 1.06 }, { scale: 1, duration: 0.36, ease: "back.out(3)", immediateRender: false }, C1 + 0.08);
+      tl.fromTo("#s11-lab", { color: "#5b6573" }, { color: "#16a34a", duration: 0.16, ease: "power2.out" }, T4 - 0.04);
+
+      // "solutions.": the green stamp thumps onto the book; the book jolts, an ink ring spreads, green pixels kick out
+      const ST = w(6) - 0.16;
+      tl.fromTo("#s11-stamp", { opacity: 0, scale: 2.3, rotation: -24 }, { opacity: 1, scale: 1, rotation: -9, duration: 0.16, ease: "power3.in" }, ST);
+      tl.fromTo("#s11-ink", { opacity: 0, scale: 0.92, rotation: -9 }, { opacity: 0.8, scale: 0.92, rotation: -9, duration: 0.01 }, ST + 0.15);
+      tl.fromTo("#s11-ink", { opacity: 0.8, scale: 0.92 }, { opacity: 0, scale: 1.45, duration: 0.45, ease: "power2.out", immediateRender: false }, ST + 0.16);
+      tl.fromTo("#s11-cover", { y: 0 }, { y: 10, duration: 0.06, ease: "power2.out" }, ST + 0.16);
+      tl.fromTo("#s11-cover", { y: 10 }, { y: 0, duration: 0.35, ease: "back.out(3)", immediateRender: false }, ST + 0.22);
+      // pixel kick from the stamp (the mosaic's squares), in frame space around the stamp's centre on the book
+      const pxs = document.getElementById("s11-pxs");
+      const PXA = [196, 164, 128, 98, 64, 22, 338, 290, 250, 228];
+      PXA.forEach((deg, k) => {
+        const p = document.createElement("div"); p.className = "s11-px"; pxs.appendChild(p);
+        const a = deg * Math.PI / 180, cx = 778, cy = 1332, s0 = 0.7 + (k % 3) * 0.25, t0 = ST + 0.16 + (k % 3) * 0.015;
+        const x0 = cx + 196 * Math.cos(a), y0 = cy + 62 * Math.sin(a), x1 = cx + 316 * Math.cos(a), y1 = cy + 190 * Math.sin(a);
+        tl.fromTo(p, { opacity: 0 }, { opacity: 1, duration: 0.01 }, t0);
+        tl.fromTo(p, { x: x0, y: y0, scale: s0, rotation: 0 }, { x: x1, y: y1, scale: s0 * 0.4, rotation: (k % 2 ? 50 : -50), duration: 0.34, ease: "power3.out" }, t0);
+        tl.fromTo(p, { opacity: 1 }, { opacity: 0, duration: 0.3, ease: "power2.in", immediateRender: false }, t0 + 0.04);
+      });
+
+      // continuous layer: the odometer reels (motion-blurred while they spin), leading zeros dimmed
+      const reels = [0, 1, 2, 3].map((k) => document.getElementById("s11-r" + k));
+      reels.forEach((s) => { for (let d = 0; d <= 10; d++) { const e = document.createElement("div"); e.textContent = String(d % 10); s.appendChild(e); } });
+      const ease3 = (p) => 1 - Math.pow(1 - p, 3);
+      const valAt = (t) => 1000 * ease3(clamp((t - C0) / (C1 - C0), 0, 1));
       function draw(t) {
-        let n = 0;
-        letters.forEach((s, k) => { const on = t >= TY0 + k * TYG; s.style.display = on ? "inline" : "none"; if (on) n++; });
-        ph.style.opacity = n > 0 ? "0" : "1";
-        const typing = t >= TY0 - 0.05 && t < TY0 + 4 * TYG + 0.05;
-        caret.style.opacity = t >= TAP + 0.05 ? "0" : (typing || Math.floor(t * 2.4) % 2 === 0 ? "1" : "0");
-        glow.style.opacity = (0.72 + 0.28 * Math.sin(t * 3.4)).toFixed(3);
-        glow.style.transform = "scale(" + (1 + 0.04 * Math.sin(t * 3.4)).toFixed(3) + ")";
+        const v = valAt(t), dv = (valAt(t + 0.004) - valAt(t - 0.004)) / 0.008;
+        for (let k = 0; k < 4; k++) {
+          const P = Math.pow(10, k);
+          let pos;
+          if (k === 0) pos = v % 10;
+          else { const n = Math.floor(v / P), lower = v - n * P; pos = (n % 10) + clamp(lower - (P - 1), 0, 1); }
+          const r = reels[k];
+          r.style.transform = "translateY(" + (-pos * 122).toFixed(1) + "px)";
+          const travel = (dv / P) * 122 / 30;
+          r.style.filter = travel > 8 ? "blur(" + Math.min(5, travel * 0.05 + 1).toFixed(1) + "px)" : "none";
+          r.style.opacity = k > 0 && v < P - 0.5 ? "0.22" : "1";
+        }
       }
       const st = { t: 0 };
       tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: () => draw(st.t) }, 0);

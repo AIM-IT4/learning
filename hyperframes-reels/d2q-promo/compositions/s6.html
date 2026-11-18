@@ -2,251 +2,134 @@
   <style>
     @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
     @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
-    #root { position: absolute; inset: 0; overflow: hidden; font-family: D2QSans, sans-serif; color: #0f172a; }
-    #s6-cam { position: absolute; inset: 0; transform-origin: 540px 1060px; }
-
-    /* ---- ring binder, real cover in its sleeve ---- */
-    #s6-binder { position: absolute; left: 118px; top: 508px; width: 560px; height: 500px; transform-origin: 50% 50%; opacity: 0; }
-    .s6-layer { position: absolute; width: 524px; height: 462px; border-radius: 20px; }
-    #s6-bback { left: 40px; top: 22px; background: linear-gradient(180deg, #067a75, #055f5b); box-shadow: 0 30px 56px rgba(15,23,42,0.24), 0 8px 18px rgba(15,23,42,0.10); }
-    #s6-bpg2 { left: 28px; top: 15px; background: repeating-linear-gradient(180deg, #ffffff 0 5px, #e2e8f0 5px 7px); border: 2px solid #d6dfeb; }
-    #s6-bpg1 { left: 16px; top: 8px; background: repeating-linear-gradient(180deg, #ffffff 0 5px, #e8eef5 5px 7px); border: 2px solid #d6dfeb; }
-    #s6-bfront { left: 0; top: 0; overflow: hidden; border: 2px solid #056b67;
-                 background: linear-gradient(160deg, #19bdb5 0%, #08a9a2 42%, #067a75 100%);
-                 box-shadow: 0 12px 26px rgba(15,23,42,0.18), inset 0 2px 0 rgba(255,255,255,0.40), inset 0 -3px 0 rgba(0,0,0,0.10); }
-    #s6-bspine { position: absolute; left: 0; top: 0; width: 72px; height: 462px;
-                 background: linear-gradient(90deg, #055f5b 0%, #08a9a2 55%, #067a75 100%); border-right: 3px solid rgba(4,70,67,0.55); }
-    #s6-bspine::after { content: ""; position: absolute; left: 10px; top: 0; width: 6px; height: 462px; background: rgba(255,255,255,0.22); border-radius: 3px; }
-    #s6-insert { position: absolute; left: 88px; top: 20px; width: 418px; height: 418px; border-radius: 12px; overflow: hidden;
-                 border: 4px solid #ffffff; box-shadow: 0 6px 14px rgba(4,60,57,0.35); }
-    #s6-insert img { display: block; width: 100%; height: 100%; }
-    #s6-sleeve { position: absolute; left: 80px; top: 12px; width: 434px; height: 434px; border-radius: 16px;
-                 background: linear-gradient(124deg, rgba(255,255,255,0.46) 0%, rgba(255,255,255,0.12) 24%, rgba(255,255,255,0) 40%, rgba(255,255,255,0) 86%, rgba(255,255,255,0.14) 100%);
-                 border: 2px solid rgba(255,255,255,0.35); }
-    #s6-rings { position: absolute; left: -40px; top: 0; width: 120px; height: 462px; overflow: visible; }
-
-    /* ---- the laptop ---- */
-    #s6-floor { position: absolute; left: 194px; top: 1566px; width: 820px; height: 96px; border-radius: 50%;
-                background: radial-gradient(ellipse at center, rgba(15,23,42,0.22), rgba(15,23,42,0) 70%); }
-    #s6-lap { position: absolute; left: 194px; top: 1006px; width: 820px; height: 590px; transform-origin: 50% 100%; }
-    #s6-lglow { position: absolute; left: -40px; top: -80px; width: 900px; height: 620px; border-radius: 50%; opacity: 0.6;
-                background: radial-gradient(ellipse at center, rgba(8,169,162,0.42) 0%, rgba(8,169,162,0.14) 42%, rgba(8,169,162,0) 70%); }
-    #s6-deck { position: absolute; left: 0; top: 444px; width: 820px; height: 140px; overflow: visible; }
-    #s6-lid { position: absolute; left: 50px; top: 0; width: 720px; height: 452px; border-radius: 30px; border: 2px solid #94a3b8;
-              background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 55%, #cbd5e1 100%);
-              box-shadow: 0 30px 60px rgba(15,23,42,0.22), 0 8px 18px rgba(15,23,42,0.10), inset 0 2px 0 #ffffff; }
-    #s6-bezel { position: absolute; left: 10px; top: 10px; width: 696px; height: 428px; border-radius: 21px; background: #0b1220; }
-    #s6-cami { position: absolute; left: 344px; top: 3px; width: 8px; height: 8px; border-radius: 50%; background: #334155; }
-    #s6-screen { position: absolute; left: 14px; top: 14px; width: 668px; height: 400px; border-radius: 10px; overflow: hidden;
-                 background: linear-gradient(180deg, #13203a 0%, #0f172a 100%); }
-    #s6-ui { position: absolute; inset: 0; opacity: 0; }
-    #s6-bar { position: absolute; left: 0; top: 0; width: 668px; height: 62px; background: #0b1324; border-bottom: 2px solid #1e293b; }
-    .s6-dot { position: absolute; top: 24px; width: 15px; height: 15px; border-radius: 50%; }
-    #s6-file { position: absolute; left: 108px; top: 0; font: 600 26px/62px "JetBrains Mono", monospace; color: #94a3b8; }
-    #s6-run { position: absolute; left: 498px; top: 9px; width: 156px; height: 44px; border-radius: 22px; text-align: center;
-              background: linear-gradient(180deg, #19bdb5 0%, #08a9a2 55%, #067a75 100%); border: 2px solid #067a75;
-              box-shadow: 0 4px 12px rgba(8,169,162,0.45), inset 0 2px 0 rgba(255,255,255,0.40);
-              font: 800 26px/40px D2QSans, sans-serif; color: #ffffff; letter-spacing: 0.01em; white-space: nowrap; }
-    #s6-ripple { position: absolute; left: 498px; top: 9px; width: 156px; height: 44px; border-radius: 22px; border: 3px solid #67d6cf; opacity: 0; }
-    .s6-ln { position: absolute; left: 0; width: 44px; text-align: right; font: 500 26px/50px "JetBrains Mono", monospace; color: #64748b; }
-    .s6-code { position: absolute; left: 58px; font: 500 27px/50px "JetBrains Mono", monospace; color: #cbd5e1; white-space: pre; }
-    .s6-code .k { color: #67d6cf; font-weight: 700; }
-    .s6-code .f { color: #ffffff; font-weight: 700; }
-    .s6-code .n { color: #e6f6f4; font-weight: 700; }
-    .s6-code .p { color: #94a3b8; }
-    #s6-cur { position: absolute; left: 58px; top: 86px; width: 15px; height: 34px; border-radius: 2px; background: #67d6cf; box-shadow: 0 0 10px rgba(103,214,207,0.6); }
-    #s6-div { position: absolute; left: 18px; top: 292px; width: 632px; height: 2px; background: #1e293b; }
-    #s6-out { position: absolute; left: 18px; top: 306px; height: 70px; display: flex; align-items: center; gap: 22px; opacity: 0; }
-    #s6-out span { font: 600 26px/1 "JetBrains Mono", monospace; color: #64748b; }
-    #s6-out b { font: 800 50px/1 "JetBrains Mono", monospace; color: #67d6cf; letter-spacing: -0.01em; text-shadow: 0 0 18px rgba(103,214,207,0.45); }
-    #s6-glare { position: absolute; inset: 0; background: linear-gradient(128deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.03) 30%, rgba(255,255,255,0) 46%); }
-
-    /* ---- link line ---- */
-    #s6-link { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: visible; }
-    .s6-end { position: absolute; width: 30px; height: 30px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #67d6cf, #08a9a2 60%, #067a75);
-              border: 3px solid #ffffff; box-shadow: 0 4px 12px rgba(8,169,162,0.5); }
-    .s6-pulse { position: absolute; left: 0; top: 0; width: 18px; height: 18px; border-radius: 4px; background: #08a9a2; opacity: 0;
-                box-shadow: 0 0 14px rgba(8,169,162,0.8); }
+    #root { position: absolute; inset: 0; overflow: hidden; }
+    /* the shared background's green glow turns red on "pressure" (same geometry as bg.html's glow, so it stays under y 682) */
+    #s6-bgtint { position: absolute; inset: 0; opacity: 0;
+                 background: radial-gradient(ellipse 58% 34% at 50% 60%, rgba(244,63,94,0.30) 0%, rgba(244,63,94,0.10) 45%, rgba(244,63,94,0) 72%),
+                             radial-gradient(ellipse 58% 34% at 50% 60%, rgba(16,19,24,0.62) 0%, rgba(16,19,24,0.30) 45%, rgba(16,19,24,0) 72%); }
+    #s6-cam { position: absolute; inset: 0; transform-origin: 540.5px 1036px; }
+    #s6-shake { position: absolute; inset: 0; }
+    /* p05 at the standard placement; dial centre measured at (540.5,1036), dial radius ~283, tick ring r 216-244, colour band r 242-273.
+       Its faint top halo is faded out so nothing reaches above y 560 when the camera pushes in to 1.12 */
+    .s6-pl { position: absolute; left: -40px; top: 500px; width: 1160px; height: 1160px;
+             -webkit-mask-image: linear-gradient(180deg, transparent 0%, transparent 6%, #000 13%);
+             mask-image: linear-gradient(180deg, transparent 0%, transparent 6%, #000 13%); }
+    /* the halo swap: outside r 334 the green plate fades out while a hue-rotated copy fades in, so the same glow turns red.
+       hue-rotate and saturate keep greys exactly, so the crossfade band can sit on the chrome ring itself (r 283-377)
+       and the chrome and the stem are untouched; the dial's colour band (r 242-273) is inside the band */
+    #s6-pw { position: absolute; inset: 0; --ho: 1;
+             -webkit-mask-image: radial-gradient(circle at 540.5px 1036px, #000 0px, #000 334px, rgba(0,0,0,var(--ho)) 352px);
+             mask-image: radial-gradient(circle at 540.5px 1036px, #000 0px, #000 334px, rgba(0,0,0,var(--ho)) 352px); }
+    #s6-rw { position: absolute; inset: 0; opacity: 0;
+             -webkit-mask-image: radial-gradient(circle at 540.5px 1036px, transparent 0px, transparent 334px, #000 352px);
+             mask-image: radial-gradient(circle at 540.5px 1036px, transparent 0px, transparent 334px, #000 352px); }
+    #s6-plate2 { filter: hue-rotate(220deg) saturate(2.2); }
+    #s6-tint { position: absolute; left: 240.5px; top: 736px; width: 600px; height: 600px; border-radius: 50%; opacity: 0;
+               background: radial-gradient(circle, rgba(244,63,94,0.12) 0%, rgba(244,63,94,0.2) 55%, rgba(244,63,94,0.34) 84%, rgba(244,63,94,0.1) 95%, rgba(244,63,94,0) 100%); }
+    #s6-ndl { position: absolute; left: 220.5px; top: 716px; width: 640px; height: 640px; overflow: visible; }
+    #s6-chip { position: absolute; left: 0; right: 0; top: 1436px; display: flex; justify-content: center; }
+    #s6-chipin { height: 86px; display: flex; align-items: center; gap: 18px; padding: 0 36px 0 28px; border-radius: 43px; opacity: 0; white-space: nowrap;
+                 background: linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.04)), rgba(22,18,24,0.9);
+                 border: 1.5px solid rgba(244,63,94,0.5); transform-origin: 50% 0%;
+                 box-shadow: 0 30px 70px rgba(0,0,0,0.45), 0 0 60px rgba(244,63,94,0.22), inset 0 1.5px 0 rgba(255,255,255,0.22);
+                 font: 800 42px/1 "D2QSans", sans-serif; letter-spacing: -0.015em; color: #f4f6f7; }
+    #s6-chipin em { font-style: normal; color: #f43f5e; }
+    #s6-live { width: 20px; height: 20px; border-radius: 50%; background: #f43f5e; box-shadow: 0 0 0 7px rgba(244,63,94,0.24), 0 0 18px rgba(244,63,94,0.8); }
   </style>
   <div id="root" data-composition-id="s6" data-width="1080" data-height="1920">
+    <div id="s6-bgtint"></div>
     <div id="s6-cam">
-      <div id="s6-binder">
-        <div class="s6-layer" id="s6-bback"></div>
-        <div class="s6-layer" id="s6-bpg2"></div>
-        <div class="s6-layer" id="s6-bpg1"></div>
-        <div class="s6-layer" id="s6-bfront">
-          <div id="s6-bspine"></div>
-          <div id="s6-insert"><img src="assets/covers/equity-derivatives-quant-notes.jpg" alt="" /></div>
-          <div id="s6-sleeve"></div>
-        </div>
-        <svg id="s6-rings" width="120" height="462" viewBox="0 0 120 462">
+      <div id="s6-shake">
+        <div id="s6-pw"><img class="s6-pl" id="s6-plate" src="assets/plates/p05.png" alt="" /></div>
+        <div id="s6-rw"><img class="s6-pl" id="s6-plate2" src="assets/plates/p05.png" alt="" /></div>
+        <div id="s6-tint"></div>
+        <!-- the needle: tapered, black at the root to dark red at the tip, a chrome hub over its root -->
+        <svg id="s6-ndl" viewBox="-320 -320 640 640">
           <defs>
-            <linearGradient id="s6-chrome" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stop-color="#ffffff" /><stop offset="0.45" stop-color="#cbd5e1" /><stop offset="0.55" stop-color="#94a3b8" /><stop offset="1" stop-color="#e2e8f0" />
+            <linearGradient id="s6-gN" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="#2a0710" /><stop offset="0.46" stop-color="#9f1239" /><stop offset="0.54" stop-color="#e11d48" /><stop offset="1" stop-color="#3b0a14" />
             </linearGradient>
+            <linearGradient id="s6-gR" x1="0" y1="1" x2="0" y2="0">
+              <stop offset="0" stop-color="#0b0c0f" /><stop offset="0.32" stop-color="#16090c" stop-opacity="0.9" /><stop offset="0.6" stop-color="#16090c" stop-opacity="0" />
+            </linearGradient>
+            <linearGradient id="s6-gH" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#f4f6f8" /><stop offset="0.38" stop-color="#aab2bc" /><stop offset="0.55" stop-color="#e3e7eb" /><stop offset="1" stop-color="#5b636e" />
+            </linearGradient>
+            <linearGradient id="s6-gH2" x1="1" y1="1" x2="0" y2="0">
+              <stop offset="0" stop-color="#eef1f4" /><stop offset="0.5" stop-color="#8d96a1" /><stop offset="1" stop-color="#cfd5db" />
+            </linearGradient>
+            <filter id="s6-blur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="5" /></filter>
           </defs>
-          <g id="s6-ringg"></g>
+          <g id="s6-nsh" transform="translate(9 12) rotate(-112)">
+            <path d="M -12 0 L -2.6 -218 Q 0 -233 2.6 -218 L 12 0 L 8 34 Q 0 42 -8 34 Z" fill="rgba(0,0,0,0.42)" filter="url(#s6-blur)" />
+          </g>
+          <g id="s6-ng" transform="rotate(-112)">
+            <path d="M -12 0 L -8 34 Q 0 42 8 34 L 12 0 Z" fill="#1a0a0e" stroke="#08090b" stroke-width="1.4" stroke-linejoin="round" />
+            <path d="M -12 0 L -2.6 -218 Q 0 -233 2.6 -218 L 12 0 Z" fill="url(#s6-gN)" stroke="#1a0509" stroke-width="1.4" stroke-linejoin="round" />
+            <path d="M -12 0 L -2.6 -218 Q 0 -233 2.6 -218 L 12 0 Z" fill="url(#s6-gR)" />
+            <path d="M 0 -30 L 0 -214" stroke="rgba(255,190,200,0.6)" stroke-width="1.6" stroke-linecap="round" />
+          </g>
+          <!-- chrome hub: a domed cap with a recessed collar, lit from the top-left like the gauge -->
+          <circle cx="2" cy="5" r="26" fill="rgba(0,0,0,0.38)" filter="url(#s6-blur)" />
+          <circle cx="0" cy="0" r="23" fill="url(#s6-gH)" stroke="#3a4049" stroke-width="2" />
+          <circle cx="0" cy="0" r="15.5" fill="url(#s6-gH2)" stroke="rgba(40,45,52,0.55)" stroke-width="1.4" />
+          <circle cx="0" cy="0" r="6" fill="#9aa2ac" stroke="#4b525c" stroke-width="1.3" />
+          <path d="M -9 -12 A 15 15 0 0 1 9 -12" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="2.2" stroke-linecap="round" />
         </svg>
+        <div id="s6-chip"><div id="s6-chipin"><span id="s6-live"></span>Explain it. <em>Live.</em></div></div>
       </div>
-      <div id="s6-floor"></div>
-      <div id="s6-lap">
-        <div id="s6-lglow"></div>
-        <svg id="s6-deck" width="820" height="140" viewBox="0 0 820 140">
-          <defs>
-            <linearGradient id="s6-dg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f8fafc" /><stop offset="1" stop-color="#e2e8f0" /></linearGradient>
-            <linearGradient id="s6-de" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#cbd5e1" /><stop offset="1" stop-color="#94a3b8" /></linearGradient>
-          </defs>
-          <rect x="70" y="0" width="680" height="12" rx="5" fill="#475569" />
-          <path d="M50 8 L770 8 L800 112 L20 112 Z" fill="url(#s6-dg)" stroke="#94a3b8" stroke-width="2" stroke-linejoin="round" />
-          <path d="M20 112 L800 112 L795 128 Q792 133 785 133 L35 133 Q28 133 25 128 Z" fill="url(#s6-de)" stroke="#94a3b8" stroke-width="2" stroke-linejoin="round" />
-          <rect x="360" y="112" width="100" height="7" rx="3.5" fill="#94a3b8" />
-          <path d="M122 18 L698 18 L726 78 L94 78 Z" fill="#0f172a" stroke="#0f172a" stroke-width="8" stroke-linejoin="round" />
-          <g id="s6-keys"></g>
-          <path d="M332 87 L488 87 L495 107 L325 107 Z" fill="#eef2f7" stroke="#cbd5e1" stroke-width="2" stroke-linejoin="round" />
-        </svg>
-        <div id="s6-lid">
-          <div id="s6-bezel">
-            <div id="s6-cami"></div>
-            <div id="s6-screen">
-              <div id="s6-ui">
-                <div id="s6-bar">
-                  <div class="s6-dot" style="left:24px; background:#f43f5e;"></div>
-                  <div class="s6-dot" style="left:50px; background:#f59e0b;"></div>
-                  <div class="s6-dot" style="left:76px; background:#08a9a2;"></div>
-                  <div id="s6-file">forward.py</div>
-                  <div id="s6-ripple"></div>
-                  <div id="s6-run">▶ Run</div>
-                </div>
-                <div class="s6-ln" style="top:78px">1</div><div class="s6-ln" style="top:128px">2</div><div class="s6-ln" style="top:178px">3</div><div class="s6-ln" style="top:228px">4</div>
-                <div class="s6-code" id="s6-c0" style="top:78px"></div>
-                <div class="s6-code" id="s6-c1" style="top:128px"></div>
-                <div class="s6-code" id="s6-c2" style="top:178px"></div>
-                <div class="s6-code" id="s6-c3" style="top:228px"></div>
-                <div id="s6-cur"></div>
-                <div id="s6-div"></div>
-                <div id="s6-out"><span>Out</span><b>104.08</b></div>
-              </div>
-              <div id="s6-glare"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <svg id="s6-link" width="1080" height="1920" viewBox="0 0 1080 1920">
-        <path id="s6-lglowp" d="M636 712 C 800 700, 886 830, 852 1000" fill="none" stroke="rgba(8,169,162,0.25)" stroke-width="20" stroke-linecap="round" pathLength="1" stroke-dasharray="1 1.2" stroke-dashoffset="1.1" />
-        <path id="s6-lpath" d="M636 712 C 800 700, 886 830, 852 1000" fill="none" stroke="#08a9a2" stroke-width="7" stroke-linecap="round" pathLength="1" stroke-dasharray="1 1.2" stroke-dashoffset="1.1" />
-      </svg>
-      <div class="s6-end" id="s6-end0" style="left:621px; top:697px;"></div>
-      <div class="s6-end" id="s6-end1" style="left:837px; top:985px;"></div>
-      <div class="s6-pulse" id="s6-p0"></div>
-      <div class="s6-pulse" id="s6-p1"></div>
     </div>
   </div>
   <script>
     (function () {
-      /*DATA*/ const DUR = 2.65; const W = [0.18, 0.88, 1.04, 1.2, 1.28, 1.56, 1.7, 1.96]; /*END*/
-      // words: 0 First, 1 notes 2 with 3 the 4 code 5 that 6 runs 7 them.
-      const w = (i) => (W.length > i ? W[i] : 0.2 + i * 0.31);
-      const T0 = 0.6, T1 = Math.max(T0 + 0.4, w(6) - 0.15), RUN = w(6), LINK = w(2);   // review B: type through the pause before "notes", readable
+      /*DATA*/ const DUR = 3.59; const W = [0.16, 0.42, 0.86, 1.06, 1.26, 1.4, 1.62, 2.08, 2.48, 2.68, 2.84, 3.18]; /*END*/
+      // words: 0 But 1 formulas 2 were 3 never 4 the 5 hard 6 part. 7 Explaining 8 them 9 under 10 pressure 11 is.
+      const w = (i) => Math.max(0, W.length > i ? W[i] : 0.16 + i * 0.28);
       const tl = gsap.timeline({ paused: true });
+      const T1 = w(7) - 0.04;                 // "Explaining": the needle climbs
+      const T2 = Math.max(T1 + 0.2, w(10) - 0.06); // "pressure": it slams into the red
+      const HIT = T2 + 0.1;                   // the moment it hits the stop
+      // camera: a quick settle, then a slow push into the dial that keeps accelerating, plus a short shake on the hit
+      tl.fromTo("#s6-cam", { scale: 0.94 }, { scale: 1, duration: 0.5, ease: "expo.out" }, 0);
+      tl.fromTo("#s6-cam", { scale: 1 }, { scale: 1.12, duration: Math.max(0.2, DUR - 0.5), ease: "power1.in", immediateRender: false }, 0.5);
+      // the dial, its halo and the background glow tint red on the hit; the chip pops under the gauge
+      tl.fromTo("#s6-tint", { opacity: 0 }, { opacity: 1, duration: 0.14, ease: "power2.out" }, HIT - 0.04);
+      tl.fromTo("#s6-pw", { "--ho": 1 }, { "--ho": 0, duration: 0.18, ease: "power2.out" }, HIT - 0.04);
+      tl.fromTo("#s6-rw", { opacity: 0 }, { opacity: 1, duration: 0.18, ease: "power2.out" }, HIT - 0.04);
+      tl.fromTo("#s6-bgtint", { opacity: 0 }, { opacity: 1, duration: 0.22, ease: "power2.out" }, HIT - 0.04);
+      tl.fromTo("#s6-chipin", { opacity: 0, scale: 0.4, y: -30 }, { opacity: 1, scale: 1, y: 0, duration: 0.28, ease: "back.out(2.2)" }, HIT - 0.02);
 
-      // static build: keyboard keys and binder rings
-      const NS = "http://www.w3.org/2000/svg";
-      const keys = document.getElementById("s6-keys");
-      for (let r = 0; r < 4; r++) {
-        const y0 = 23 + r * 13.6, y1 = y0 + 10, ym = (y0 + y1) / 2;
-        const xl = 122 - ((ym - 18) / 60) * 28 + 8, xr = 698 + ((ym - 18) / 60) * 28 - 8;
-        const n = 14, gap = 5, kw = (xr - xl - gap * (n - 1)) / n;
-        for (let k = 0; k < n; k++) {
-          if (r === 3 && k > 4 && k < 9) { if (k === 5) { const sp = document.createElementNS(NS, "rect"); sp.setAttribute("x", (xl + 5 * (kw + gap)).toFixed(1)); sp.setAttribute("y", y0); sp.setAttribute("width", (4 * kw + 3 * gap).toFixed(1)); sp.setAttribute("height", 10); sp.setAttribute("rx", 2.5); sp.setAttribute("fill", "#334155"); keys.appendChild(sp); } continue; }
-          const kr = document.createElementNS(NS, "rect");
-          kr.setAttribute("x", (xl + k * (kw + gap)).toFixed(1)); kr.setAttribute("y", y0); kr.setAttribute("width", kw.toFixed(1)); kr.setAttribute("height", 10); kr.setAttribute("rx", 2.5); kr.setAttribute("fill", "#334155");
-          keys.appendChild(kr);
+      const clamp01 = (x) => Math.max(0, Math.min(1, x));
+      const backOut = (x, s) => { x -= 1; return x * x * ((s + 1) * x + s) + 1; };
+      const climb = (t) => -112 + 92 * backOut(clamp01((t - T1) / 0.46), 1.3);
+      function angleAt(t) {
+        let base;
+        if (t < T2) base = climb(t);
+        else {
+          const u = t - T2;
+          if (u < 0.1) { const s = u / 0.1, b0 = climb(T2); base = b0 + (130 - b0) * (s * s * (1.6 - 0.6 * s)); }
+          else { const v = u - 0.1; base = 122 + 8 * Math.exp(-v * 8) * Math.cos(v * 2 * Math.PI * 4.2); }
         }
+        // barely trembling at rest, a little more as it climbs, a high-frequency jitter once it is pinned in the red
+        let amp, f;
+        if (t < T2) { amp = 0.5 + 0.45 * clamp01((t - T1) / 0.3); f = 1; }
+        else { amp = 1.4 * clamp01((t - HIT + 0.02) / 0.12); f = 2.7; }
+        return base + amp * (0.65 * Math.sin(t * 2 * Math.PI * 7.3 * f) + 0.35 * Math.sin(t * 2 * Math.PI * 11.9 * f + 1.3));
       }
-      const rg = document.getElementById("s6-ringg");
-      [96, 231, 366].forEach((cy) => {
-        const hole = document.createElementNS(NS, "ellipse");
-        hole.setAttribute("cx", 84); hole.setAttribute("cy", cy); hole.setAttribute("rx", 8); hole.setAttribute("ry", 12); hole.setAttribute("fill", "#043f3c");
-        rg.appendChild(hole);
-        const ring = document.createElementNS(NS, "path");
-        ring.setAttribute("d", "M84 " + (cy - 9) + " C 52 " + (cy - 26) + ", 10 " + (cy - 18) + ", 10 " + cy + " C 10 " + (cy + 18) + ", 52 " + (cy + 26) + ", 84 " + (cy + 9));
-        ring.setAttribute("fill", "none"); ring.setAttribute("stroke", "url(#s6-chrome)"); ring.setAttribute("stroke-width", 10); ring.setAttribute("stroke-linecap", "round");
-        rg.appendChild(ring);
-        const edge = document.createElementNS(NS, "path");
-        edge.setAttribute("d", "M84 " + (cy - 9) + " C 52 " + (cy - 26) + ", 10 " + (cy - 18) + ", 10 " + cy + " C 10 " + (cy + 18) + ", 52 " + (cy + 26) + ", 84 " + (cy + 9));
-        edge.setAttribute("fill", "none"); edge.setAttribute("stroke", "rgba(71,85,105,0.55)"); edge.setAttribute("stroke-width", 2);
-        rg.insertBefore(edge, ring);
-      });
-
-      // camera: one slow push-in
-      tl.fromTo("#s6-cam", { scale: 1 }, { scale: 1.05, duration: DUR, ease: "none" }, 0);
-
-      // the laptop rises in first, its screen wakes
-      tl.fromTo("#s6-lap", { opacity: 0, y: 260, scale: 0.9 }, { opacity: 1, y: 0, scale: 1, duration: 0.48, ease: "back.out(1.3)" }, 0.02);
-      tl.fromTo("#s6-floor", { opacity: 0, scaleX: 0.5 }, { opacity: 1, scaleX: 1, duration: 0.45, ease: "power2.out" }, 0.08);
-      tl.fromTo("#s6-ui", { opacity: 0 }, { opacity: 1, duration: 0.25, ease: "power1.out" }, 0.32);
-
-      // W[1] "notes": the ring binder arrives from the left
-      tl.fromTo("#s6-binder", { opacity: 0, x: -720, y: 40, rotation: -24 }, { opacity: 1, x: 0, y: 0, rotation: -4, duration: 0.5, ease: "back.out(1.2)" }, w(1) - 0.08);
-
-      // W[2] "with": the teal link line draws from the binder to the laptop
-      tl.fromTo("#s6-end0", { scale: 0 }, { scale: 1, duration: 0.25, ease: "back.out(2.5)" }, LINK - 0.06);
-      tl.fromTo(["#s6-lpath", "#s6-lglowp"], { attr: { "stroke-dashoffset": 1.1 } }, { attr: { "stroke-dashoffset": 0 }, duration: 0.34, ease: "power2.inOut" }, LINK);
-      tl.fromTo("#s6-end1", { scale: 0 }, { scale: 1, duration: 0.25, ease: "back.out(2.5)" }, LINK + 0.28);
-
-      // W[6] "runs": the Run button pulses and the output appears
-      tl.fromTo("#s6-run", { scale: 1 }, { scale: 1.16, duration: 0.12, ease: "power2.out", yoyo: true, repeat: 1 }, RUN - 0.04);
-      tl.fromTo("#s6-out", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.16, ease: "power2.out" }, RUN - 0.02);
-      tl.fromTo("#s6-lglow", { opacity: 0.6, scale: 1 }, { opacity: 1, scale: 1.08, duration: 0.3, ease: "power2.out", immediateRender: false }, RUN + 0.06);
-
-      // typing, cursor, ripple and the pulses travelling along the link
-      const LINES = [
-        [["from", "k"], [" math ", "i"], ["import", "k"], [" ", "i"], ["exp", "f"]],
-        [["def", "k"], [" ", "i"], ["forward", "f"], ["(", "p"], ["S", "i"], [", ", "p"], ["r", "i"], [", ", "p"], ["q", "i"], [", ", "p"], ["T", "i"], ["):", "p"]],
-        [["    ", "i"], ["return", "k"], [" S ", "i"], ["*", "p"], [" ", "i"], ["exp", "f"], ["((", "p"], ["r", "i"], [" - ", "p"], ["q", "i"], [")", "p"], [" * ", "p"], ["T", "i"], [")", "p"]],
-        [["print", "f"], ["(", "p"], ["forward", "f"], ["(", "p"], ["100", "n"], [", ", "p"], ["0.05", "n"], [", ", "p"], ["0.01", "n"], [", ", "p"], ["1", "n"], ["))", "p"]],
-      ];
-      const LEN = LINES.map((L) => L.reduce((a, [s]) => a + s.length, 0));
-      const TOTAL = LEN.reduce((a, b) => a + b, 0);
-      const codeEls = [0, 1, 2, 3].map((i) => document.getElementById("s6-c" + i));
-      const cur = document.getElementById("s6-cur"), ripple = document.getElementById("s6-ripple");
-      const pulses = [document.getElementById("s6-p0"), document.getElementById("s6-p1")];
-      const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
-      const shown = [-1, -1, -1, -1];
-      function lineHTML(L, n) {
-        let out = "", left = n;
-        for (const [s, c] of L) { if (left <= 0) break; const part = s.slice(0, left); left -= part.length; out += '<span class="' + c + '">' + part + "</span>"; }
-        return out;
-      }
-      const bez = (a, b, c, d, u) => { const v = 1 - u; return v * v * v * a + 3 * v * v * u * b + 3 * v * u * u * c + u * u * u * d; };
-      function draw(t) {
-        const n = Math.floor(TOTAL * clamp((t - T0) / (T1 - T0), 0, 1));
-        let rest = n, li = 0, col = 0;
-        for (let i = 0; i < 4; i++) {
-          const k = clamp(rest, 0, LEN[i]);
-          if (k !== shown[i]) { codeEls[i].innerHTML = lineHTML(LINES[i], k); shown[i] = k; }
-          if (rest > 0 || i === 0) { li = i; col = k; }
-          rest -= LEN[i];
-          if (rest <= 0 && k < LEN[i]) { rest = 0; }
-        }
-        if (n >= TOTAL) { li = 3; col = LEN[3]; }
-        cur.style.transform = "translate(" + (col * 16.2).toFixed(1) + "px," + (li * 50).toFixed(1) + "px)";
-        const typing = t >= T0 && t <= T1 + 0.05;
-        cur.style.opacity = typing || Math.floor(t * 3.2) % 2 === 0 ? "1" : "0";
-        const rd = t - RUN;
-        if (rd >= 0 && rd < 0.42) { const q = rd / 0.42; ripple.style.opacity = (0.95 * (1 - q) * (1 - q)).toFixed(3); ripple.style.transform = "scale(" + (1 + 0.3 * q).toFixed(3) + "," + (1 + 0.55 * q).toFixed(3) + ")"; }
-        else ripple.style.opacity = "0";
-        pulses.forEach((p, k) => {
-          const t0 = LINK + 0.36;
-          if (t < t0) { p.style.opacity = "0"; return; }
-          const u = (((t - t0) * 1.05 + k * 0.5) % 1 + 1) % 1;
-          const x = bez(636, 800, 886, 852, u), y = bez(712, 700, 830, 1000, u);
-          p.style.transform = "translate(" + (x - 9).toFixed(1) + "px," + (y - 9).toFixed(1) + "px) rotate(45deg)";
-          p.style.opacity = (clamp(u * 6, 0, 1) * clamp((1 - u) * 6, 0, 1)).toFixed(3);
-        });
-      }
+      const ng = document.getElementById("s6-ng"), nsh = document.getElementById("s6-nsh"), shake = document.getElementById("s6-shake");
       const st = { t: 0 };
-      tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: () => draw(st.t) }, 0);
+      function draw() {
+        const t = st.t, a = angleAt(t).toFixed(2);
+        ng.setAttribute("transform", "rotate(" + a + ")");
+        nsh.setAttribute("transform", "translate(9 12) rotate(" + a + ")");
+        const k = t - HIT;
+        if (k >= 0 && k < 0.3) {
+          const e = Math.exp(-k * 11);
+          shake.style.transform = "translate(" + (6 * e * Math.sin(k * 2 * Math.PI * 17)).toFixed(2) + "px," + (4.5 * e * Math.cos(k * 2 * Math.PI * 21)).toFixed(2) + "px)";
+        } else shake.style.transform = "none";
+      }
+      tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: draw }, 0);
+      draw();
       window.__timelines["s6"] = tl;
     })();
   </script>

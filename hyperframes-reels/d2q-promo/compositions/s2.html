@@ -2,233 +2,104 @@
   <style>
     @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
     @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
-    #root { position: absolute; inset: 0; overflow: hidden; font-family: D2QSans, sans-serif; color: #0f172a; }
-    #s2-cam { position: absolute; inset: 0; transform-origin: 540px 520px; }
-    #s2-floor { position: absolute; left: 40px; top: 1580px; width: 1000px; height: 110px; border-radius: 50%;
-                background: radial-gradient(ellipse at center, rgba(15,23,42,0.22), rgba(15,23,42,0) 70%); }
-    /* whiteboard */
-    #s2-wb { position: absolute; left: 120px; top: 504px; width: 840px; height: 340px; }
-    #s2-wbglow { position: absolute; inset: -10px; border-radius: 30px; box-shadow: 0 22px 60px 4px rgba(8,169,162,0.42); opacity: 0; }
-    #s2-wbframe { position: absolute; inset: 0; border-radius: 22px; border: 2px solid #b6c2d1;
-                  background: linear-gradient(180deg, #f8fafc, #cbd5e1); box-shadow: 0 24px 50px rgba(15,23,42,0.16), inset 0 2px 0 #ffffff; }
-    #s2-wbsurf { position: absolute; left: 14px; top: 14px; right: 14px; bottom: 14px; border-radius: 12px; overflow: hidden;
-                 background: linear-gradient(160deg, #ffffff 0%, #f8fafc 55%, #eef2f7 100%); box-shadow: inset 0 2px 6px rgba(15,23,42,0.10); }
-    #s2-wbdim { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(100,116,139,0.30), rgba(71,85,105,0.24)); }
-    #s2-wbsheen { position: absolute; left: -240px; top: -60px; width: 160px; height: 460px; background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.8), rgba(255,255,255,0)); }
-    #s2-q { position: absolute; left: 0; right: 0; top: 92px; text-align: center; font: 800 70px/1 D2QSans, sans-serif; letter-spacing: -0.02em; color: #0f172a;
-            clip-path: inset(-20% 100% -20% -2%); }
-    #s2-q b { color: #08a9a2; font-weight: 800; }
-    #s2-qline { position: absolute; left: 0; top: 0; width: 812px; height: 312px; overflow: visible; }
-    #s2-tray { position: absolute; left: 290px; top: 336px; width: 260px; height: 16px; border-radius: 8px; background: linear-gradient(180deg, #e2e8f0, #94a3b8); }
-    #s2-marker { position: absolute; left: 330px; top: 326px; width: 92px; height: 16px; border-radius: 8px; background: linear-gradient(90deg, #08a9a2 0 26%, #f8fafc 26% 100%);
-                 box-shadow: 0 3px 5px rgba(15,23,42,0.2); }
-    #s2-lamp { position: absolute; left: 270px; top: -14px; width: 300px; height: 20px; border-radius: 10px; background: linear-gradient(180deg, #e2e8f0, #94a3b8);
-               box-shadow: 0 4px 8px rgba(15,23,42,0.18); }
-    #s2-lampon { position: absolute; inset: 0; border-radius: 10px; background: linear-gradient(180deg, #ffffff, #8ce6df); box-shadow: 0 8px 18px 2px rgba(103,214,207,0.9); opacity: 0; }
-    /* chair */
-    #s2-chair { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 540px 1180px; }
-    #s2-chback { position: absolute; left: 380px; top: 790px; width: 320px; height: 420px; border-radius: 96px 96px 30px 30px;
-                 background: linear-gradient(180deg, #475569 0%, #334155 40%, #1e293b 100%); border: 2px solid #1e293b;
-                 box-shadow: 0 24px 44px rgba(15,23,42,0.28), inset 0 4px 0 rgba(255,255,255,0.18); }
-    #s2-chcush { position: absolute; left: 412px; top: 824px; width: 256px; height: 380px; border-radius: 76px 76px 24px 24px;
-                 background: linear-gradient(180deg, #64748b 0%, #475569 38%, #334155 100%); box-shadow: inset 0 4px 0 rgba(255,255,255,0.22), inset 0 -20px 30px rgba(15,23,42,0.25); }
-    .s2-seam { position: absolute; top: 860px; width: 4px; height: 330px; border-radius: 2px; background: rgba(15,23,42,0.28); }
-    .s2-arm { position: absolute; top: 1056px; width: 96px; height: 42px; border-radius: 21px; background: linear-gradient(180deg, #64748b, #1e293b);
-              box-shadow: inset 0 3px 0 rgba(255,255,255,0.22), 0 8px 14px rgba(15,23,42,0.22); }
-    .s2-armpost { position: absolute; top: 1090px; width: 26px; height: 100px; background: linear-gradient(90deg, #1e293b, #475569, #1e293b); }
-    /* desk set */
-    #s2-set { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
-    #s2-desk { position: absolute; left: 0; top: 1140px; width: 1080px; height: 520px; overflow: visible; }
-    .s2-sh { position: absolute; border-radius: 50%; background: radial-gradient(ellipse at center, rgba(15,23,42,0.26), rgba(15,23,42,0) 70%); }
-    #s2-glass { position: absolute; left: 152px; top: 1060px; width: 150px; height: 232px; overflow: visible; transform-origin: 75px 230px; }
-    #s2-np { position: absolute; left: 96px; top: 1286px; width: 400px; height: 124px; overflow: visible; transform-origin: 200px 112px; }
-    #s2-sw { position: absolute; left: 720px; top: 934px; width: 260px; height: 300px; overflow: visible; transform-origin: 130px 270px;
-             filter: drop-shadow(0 16px 18px rgba(15,23,42,0.24)); }
-    #s2-sc { position: absolute; left: 548px; top: 1186px; width: 430px; height: 196px; transform-origin: 215px 196px; }
-    #s2-scglow { position: absolute; inset: -14px; border-radius: 36px; background: radial-gradient(ellipse at center, rgba(8,169,162,0.45), rgba(8,169,162,0) 70%); opacity: 0; }
-    #s2-scin { position: absolute; inset: 0; transform-origin: 50% 50%; }
-    .s2-face { position: absolute; inset: 0; border-radius: 26px; border: 2px solid #d6dfeb; background: linear-gradient(180deg, #ffffff 0%, #f4f7fa 100%);
-               box-shadow: 0 20px 36px rgba(15,23,42,0.18), 0 6px 12px rgba(15,23,42,0.08), inset 0 2px 0 #ffffff; }
-    .s2-face span { position: absolute; left: 0; right: 0; top: 0; text-align: center; font: 800 62px/192px D2QSans, sans-serif; letter-spacing: -0.02em; color: #0f172a; }
-    #s2-back { opacity: 0; }
-    #s2-back span { text-align: left; left: 44px; }
-    #s2-chk { position: absolute; left: 330px; top: 66px; width: 62px; height: 62px; border-radius: 31px; background: radial-gradient(circle at 35% 30%, #67d6cf, #08a9a2 60%, #067a75);
-              box-shadow: 0 6px 14px rgba(8,169,162,0.45); }
-    #s2-holder { position: absolute; left: 700px; top: 1364px; width: 126px; height: 36px; border-radius: 10px 10px 8px 8px;
-                 background: linear-gradient(180deg, #67d6cf, #08a9a2 55%, #067a75); box-shadow: 0 8px 12px rgba(15,23,42,0.22), inset 0 2px 0 rgba(255,255,255,0.5); }
+    #root { position: absolute; inset: 0; overflow: hidden; }
+    #s2-cam { position: absolute; inset: 0; transform-origin: 540px 1032px; }
+    /* the shield group punches as one: plate + etched delta + ring, about the face centre */
+    #s2-shield { position: absolute; inset: 0; transform-origin: 540px 1032px; }
+    #s2-plate { position: absolute; left: -40px; top: 500px; width: 1160px; height: 1160px; }
+    /* p02 at the standard placement: shield x 243-838, y 711-1446; glass face centre (540,1032); the delta sits a touch high
+       because the face narrows toward its point */
+    #s2-ring { position: absolute; left: 368px; top: 836px; width: 344px; height: 344px; border-radius: 50%;
+               border: 3.5px solid rgba(187,247,208,0.85); box-shadow: 0 0 24px rgba(34,197,94,0.75), inset 0 0 24px rgba(34,197,94,0.45); }
+    #s2-ringin { position: absolute; left: 392px; top: 860px; width: 296px; height: 296px; border-radius: 50%;
+                 border: 1.5px solid rgba(220,252,231,0.45); }
+    #s2-delta, #s2-flash { position: absolute; left: 380px; top: 848px; width: 320px; height: 320px; overflow: visible; }
+    #s2-delta { filter: drop-shadow(0 0 16px rgba(34,197,94,0.95)) drop-shadow(0 0 46px rgba(34,197,94,0.55)); }
+    #s2-flash { opacity: 0; filter: drop-shadow(0 0 26px rgba(255,255,255,0.95)) drop-shadow(0 0 70px rgba(134,239,172,0.9)); }
+    #s2-wave { position: absolute; left: 390px; top: 858px; width: 300px; height: 300px; border-radius: 50%; opacity: 0;
+               border: 10px solid #22c55e; box-shadow: 0 0 40px rgba(34,197,94,0.85), inset 0 0 30px rgba(34,197,94,0.55); }
+    #s2-wave2 { position: absolute; left: 390px; top: 858px; width: 300px; height: 300px; border-radius: 50%; opacity: 0;
+                border: 4px solid rgba(220,252,231,0.9); }
+    /* the two chips: dark glass pills, chunky, a green icon disc */
+    .s2-chip { position: absolute; height: 82px; display: flex; align-items: center; gap: 14px; padding: 0 30px 0 12px; border-radius: 41px;
+               background: linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.04)), rgba(20,25,32,0.9);
+               border: 1.5px solid rgba(255,255,255,0.16); white-space: nowrap; opacity: 0;
+               box-shadow: 0 30px 70px rgba(0,0,0,0.45), 0 0 60px rgba(34,197,94,0.14), inset 0 1.5px 0 rgba(255,255,255,0.22);
+               font: 800 38px/1 "D2QSans", sans-serif; letter-spacing: -0.01em; color: #f4f6f7; }
+    .s2-ico { width: 58px; height: 58px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+              background: radial-gradient(circle at 35% 28%, #86efac 0%, #22c55e 48%, #15803d 100%);
+              box-shadow: 0 0 22px rgba(34,197,94,0.55), inset 0 2px 0 rgba(255,255,255,0.45); }
+    .s2-ico b { font: 800 32px/1 "JetBrains Mono", monospace; color: #06140b; }
+    .s2-chip i { font-style: normal; font-family: "JetBrains Mono", monospace; font-weight: 800; color: #22c55e; }
+    #s2-chipL { left: 62px; top: 820px; transform-origin: 100% 50%; }
+    #s2-chipR { left: 668px; top: 1150px; transform-origin: 0% 50%; }
   </style>
   <div id="root" data-composition-id="s2" data-width="1080" data-height="1920">
     <div id="s2-cam">
-      <div id="s2-floor"></div>
-      <div id="s2-wb">
-        <div id="s2-wbglow"></div>
-        <div id="s2-wbframe"></div>
-        <div id="s2-wbsurf">
-          <div id="s2-q"><b>Hedge</b> this option.</div>
-          <svg id="s2-qline" viewBox="0 0 812 312"><path id="s2-qlp" d="M 168 190 Q 250 200 330 186" pathLength="100" fill="none" stroke="#08a9a2" stroke-width="8" stroke-linecap="round" opacity="0"/></svg>
-          <div id="s2-wbsheen"></div>
-          <div id="s2-wbdim"></div>
-        </div>
-        <div id="s2-tray"></div><div id="s2-marker"></div>
-        <div id="s2-lamp"><div id="s2-lampon"></div></div>
-      </div>
-      <div id="s2-chair">
-        <div class="s2-armpost" style="left:365px"></div><div class="s2-armpost" style="left:689px"></div>
-        <div id="s2-chback"></div><div id="s2-chcush"></div>
-        <div class="s2-seam" style="left:494px"></div><div class="s2-seam" style="left:582px"></div>
-        <div class="s2-arm" style="left:330px"></div><div class="s2-arm" style="left:654px"></div>
-      </div>
-      <div id="s2-set">
-        <svg id="s2-desk" viewBox="0 0 1080 520">
+      <div id="s2-shield">
+        <img id="s2-plate" src="assets/plates/p02.png" alt="" />
+        <!-- the shockwave rings run under the delta, so they leave the face centre behind the glyph's strokes -->
+        <div id="s2-wave"></div>
+        <div id="s2-wave2"></div>
+        <div id="s2-ring"></div>
+        <div id="s2-ringin"></div>
+        <!-- a heavy grotesque delta (D2QSans has no Greek): outer triangle with a small counter, etched white-to-mint -->
+        <svg id="s2-delta" viewBox="-160 -160 320 320">
           <defs>
-            <linearGradient id="s2-gTop" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e8edf3"/><stop offset="1" stop-color="#ffffff"/></linearGradient>
-            <linearGradient id="s2-gFront" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#eef2f7"/><stop offset="1" stop-color="#c3cedb"/></linearGradient>
-            <linearGradient id="s2-gSide" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b6c2d1"/><stop offset="1" stop-color="#8a99ad"/></linearGradient>
-            <linearGradient id="s2-gLeg" x1="0" x2="1"><stop offset="0" stop-color="#94a3b8"/><stop offset="0.4" stop-color="#e2e8f0"/><stop offset="1" stop-color="#94a3b8"/></linearGradient>
-            <linearGradient id="s2-gPanel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d5dde7"/><stop offset="1" stop-color="#e8edf3"/></linearGradient>
+            <linearGradient id="s2-gD" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#ffffff" /><stop offset="0.55" stop-color="#f0fdf4" /><stop offset="1" stop-color="#bbf7d0" />
+            </linearGradient>
           </defs>
-          <rect x="962" y="66" width="34" height="170" fill="url(#s2-gLeg)"/>
-          <rect x="166" y="300" width="658" height="128" fill="url(#s2-gPanel)" stroke="#c3cedb" stroke-width="2"/>
-          <rect x="112" y="296" width="56" height="186" rx="6" fill="url(#s2-gLeg)" stroke="#b6c2d1" stroke-width="2"/>
-          <rect x="822" y="296" width="56" height="186" rx="6" fill="url(#s2-gLeg)" stroke="#b6c2d1" stroke-width="2"/>
-          <path d="M 900 260 L 1010 30 L 1010 70 L 900 300 Z" fill="url(#s2-gSide)" stroke="#94a3b8" stroke-width="2" stroke-linejoin="round"/>
-          <rect x="90" y="260" width="810" height="40" fill="url(#s2-gFront)" stroke="#b6c2d1" stroke-width="2"/>
-          <path d="M 90 260 L 900 260 L 1010 30 L 200 30 Z" fill="url(#s2-gTop)" stroke="#c3cedb" stroke-width="2" stroke-linejoin="round"/>
-          <path d="M 92 259 L 898 259" stroke="#08a9a2" stroke-width="4" stroke-linecap="round"/>
-          <path d="M 206 34 L 1002 34" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+          <path fill="url(#s2-gD)" fill-rule="evenodd" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linejoin="round"
+                d="M -11 -128 Q 0 -146 11 -128 L 140 100 Q 148 118 128 118 L -128 118 Q -148 118 -140 100 Z
+                   M 0 -40 L -54 66 L 54 66 Z" />
+          <path d="M -4 -118 L -118 92" stroke="rgba(255,255,255,0.95)" stroke-width="5" stroke-linecap="round" opacity="0.8" />
         </svg>
-        <div id="s2-sh1" class="s2-sh" style="left:150px;top:1262px;width:170px;height:40px"></div>
-        <div id="s2-sh2" class="s2-sh" style="left:740px;top:1196px;width:230px;height:44px"></div>
-        <div id="s2-sh3" class="s2-sh" style="left:120px;top:1374px;width:360px;height:44px"></div>
-        <div id="s2-sh4" class="s2-sh" style="left:600px;top:1374px;width:330px;height:44px"></div>
-        <svg id="s2-glass" viewBox="0 0 150 232">
-          <defs><clipPath id="s2-gclip"><path d="M 22 10 L 128 10 L 114 212 Q 113 222 103 222 L 47 222 Q 37 222 36 212 Z"/></clipPath></defs>
-          <g clip-path="url(#s2-gclip)"><g id="s2-water">
-            <rect x="-20" y="78" width="190" height="170" fill="rgba(103,214,207,0.42)"/>
-            <ellipse cx="75" cy="78" rx="60" ry="9" fill="rgba(8,169,162,0.28)" stroke="#67d6cf" stroke-width="3"/>
-          </g></g>
-          <path d="M 22 10 L 128 10 L 114 212 Q 113 222 103 222 L 47 222 Q 37 222 36 212 Z" fill="rgba(255,255,255,0.28)" stroke="#a9b6c6" stroke-width="3"/>
-          <path d="M 38 200 Q 75 212 112 200 L 113 214 Q 112 222 103 222 L 47 222 Q 38 222 37 214 Z" fill="rgba(203,213,225,0.7)"/>
-          <ellipse cx="75" cy="10" rx="53" ry="7" fill="rgba(255,255,255,0.5)" stroke="#a9b6c6" stroke-width="3"/>
-          <path d="M 36 26 L 48 196" stroke="#ffffff" stroke-width="7" stroke-linecap="round" opacity="0.9"/>
-          <path d="M 108 30 L 102 120" stroke="#ffffff" stroke-width="4" stroke-linecap="round" opacity="0.6"/>
+        <svg id="s2-flash" viewBox="-160 -160 320 320">
+          <path fill="#ffffff" fill-rule="evenodd"
+                d="M -11 -128 Q 0 -146 11 -128 L 140 100 Q 148 118 128 118 L -128 118 Q -148 118 -140 100 Z
+                   M 0 -40 L -54 66 L 54 66 Z" />
         </svg>
-        <svg id="s2-np" viewBox="0 0 400 124">
-          <defs><linearGradient id="s2-gNp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#475569"/><stop offset="0.5" stop-color="#1e293b"/><stop offset="1" stop-color="#0f172a"/></linearGradient></defs>
-          <path d="M 40 6 L 360 6 L 352 14 L 48 14 Z" fill="#94a3b8"/>
-          <path d="M 20 110 L 380 110 L 360 12 L 40 12 Z" fill="url(#s2-gNp)" stroke="#0f172a" stroke-width="2" stroke-linejoin="round"/>
-          <path d="M 42 15 L 358 15" stroke="#ffffff" stroke-width="2" opacity="0.4"/>
-          <text x="200" y="74" text-anchor="middle" font-family="D2QSans, sans-serif" font-weight="800" font-size="38" letter-spacing="4" fill="#ffffff">FINAL ROUND</text>
-          <rect x="160" y="86" width="80" height="5" rx="2.5" fill="#67d6cf"/>
-          <rect id="s2-npsheen" x="-60" y="12" width="40" height="98" fill="rgba(255,255,255,0.22)" transform="skewX(-18)"/>
-        </svg>
-        <svg id="s2-sw" viewBox="0 0 260 300">
-          <defs>
-            <radialGradient id="s2-gCase" cx="0.35" cy="0.3" r="0.8"><stop offset="0" stop-color="#ffffff"/><stop offset="0.55" stop-color="#e2e8f0"/><stop offset="1" stop-color="#94a3b8"/></radialGradient>
-            <linearGradient id="s2-gMet" x1="0" x2="1"><stop offset="0" stop-color="#94a3b8"/><stop offset="0.45" stop-color="#f8fafc"/><stop offset="1" stop-color="#7b8aa0"/></linearGradient>
-            <radialGradient id="s2-gDial" cx="0.4" cy="0.35" r="0.75"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#e8edf3"/></radialGradient>
-          </defs>
-          <circle cx="130" cy="20" r="15" fill="none" stroke="url(#s2-gMet)" stroke-width="7"/>
-          <rect x="120" y="44" width="20" height="22" fill="url(#s2-gMet)"/>
-          <rect id="s2-crown" x="106" y="28" width="48" height="22" rx="8" fill="url(#s2-gMet)" stroke="#94a3b8" stroke-width="1.5"/>
-          <g id="s2-btn" transform="rotate(44 130 145)"><rect x="119" y="16" width="22" height="24" rx="6" fill="url(#s2-gMet)" stroke="#94a3b8" stroke-width="1.5"/></g>
-          <circle cx="130" cy="145" r="112" fill="url(#s2-gCase)" stroke="#a9b6c6" stroke-width="2"/>
-          <circle cx="130" cy="145" r="101" fill="#cbd5e1"/>
-          <circle cx="130" cy="145" r="93" fill="url(#s2-gDial)" stroke="#b6c2d1" stroke-width="2"/>
-          <circle id="s2-arc" cx="130" cy="145" r="52" fill="none" stroke="rgba(8,169,162,0.30)" stroke-width="26" pathLength="360" stroke-dasharray="0 360" transform="rotate(-90 130 145)"/>
-          <g id="s2-ticks"></g>
-          <g id="s2-hand"><path d="M 130 168 L 130 66" stroke="#08a9a2" stroke-width="6" stroke-linecap="round"/><circle cx="130" cy="172" r="7" fill="#08a9a2"/></g>
-          <circle cx="130" cy="145" r="11" fill="#0f172a"/><circle cx="130" cy="145" r="4.5" fill="#67d6cf"/>
-          <path d="M 62 104 A 80 80 0 0 1 128 66" fill="none" stroke="#ffffff" stroke-width="8" stroke-linecap="round" opacity="0.75"/>
-        </svg>
-        <div id="s2-holder"></div>
-        <div id="s2-sc"><div id="s2-scglow"></div><div id="s2-scin">
-          <div id="s2-front" class="s2-face"><span>memorise</span>
-            <svg style="position:absolute;left:0;top:0;overflow:visible" width="430" height="196" viewBox="0 0 430 196"><path id="s2-strike" d="M 70 108 L 362 94" pathLength="100" fill="none" stroke="#f43f5e" stroke-width="10" stroke-linecap="round" opacity="0"/></svg>
-          </div>
-          <div id="s2-back" class="s2-face"><span>practise</span>
-            <div id="s2-chk"><svg width="62" height="62" viewBox="0 0 62 62"><path id="s2-chkp" d="M 18 32 L 27 41 L 45 22" pathLength="100" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" opacity="0"/></svg></div>
-          </div>
-        </div></div>
       </div>
+      <div class="s2-chip" id="s2-chipL"><span class="s2-ico">
+        <svg width="34" height="34" viewBox="0 0 34 34"><path d="M 17 3.5 L 28.5 8 V 16 C 28.5 23.5 23.5 28.5 17 31 C 10.5 28.5 5.5 23.5 5.5 16 V 8 Z" fill="none" stroke="#06140b" stroke-width="3.8" stroke-linejoin="round" />
+          <path d="M 11.5 17 L 15.5 21 L 22.5 13" fill="none" stroke="#06140b" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      </span><span><i>Δ</i>-hedge</span></div>
+      <div class="s2-chip" id="s2-chipR"><span class="s2-ico">
+        <svg width="34" height="34" viewBox="0 0 34 34"><path d="M 27 13 A 11 11 0 0 0 7 11 M 7 21 A 11 11 0 0 0 27 23" fill="none" stroke="#06140b" stroke-width="4" stroke-linecap="round" />
+          <path d="M 4 6 L 7 12 L 13 9 M 30 28 L 27 22 L 21 25" fill="none" stroke="#06140b" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      </span>rebalance</div>
     </div>
   </div>
   <script>
     (function () {
-      /*DATA*/ const DUR = 3.65; const W = [0.18, 0.52, 0.64, 0.96, 1.2, 1.32, 1.46, 2.1, 2.26, 2.56, 2.82, 2.96]; /*END*/
-      // words: 0 If 1 you're 2 preparing 3 for 4 a 5 quant 6 interview, 7 this 8 changes 9 how 10 you 11 study.
-      const w = (i) => (W.length > i ? W[i] : 0.18 + i * 0.27);
-      const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
-      const eio = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
-      const P = { press: w(2), glint: w(4), lit: w(6) - 0.04, q0: w(6) + 0.04, strike: w(7), flip: Math.max(w(8) + 0.06, w(7) + 0.3), chk: w(10), glow: w(11) };
+      /*DATA*/ const DUR = 1.19; const W = [0.16, 0.42, 0.52, 0.64, 0.8, 0.96]; /*END*/
+      // words: 0 But 1 can 2 you 3 hedge 4 with 5 it?
+      const w = (i) => Math.max(0, W.length > i ? W[i] : 0.16 + i * 0.16);
       const tl = gsap.timeline({ paused: true });
-      tl.fromTo("#s2-cam", { scale: 1, y: 0 }, { scale: 1.05, y: -10, duration: DUR, ease: "none" }, 0);
-      // the set arrives in the first 0.3 s: desk slides up and settles, props scale in on a short stagger
-      tl.fromTo("#s2-set", { y: 150 }, { y: 0, duration: 0.5, ease: "power3.out" }, 0);
-      tl.fromTo("#s2-floor", { opacity: 0.3, scaleX: 0.8 }, { opacity: 1, scaleX: 1, duration: 0.5, ease: "power3.out" }, 0);
-      tl.fromTo("#s2-wb", { y: -50, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45, ease: "power3.out" }, 0.02);
-      tl.fromTo("#s2-chair", { y: 110, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: "power3.out" }, 0.04);
-      [["#s2-sh1", 0.1], ["#s2-sh2", 0.12], ["#s2-sh3", 0.15], ["#s2-sh4", 0.2]].forEach(([id, at]) =>
-        tl.fromTo(id, { opacity: 0, scaleX: 0.5 }, { opacity: 1, scaleX: 1, duration: 0.4, ease: "power2.out" }, at));
-      [["#s2-glass", 0.08], ["#s2-np", 0.13], ["#s2-sw", 0.1], ["#s2-sc", 0.18], ["#s2-holder", 0.16]].forEach(([id, at]) =>
-        tl.fromTo(id, { scale: 0.55, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.42, ease: "back.out(1.7)" }, at));
-      // W[6] "interview": the whiteboard lights up with the question
-      tl.fromTo("#s2-wbdim", { opacity: 1 }, { opacity: 0, duration: 0.25, ease: "power2.out" }, P.lit);
-      tl.fromTo("#s2-lampon", { opacity: 0 }, { opacity: 1, duration: 0.18, ease: "power2.out" }, P.lit);
-      tl.fromTo("#s2-wbglow", { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out" }, P.lit);
-      // W[7]..W[11]: strike "memorise", flip the card, check "practise"
-      tl.fromTo("#s2-scin", { scaleX: 1, filter: "blur(0px)" }, { scaleX: 0.02, filter: "blur(5px)", duration: 0.13, ease: "power2.in" }, P.flip);
-      tl.fromTo("#s2-front", { opacity: 1 }, { opacity: 0, duration: 0.01 }, P.flip + 0.13);
-      tl.fromTo("#s2-back", { opacity: 0 }, { opacity: 1, duration: 0.01 }, P.flip + 0.13);
-      tl.fromTo("#s2-scin", { scaleX: 0.02, filter: "blur(5px)" }, { scaleX: 1, filter: "blur(0px)", duration: 0.18, ease: "power2.out", immediateRender: false }, P.flip + 0.14);
-      tl.fromTo("#s2-sc", { y: 0 }, { y: -34, duration: 0.15, ease: "power2.out", yoyo: true, repeat: 1, immediateRender: false }, P.flip);
-      tl.fromTo("#s2-chk", { scale: 0.3, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.3, ease: "back.out(2.2)" }, P.chk - 0.08);
-      tl.fromTo("#s2-scglow", { opacity: 0 }, { opacity: 1, duration: 0.25, ease: "power2.out" }, P.glow);
-
-      // stopwatch ticks (built once)
-      const NS = "http://www.w3.org/2000/svg", tg = document.getElementById("s2-ticks");
-      for (let i = 0; i < 60; i++) {
-        const a = (i * 6 * Math.PI) / 180, maj = i % 5 === 0, r0 = maj ? 70 : 78, r1 = 87;
-        const ln = document.createElementNS(NS, "line");
-        ln.setAttribute("x1", (130 + r0 * Math.sin(a)).toFixed(2)); ln.setAttribute("y1", (145 - r0 * Math.cos(a)).toFixed(2));
-        ln.setAttribute("x2", (130 + r1 * Math.sin(a)).toFixed(2)); ln.setAttribute("y2", (145 - r1 * Math.cos(a)).toFixed(2));
-        ln.setAttribute("stroke", maj ? "#0f172a" : "#94a3b8"); ln.setAttribute("stroke-width", maj ? "5" : "2.5"); ln.setAttribute("stroke-linecap", "round");
-        tg.appendChild(ln);
-      }
-      const $ = (id) => document.getElementById(id);
-      const hand = $("s2-hand"), arc = $("s2-arc"), btn = $("s2-btn"), water = $("s2-water"), q = $("s2-q"), qlp = $("s2-qlp");
-      const strike = $("s2-strike"), chkp = $("s2-chkp"), npsheen = $("s2-npsheen"), wbsheen = $("s2-wbsheen"), scglow = $("s2-scglow");
-      ["s2-qlp","s2-strike","s2-chkp"].forEach((id) => { const e = document.getElementById(id); e.setAttribute("stroke-dasharray", "100 100"); e.setAttribute("stroke-dashoffset", "100"); });
-      const backOut = (x) => { const s = 2.2; x -= 1; return x * x * ((s + 1) * x + s) + 1; };
-      const TICK = 0.25;
-      function draw(t) {
-        // the hand ticks one mark every quarter second, with a small snap
-        const n = Math.floor(t / TICK), f = clamp((t - n * TICK) / 0.08, 0, 1);
-        const ang = -36 + 6 * (n - 1 + backOut(f));
-        hand.setAttribute("transform", "rotate(" + ang.toFixed(2) + " 130 145)");
-        // the button is pressed on "preparing"; a teal elapsed arc then follows the hand
-        const pr = t - P.press, dip = pr >= 0 && pr < 0.2 ? Math.sin((pr / 0.2) * Math.PI) * 7 : 0;
-        btn.setAttribute("transform", "rotate(44 130 145) translate(0 " + dip.toFixed(2) + ")");
-        const from = -36 + 6 * Math.floor(P.press / TICK), span = pr >= 0 ? Math.max(0, ang - from) : 0;
-        arc.setAttribute("stroke-dasharray", span.toFixed(2) + " 360");
-        arc.setAttribute("transform", "rotate(" + (-90 + from).toFixed(2) + " 130 145)");
-        // the water sways gently; a slosh when the props land and on "interview"
-        const sl = 3.2 * Math.exp(-t * 3) * Math.sin(t * 13) + 1.6 * Math.sin(t * 2.6) + (t > P.lit ? 2.4 * Math.exp(-(t - P.lit) * 4) * Math.sin((t - P.lit) * 15) : 0);
-        water.setAttribute("transform", "rotate(" + sl.toFixed(2) + " 75 78)");
-        // nameplate glint on "a"
-        const gp = clamp((t - P.glint) / 0.5, 0, 1);
-        npsheen.setAttribute("x", (-60 + 520 * eio(gp)).toFixed(1));
-        // the question writes on as the board lights up, a teal underline under "Hedge"
-        const qp = clamp((t - P.q0) / 0.42, 0, 1);
-        q.style.clipPath = qp >= 1 ? "none" : "inset(-20% " + (100 - 100 * qp).toFixed(1) + "% -20% -2%)";
-        const lp = clamp((t - P.q0 - 0.4) / 0.25, 0, 1); qlp.setAttribute("stroke-dashoffset", (100 - 100 * lp).toFixed(2)); qlp.setAttribute("opacity", lp > 0 ? "1" : "0");
-        wbsheen.style.transform = "translateX(" + (1200 * eio(clamp((t - P.lit) / 0.55, 0, 1))).toFixed(1) + "px) rotate(16deg)";
-        const sp = clamp((t - P.strike) / 0.22, 0, 1); strike.setAttribute("stroke-dashoffset", (100 - 100 * sp).toFixed(2)); strike.setAttribute("opacity", sp > 0 ? "1" : "0");
-        const cp = clamp((t - P.chk) / 0.22, 0, 1); chkp.setAttribute("stroke-dashoffset", (100 - 100 * cp).toFixed(2)); chkp.setAttribute("opacity", cp > 0 ? "1" : "0");
-        if (t > P.glow) scglow.style.transform = "scale(" + (1 + 0.04 * Math.sin((t - P.glow) * 8)).toFixed(3) + ")";
-      }
-      const st = { t: 0 };
-      tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: () => draw(st.t) }, 0);
+      const H = w(3);
+      // camera: the shield drops in from above and settles, then a slow push toward the face
+      tl.fromTo("#s2-cam", { y: -90, scale: 1.12 }, { y: 0, scale: 1, duration: 0.6, ease: "expo.out" }, 0);
+      tl.fromTo("#s2-cam", { scale: 1 }, { scale: 1.04, duration: Math.max(0.2, DUR - 0.6), ease: "sine.inOut", immediateRender: false }, 0.6);
+      // the delta is etched in as the shot lands; its ring draws a beat later
+      tl.fromTo("#s2-delta", { opacity: 0, scale: 0.86 }, { opacity: 1, scale: 1, duration: 0.34, ease: "power3.out" }, 0.02);
+      tl.fromTo("#s2-ring", { opacity: 0, scale: 0.82 }, { opacity: 1, scale: 1, duration: 0.4, ease: "power3.out" }, 0.08);
+      tl.fromTo("#s2-ringin", { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, duration: 0.4, ease: "power3.out" }, 0.12);
+      // "hedge": the shield punches, a green shockwave leaves the face, the delta flashes white-hot
+      tl.fromTo("#s2-shield", { scale: 1 }, { scale: 1.08, duration: 0.08, ease: "power2.out" }, H - 0.03);
+      tl.fromTo("#s2-shield", { scale: 1.08 }, { scale: 1, duration: 0.26, ease: "power2.inOut", immediateRender: false }, H + 0.05);
+      tl.fromTo("#s2-flash", { opacity: 0 }, { opacity: 1, duration: 0.05, ease: "none" }, H - 0.03);
+      tl.fromTo("#s2-flash", { opacity: 1 }, { opacity: 0.18, duration: 0.34, ease: "power2.out", immediateRender: false }, H + 0.04);
+      // the rings leave the face centre fast (past the glyph within a frame), then coast out as they fade
+      tl.fromTo("#s2-wave", { scale: 0.5 }, { scale: 2.3, duration: 0.55, ease: "expo.out", immediateRender: false }, H - 0.02);
+      tl.fromTo("#s2-wave", { opacity: 1 }, { opacity: 0, duration: 0.55, ease: "power2.in", immediateRender: false }, H - 0.02);
+      tl.fromTo("#s2-wave2", { scale: 0.5 }, { scale: 1.75, duration: 0.45, ease: "expo.out", immediateRender: false }, H + 0.04);
+      tl.fromTo("#s2-wave2", { opacity: 0.9 }, { opacity: 0, duration: 0.45, ease: "power2.in", immediateRender: false }, H + 0.04);
+      tl.fromTo("#s2-ring", { borderColor: "rgba(187,247,208,0.85)" }, { borderColor: "rgba(255,255,255,1)", duration: 0.06, ease: "none", immediateRender: false }, H - 0.03);
+      tl.fromTo("#s2-ring", { borderColor: "rgba(255,255,255,1)" }, { borderColor: "rgba(187,247,208,0.85)", duration: 0.3, ease: "power2.out", immediateRender: false }, H + 0.06);
+      // "with it?": a chip pops out of each side of the shield
+      tl.fromTo("#s2-chipL", { opacity: 0, scale: 0.4, x: 70, rotation: -10 }, { opacity: 1, scale: 1, x: 0, rotation: -4, duration: 0.26, ease: "back.out(2.2)" }, w(4) - 0.06);
+      tl.fromTo("#s2-chipR", { opacity: 0, scale: 0.4, x: -70, rotation: 10 }, { opacity: 1, scale: 1, x: 0, rotation: 3, duration: 0.26, ease: "back.out(2.2)" }, Math.min(w(5) - 0.1, DUR - 0.34));
       window.__timelines["s2"] = tl;
     })();
   </script>

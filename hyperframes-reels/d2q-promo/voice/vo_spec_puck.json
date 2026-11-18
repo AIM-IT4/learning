@@ -1,0 +1,86 @@
+{
+ "tempo": 1.0,
+ "max_pause": 0.3,
+ "keep": 0.22,
+ "parts": [
+  [
+   "p01",
+   "/home/user/Films/d2q-promo/voice/paradee_puck/p01.wav"
+  ],
+  [
+   "p02",
+   "/home/user/Films/d2q-promo/voice/paradee_puck/p02.wav"
+  ],
+  [
+   "p03",
+   "/home/user/Films/d2q-promo/voice/paradee_puck/p03.wav"
+  ],
+  [
+   "p04",
+   "/home/user/Films/d2q-promo/voice/paradee_puck/p04.wav"
+  ],
+  [
+   "p05",
+   "/home/user/Films/d2q-promo/voice/paradee_puck/p05.wav",
+   {
+    "max_pause": 9
+   }
+  ],
+  [
+   "p06",
+   "/home/user/Films/d2q-promo/voice/paradee_puck/p06.wav"
+  ],
+  [
+   "p07",
+   "/home/user/Films/d2q-promo/voice/paradee_puck/p07.wav"
+  ],
+  [
+   "p08",
+   "/home/user/Films/d2q-promo/voice/paradee_puck/p08.wav"
+  ],
+  [
+   "p09",
+   "/home/user/Films/d2q-promo/voice/paradee_puck/p09.wav"
+  ],
+  [
+   "p10",
+   "/home/user/Films/d2q-promo/voice/paradee_puck/p10.wav"
+  ],
+  [
+   "p11",
+   "/home/user/Films/d2q-promo/voice/paradee_puck/p11.wav"
+  ],
+  [
+   "p12",
+   "/home/user/Films/d2q-promo/voice/paradee_puck/p12.wav"
+  ],
+  [
+   "p13",
+   "/home/user/Films/d2q-promo/voice/paradee_puck/p13.wav"
+  ],
+  [
+   "p14",
+   "/home/user/Films/d2q-promo/voice/paradee_puck/p14.wav"
+  ],
+  [
+   "p15",
+   "/home/user/Films/d2q-promo/voice/paradee_puck/p15.wav"
+  ]
+ ],
+ "gaps": [
+  0.15,
+  0.22,
+  0.22,
+  0.2,
+  0.25,
+  0.15,
+  0.25,
+  0.22,
+  0.22,
+  0.22,
+  0.22,
+  0.22,
+  0.2,
+  0.7
+ ]
+}

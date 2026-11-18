@@ -2,226 +2,220 @@
   <style>
     @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
     @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
-    #root { position: absolute; inset: 0; overflow: hidden; font-family: D2QSans, sans-serif; color: #0f172a; }
-    #s4-cam { position: absolute; inset: 0; transform-origin: 540px 1150px; }
-    .s4-shadow { position: absolute; border-radius: 50%; background: radial-gradient(ellipse at center, rgba(15,23,42,0.22), rgba(15,23,42,0) 70%); }
-    #s4-pfloor { left: 120px; top: 1452px; width: 840px; height: 96px; }
-    #s4-gfloor { left: 290px; top: 1652px; width: 560px; height: 70px; }
-
-    /* ---- the pile of formula cards ---- */
-    #s4-pile { position: absolute; left: 80px; top: 620px; width: 920px; height: 840px; transform-origin: 50% 50%; }
-    .s4-card { position: absolute; left: 0; width: 920px; height: 240px; border-radius: 32px;
-               background: linear-gradient(180deg, #ffffff 0%, #f4f8fb 100%); border: 2px solid #d6dfeb;
-               box-shadow: 0 26px 48px rgba(15,23,42,0.13), 0 6px 14px rgba(15,23,42,0.07), 0 -5px 16px rgba(15,23,42,0.06), inset 0 2px 0 #ffffff; }
-    .s4-bar { position: absolute; left: 32px; top: 42px; width: 12px; height: 66px; border-radius: 6px;
-              background: linear-gradient(180deg, #67d6cf, #08a9a2); box-shadow: 0 4px 10px rgba(8,169,162,0.35); }
-    .s4-f { position: absolute; left: 70px; top: 0; height: 150px; line-height: 150px; white-space: nowrap;
-            font: 600 56px/150px D2QSans, sans-serif; letter-spacing: -0.01em; color: #0f172a; }
-    .s4-f i { font-style: italic; margin-right: 0.07em; }
-    .s4-f sub, .s4-f sup { font-size: 0.6em; line-height: 0; position: relative; vertical-align: baseline; }
-    .s4-f sub { top: 0.32em; }
-    .s4-f sup { top: -0.78em; }
-    .s4-f .s4-rad { display: inline-block; border-top: 5px solid #0f172a; line-height: 1; padding: 2px 6px 0 4px; margin-left: -3px; }
-    .s4-rule { position: absolute; left: 32px; right: 32px; height: 2px; background: #e6edf5; }
-    .s4-rule.t { background: #bfe9e5; }
-
-    /* ---- the pressure gauge ---- */
-    #s4-gwrap { position: absolute; left: 200px; top: 835px; width: 740px; height: 860px; }
-    #s4-gshake { position: absolute; inset: 0; }
-    #s4-rglow { position: absolute; left: -330px; top: -330px; width: 1400px; height: 1400px; border-radius: 50%; opacity: 0;
-                background: radial-gradient(circle, rgba(244,63,94,0.58) 0%, rgba(244,63,94,0.26) 30%, rgba(244,63,94,0) 60%); }
-    #s4-nut { position: absolute; left: 270px; top: 690px; width: 200px; height: 84px; border-radius: 10px; border: 2px solid #94a3b8;
-              background: linear-gradient(90deg, #94a3b8 0%, #cbd5e1 18%, #cbd5e1 24%, #ffffff 26%, #f1f5f9 50%, #e2e8f0 74%, #94a3b8 76%, #64748b 100%);
-              box-shadow: 0 10px 18px rgba(15,23,42,0.18); }
-    #s4-pipe { position: absolute; left: 320px; top: 770px; width: 100px; height: 64px; border: 2px solid #94a3b8; border-top: 0;
-               background: linear-gradient(90deg, #94a3b8 0%, #f8fafc 38%, #e2e8f0 60%, #94a3b8 100%); }
-    #s4-flange { position: absolute; left: 290px; top: 826px; width: 160px; height: 26px; border-radius: 8px; border: 2px solid #94a3b8;
-                 background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%); }
-    #s4-bezel { position: absolute; left: 0; top: 0; width: 740px; height: 740px; border-radius: 50%; border: 2px solid #b4c0cf;
-                background: conic-gradient(from 200deg, #ffffff 0deg, #cbd5e1 60deg, #f8fafc 120deg, #94a3b8 190deg, #e2e8f0 250deg, #ffffff 310deg, #ffffff 360deg);
-                box-shadow: 0 44px 80px rgba(15,23,42,0.24), 0 12px 24px rgba(15,23,42,0.12), inset 0 3px 2px rgba(255,255,255,0.95); }
-    #s4-bevel { position: absolute; left: 22px; top: 22px; width: 696px; height: 696px; border-radius: 50%;
-                background: linear-gradient(180deg, #94a3b8 0%, #e2e8f0 45%, #ffffff 100%); }
-    #s4-dial { position: absolute; left: 36px; top: 36px; width: 668px; height: 668px; border-radius: 50%;
-               background: radial-gradient(circle at 50% 30%, #ffffff 0%, #f8fafc 52%, #e6edf5 100%);
-               box-shadow: inset 0 10px 22px rgba(15,23,42,0.20), inset 0 -4px 10px rgba(255,255,255,0.9); }
-    #s4-arc { position: absolute; left: 0; top: 0; width: 740px; height: 740px; }
-    #s4-label { position: absolute; left: 0; width: 740px; top: 546px; text-align: center; font: 800 38px/1 D2QSans, sans-serif;
-                letter-spacing: 0.22em; text-indent: 0.22em; color: #475569; opacity: 0; }
-    #s4-needle { position: absolute; left: 338px; top: 100px; width: 64px; height: 340px; transform-origin: 32px 270px; transform: rotate(-130deg); }
-    #s4-hub { position: absolute; left: 322px; top: 322px; width: 96px; height: 96px; border-radius: 50%;
-              background: radial-gradient(circle at 38% 30%, #ffffff 0%, #e2e8f0 45%, #94a3b8 100%); border: 2px solid #94a3b8;
-              box-shadow: 0 8px 16px rgba(15,23,42,0.28); }
-    #s4-cap { position: absolute; left: 26px; top: 26px; width: 40px; height: 40px; border-radius: 50%;
-              background: radial-gradient(circle at 35% 30%, #67d6cf 0%, #08a9a2 55%, #067a75 100%); box-shadow: inset 0 2px 2px rgba(255,255,255,0.6); }
-    #s4-glass { position: absolute; left: 36px; top: 36px; width: 668px; height: 668px; border-radius: 50%; pointer-events: none;
-                background: radial-gradient(ellipse 62% 40% at 38% 16%, rgba(255,255,255,0.80) 0%, rgba(255,255,255,0.18) 55%, rgba(255,255,255,0) 72%); }
-
-    /* ---- the chip ---- */
-    #s4-chip { position: absolute; left: 566px; top: 610px; height: 96px; padding: 0 34px 0 30px; border-radius: 48px; display: flex; align-items: center; gap: 18px;
-               background: linear-gradient(180deg, #ffffff 0%, #f3f7fa 100%); border: 2px solid #d6dfeb; white-space: nowrap;
-               box-shadow: 0 18px 36px rgba(15,23,42,0.16), 0 4px 10px rgba(15,23,42,0.08), inset 0 2px 0 #ffffff;
-               font: 800 40px/1 D2QSans, sans-serif; letter-spacing: -0.02em; color: #0f172a; opacity: 0; transform-origin: 30% 50%; }
-    #s4-chip b { color: #08a9a2; font-weight: 800; }
-    #s4-dot { position: relative; width: 24px; height: 24px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #67d6cf, #08a9a2 60%, #067a75); flex: none; }
-    #s4-ring { position: absolute; left: -2px; top: -2px; width: 24px; height: 24px; border-radius: 50%; border: 3px solid #08a9a2; }
+    #root { position: absolute; inset: 0; overflow: hidden; }
+    #s4-cam { position: absolute; inset: 0; transform-origin: 540px 1095px; }
+    #s4-halo { position: absolute; left: -10px; top: 640px; width: 1100px; height: 960px; border-radius: 50%; opacity: 0.6;
+               background: radial-gradient(ellipse at center, rgba(34,197,94,0.22) 0%, rgba(34,197,94,0.08) 45%, rgba(34,197,94,0) 70%); }
+    #s4-under { position: absolute; left: 120px; top: 1520px; width: 840px; height: 160px; border-radius: 50%; opacity: 0.7;
+                background: radial-gradient(ellipse at center, rgba(34,197,94,0.60) 0%, rgba(34,197,94,0.20) 42%, rgba(34,197,94,0) 72%); }
+    #s4-persp { position: absolute; inset: 0; perspective: 1600px; perspective-origin: 540px 1095px; }
+    /* the notebook: a dark glass card in 3D */
+    #s4-card { position: absolute; left: 90px; top: 620px; width: 900px; height: 950px; border-radius: 26px; overflow: hidden; transform-origin: 50% 50%;
+               background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.03)), linear-gradient(180deg, rgba(21,26,33,0.93), rgba(12,16,21,0.95));
+               border: 1.5px solid rgba(255,255,255,0.14);
+               box-shadow: 0 30px 70px rgba(0,0,0,0.45), 0 0 60px rgba(34,197,94,0.14), inset 0 1.5px 0 rgba(255,255,255,0.18); }
+    #s4-head { position: absolute; left: 0; top: 0; width: 900px; height: 92px; border-bottom: 1.5px solid rgba(255,255,255,0.08); }
+    .s4-dot { position: absolute; top: 36px; width: 20px; height: 20px; border-radius: 10px; }
+    #s4-file { position: absolute; left: 132px; top: 0; font: 600 26px/92px "JetBrains Mono", monospace; color: #9aa4b2; }
+    #s4-one { position: absolute; right: 28px; top: 24px; height: 44px; padding: 0 18px; border-radius: 22px; white-space: nowrap;
+              font: 700 26px/41px "JetBrains Mono", monospace; color: #fb7185; background: rgba(244,63,94,0.12); border: 1.5px solid rgba(244,63,94,0.55); }
+    #s4-chart { position: absolute; left: 24px; top: 100px; width: 852px; height: 420px; }
+    .s4-ax { position: absolute; left: 62px; width: 34px; text-align: right; font: 600 26px/32px "JetBrains Mono", monospace; color: #9aa4b2; }
+    #s4-tx { position: absolute; left: 112px; top: 462px; font: 600 26px/32px "JetBrains Mono", monospace; color: #9aa4b2; }
+    #s4-sllab { position: absolute; left: 40px; top: 560px; font: 700 30px/64px "D2QSans", sans-serif; color: #9aa4b2; }
+    #s4-track { position: absolute; left: 290px; top: 585px; width: 520px; height: 14px; border-radius: 7px; background: rgba(255,255,255,0.10); }
+    #s4-fill { position: absolute; left: 0; top: 0; height: 14px; width: 0; border-radius: 7px; background: linear-gradient(90deg, #16a34a, #22c55e);
+               box-shadow: 0 0 12px rgba(34,197,94,0.55); }
+    #s4-knob { position: absolute; left: 267px; top: 569px; width: 46px; height: 46px; border-radius: 23px; background: #f4f6f7; border: 7px solid #22c55e;
+               box-shadow: 0 0 0 6px rgba(34,197,94,0.16), 0 6px 16px rgba(0,0,0,0.5), 0 0 18px rgba(34,197,94,0.5); }
+    #s4-slv { position: absolute; left: 240px; top: 520px; width: 100px; text-align: center; font: 800 36px/1 "JetBrains Mono", monospace; color: #f4f6f7; }
+    #s4-errlab { position: absolute; left: 40px; top: 662px; font: 700 30px/1 "D2QSans", sans-serif; color: #9aa4b2; }
+    #s4-ph, #s4-err { position: absolute; left: 30px; top: 704px; font: 800 190px/1 "JetBrains Mono", monospace; letter-spacing: -0.04em; white-space: nowrap; }
+    #s4-ph { font-weight: 300; color: rgba(255,255,255,0.11); }
+    #s4-err { color: #f43f5e; opacity: 0; transform-origin: 0% 60%; }
+    #s4-cover { position: absolute; left: 632px; top: 654px; width: 230px; height: 230px; border-radius: 22px; overflow: hidden;
+                border: 1.5px solid rgba(255,255,255,0.20); box-shadow: 0 22px 44px rgba(0,0,0,0.5), 0 0 30px rgba(34,197,94,0.16); }
+    #s4-cover img { display: block; width: 100%; height: 100%; }
+    #s4-cover i { position: absolute; inset: 0; background: linear-gradient(140deg, rgba(255,255,255,0.42) 0%, rgba(255,255,255,0.10) 26%, rgba(255,255,255,0) 44%); }
+    #s4-sheen { position: absolute; left: -900px; top: 0; width: 2700px; height: 950px;
+                background: linear-gradient(105deg, rgba(255,255,255,0) 44%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0) 56%); }
+    #s4-glint { position: absolute; left: 0; top: -40px; width: 280px; height: 1030px; opacity: 0;
+                background: linear-gradient(100deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.13) 50%, rgba(255,255,255,0) 100%); }
   </style>
   <div id="root" data-composition-id="s4" data-width="1080" data-height="1920">
     <div id="s4-cam">
-      <div id="s4-pfloor" class="s4-shadow"></div>
-      <div id="s4-gfloor" class="s4-shadow"></div>
-      <div id="s4-pile">
-        <div class="s4-card" id="s4-c0" style="top:0px"><div class="s4-bar"></div><div class="s4-f"><i>C</i> = <i>S</i>·<i>N</i>(<i>d</i><sub>1</sub>) − <i>K</i>·<i>e</i><sup>−<i>rT</i></sup>·<i>N</i>(<i>d</i><sub>2</sub>)</div><div class="s4-rule t" style="top:150px"></div><div class="s4-rule" style="top:184px"></div><div class="s4-rule" style="top:214px"></div></div>
-        <div class="s4-card" id="s4-c1" style="top:150px"><div class="s4-bar"></div><div class="s4-f">d<i>f</i> = <i>f</i>′(<i>S</i>)d<i>S</i> + ½<i>f</i>″(<i>S</i>)(d<i>S</i>)<sup>2</sup></div><div class="s4-rule t" style="top:150px"></div><div class="s4-rule" style="top:184px"></div><div class="s4-rule" style="top:214px"></div></div>
-        <div class="s4-card" id="s4-c2" style="top:300px"><div class="s4-bar"></div><div class="s4-f"><i>C</i> − <i>P</i> = <i>S</i> − <i>K</i>·<i>e</i><sup>−<i>rT</i></sup></div><div class="s4-rule t" style="top:150px"></div><div class="s4-rule" style="top:184px"></div><div class="s4-rule" style="top:214px"></div></div>
-        <div class="s4-card" id="s4-c3" style="top:450px"><div class="s4-bar"></div><div class="s4-f">Δ = ∂<i>V</i>/∂<i>S</i></div><div class="s4-rule t" style="top:150px"></div><div class="s4-rule" style="top:184px"></div><div class="s4-rule" style="top:214px"></div></div>
-        <div class="s4-card" id="s4-c4" style="top:600px"><div class="s4-bar"></div><div class="s4-f"><i>σ</i>√<span class="s4-rad"><i>T</i></span></div><div class="s4-rule t" style="top:150px"></div><div class="s4-rule" style="top:184px"></div><div class="s4-rule" style="top:214px"></div></div>
-      </div>
-      <div id="s4-gwrap">
-        <div id="s4-gshake">
-          <div id="s4-rglow"></div>
-          <div id="s4-pipe"></div>
-          <div id="s4-flange"></div>
-          <div id="s4-nut"></div>
-          <div id="s4-bezel"></div>
-          <div id="s4-bevel"></div>
-          <div id="s4-dial"></div>
-          <canvas id="s4-arc" width="740" height="740"></canvas>
-          <div id="s4-needle">
-            <svg width="64" height="340" viewBox="0 0 64 340">
-              <defs>
-                <linearGradient id="s4-ng" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0" stop-color="#64748b" /><stop offset="0.48" stop-color="#334155" /><stop offset="0.52" stop-color="#0f172a" /><stop offset="1" stop-color="#1e293b" />
-                </linearGradient>
-              </defs>
-              <path d="M32 6 L46 268 Q47 300 41 334 L23 334 Q17 300 18 268 Z" fill="url(#s4-ng)" stroke="#0f172a" stroke-width="2" stroke-linejoin="round" />
-              <path d="M31 30 L24 250" stroke="rgba(255,255,255,0.45)" stroke-width="3" stroke-linecap="round" />
-            </svg>
+      <div id="s4-halo"></div>
+      <div id="s4-under"></div>
+      <div id="s4-persp">
+        <div id="s4-card">
+          <div id="s4-head">
+            <div class="s4-dot" style="left:34px; background:#f43f5e;"></div>
+            <div class="s4-dot" style="left:64px; background:#f59e0b;"></div>
+            <div class="s4-dot" style="left:94px; background:#22c55e;"></div>
+            <div id="s4-file" data-layout-ignore>delta_hedging.ipynb</div>
+            <div id="s4-one">one simulated path</div>
           </div>
-          <div id="s4-hub"><div id="s4-cap"></div></div>
-          <div id="s4-glass"></div>
-          <div id="s4-label">PRESSURE</div>
+          <canvas id="s4-chart" width="852" height="420"></canvas>
+          <div class="s4-ax" style="top:394px">0</div>
+          <div class="s4-ax" style="top:197px">2</div>
+          <div id="s4-tx">time to expiry →</div>
+          <div id="s4-sllab">rebalances</div>
+          <div id="s4-track"><div id="s4-fill"></div></div>
+          <div id="s4-knob"></div>
+          <div id="s4-slv">5</div>
+          <div id="s4-errlab">final hedging error</div>
+          <div id="s4-ph">–.––</div>
+          <div id="s4-err">2.32</div>
+          <div id="s4-cover"><img src="assets/covers/stochastic-calculus-visual-lab.jpg" alt="" /><i></i></div>
+          <div id="s4-sheen"></div>
+          <div id="s4-glint"></div>
         </div>
       </div>
-      <div id="s4-chip"><div id="s4-dot"><div id="s4-ring"></div></div><span>Explain it. <b>Live.</b></span></div>
     </div>
   </div>
   <script>
     (function () {
-      /*DATA*/ const DUR = 6.01; const W = [0.18, 0.82, 1.34, 2.54, 2.86, 3.24, 3.44, 3.62, 3.76, 3.98, 4.56, 4.96, 5.16, 5.36, 5.64]; /*END*/
-      // words: 0 Everyone 1 memorises 2 formulas. | 3 But 4 formulas 5 were 6 never 7 the 8 hard 9 part. 10 Explaining 11 them 12 under 13 pressure 14 is.
-      const w = (i) => (W.length > i ? W[i] : 0.2 + i * 0.32);
-      const CARD0 = 0.04, CARD4 = Math.max(CARD0 + 0.8, w(2) + 0.02);          // five cards, one about every 0.3 s
-      const P2 = w(3);                                                         // the pile slides left, the gauge rises
-      const LAND = P2 + 0.1 + 0.62;                                             // gauge settled
-      const ARC0 = P2 + 0.5, ARC1 = P2 + 1.1;                                   // coloured arc draws on
-      const SW0 = w(10), SW1 = Math.max(w(13), w(10) + 0.3);                    // needle sweep, lands on "pressure"
+      /*DATA*/ const DUR = 6.37; const W = [0.16, 0.5, 0.94, 1.28, 1.56, 1.68, 1.86, 2.24, 2.46, 2.56, 2.82, 3.02, 4.16, 4.313, 4.62, 4.9]; /*END*/
+      // words: 0 One 1 simulated 2 path. 3 Hedge 4 it 5 five 6 times, 7 and 8 the 9 error 10 is 11 2.32 | 12 Two 13 hundred 14 times: 15 0.07
+      const w = (i) => Math.max(0, W.length > i ? W[i] : 0.16 + i * 0.32);
+      // v2's beats: the path draws from "One" to "Hedge", ticks on "five", a rose pulse from "error" to "Two",
+      // the readout on "2.32", and from "Two" the knob, the path and the error move together; the final jump lands on "0.07"
+      const P = { chart0: w(0), chart1: w(3), ticks0: w(5), pulse0: w(9), pulse1: w(12), errIn: w(11) - 0.1, slide0: w(12), land: w(15) - 0.02 };
+      P.slide1 = Math.max(P.slide0 + 0.3, P.land);
       const tl = gsap.timeline({ paused: true });
-
-      // one slow camera move
+      // camera: the card orbits in (rotateY -10 -> 0, expo.out 0.8 s), then drifts on to +4 deg; a slow push over the whole shot
       tl.fromTo("#s4-cam", { scale: 1 }, { scale: 1.05, duration: DUR, ease: "none" }, 0);
+      tl.fromTo("#s4-card", { rotationY: -10, rotationX: 8, z: -160, y: 40 }, { rotationY: 0, rotationX: 4, z: 0, y: 0, duration: 0.8, ease: "expo.out" }, 0);
+      tl.fromTo("#s4-card", { rotationY: 0 }, { rotationY: 4, duration: DUR - 0.8, ease: "sine.inOut", immediateRender: false }, 0.8);
+      tl.fromTo("#s4-sheen", { x: -340 }, { x: 0, duration: 0.8, ease: "expo.out" }, 0);
+      tl.fromTo("#s4-sheen", { x: 0 }, { x: 150, duration: DUR - 0.8, ease: "sine.inOut", immediateRender: false }, 0.8);
+      // "simulated": the label; "path.": the real notebook's cover
+      tl.fromTo("#s4-one", { opacity: 0, scale: 0.6, x: 24 }, { opacity: 1, scale: 1, x: 0, duration: 0.3, ease: "back.out(2)" }, w(1) - 0.04);
+      tl.fromTo("#s4-cover", { opacity: 0, rotation: 12, y: 40, scale: 0.85 }, { opacity: 1, rotation: 3, y: 0, scale: 1, duration: 0.45, ease: "back.out(1.5)" }, w(2) + 0.3);
+      // "0.07": the card punches, the glow under it flares, a glint crosses the glass, the label turns green
+      tl.fromTo("#s4-card", { scale: 1 }, { scale: 1.025, duration: 0.09, ease: "power2.out", yoyo: true, repeat: 1 }, P.land - 0.01);
+      tl.fromTo("#s4-under", { opacity: 0.7, scaleX: 1 }, { opacity: 1, scaleX: 1.16, duration: 0.16, ease: "power2.out" }, P.land);
+      tl.fromTo("#s4-under", { opacity: 1, scaleX: 1.16 }, { opacity: 0.9, scaleX: 1.06, duration: 0.8, ease: "sine.out", immediateRender: false }, P.land + 0.16);
+      tl.fromTo("#s4-halo", { opacity: 0.6 }, { opacity: 1, duration: 0.16, ease: "power2.out" }, P.land);
+      tl.fromTo("#s4-halo", { opacity: 1 }, { opacity: 0.8, duration: 0.8, ease: "sine.out", immediateRender: false }, P.land + 0.16);
+      tl.fromTo("#s4-glint", { x: -320, opacity: 1 }, { x: 960, opacity: 1, duration: 0.6, ease: "power2.inOut" }, P.land + 0.06);
+      tl.fromTo("#s4-one", { color: "#fb7185", backgroundColor: "rgba(244,63,94,0.12)", borderColor: "rgba(244,63,94,0.55)" },
+                { color: "#4ade80", backgroundColor: "rgba(34,197,94,0.14)", borderColor: "rgba(34,197,94,0.65)", duration: 0.08, ease: "none" }, P.land);
+      tl.fromTo("#s4-one", { scale: 1 }, { scale: 1.08, duration: 0.1, ease: "power2.out", yoyo: true, repeat: 1, immediateRender: false }, P.land);
 
-      // formula cards fly in from alternating sides and stack into a neat cascade
-      const ROT = [-1.1, 0.9, -0.7, 1.0, -0.5];
-      for (let i = 0; i < 5; i++) {
-        const side = i % 2 === 0 ? -1 : 1;
-        const at = CARD0 + ((CARD4 - CARD0) * i) / 4;
-        tl.fromTo("#s4-c" + i,
-          { x: side * 820, y: -260 + (i % 3) * 60, rotation: side * 26, scale: 1.08, opacity: 0, filter: "blur(5px)" },
-          { x: 0, y: 0, rotation: ROT[i], scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.44, ease: "back.out(1.25)" }, at);
-      }
-      tl.fromTo("#s4-pfloor", { opacity: 0, scaleX: 0.6 }, { opacity: 1, scaleX: 1, duration: CARD4 + 0.4, ease: "power2.out" }, 0.05);
-
-      // the pile slides left and dims; the gauge rises in from below
-      tl.fromTo("#s4-pile", { x: 0, y: 0, scale: 1, opacity: 1 }, { x: -232, y: -315, scale: 0.54, opacity: 0.5, duration: 0.7, ease: "power3.inOut" }, P2);
-      tl.fromTo("#s4-pfloor", { opacity: 1 }, { opacity: 0, duration: 0.4, ease: "power2.out", immediateRender: false }, P2);
-      tl.fromTo("#s4-gwrap", { y: 1150, opacity: 1 }, { y: 0, opacity: 1, duration: 0.72, ease: "back.out(0.85)" }, P2 + 0.1);
-      tl.fromTo("#s4-gfloor", { opacity: 0, scaleX: 0.4 }, { opacity: 1, scaleX: 1, duration: 0.5, ease: "power2.out" }, P2 + 0.4);
-      tl.fromTo("#s4-label", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, ARC1 - 0.2);
-
-      // "Explain it. Live." pops
-      tl.fromTo("#s4-chip", { opacity: 0, scale: 0.35, rotation: -10 }, { opacity: 1, scale: 1, rotation: -3, duration: 0.42, ease: "back.out(2.2)" }, SW0);
-
-      // procedural parts: arc + ticks, needle, shake, glows, live dot
+      const nr = (function (a) { return function () { a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; })(77);
+      const NOISE = Array.from({ length: 400 }, () => (nr() + nr() + nr() - 1.5) / 0.75);
       const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+      const ease = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
       const mix = (a, b, k) => a + (b - a) * k;
       const hex = (c) => [parseInt(c.slice(1, 3), 16), parseInt(c.slice(3, 5), 16), parseInt(c.slice(5, 7), 16)];
-      const mixc = (c1, c2, k) => { const a = hex(c1), b = hex(c2); return "rgb(" + a.map((v, i) => Math.round(mix(v, b[i], k))).join(",") + ")"; };
-      const easeOut = (x) => 1 - Math.pow(1 - x, 3);
-      const R = Math.PI / 180;
-      const g = document.getElementById("s4-arc").getContext("2d");
-      const GC = 370, AR = 272, AW = 46, A0 = -130, A1 = 130;
-      const STOPS = [[-130, "#08a9a2"], [-48, "#14b8a6"], [-18, "#f59e0b"], [26, "#f59e0b"], [56, "#f43f5e"], [130, "#e11d48"]];
-      function colAt(a) {
-        for (let k = 0; k < STOPS.length - 1; k++) {
-          const [a0, c0] = STOPS[k], [a1, c1] = STOPS[k + 1];
-          if (a <= a1) return mixc(c0, c1, clamp((a - a0) / (a1 - a0), 0, 1));
+      const mixa = (c1, c2, k) => { const a = hex(c1), b = hex(c2); return a.map((v, i) => Math.round(mix(v, b[i], k))); };
+      const rgb = (a, al) => (al === undefined ? "rgb(" + a.join(",") + ")" : "rgba(" + a.join(",") + "," + al.toFixed(3) + ")");
+      // rose -> amber -> green through hue (a straight RGB mix of rose and green goes muddy brown)
+      const hsl2rgb = (h, s, l) => { h = ((h % 360) + 360) % 360; const c = (1 - Math.abs(2 * l - 1)) * s, x = c * (1 - Math.abs(((h / 60) % 2) - 1)), m = l - c / 2;
+        const v = h < 60 ? [c, x, 0] : h < 120 ? [x, c, 0] : h < 180 ? [0, c, x] : h < 240 ? [0, x, c] : h < 300 ? [x, 0, c] : [c, 0, x];
+        return v.map((q) => Math.round((q + m) * 255)); };
+      const heat = (k) => hsl2rgb(349.7 + 152.4 * k, 0.892 - 0.187 * k, 0.602 - 0.149 * k);
+      // a 0 -> 1 -> 0 bump: up over `up` seconds from `at`, back down over `dn`
+      const bump = (t, at, up, dn) => (t < at ? 0 : t < at + up ? Math.sin(((t - at) / up) * Math.PI / 2) : t < at + up + dn ? 1 - (t - at - up) / dn : 0);
+      const cv = document.getElementById("s4-chart"), g = cv.getContext("2d");
+      const err = document.getElementById("s4-err"), ph = document.getElementById("s4-ph");
+      const knob = document.getElementById("s4-knob"), fill = document.getElementById("s4-fill"), slv = document.getElementById("s4-slv");
+      // the notebook's two real readings: 5 rebalances -> 2.32, 200 -> 0.07; in between a power law joins them
+      const nAt = (t) => 5 * Math.pow(40, ease(clamp((t - P.slide0) / (P.slide1 - P.slide0), 0, 1)));
+      const errAt = (N) => 2.32 * Math.pow(N / 5, Math.log(0.07 / 2.32) / Math.log(40));
+      const goodness = (E) => clamp(Math.log(2.32 / E) / Math.log(2.32 / 0.07), 0, 1);   // 0 at 2.32 (rose), 1 at 0.07 (green)
+      const L = 84, R = 812, Tp = 34, Bt = 350, y0 = -0.4, y1 = 2.8;
+      const Y = (v) => Bt - ((v - y0) / (y1 - y0)) * (Bt - Tp);
+      function drawChart(t) {
+        g.clearRect(0, 0, 852, 420);
+        g.lineWidth = 2; g.strokeStyle = "rgba(255,255,255,0.07)";
+        for (let gl = 0.5; gl <= 2.5; gl += 0.5) { g.beginPath(); g.moveTo(L, Y(gl)); g.lineTo(R, Y(gl)); g.stroke(); }
+        g.strokeStyle = "rgba(255,255,255,0.18)"; g.beginPath(); g.moveTo(L, Bt + 2); g.lineTo(R, Bt + 2); g.stroke();
+        g.setLineDash([10, 10]); g.strokeStyle = "rgba(255,255,255,0.32)"; g.beginPath(); g.moveTo(L, Y(0)); g.lineTo(R, Y(0)); g.stroke(); g.setLineDash([]);
+        const N = nAt(t), E = errAt(N);
+        const rev = clamp((t - P.chart0) / (P.chart1 - P.chart0), 0, 1);
+        if (rev <= 0) return;
+        const steps = Math.max(1, Math.round(N));
+        const landed = t >= P.land;
+        const col = landed ? hex("#22c55e") : heat(goodness(E));
+        // the path: hedging error along one simulated path, re-hedged at each rebalance
+        const M = 400, upto = Math.floor(M * rev), pts = [];
+        for (let i = 0; i <= upto; i++) {
+          const x = i / M, xq = Math.floor(x * steps) / steps, j = Math.min(M - 1, Math.floor(xq * M));
+          pts.push([L + x * (R - L), Y(E * (xq + 0.55 * NOISE[j] * Math.sin(Math.PI * xq)))]);
         }
-        return STOPS[STOPS.length - 1][1];
-      }
-      function drawGauge(p, hot) {
-        g.clearRect(0, 0, 740, 740);
-        // groove for the arc
-        g.lineCap = "round"; g.lineWidth = AW + 12; g.strokeStyle = "rgba(15,23,42,0.07)";
-        g.beginPath(); g.arc(GC, GC, AR, (A0 - 90) * R, (A1 - 90) * R); g.stroke();
-        if (p <= 0) return;
-        const aEnd = A0 + (A1 - A0) * p;
-        g.lineCap = "butt"; g.lineWidth = AW;
-        for (let a = A0; a < aEnd; a += 1) {
-          const b = Math.min(aEnd, a + 1.25);
-          g.strokeStyle = colAt(a + 0.5);
-          if (hot > 0 && a > 50) { g.shadowColor = "rgba(244,63,94," + (0.85 * hot).toFixed(3) + ")"; g.shadowBlur = 26 * hot; } else { g.shadowBlur = 0; }
-          g.beginPath(); g.arc(GC, GC, AR, (a - 90) * R, (b - 90) * R); g.stroke();
+        const grd = g.createLinearGradient(0, Tp, 0, Y(0));
+        grd.addColorStop(0, rgb(col, 0.26)); grd.addColorStop(1, rgb(col, 0));
+        g.fillStyle = grd; g.beginPath(); g.moveTo(pts[0][0], Y(0));
+        pts.forEach(([x, y]) => g.lineTo(x, y));
+        g.lineTo(pts[pts.length - 1][0], Y(0)); g.closePath(); g.fill();
+        g.save();
+        g.shadowColor = rgb(col, 0.9); g.shadowBlur = 16;
+        g.strokeStyle = rgb(col); g.lineWidth = 6; g.lineJoin = "round"; g.lineCap = "round";
+        g.beginPath(); pts.forEach(([x, y], i) => (i ? g.lineTo(x, y) : g.moveTo(x, y))); g.stroke();
+        if (rev >= 1) { g.fillStyle = rgb(col); g.beginPath(); g.arc(R, Y(E), 11, 0, 6.2832); g.fill(); }
+        g.restore();
+        // the rebalances themselves: one tick per hedge on the time axis, popping in on "five", a dense comb at 200
+        const shown = t < P.slide0 ? Math.min(5, Math.floor(clamp((t - P.ticks0) / 0.5, 0, 1) * 5.999)) : steps;
+        for (let k = 1; k <= shown; k++) {
+          const x = L + (k / steps) * (R - L);
+          const pop = t < P.slide0 ? clamp((t - P.ticks0 - (k - 1) * 0.1) / 0.15, 0, 1) : 1;
+          g.strokeStyle = "rgba(34,197,94," + ((steps > 40 ? 0.6 : 0.95) * pop).toFixed(3) + ")";
+          g.lineWidth = steps > 40 ? 2 : 4;
+          g.beginPath(); g.moveTo(x, Bt + 2); g.lineTo(x, Bt - (steps > 40 ? 12 : 20 * pop)); g.stroke();
+          if (steps <= 40) { g.setLineDash([6, 8]); g.strokeStyle = "rgba(34,197,94," + (0.22 * pop).toFixed(3) + ")"; g.lineWidth = 2;
+            g.beginPath(); g.moveTo(x, Bt - 20); g.lineTo(x, Tp); g.stroke(); g.setLineDash([]); }
         }
-        g.shadowBlur = 0;
-        // rounded ends
-        [[A0, colAt(A0)], [aEnd, colAt(aEnd)]].forEach(([a, c]) => {
-          g.fillStyle = c; g.beginPath(); g.arc(GC + AR * Math.cos((a - 90) * R), GC + AR * Math.sin((a - 90) * R), AW / 2, 0, 6.2832); g.fill();
-        });
-        // gloss: a bright line along the outer edge, a soft shade along the inner edge
-        g.lineCap = "round";
-        g.lineWidth = 5; g.strokeStyle = "rgba(255,255,255,0.55)";
-        g.beginPath(); g.arc(GC, GC, AR + AW / 2 - 7, (A0 - 90) * R, (aEnd - 90) * R); g.stroke();
-        g.lineWidth = 4; g.strokeStyle = "rgba(15,23,42,0.13)";
-        g.beginPath(); g.arc(GC, GC, AR - AW / 2 + 3, (A0 - 90) * R, (aEnd - 90) * R); g.stroke();
-        // ticks
-        for (let k = 0; k <= 40; k++) {
-          const a = A0 + k * 6.5;
-          if (a > aEnd + 0.01) break;
-          const major = k % 4 === 0, r1 = AR - AW / 2 - 14, r0 = r1 - (major ? 38 : 18);
-          g.strokeStyle = major ? "#334155" : "#94a3b8"; g.lineWidth = major ? 7 : 4;
-          const c = Math.cos((a - 90) * R), s = Math.sin((a - 90) * R);
-          g.beginPath(); g.moveTo(GC + r0 * c, GC + r0 * s); g.lineTo(GC + r1 * c, GC + r1 * s); g.stroke();
+        // a rose pulse on the path's end while the error is named; a green burst when it lands
+        if (rev >= 1 && t > P.pulse0 && t < P.pulse1) {
+          const q = ((t - P.pulse0) % 0.55) / 0.55;
+          g.strokeStyle = "rgba(244,63,94," + (0.65 * (1 - q)).toFixed(3) + ")"; g.lineWidth = 4;
+          g.beginPath(); g.arc(R, Y(E), 14 + 30 * q, 0, 6.2832); g.stroke();
+        }
+        if (landed && t < P.land + 0.6) {
+          const q = (t - P.land) / 0.6;
+          g.strokeStyle = "rgba(34,197,94," + (0.95 * (1 - q) * (1 - q)).toFixed(3) + ")"; g.lineWidth = 5;
+          g.beginPath(); g.arc(R, Y(E), 14 + 64 * q, 0, 6.2832); g.stroke();
         }
       }
-      const A_REST = -112, A_HIT = 108;
-      function needleAngle(t) {
-        const tremor = 1.6 * Math.sin(t * 11.3) + 0.9 * Math.sin(t * 27.1 + 1.3);
-        if (t < LAND - 0.25) return -130;
-        if (t < SW0) { const d = t - (LAND - 0.25); return A_REST + (-130 - A_REST) * Math.exp(-d * 6) * Math.cos(d * 16) + tremor * clamp(d * 3, 0, 1); }
-        if (t < SW1) { const u = (t - SW0) / (SW1 - SW0); return mix(A_REST, A_HIT, Math.pow(u, 1.7)) + tremor * (1 - u); }
-        const d = t - SW1;
-        return A_HIT + 10 * Math.exp(-d * 7) * Math.sin(d * 34) + 1.4 * Math.sin(t * 31) + 0.8 * Math.sin(t * 47 + 2);
-      }
-      const needle = document.getElementById("s4-needle"), shake = document.getElementById("s4-gshake");
-      const rglow = document.getElementById("s4-rglow"), ring = document.getElementById("s4-ring");
-      function draw(t) {
-        const p = easeOut(clamp((t - ARC0) / (ARC1 - ARC0), 0, 1));
-        const hot = t < SW1 - 0.04 ? 0 : clamp((t - SW1 + 0.04) / 0.14, 0, 1) * (0.78 + 0.22 * Math.sin((t - SW1) * 12));
-        drawGauge(p, hot);
-        needle.style.transform = "rotate(" + needleAngle(t).toFixed(2) + "deg)";
-        const d = t - SW1;
-        if (d >= 0) {
-          const k = Math.exp(-d * 8);
-          shake.style.transform = "translate(" + (13 * k * Math.sin(d * 46)).toFixed(2) + "px," + (4 * k * Math.sin(d * 39 + 1)).toFixed(2) + "px) rotate(" + (0.9 * k * Math.sin(d * 37)).toFixed(3) + "deg)";
-        } else shake.style.transform = "none";
-        rglow.style.opacity = hot.toFixed(3);
-        const ph = ((t * 1.5) % 1 + 1) % 1;
-        ring.style.transform = "scale(" + (1 + 1.3 * ph).toFixed(3) + ")";
-        ring.style.opacity = (0.75 * (1 - ph)).toFixed(3);
+      function drawReadouts(t) {
+        const p = ease(clamp((t - P.slide0) / (P.slide1 - P.slide0), 0, 1));
+        const x = p * 520;
+        knob.style.left = (267 + x).toFixed(1) + "px";
+        slv.style.left = (240 + x).toFixed(1) + "px";
+        fill.style.width = x.toFixed(1) + "px";
+        slv.textContent = String(Math.round(nAt(t)));
+        // the knob answers "five", and again when 200 lands
+        const pk = Math.max(bump(t, P.ticks0 - 0.04, 0.14, 0.16), bump(t, P.land, 0.1, 0.25));
+        knob.style.transform = "scale(" + (1 + 0.3 * pk).toFixed(3) + ")";
+        slv.style.transform = "scale(" + (1 + 0.35 * pk).toFixed(3) + ")";
+        slv.style.color = rgb(mixa("#f4f6f7", "#4ade80", Math.max(pk, p)));
+        // the error readout: 2.32 in rose, counting down through the power law, the final jump to 0.07 on the word
+        const c = clamp((t - P.slide0) / (P.land - P.slide0), 0, 1);
+        const landed = t >= P.land;
+        const E = landed ? 0.07 : Math.max(0.08, errAt(nAt(t)));
+        let s = E.toFixed(2);
+        if (c > 0.04 && c < 0.72) { const f = Math.floor(t * 30); s = s.slice(0, -2) + ((f * 7) % 10) + ((f * 3 + 5) % 10); }
+        err.textContent = s;
+        const vis = clamp((t - P.errIn) / 0.16, 0, 1);
+        err.style.opacity = vis.toFixed(3);
+        ph.style.opacity = (1 - vis).toFixed(3);
+        if (landed) {
+          const gl = 1 - 0.5 * clamp((t - P.land) / 0.8, 0, 1);
+          err.style.color = "#22c55e";
+          err.style.textShadow = "0 0 " + (54 * gl).toFixed(1) + "px rgba(34,197,94," + (0.95 * gl).toFixed(3) + ")";
+        } else {
+          const breathe = t > P.pulse0 && t < P.slide0 ? 0.5 - 0.5 * Math.cos(((t - P.pulse0) / 0.55) * 2 * Math.PI) : 0;
+          err.style.color = rgb(heat(0.9 * goodness(E)));
+          err.style.textShadow = "0 0 " + (26 + 18 * breathe).toFixed(1) + "px rgba(244,63,94," + ((0.32 + 0.3 * breathe) * (1 - goodness(E))).toFixed(3) + ")";
+        }
+        const pop = Math.max(bump(t, P.errIn, 0.001, 0.26) * 0.16, bump(t, P.land, 0.001, 0.3) * 0.14);
+        err.style.transform = "scale(" + (1 + pop).toFixed(3) + ")";
       }
       const st = { t: 0 };
-      tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: () => draw(st.t) }, 0);
+      tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: () => { drawChart(st.t); drawReadouts(st.t); } }, 0);
       window.__timelines["s4"] = tl;
     })();
   </script>

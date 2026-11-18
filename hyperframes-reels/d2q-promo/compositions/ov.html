@@ -1,43 +1,50 @@
 <template>
   <style>
     @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
-    @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
     #root { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
-    #ov-brand { position: absolute; left: 0; right: 0; top: 40px; height: 64px; display: flex; justify-content: center; align-items: center; gap: 14px; }
-    #ov-brand img { width: 56px; height: 56px; }
-    #ov-brand span { font: 700 34px/1 D2QSans, sans-serif; color: #0f172a; letter-spacing: -0.01em; }
-    #ov-foot { position: absolute; left: 0; right: 0; top: 1792px; text-align: center; font: 600 26px/1 "JetBrains Mono", monospace; color: #5b6b82; letter-spacing: 0.06em; }
-    #ov-caps { position: absolute; left: 50px; top: 140px; width: 980px; height: 300px; }
-    .ov-cap { position: absolute; left: 0; top: 0; width: 980px; height: 300px; display: flex; align-items: center; justify-content: center; opacity: 0; }
-    .ov-cap p { margin: 0; text-align: center; font: 800 68px/1.07 D2QSans, sans-serif; letter-spacing: -0.035em; color: #0f172a; }
+    #ov-brand { position: absolute; left: 0; right: 0; top: 46px; height: 60px; display: flex; justify-content: center; align-items: center; gap: 12px; }
+    #ov-brand img { width: 50px; height: 50px; border-radius: 12px; }
+    #ov-brand span { font: 700 32px/1 "D2QSans", sans-serif; letter-spacing: -0.01em; color: #111418; }
+    #ov-caps { position: absolute; left: 40px; top: 150px; width: 1000px; height: 380px; }
+    .ov-cap { position: absolute; left: 0; top: 0; width: 1000px; height: 380px; display: flex; align-items: center; justify-content: center; opacity: 0; }
+    .ov-cap p { margin: 0; text-align: center; font-family: "D2QSans", sans-serif; font-weight: 800; line-height: 1.0; letter-spacing: -0.045em; }
+    .ov-cap.L p { color: #111418; }
+    .ov-cap.D p { color: #f4f6f7; }
     .ov-cap .w { display: inline-block; opacity: 0; }
-    .ov-cap .a { color: #08a9a2; }
+    .ov-cap.L .a { color: #16a34a; }
+    .ov-cap.D .a { color: #22c55e; }
     .ov-cap .r { color: #f43f5e; }
-    .ov-hero { position: absolute; left: 0; width: 1080px; top: 140px; height: 300px; display: flex; align-items: center; justify-content: center;
-               font: 900 230px/1 D2QSans, sans-serif; letter-spacing: -0.055em; color: #08a9a2; opacity: 0; white-space: nowrap;
-               text-shadow: 0 10px 30px rgba(8,169,162,0.25); }
+    .ov-cap .h { font-size: 1.42em; line-height: 0.92; }
+    .ov-hero { position: absolute; left: 0; width: 1080px; top: 150px; height: 380px; display: flex; align-items: center; justify-content: center;
+               font-family: "D2QSans", sans-serif; font-weight: 800; line-height: 1; letter-spacing: -0.06em; opacity: 0; white-space: nowrap; }
+    .ov-hero.L { color: #16a34a; text-shadow: 0 12px 34px rgba(22,163,74,0.22); }
+    .ov-hero.D { color: #22c55e; text-shadow: 0 0 46px rgba(34,197,94,0.55), 0 0 12px rgba(34,197,94,0.35); }
+    .ov-hero.R { color: #f43f5e; text-shadow: 0 0 46px rgba(244,63,94,0.55), 0 0 12px rgba(244,63,94,0.35); }
     #ov-wipe { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
   </style>
   <div id="root" data-composition-id="ov" data-width="1080" data-height="1920">
-    <div id="ov-caps"></div>
-    <div id="ov-heroes"></div>
-    <div id="ov-brand"><img src="assets/logo.png" alt="" /><span>Desk2Quant</span></div>
-    <div id="ov-foot">desk2quant.com</div>
+    <div id="ov-caps" data-layout-allow-overlap></div>
+    <div id="ov-heroes" data-layout-allow-overlap></div>
+    <div id="ov-brand"><img src="assets/logo.png" alt="" /><span id="ov-brandtxt">Desk2Quant</span></div>
     <canvas id="ov-wipe" width="1080" height="1920"></canvas>
   </div>
   <script>
     (function () {
-      /*DATA*/ const DUR = 46.7; const LINES = [{"id": "L1", "tok": ["You", "can", "derive", "the", "Black–Scholes", "model."], "acc": [4], "rose": [], "on": [-0.08, 0.24, 0.4, 0.74, 0.92, 1.48], "hero": null}, {"id": "L2", "tok": ["But", "can", "you", "hedge", "with", "it?"], "acc": [3], "rose": [], "on": [2.43, 2.75, 2.89, 3.05, 3.23, 3.45], "hero": {"i": 3, "size": 250}}, {"id": "L3", "tok": ["If", "you're", "preparing", "for", "a", "quant", "interview,", "this", "changes", "how", "you", "study."], "acc": [6], "rose": [], "on": [4.22, 4.56, 4.68, 5.0, 5.24, 5.36, 5.5, 6.14, 6.3, 6.6, 6.86, 7.0], "hero": {"i": 6, "size": 170}}, {"id": "L4", "tok": ["One", "simulated", "path.", "Hedge", "it", "five", "times,", "and", "the", "error", "is", "2.32"], "acc": [], "rose": [11], "on": [7.87, 8.29, 8.75, 9.31, 9.51, 9.63, 9.83, 10.39, 10.57, 10.67, 10.87, 11.05], "hero": null}, {"id": "L5", "tok": ["Two", "hundred", "times:", "0.07"], "acc": [3], "rose": [], "on": [12.55, 12.75, 13.15, 13.71], "hero": {"i": 3, "size": 300}}, {"id": "L6", "tok": ["Everyone", "memorises", "formulas."], "acc": [], "rose": [], "on": [15.86, 16.5, 17.02], "hero": null}, {"id": "L7", "tok": ["But", "formulas", "were", "never", "the", "hard", "part.", "Explaining", "them", "under", "pressure", "is."], "acc": [10], "rose": [], "on": [18.22, 18.54, 18.92, 19.12, 19.3, 19.44, 19.66, 20.24, 20.64, 20.84, 21.04, 21.32], "hero": {"i": 10, "size": 180}}, {"id": "L8", "tok": ["Desk2Quant", "trains", "exactly", "that.", "Built", "by", "a", "practising", "bank", "quant."], "acc": [0], "rose": [], "on": [21.87, 22.73, 22.97, 23.47, 24.03, 24.21, 24.41, 24.55, 24.83, 25.25], "hero": {"i": 0, "size": 150}}, {"id": "L9", "tok": ["First,", "notes", "with", "the", "code", "that", "runs", "them."], "acc": [4], "rose": [], "on": [26.0, 26.7, 26.86, 27.02, 27.1, 27.38, 27.52, 27.78], "hero": {"i": 4, "size": 260}}, {"id": "L10", "tok": ["Then", "the", "desk:", "Greeks,", "P&L", "explain,", "XVA,", "model", "validation."], "acc": [2], "rose": [], "on": [28.65, 28.99, 29.11, 29.53, 29.83, 30.35, 31.01, 31.45, 31.77], "hero": {"i": 2, "size": 260}}, {"id": "L11", "tok": ["Then", "the", "interview:", "1000+", "problems,", "with", "solutions."], "acc": [3], "rose": [], "on": [32.61, 32.95, 33.03, 33.63, 33.91, 34.37, 34.65], "hero": {"i": 3, "size": 260}}, {"id": "L12", "tok": ["Don't", "know", "where", "to", "start?", "10", "resources", "are", "free."], "acc": [8], "rose": [], "on": [35.44, 35.94, 36.08, 36.24, 36.38, 36.9, 37.04, 37.46, 37.66], "hero": {"i": 8, "size": 270}}, {"id": "L13", "tok": ["Textbooks", "teach", "you", "the", "model."], "acc": [4], "rose": [], "on": [38.33, 39.03, 39.27, 39.49, 39.59], "hero": {"i": 4, "size": 250}}, {"id": "L14", "tok": ["The", "desk", "teaches", "you", "what", "breaks", "it."], "acc": [5], "rose": [], "on": [40.22, 40.54, 40.8, 41.08, 41.34, 41.5, 41.78], "hero": {"i": 5, "size": 260}}, {"id": "L15", "tok": ["Comment", "FREE,", "and", "we'll", "DM", "you", "all", "ten."], "acc": [1], "rose": [], "on": [42.96, 43.52, 43.78, 44.04, 44.22, 44.42, 44.66, 44.88], "hero": null}]; const CUTS = [[4.04, "B"], [7.69, "A"], [15.68, "B"], [21.69, "A"], [25.82, "B"], [28.47, "A"], [32.43, "B"], [35.26, "A"], [38.15, "B"], [42.78, "A"]]; /*END*/
+      /*DATA*/ const DUR = 39.46; const LINES = [{"id": "L1", "tok": ["You", "can", "derive", "the", "Black–Scholes", "model."], "acc": [4], "rose": [], "on": [-0.05, 0.19, 0.29, 0.51, 0.65, 1.11], "hero": {"i": 4, "size": 150}, "theme": "L"}, {"id": "L2", "tok": ["But", "can", "you", "hedge", "with", "it?"], "acc": [3], "rose": [], "on": [1.68, 1.94, 2.04, 2.16, 2.32, 2.48], "hero": {"i": 3, "size": 260}, "theme": "D"}, {"id": "L3", "tok": ["If", "you're", "preparing", "for", "a", "quant", "interview,", "this", "changes", "how", "you", "study."], "acc": [6], "rose": [], "on": [2.87, 3.15, 3.25, 3.57, 3.79, 3.91, 4.09, 4.71, 4.83, 5.13, 5.35, 5.51], "hero": {"i": 6, "size": 190}, "theme": "L"}, {"id": "L4", "tok": ["One", "simulated", "path.", "Hedge", "it", "five", "times,", "and", "the", "error", "is", "2.32"], "acc": [], "rose": [11], "on": [6.06, 6.4, 6.84, 7.18, 7.46, 7.58, 7.76, 8.14, 8.36, 8.46, 8.72, 8.92], "hero": null, "theme": "D"}, {"id": "L5", "tok": ["Two", "hundred", "times:", "0.07"], "acc": [3], "rose": [], "on": [10.06, 10.213, 10.52, 10.8], "hero": {"i": 3, "size": 300}, "theme": "D"}, {"id": "L6", "tok": ["Everyone", "memorises", "formulas."], "acc": [2], "rose": [], "on": [12.43, 12.91, 13.31], "hero": null, "theme": "L"}, {"id": "L7", "tok": ["But", "formulas", "were", "never", "the", "hard", "part.", "Explaining", "them", "under", "pressure", "is."], "acc": [3], "rose": [10], "on": [14.07, 14.33, 14.77, 14.97, 15.17, 15.31, 15.53, 15.99, 16.39, 16.59, 16.75, 17.09], "hero": {"i": 10, "size": 200, "c": "r"}, "theme": "D"}, {"id": "L8a", "tok": ["Desk2Quant", "trains", "exactly", "that."], "acc": [0], "rose": [], "on": [17.66, 18.4, 18.72, 19.18], "hero": {"i": 0, "size": 170}, "theme": "L"}, {"id": "L8b", "tok": ["Built", "by", "a", "practising", "bank", "quant."], "acc": [4, 5], "rose": [], "on": [19.72, 19.88, 20.04, 20.18, 20.5, 20.84], "hero": null, "theme": "D"}, {"id": "L9", "tok": ["First,", "notes", "with", "the", "code", "that", "runs", "them."], "acc": [4], "rose": [], "on": [21.44, 21.82, 22.04, 22.18, 22.28, 22.5, 22.62, 22.86], "hero": {"i": 4, "size": 270}, "theme": "L"}, {"id": "L10", "tok": ["Then", "the", "desk:", "Greeks,", "P&L", "explain,", "XVA,", "model", "validation."], "acc": [2], "rose": [], "on": [23.3, 23.58, 23.66, 24.14, 24.32, 24.88, 25.28, 25.94, 26.24], "hero": {"i": 2, "size": 270}, "theme": "D"}, {"id": "L11", "tok": ["Then", "the", "interview:", "1000+", "problems,", "with", "solutions."], "acc": [3], "rose": [], "on": [27.1, 27.36, 27.46, 28.02, 28.38, 28.86, 28.96], "hero": {"i": 3, "size": 270}, "theme": "L"}, {"id": "L12a", "tok": ["Don't", "know", "where", "to", "start?"], "acc": [4], "rose": [], "on": [29.77, 30.09, 30.19, 30.33, 30.45], "hero": null, "theme": "D"}, {"id": "L12b", "tok": ["10", "resources", "are", "free."], "acc": [3], "rose": [], "on": [30.85, 30.99, 31.45, 31.67], "hero": {"i": 3, "size": 290}, "theme": "L"}, {"id": "L13", "tok": ["Textbooks", "teach", "you", "the", "model."], "acc": [4], "rose": [], "on": [32.19, 32.71, 32.91, 33.05, 33.13], "hero": {"i": 4, "size": 260}, "theme": "D"}, {"id": "L14", "tok": ["The", "desk", "teaches", "you", "what", "breaks", "it."], "acc": [5], "rose": [], "on": [33.72, 33.96, 34.18, 34.4, 34.58, 34.7, 34.92], "hero": {"i": 5, "size": 270}, "theme": "D"}, {"id": "L15", "tok": ["Comment", "FREE,", "and", "we'll", "DM", "you", "all", "ten."], "acc": [1], "rose": [], "on": [35.76, 36.14, 36.4, 36.58, 36.76, 36.94, 37.12, 37.22], "hero": null, "theme": "L"}]; const CUTS = [[1.52, "D", "stair"], [2.71, "L", "stair"], [5.9, "D", "dissolve"], [12.27, "L", "stair"], [13.91, "D", "stair"], [17.5, "L", "stair"], [19.56, "D", "stair"], [21.28, "L", "stair"], [23.14, "D", "stair"], [26.94, "L", "stair"], [29.61, "D", "stair"], [30.69, "L", "stair"], [32.03, "D", "dissolve"], [35.6, "L", "dissolve"]]; /*END*/
       const tl = gsap.timeline({ paused: true });
       const capsEl = document.getElementById("ov-caps"), heroesEl = document.getElementById("ov-heroes");
+      const sizeFor = (n) => (n <= 30 ? 92 : n <= 44 ? 84 : n <= 58 ? 76 : 70);
 
-      // ---------------- captions: one sentence at a time, each word on its spoken onset; hero word slams over the dimmed line
+      // ---------------- captions: big, heavy, mixed-size; each word on its spoken onset; the hero word slams over the
+      // dimmed sentence, then lives on inside it at 1.42x in the accent colour (the reference's "post trial reels" look)
       LINES.forEach((L, li) => {
-        const cap = document.createElement("div"); cap.className = "ov-cap"; cap.id = "ov-c" + L.id;
+        const cap = document.createElement("div"); cap.className = "ov-cap " + L.theme; cap.id = "ov-c" + L.id;
         const p = document.createElement("p"); cap.appendChild(p);
+        p.style.fontSize = sizeFor(L.tok.join(" ").length) + "px";
+        const H = L.hero;
         const spans = L.tok.map((w, i) => {
           const s = document.createElement("span");
-          s.className = "w" + (L.acc.includes(i) ? " a" : "") + (L.rose.includes(i) ? " r" : "");
+          s.className = "w" + (L.acc.includes(i) ? " a" : "") + (L.rose.includes(i) ? " r" : "") + (H && i === H.i ? " h" : "");
           s.textContent = w; p.appendChild(s);
           if (i < L.tok.length - 1) p.appendChild(document.createTextNode(" "));
           return s;
@@ -46,45 +53,55 @@
         const t0 = L.on[0];
         const next = li + 1 < LINES.length ? LINES[li + 1].on[0] : DUR + 1;
         const hideT = next - 0.1;
-        const H = L.hero, th = H ? L.on[H.i] : null;
+        const th = H ? L.on[H.i] : null;
         const backT = H ? Math.min(th + 0.6, hideT - 0.3) : null;
-        tl.fromTo(cap, { opacity: 0 }, { opacity: 1, duration: 0.01 }, t0 - 0.08);
+        tl.fromTo(cap, { opacity: 0 }, { opacity: 1, duration: 0.01 }, Math.max(0, t0 - 0.08));
         spans.forEach((s, i) => {
-          const at = H && i === H.i ? backT + 0.04 : L.on[i] - 0.04;
-          tl.fromTo(s, { opacity: 0, y: 22, filter: "blur(8px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.2, ease: "power2.out" }, at);
+          const at = Math.max(0, H && i === H.i ? backT + 0.02 : L.on[i] - 0.04);
+          if (H && i === H.i) tl.fromTo(s, { opacity: 0, scale: 1.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power3.out" }, at);
+          else tl.fromTo(s, { opacity: 0, y: 26, filter: "blur(8px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.2, ease: "power2.out" }, at);
         });
         if (H) {
-          const h = document.createElement("div"); h.className = "ov-hero"; h.id = "ov-h" + L.id;
+          const h = document.createElement("div"); h.className = "ov-hero " + L.theme + (H.c === "r" ? " R" : ""); h.id = "ov-h" + L.id;
           const raw = L.tok[H.i];
-          h.textContent = raw.replace(/[,:?!]+$/, "").replace(/\.$/, (m) => (/[a-z]\.$/i.test(raw) ? "." : ""));
+          h.textContent = raw.replace(/[,:?!]+$/, "").replace(/\.$/, () => (/[a-z]\.$/i.test(raw) ? "." : ""));
           h.style.fontSize = H.size + "px";
           heroesEl.appendChild(h);
-          tl.fromTo(cap, { opacity: 1 }, { opacity: 0.22, duration: 0.12, immediateRender: false }, th - 0.06);
-          tl.fromTo(h, { opacity: 0, scale: 1.75, filter: "blur(16px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out", immediateRender: false }, th - 0.02);
-          tl.fromTo(h, { opacity: 1, scale: 1, y: 0 }, { opacity: 0, scale: 0.4, y: -30, duration: 0.24, ease: "power2.in", immediateRender: false }, backT);
-          tl.fromTo(cap, { opacity: 0.22 }, { opacity: 1, duration: 0.2, immediateRender: false }, backT + 0.02);
+          tl.fromTo(cap, { opacity: 1 }, { opacity: 0.2, duration: 0.12, immediateRender: false }, th - 0.06);
+          tl.fromTo(h, { opacity: 0, scale: 1.8, filter: "blur(18px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out", immediateRender: false }, th - 0.02);
+          tl.fromTo(h, { opacity: 1, scale: 1, y: 0 }, { opacity: 0, scale: 0.45, y: 20, duration: 0.24, ease: "power2.in", immediateRender: false }, backT);
+          tl.fromTo(cap, { opacity: 0.2 }, { opacity: 1, duration: 0.2, immediateRender: false }, backT + 0.02);
         }
         if (li + 1 < LINES.length) tl.fromTo(cap, { opacity: 1 }, { opacity: 0, duration: 0.01, immediateRender: false }, hideT);
       });
 
-      // ---------------- pixel-staircase wipe on every cut: covers the frame just before the cut, uncovers just after
+      // ---------------- the logo bar follows the scene's theme (switched at each cut, under the wipe)
+      const themeCuts = [[0, LINES.length ? LINES[0].theme : "L"]].concat(CUTS.map(([t, th]) => [t, th]));
+      themeCuts.forEach(([t, th]) => tl.set("#ov-brandtxt", { color: th === "D" ? "#f4f6f7" : "#111418" }, t));
+
+      // ---------------- cuts: a pixel staircase that sweeps across, or a random pixel dissolve (the reference uses both)
       const g = document.getElementById("ov-wipe").getContext("2d");
+      function mulberry32(a) { return function () { a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+      const T = 60, C = 18, R = 32, K = C + R;
+      const rnd = mulberry32(7), ORDER = Array.from({ length: C * R }, () => rnd());
       const st = { t: 0 };
       function draw() {
         const t = st.t;
         g.clearRect(0, 0, 1080, 1920);
-        const T = 30, C = 36, R = 64, K = C + R;
-        CUTS.forEach(([tc, bg]) => {
-          const a = tc - 0.2, b = tc + 0.24;
+        CUTS.forEach(([tc, th, kind]) => {
+          const a = tc - 0.2, b = tc + 0.26;
           if (t < a || t > b) return;
-          const fill = bg === "B" ? "#e6f6f4" : "#eef3f8";
+          const fill = th === "D" ? "#12161c" : "#eceef0";
           for (let r = 0; r < R; r++) for (let c = 0; c < C; c++) {
-            const k = c + (R - 1 - r) + ((c * 7 + r * 13) % 5);
+            let k, span;
+            if (kind === "dissolve") { k = ORDER[r * C + c]; span = 1; }
+            else { k = (c + (R - 1 - r) + ((c * 7 + r * 13) % 5)) / (K + 6); span = 1; }
             let cov, edge;
-            if (t < tc) { const e = ((t - a) / (tc - a)) * (K + 6); cov = k < e; edge = cov && k > e - 3; }
-            else { const e = ((t - tc) / (b - tc)) * (K + 6); cov = k >= e; edge = cov && k < e + 3; }
+            if (t < tc) { const e = ((t - a) / (tc - a)) * (span + 0.08); cov = k < e; edge = cov && k > e - 0.07; }
+            else { const e = ((t - tc) / (b - tc)) * (span + 0.08); cov = k >= e; edge = cov && k < e + 0.07; }
             if (!cov) continue;
-            g.fillStyle = edge ? "#08a9a2" : fill;
+            g.fillStyle = edge ? "#22c55e" : fill;
             g.fillRect(c * T, r * T, T, T);
           }
         });

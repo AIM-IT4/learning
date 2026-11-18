@@ -1,0 +1,208 @@
+<template>
+  <style>
+    @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
+    @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
+    #root { position: absolute; inset: 0; overflow: hidden; }
+    #s15-cam { position: absolute; inset: 0; transform-origin: 540px 1060px; }
+    #s15-glow { position: absolute; left: 60px; top: 760px; width: 960px; height: 620px; border-radius: 50%; opacity: 0;
+                background: radial-gradient(closest-side, rgba(22,163,74,0.16), rgba(22,163,74,0.05) 60%, rgba(22,163,74,0) 100%); }
+    #s15-floor { position: absolute; left: 120px; top: 1540px; width: 840px; height: 90px; border-radius: 50%;
+                 background: radial-gradient(ellipse at center, rgba(17,20,24,0.16), rgba(17,20,24,0) 70%); }
+    /* shared chunky glossy card: a thickness slab under a white face */
+    .s15-slab { position: absolute; left: 0; top: 12px; width: 100%; height: 100%; background: linear-gradient(180deg, #d3d9e0 0%, #b3bcc7 100%);
+                box-shadow: 0 30px 60px rgba(17,20,24,0.12), 0 8px 18px rgba(17,20,24,0.06); }
+    .s15-card { position: absolute; left: 0; top: 0; width: 100%; height: 100%; border: 2px solid #dfe4ea; overflow: hidden;
+                background: linear-gradient(180deg, #ffffff 0%, #f3f5f7 100%); box-shadow: inset 0 3px 0 #ffffff, inset 0 -6px 0 rgba(17,20,24,0.03); }
+    .s15-hl { position: absolute; left: 14px; right: 14px; top: 6px; height: 56px; border-radius: 40px 40px 80px 80px;
+              background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0)); }
+    /* comment composer */
+    #s15-cmtw { position: absolute; left: 60px; top: 592px; width: 960px; height: 170px; }
+    #s15-cmt { position: absolute; inset: 0; transform-origin: 480px 85px; }
+    #s15-cmt .s15-slab, #s15-cmt .s15-card { border-radius: 46px; }
+    #s15-av { position: absolute; left: 28px; top: 33px; width: 104px; height: 104px; border-radius: 50%; overflow: hidden;
+              background: linear-gradient(180deg, #dfe4ea 0%, #c3cbd5 100%); box-shadow: inset 0 2px 0 #ffffff, 0 4px 10px rgba(17,20,24,0.12); }
+    #s15-in { position: absolute; left: 152px; top: 25px; width: 660px; height: 120px; border-radius: 60px; background: #eef1f4; border: 2px solid #e1e6eb;
+              box-shadow: inset 0 3px 8px rgba(17,20,24,0.07); }
+    #s15-ph { position: absolute; left: 40px; top: 0; font: 500 40px/116px "D2QSans", sans-serif; color: #8a94a3; white-space: nowrap; }
+    #s15-typed { position: absolute; left: 40px; top: 0; height: 116px; display: flex; align-items: center; font: 900 64px/1 "D2QSans", sans-serif; color: #111418; letter-spacing: 0.01em; }
+    #s15-typed span { display: none; }
+    #s15-caret { display: block; width: 5px; height: 62px; border-radius: 3px; background: #16a34a; margin-left: 6px; }
+    #s15-send { position: absolute; left: 828px; top: 29px; width: 112px; height: 112px; border-radius: 50%;
+                background: radial-gradient(circle at 35% 28%, #6ee7a0 0%, #22c55e 45%, #15803d 100%);
+                box-shadow: 0 12px 24px rgba(22,163,74,0.38), inset 0 3px 0 rgba(255,255,255,0.5), inset 0 -6px 10px rgba(0,0,0,0.12); }
+    #s15-send svg { position: absolute; left: 0; top: 0; }
+    #s15-rip { position: absolute; left: 828px; top: 29px; width: 112px; height: 112px; border-radius: 50%; border: 6px solid #22c55e; opacity: 0; }
+    /* the direct message */
+    #s15-dm { position: absolute; left: 60px; top: 808px; width: 960px; height: 380px; opacity: 0; transform-origin: 480px 190px; }
+    #s15-name { position: absolute; left: 112px; top: 0; font: 800 36px/40px "D2QSans", sans-serif; color: #111418; letter-spacing: -0.01em; white-space: nowrap; }
+    #s15-name i { font-style: normal; color: #5b6573; font-weight: 600; font-size: 30px; margin-left: 10px; }
+    #s15-bub { position: absolute; left: 108px; top: 50px; width: 852px; height: 190px; }
+    #s15-bub .s15-slab { border-radius: 44px 44px 44px 14px; background: linear-gradient(180deg, #bfe3cb 0%, #9fceb0 100%); }
+    #s15-bubc { position: absolute; left: 0; top: 0; width: 100%; height: 100%; border-radius: 44px 44px 44px 14px; padding: 33px 40px; overflow: hidden;
+                background: linear-gradient(180deg, #ffffff 0%, #ecf8f0 100%); border: 2px solid #c6ead2; box-shadow: inset 0 3px 0 #ffffff;
+                font: 700 44px/60px "D2QSans", sans-serif; color: #111418; letter-spacing: -0.012em; }
+    #s15-dav { position: absolute; left: 0; top: 150px; width: 92px; height: 92px; border-radius: 24px; overflow: hidden;
+               box-shadow: 0 10px 18px rgba(17,20,24,0.25); }
+    #s15-dav img { display: block; width: 92px; height: 92px; }
+    #s15-row { position: absolute; left: 108px; top: 268px; width: 852px; height: 80px; }
+    .s15-tc { position: absolute; top: 0; width: 78px; height: 78px; opacity: 0; }
+    .s15-tcin { position: absolute; inset: 0; border-radius: 14px; overflow: hidden; border: 3px solid #ffffff; background: #ffffff;
+                box-shadow: 0 10px 18px rgba(17,20,24,0.18), 0 2px 5px rgba(17,20,24,0.10); }
+    .s15-tcin img { display: block; width: 100%; height: 100%; }
+    #s15-rline { position: absolute; left: 108px; top: 366px; width: 852px; height: 7px; border-radius: 4px; transform-origin: 0 50%;
+                 background: linear-gradient(90deg, #16a34a, #4ade80); box-shadow: 0 0 14px rgba(34,197,94,0.55); }
+    /* profile card (no follower or like counts) */
+    #s15-prow { position: absolute; inset: 0; }
+    #s15-pro { position: absolute; left: 60px; top: 1234px; width: 960px; height: 330px; transform-origin: 480px 165px; }
+    #s15-pro .s15-slab, #s15-pro .s15-card { border-radius: 48px; }
+    #s15-ban { position: absolute; left: 0; top: 0; width: 960px; height: 104px; background: linear-gradient(90deg, #d9f3e2 0%, #ebf8f0 55%, #f6fbf8 100%);
+               border-bottom: 2px solid #d3eedc; }
+    #s15-ban svg { position: absolute; left: 0; top: 0; }
+    #s15-logo { position: absolute; left: 44px; top: 44px; width: 200px; height: 200px; }
+    #s15-lslab { position: absolute; left: 0; top: 12px; width: 200px; height: 200px; border-radius: 48px; background: #05070a; box-shadow: 0 18px 30px rgba(17,20,24,0.28); }
+    #s15-logo img { position: absolute; left: 0; top: 0; width: 200px; height: 200px; border-radius: 48px; }
+    #s15-lgl { position: absolute; left: 0; top: 0; width: 200px; height: 200px; border-radius: 48px;
+               background: linear-gradient(160deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.06) 32%, rgba(255,255,255,0) 33%); }
+    #s15-pn { position: absolute; left: 280px; top: 120px; font: 900 72px/1 "D2QSans", sans-serif; letter-spacing: -0.035em; color: #111418; white-space: nowrap; }
+    #s15-ph2 { position: absolute; left: 283px; top: 204px; font: 600 38px/1 "D2QSans", sans-serif; color: #5b6573; white-space: nowrap; }
+    #s15-site { position: absolute; left: 280px; top: 254px; height: 58px; padding: 0 26px 0 18px; border-radius: 29px; display: flex; align-items: center; gap: 12px;
+                background: rgba(22,163,74,0.12); border: 2px solid rgba(22,163,74,0.30); font: 700 32px/1 "JetBrains Mono", monospace; color: #15803d; white-space: nowrap; }
+    #s15-shine { position: absolute; left: 0; top: -60px; width: 150px; height: 460px;
+                 background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.75), rgba(255,255,255,0)); }
+  </style>
+  <div id="root" data-composition-id="s15" data-width="1080" data-height="1920">
+    <div id="s15-cam">
+      <div id="s15-glow"></div>
+      <div id="s15-floor"></div>
+      <div id="s15-prow">
+        <div id="s15-pro">
+          <div class="s15-slab"></div>
+          <div class="s15-card" id="s15-proc">
+            <div id="s15-ban"></div>
+            <div id="s15-pn">Desk2Quant</div>
+            <div id="s15-ph2">@desk2quant</div>
+            <div id="s15-site"><svg width="32" height="32" viewBox="0 0 34 34" fill="none"><circle cx="17" cy="17" r="13" stroke="#15803d" stroke-width="3.4" /><path d="M4 17 H30 M17 4 C10 10 10 24 17 30 M17 4 C24 10 24 24 17 30" stroke="#15803d" stroke-width="3" stroke-linecap="round" /></svg>desk2quant.com</div>
+            <div id="s15-shine"></div>
+          </div>
+          <div id="s15-logo"><div id="s15-lslab"></div><img src="assets/logo.png" alt="" /><div id="s15-lgl"></div></div>
+        </div>
+      </div>
+      <div id="s15-dm">
+        <div id="s15-name">Desk2Quant <i>· now</i></div>
+        <div id="s15-bub"><div class="s15-slab"></div><div id="s15-bubc">Hey! Here are all 10 free Desk2Quant resources 🎯</div></div>
+        <div id="s15-dav"><img src="assets/logo.png" alt="" /></div>
+        <div id="s15-row">
+          <div class="s15-tc" style="left:0px;"><div class="s15-tcin"><img src="assets/covers/quant-roadmap-2026.jpg" alt="" /></div></div>
+          <div class="s15-tc" style="left:86px;"><div class="s15-tcin"><img src="assets/covers/greeks-cheat-sheet.jpg" alt="" /></div></div>
+          <div class="s15-tc" style="left:172px;"><div class="s15-tcin"><img src="assets/covers/stochastic-calculus-cheat-sheet.jpg" alt="" /></div></div>
+          <div class="s15-tc" style="left:258px;"><div class="s15-tcin"><img src="assets/covers/quant-formula-sheet.jpg" alt="" /></div></div>
+          <div class="s15-tc" style="left:344px;"><div class="s15-tcin"><img src="assets/covers/desk-probability-casebook.jpg" alt="" /></div></div>
+          <div class="s15-tc" style="left:430px;"><div class="s15-tcin"><img src="assets/covers/market-risk-interview-kit.jpg" alt="" /></div></div>
+          <div class="s15-tc" style="left:516px;"><div class="s15-tcin"><img src="assets/covers/pause-on-your-desk.jpg" alt="" /></div></div>
+          <div class="s15-tc" style="left:602px;"><div class="s15-tcin"><img src="assets/covers/the-missing-square.jpg" alt="" /></div></div>
+          <div class="s15-tc" style="left:688px;"><div class="s15-tcin"><img src="assets/covers/fx-derivatives-50-problems.jpg" alt="" /></div></div>
+          <div class="s15-tc" style="left:774px;"><div class="s15-tcin"><img src="assets/covers/ats-quant-resume-template.jpg" alt="" /></div></div>
+        </div>
+        <div id="s15-rline"></div>
+      </div>
+      <div id="s15-cmtw">
+        <div id="s15-cmt">
+          <div class="s15-slab"></div>
+          <div class="s15-card" id="s15-cmtc">
+            <div class="s15-hl"></div>
+            <div id="s15-av"><svg width="104" height="104" viewBox="0 0 104 104" fill="none"><circle cx="52" cy="41" r="18" fill="#ffffff" /><path d="M15 102 C17 76 32 65 52 65 C72 65 87 76 89 102 Z" fill="#ffffff" /></svg></div>
+            <div id="s15-in">
+              <div id="s15-ph">Add a comment…</div>
+              <div id="s15-typed"><span>F</span><span>R</span><span>E</span><span>E</span><i id="s15-caret"></i></div>
+            </div>
+            <div id="s15-rip"></div>
+            <div id="s15-send">
+              <svg id="s15-plane" width="112" height="112" viewBox="0 0 112 112" fill="none"><path d="M56 82 V34 M37 52 L56 33 L75 52" stroke="#ffffff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" /></svg>
+              <svg id="s15-chk" width="112" height="112" viewBox="0 0 112 112" fill="none"><path d="M35 57 L50 72 L78 41" stroke="#ffffff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      /*DATA*/ const DUR = 3.86; const W = [0.16, 0.54, 0.8, 0.98, 1.16, 1.34, 1.52, 1.62]; /*END*/
+      // words: 0 Comment 1 FREE, 2 and 3 we'll 4 DM 5 you 6 all 7 ten.
+      const w = (i) => Math.max(0, W.length > i ? W[i] : 0.16 + i * 0.22);
+      const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+      const tl = gsap.timeline({ paused: true });
+
+      // the banner: a little green pixel mosaic (seeded, the film's motif), not any app's branding
+      function mulberry32(a) { return function () { a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+      const rnd = mulberry32(31);
+      let sq = "";
+      for (let r = 0; r < 4; r++) for (let c = 0; c < 37; c++) {
+        const x = c * 26, wgt = Math.pow(c / 36, 1.6) * 0.15 + Math.pow(1 - c / 36, 2.2) * 0.85;
+        if (rnd() > wgt * 0.9 + 0.05) continue;
+        const a = (0.12 + 0.5 * rnd()).toFixed(2);
+        sq += '<rect x="' + (x + 2) + '" y="' + (r * 26 + 2) + '" width="22" height="22" rx="3" fill="rgba(22,163,74,' + a + ')"/>';
+      }
+      document.getElementById("s15-ban").innerHTML = '<svg width="960" height="104" viewBox="0 0 960 104">' + sq + "</svg>";
+
+      // camera: rise and settle, then hold still for the end card
+      tl.fromTo("#s15-cam", { y: 80, scale: 1.06 }, { y: 0, scale: 1, duration: 0.75, ease: "expo.out" }, 0);
+      tl.fromTo("#s15-glow", { opacity: 0 }, { opacity: 1, duration: 0.6, ease: "power2.out" }, 0.1);
+
+      // arrival: the comment box and the profile card float in on a 3D tilt, together, then part for the DM
+      const LIFT = 214, DROP = 196;
+      tl.fromTo("#s15-cmt", { opacity: 0, y: 110, rotationX: 34, rotationY: -18, scale: 0.92, transformPerspective: 1600 },
+                            { opacity: 1, y: 0, rotationX: 7, rotationY: -5, scale: 1, transformPerspective: 1600, duration: 0.6, ease: "back.out(1.4)" }, 0.02);
+      tl.fromTo("#s15-pro", { opacity: 0, y: 150, rotationX: 30, rotationY: 16, transformPerspective: 1600 },
+                            { opacity: 1, y: 0, rotationX: 6, rotationY: 5, transformPerspective: 1600, duration: 0.62, ease: "power3.out" }, 0.08);
+
+      // "Comment FREE": the letters type in one by one (drawn below), then the send button is tapped
+      const TY0 = w(0) + 0.08, TYG = clamp((w(1) + 0.12 - TY0) / 4, 0.07, 0.16);
+      const TAP = Math.max(TY0 + 4 * TYG + 0.1, w(2) - 0.08);
+      tl.fromTo("#s15-send", { scale: 1 }, { scale: 0.8, duration: 0.08, ease: "power2.in" }, TAP);
+      tl.fromTo("#s15-send", { scale: 0.8 }, { scale: 1, duration: 0.4, ease: "back.out(3)", immediateRender: false }, TAP + 0.08);
+      tl.fromTo("#s15-rip", { opacity: 0, scale: 0.9 }, { opacity: 0.75, scale: 0.9, duration: 0.01 }, TAP + 0.07);
+      tl.fromTo("#s15-rip", { opacity: 0.75, scale: 0.9 }, { opacity: 0, scale: 1.9, duration: 0.5, ease: "power2.out", immediateRender: false }, TAP + 0.08);
+      tl.fromTo("#s15-plane", { opacity: 1 }, { opacity: 0, duration: 0.1 }, TAP + 0.1);
+      tl.fromTo("#s15-chk", { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2.5)" }, TAP + 0.12);
+      // the sent comment glides up and the profile card drops to make room for the reply
+      tl.fromTo("#s15-cmtw", { y: LIFT }, { y: 0, duration: 0.55, ease: "power3.inOut" }, TAP + 0.2);
+      tl.fromTo("#s15-prow", { y: -DROP }, { y: 0, duration: 0.55, ease: "power3.inOut" }, TAP + 0.2);
+
+      // "DM": the direct message swings in from the right
+      const DM = w(4) - 0.1;
+      tl.fromTo("#s15-dm", { x: 640, opacity: 0, rotationY: -38, transformPerspective: 1600 }, { x: 0, opacity: 1, rotationY: 4, transformPerspective: 1600, duration: 0.55, ease: "power3.out" }, DM);
+      // "all": the ten free covers pop in under the bubble
+      document.querySelectorAll("#s15-row .s15-tc").forEach((el, k) => {
+        tl.fromTo(el, { opacity: 0, y: 30, scale: 0.5 }, { opacity: 1, y: 0, scale: 1, duration: 0.3, ease: "back.out(2.2)" }, w(6) - 0.06 + k * 0.03);
+      });
+      // "ten": a wave runs along the row and a green line underlines all ten
+      document.querySelectorAll("#s15-row .s15-tcin").forEach((el, k) => {
+        const t = w(7) - 0.02 + k * 0.03;
+        tl.fromTo(el, { y: 0 }, { y: -16, duration: 0.12, ease: "power2.out" }, t);
+        tl.fromTo(el, { y: -16 }, { y: 0, duration: 0.3, ease: "back.out(2.5)", immediateRender: false }, t + 0.12);
+      });
+      tl.fromTo("#s15-rline", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power2.out" }, w(7) - 0.02);
+      // the end card lands: a shine runs across the profile card and the logo tile pops once
+      const END = Math.min(DUR - 0.8, w(7) + 0.44);
+      tl.fromTo("#s15-shine", { x: -220, rotation: 16 }, { x: 1100, rotation: 16, duration: 0.7, ease: "power2.inOut" }, END);
+      tl.fromTo("#s15-logo", { scale: 1 }, { scale: 1.08, duration: 0.12, ease: "power2.out" }, END + 0.06);
+      tl.fromTo("#s15-logo", { scale: 1.08 }, { scale: 1, duration: 0.45, ease: "back.out(3)", immediateRender: false }, END + 0.18);
+
+      // continuous layer: typing and caret
+      const letters = Array.from(document.querySelectorAll("#s15-typed span"));
+      const ph = document.getElementById("s15-ph"), caret = document.getElementById("s15-caret");
+      function draw(t) {
+        let n = 0;
+        letters.forEach((s, k) => { const on = t >= TY0 + k * TYG; s.style.display = on ? "inline" : "none"; if (on) n++; });
+        ph.style.opacity = n > 0 ? "0" : "1";
+        const typing = t >= TY0 - 0.05 && t < TY0 + 4 * TYG + 0.05;
+        caret.style.opacity = t >= TAP + 0.05 ? "0" : (typing || Math.floor(t * 2.4) % 2 === 0 ? "1" : "0");
+      }
+      const st = { t: 0 };
+      tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: () => draw(st.t) }, 0);
+      window.__timelines["s15"] = tl;
+    })();
+  </script>
+</template>

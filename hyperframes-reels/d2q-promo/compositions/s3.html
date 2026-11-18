@@ -2,148 +2,146 @@
   <style>
     @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
     @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
-    #root { position: absolute; inset: 0; overflow: hidden; font-family: D2QSans, sans-serif; color: #0f172a; }
-    #s3-floor { position: absolute; left: 150px; top: 1546px; width: 780px; height: 80px; border-radius: 50%;
-                background: radial-gradient(ellipse at center, rgba(15,23,42,0.20), rgba(15,23,42,0) 70%); }
-    #s3-cam { position: absolute; inset: 0; transform-origin: 540px 1040px; }
-    #s3-nb { position: absolute; left: 66px; top: 500px; width: 948px; height: 1040px; border-radius: 42px;
-             background: linear-gradient(180deg, #ffffff 0%, #f7fafc 100%); border: 2px solid #d6dfeb;
-             box-shadow: 0 34px 70px rgba(15,23,42,0.14), 0 8px 18px rgba(15,23,42,0.07), inset 0 2px 0 #ffffff; }
-    #s3-head { position: absolute; left: 0; top: 0; width: 948px; height: 88px; border-bottom: 2px solid #e6edf5; }
-    .s3-dot { position: absolute; top: 34px; width: 20px; height: 20px; border-radius: 10px; }
-    #s3-file { position: absolute; left: 132px; top: 0; font: 600 27px/88px "JetBrains Mono", monospace; color: #475569; }
-    #s3-tag { position: absolute; right: 30px; top: 22px; height: 44px; padding: 0 18px; border-radius: 22px; background: #e6f6f4;
-              font: 700 21px/44px D2QSans, sans-serif; color: #067a75; }
-    #s3-chart { position: absolute; left: 34px; top: 112px; width: 880px; height: 440px; }
-    #s3-one { position: absolute; right: 58px; top: 128px; height: 44px; padding: 0 18px; border-radius: 22px; background: #fff1f2;
-              border: 2px solid #fda4af; font: 700 21px/40px "JetBrains Mono", monospace; color: #e11d48; letter-spacing: 0.02em; }
-    #s3-sllab { position: absolute; left: 50px; top: 600px; font: 700 28px/60px D2QSans, sans-serif; color: #475569; }
-    #s3-track { position: absolute; left: 270px; top: 623px; width: 600px; height: 14px; border-radius: 7px; background: #e2e8f0; }
-    #s3-fill { position: absolute; left: 0; top: 0; height: 14px; width: 0; border-radius: 7px; background: linear-gradient(90deg, #67d6cf, #08a9a2); }
-    #s3-knob { position: absolute; left: 248px; top: 607px; width: 46px; height: 46px; border-radius: 23px; background: #ffffff;
-               border: 7px solid #08a9a2; box-shadow: 0 6px 14px rgba(8,169,162,0.35); }
-    #s3-slv { position: absolute; left: 221px; top: 548px; width: 100px; text-align: center; font: 800 32px/1 "JetBrains Mono", monospace; color: #0f172a; }
-    #s3-errlab { position: absolute; left: 50px; top: 712px; font: 700 28px/1 D2QSans, sans-serif; color: #475569; }
-    #s3-err { position: absolute; left: 40px; top: 752px; font: 800 210px/1 "JetBrains Mono", monospace; letter-spacing: -0.04em; color: #f43f5e; opacity: 0; }
-    #s3-cover { position: absolute; right: 50px; top: 730px; width: 230px; height: 230px; border-radius: 20px; overflow: hidden;
-                box-shadow: 0 14px 30px rgba(15,23,42,0.18); border: 2px solid #ffffff; }
-    #s3-cover img { width: 100%; height: 100%; display: block; }
+    #root { position: absolute; inset: 0; overflow: hidden; }
+    #s3-cam { position: absolute; inset: 0; transform-origin: 620px 1080px; }
+    /* p03 moved up 40 px (top 460) to leave room for the toggle card under the desk; at this placement:
+       stopwatch dial centre (617,1026) r~60, crown top (615,890); glass x 721-821 y 908-1049;
+       desk top corners L(332,1106) F(581,1178) R(907,1081) B(658,1008); legs end y~1434 */
+    #s3-plate { position: absolute; left: -40px; top: 460px; width: 1160px; height: 1160px; }
+    #s3-sw { position: absolute; left: 547px; top: 956px; width: 140px; height: 140px; overflow: visible; }
+    /* timer chip floating over the stopwatch crown */
+    #s3-chip { position: absolute; left: 540px; top: 790px; height: 70px; padding: 0 24px 0 20px; display: flex; align-items: center; gap: 14px;
+               background: linear-gradient(180deg, #ffffff 0%, #f6f8fa 100%); border: 2px solid #dfe4ea; border-radius: 35px; opacity: 0;
+               box-shadow: 0 30px 60px rgba(17,20,24,0.12), 0 8px 18px rgba(17,20,24,0.06), inset 0 2px 0 #ffffff; transform-origin: 70px 84px; }
+    #s3-chip::after { content: ""; position: absolute; left: 56px; bottom: -13px; width: 22px; height: 22px; background: #f6f8fa;
+                      border-right: 2px solid #dfe4ea; border-bottom: 2px solid #dfe4ea; transform: rotate(45deg); border-radius: 0 0 6px 0; }
+    #s3-dot { width: 18px; height: 18px; border-radius: 50%; background: #16a34a; box-shadow: 0 0 0 6px rgba(22,163,74,0.16); }
+    #s3-time { font: 800 42px/1 "JetBrains Mono", monospace; color: #111418; letter-spacing: -0.02em; white-space: nowrap; }
+    #s3-ss { display: inline-block; transform-origin: 50% 60%; }
+    /* the question card, standing on the right half of the desk with a slight 3D lean */
+    #s3-qwrap { position: absolute; left: 664px; top: 930px; width: 248px; height: 176px; }
+    #s3-qshadow { position: absolute; left: 634px; top: 1076px; width: 300px; height: 46px; border-radius: 50%; opacity: 0;
+                  background: radial-gradient(ellipse at center, rgba(17,20,24,0.30) 0%, rgba(17,20,24,0.12) 50%, rgba(17,20,24,0) 72%); }
+    #s3-qcard { position: absolute; inset: 0; padding: 24px 14px 0 22px; border-radius: 24px; background: linear-gradient(180deg, #ffffff 0%, #f7f9fb 100%);
+                border: 2px solid #dfe4ea; transform: perspective(900px) rotateY(-16deg) rotateX(8deg) rotateZ(-5deg); transform-origin: 50% 100%;
+                box-shadow: 0 30px 60px rgba(17,20,24,0.12), 0 8px 18px rgba(17,20,24,0.06), inset 0 2px 0 #ffffff, inset 0 -6px 0 rgba(17,20,24,0.04); }
+    #s3-qlab { font: 800 28px/1 "D2QSans", sans-serif; letter-spacing: 0.1em; color: #16a34a; white-space: nowrap; }
+    #s3-qtxt { margin-top: 16px; font: 800 38px/1.06 "D2QSans", sans-serif; letter-spacing: -0.02em; color: #111418; white-space: nowrap; }
+    #s3-qtxt b { position: relative; font-weight: 800; color: #16a34a; }
+    #s3-uline { position: absolute; left: 0; right: 0; bottom: -6px; height: 6px; border-radius: 3px; background: #16a34a; transform-origin: 0% 50%; }
+    /* the toggle card under the desk */
+    #s3-tog { position: absolute; left: 214px; top: 1448px; width: 652px; height: 120px; opacity: 0; }
+    #s3-tglow { position: absolute; inset: -26px; border-radius: 52px; opacity: 0;
+                background: radial-gradient(ellipse at center, rgba(22,163,74,0.30) 0%, rgba(22,163,74,0.10) 55%, rgba(22,163,74,0) 75%); }
+    #s3-tcard { position: absolute; inset: 0; border-radius: 30px; background: linear-gradient(180deg, #ffffff 0%, #f7f9fb 100%); border: 2px solid #dfe4ea;
+                box-shadow: 0 30px 60px rgba(17,20,24,0.12), 0 8px 18px rgba(17,20,24,0.06), inset 0 2px 0 #ffffff; }
+    #s3-tlab { position: absolute; left: 34px; top: 0; height: 120px; display: flex; align-items: center; gap: 14px;
+               font: 700 31px/1 "D2QSans", sans-serif; color: #5b6573; letter-spacing: -0.01em; white-space: nowrap; }
+    #s3-pill { position: absolute; right: 22px; top: 20px; width: 272px; height: 80px; transform-origin: 50% 50%; }
+    .s3-face { position: absolute; inset: 0; border-radius: 40px; display: flex; align-items: center; justify-content: center; gap: 12px;
+               font: 800 36px/1 "D2QSans", sans-serif; letter-spacing: -0.015em; white-space: nowrap; }
+    #s3-pA { background: linear-gradient(180deg, #f1f3f6, #e6eaee); border: 2px solid #dfe4ea; color: #5b6573; }
+    #s3-pB { opacity: 0; color: #ffffff; background: linear-gradient(180deg, #34d16e 0%, #16a34a 100%);
+             box-shadow: 0 14px 30px rgba(22,163,74,0.32), inset 0 2px 0 rgba(255,255,255,0.45), inset 0 -3px 0 rgba(0,0,0,0.08); }
+    #s3-pB::before { content: ""; position: absolute; left: 14px; right: 14px; top: 5px; height: 30px; border-radius: 30px;
+                     background: linear-gradient(180deg, rgba(255,255,255,0.38), rgba(255,255,255,0)); }
+    #s3-ck { width: 44px; height: 44px; border-radius: 50%; background: #ffffff; display: flex; align-items: center; justify-content: center;
+             box-shadow: 0 2px 6px rgba(6,20,11,0.18); }
+    #s3-strike { position: absolute; left: 30px; top: 37px; width: 212px; height: 6px; border-radius: 3px; background: #f43f5e; transform-origin: 0% 50%; }
   </style>
   <div id="root" data-composition-id="s3" data-width="1080" data-height="1920">
-    <div id="s3-floor"></div>
     <div id="s3-cam">
-      <div id="s3-nb">
-        <div id="s3-head">
-          <div class="s3-dot" style="left:34px; background:#f43f5e;"></div>
-          <div class="s3-dot" style="left:64px; background:#f59e0b;"></div>
-          <div class="s3-dot" style="left:94px; background:#08a9a2;"></div>
-          <div id="s3-file">delta_hedging.ipynb</div>
-          <div id="s3-tag">Stochastic Calculus Visual Lab</div>
+      <img id="s3-plate" src="assets/plates/p03.png" alt="" />
+      <!-- the stopwatch's blank dial gets a live hand and a green "time left" wedge -->
+      <svg id="s3-sw" viewBox="-70 -70 140 140">
+        <path id="s3-wedge" d="M 0 0 Z" fill="rgba(22,163,74,0.24)" />
+        <g id="s3-ticks"></g>
+        <line id="s3-hand" x1="0" y1="10" x2="0" y2="-46" stroke="#111418" stroke-width="4.5" stroke-linecap="round" />
+        <circle cx="0" cy="0" r="6.5" fill="#111418" /><circle cx="0" cy="0" r="2.6" fill="#22c55e" />
+      </svg>
+      <div id="s3-chip"><div id="s3-dot"></div><div id="s3-time">00:<span id="s3-ss">45</span></div></div>
+      <div id="s3-qshadow"></div>
+      <div id="s3-qwrap">
+        <div id="s3-qcard">
+          <div id="s3-qlab">FINAL ROUND</div>
+          <div id="s3-qtxt"><b>Hedge<span id="s3-uline"></span></b> this<br />option.</div>
         </div>
-        <canvas id="s3-chart" width="880" height="440"></canvas>
-        <div id="s3-one">one simulated path</div>
-        <div id="s3-sllab">rebalances</div>
-        <div id="s3-track"><div id="s3-fill"></div></div>
-        <div id="s3-knob"></div>
-        <div id="s3-slv">5</div>
-        <div id="s3-errlab">final hedging error</div>
-        <div id="s3-err">2.32</div>
-        <div id="s3-cover"><img src="assets/covers/stochastic-calculus-visual-lab.jpg" alt="" /></div>
+      </div>
+      <div id="s3-tog">
+        <div id="s3-tglow"></div>
+        <div id="s3-tcard"></div>
+        <div id="s3-tlab">
+          <svg width="40" height="40" viewBox="0 0 40 40"><rect x="5" y="7" width="30" height="26" rx="5" fill="none" stroke="#5b6573" stroke-width="3.5" />
+            <path d="M 20 9 L 20 31" stroke="#5b6573" stroke-width="3" /><path d="M 10 15 L 16 15 M 10 21 L 16 21 M 24 15 L 30 15 M 24 21 L 30 21" stroke="#5b6573" stroke-width="2.6" stroke-linecap="round" /></svg>
+          How you study
+        </div>
+        <div id="s3-pill">
+          <div class="s3-face" id="s3-pA">Memorise<div id="s3-strike"></div></div>
+          <div class="s3-face" id="s3-pB"><span id="s3-ck"><svg width="30" height="30" viewBox="0 0 30 30">
+            <path id="s3-ckp" d="M 7 15.5 L 12.5 21 L 23 9.5" pathLength="100" stroke-dasharray="100 100" stroke-dashoffset="100" opacity="0" fill="none" stroke="#16a34a" stroke-width="4.6" stroke-linecap="round" stroke-linejoin="round" /></svg></span>Practise</div>
+        </div>
       </div>
     </div>
   </div>
   <script>
     (function () {
-      /*DATA*/ const DUR = 7.99; const W = [0.18, 0.6, 1.06, 1.62, 1.82, 1.94, 2.14, 2.7, 2.88, 2.98, 3.18, 3.36, 4.86, 5.06, 5.46, 6.02]; /*END*/
-      // words: 0 One 1 simulated 2 path. 3 Hedge 4 it 5 five 6 times, 7 and 8 the 9 error 10 is 11 2.32 | 12 Two 13 hundred 14 times: 15 0.07
-      const w = (i) => (W.length > i ? W[i] : 0.2 + i * 0.42);
-      // the knob, the path and the error move together from "Two" and land on "zero point zero seven"
-      const P = { chart0: w(0), chart1: w(3), errIn: w(11) - 0.1, slide0: w(12), slide1: w(15) - 0.05 };
-      P.count0 = P.slide0; P.count1 = P.slide1;
-      P.ticks0 = w(5); P.pulse0 = w(9); P.pulse1 = w(12);        // "five" -> ticks; "error" .. "Two" -> pulse
+      /*DATA*/ const DUR = 3.19; const W = [0.16, 0.44, 0.54, 0.86, 1.08, 1.2, 1.38, 2.0, 2.12, 2.42, 2.64, 2.8]; /*END*/
+      // words: 0 If 1 you're 2 preparing 3 for 4 a 5 quant 6 interview, 7 this 8 changes 9 how 10 you 11 study.
+      const w = (i) => Math.max(0, W.length > i ? W[i] : 0.16 + i * 0.24);
       const tl = gsap.timeline({ paused: true });
-      tl.fromTo("#s3-nb", { opacity: 0, y: 90 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 0.05);
-      tl.fromTo("#s3-cam", { scale: 1 }, { scale: 1.045, duration: DUR, ease: "none" }, 0);
-      tl.fromTo("#s3-one", { opacity: 0, x: 20 }, { opacity: 1, x: 0, duration: 0.3, ease: "power2.out" }, w(1));
-      tl.fromTo("#s3-cover", { opacity: 0, rotation: 8, y: 30 }, { opacity: 1, rotation: 0, y: 0, duration: 0.45, ease: "back.out(1.5)" }, w(2) + 0.3);
-      // the hit on "zero point zero seven" (critic: the card reacts): the card bumps, the number glows
-      tl.fromTo("#s3-cam", { y: 0 }, { y: -10, duration: 0.1, ease: "power2.out", yoyo: true, repeat: 1, immediateRender: false }, w(15) - 0.03);
-      tl.fromTo("#s3-err", { textShadow: "0 0 0px rgba(8,169,162,0)" }, { textShadow: "0 0 40px rgba(8,169,162,0.9)", duration: 0.14, ease: "power2.out", yoyo: true, repeat: 1, repeatDelay: 0.25, immediateRender: false }, w(15) - 0.03);
-      // the knob answers "five"
-      tl.fromTo("#s3-knob", { scale: 1 }, { scale: 1.3, duration: 0.14, ease: "power2.out", yoyo: true, repeat: 1, immediateRender: false }, w(5) - 0.04);
-      tl.fromTo("#s3-slv", { scale: 1, color: "#0f172a" }, { scale: 1.35, color: "#067a75", duration: 0.16, ease: "power2.out", yoyo: true, repeat: 1, immediateRender: false }, w(5) - 0.04);
+      const IV = w(6), FLIP = w(8);
+      // camera: slides in from the right and settles, then a slow push toward the desk
+      tl.fromTo("#s3-cam", { x: 90, scale: 1.08 }, { x: 0, scale: 1, duration: 0.7, ease: "expo.out" }, 0);
+      tl.fromTo("#s3-cam", { scale: 1 }, { scale: 1.05, duration: Math.max(0.2, DUR - 0.7), ease: "sine.inOut", immediateRender: false }, 0.7);
+      // "preparing": the clock starts, a timer chip pops over the stopwatch
+      tl.fromTo("#s3-chip", { opacity: 0, scale: 0.5, y: 24 }, { opacity: 1, scale: 1, y: 0, duration: 0.3, ease: "back.out(2.2)" }, w(2) - 0.08);
+      // "interview": the question card slides along the desk and stops on it
+      tl.fromTo("#s3-qwrap", { x: 430, y: -128, rotation: 5, filter: "blur(6px)" }, { x: 0, y: 0, rotation: 0, filter: "blur(0px)", duration: 0.44, ease: "expo.out" }, IV - 0.14);
+      tl.fromTo("#s3-qshadow", { opacity: 0, scaleX: 0.6 }, { opacity: 1, scaleX: 1, duration: 0.3, ease: "power2.out" }, IV - 0.02);
+      tl.fromTo("#s3-uline", { scaleX: 0 }, { scaleX: 1, duration: 0.22, ease: "power2.out" }, IV + 0.2);
+      // the toggle card rises under the desk, still on "Memorise"
+      tl.fromTo("#s3-tog", { opacity: 0, y: 70 }, { opacity: 1, y: 0, duration: 0.5, ease: "expo.out" }, IV + 0.3);
+      // "this": strike it ... "changes": the pill flips to Practise, the check draws, the card glows on "study"
+      tl.fromTo("#s3-strike", { scaleX: 0 }, { scaleX: 1, duration: 0.14, ease: "power2.out" }, w(7) - 0.04);
+      tl.fromTo("#s3-pill", { rotationX: 0, transformPerspective: 600 }, { rotationX: 90, duration: 0.09, ease: "power2.in" }, FLIP - 0.04);
+      tl.fromTo("#s3-pA", { opacity: 1 }, { opacity: 0, duration: 0.01 }, FLIP + 0.05);
+      tl.fromTo("#s3-pB", { opacity: 0 }, { opacity: 1, duration: 0.01 }, FLIP + 0.05);
+      tl.fromTo("#s3-pill", { rotationX: -90 }, { rotationX: 0, duration: 0.28, ease: "back.out(1.9)", immediateRender: false }, FLIP + 0.05);
+      tl.fromTo("#s3-tog", { y: 0 }, { y: -14, duration: 0.1, ease: "power2.out", immediateRender: false }, FLIP - 0.04);
+      tl.fromTo("#s3-tog", { y: -14 }, { y: 0, duration: 0.24, ease: "power2.inOut", immediateRender: false }, FLIP + 0.06);
+      tl.fromTo("#s3-ckp", { attr: { "stroke-dashoffset": 100, opacity: 0 } }, { attr: { "stroke-dashoffset": 0, opacity: 1 }, duration: 0.2, ease: "power2.out" }, FLIP + 0.2);
+      tl.fromTo("#s3-tglow", { opacity: 0 }, { opacity: 1, duration: 0.24, ease: "power2.out" }, Math.min(w(11) - 0.06, DUR - 0.45));
 
-      const nr = (function (a) { return function () { a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a);
-        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; })(77);
-      const NOISE = Array.from({ length: 400 }, () => (nr() + nr() + nr() - 1.5) / 0.75);
-      const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
-      const ease = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
-      const mix = (a, b, k) => a + (b - a) * k;
-      const hex = (c) => [parseInt(c.slice(1, 3), 16), parseInt(c.slice(3, 5), 16), parseInt(c.slice(5, 7), 16)];
-      const mixc = (c1, c2, k) => { const a = hex(c1), b = hex(c2); return "rgb(" + a.map((v, i) => Math.round(mix(v, b[i], k))).join(",") + ")"; };
-      const chart = document.getElementById("s3-chart").getContext("2d");
-      const err = document.getElementById("s3-err"), knob = document.getElementById("s3-knob"), fill = document.getElementById("s3-fill"), slv = document.getElementById("s3-slv");
-      // the notebook's two real readings: 5 rebalances -> 2.32, 200 -> 0.07; in between a power law joins them
-      const nAt = (t) => 5 * Math.pow(40, ease(clamp((t - P.slide0) / (P.slide1 - P.slide0), 0, 1)));
-      const errAt = (N) => 2.32 * Math.pow(N / 5, Math.log(0.07 / 2.32) / Math.log(40));
-      function drawChart(t) {
-        chart.clearRect(0, 0, 880, 440);
-        const L = 70, R = 850, Tp = 40, Bt = 372, y0 = -0.4, y1 = 2.8;
-        const Y = (v) => Bt - ((v - y0) / (y1 - y0)) * (Bt - Tp);
-        chart.strokeStyle = "#e6edf5"; chart.lineWidth = 2;
-        for (let gl = 0; gl <= 2.5; gl += 0.5) { chart.beginPath(); chart.moveTo(L, Y(gl)); chart.lineTo(R, Y(gl)); chart.stroke(); }
-        chart.setLineDash([10, 10]); chart.strokeStyle = "#94a3b8"; chart.beginPath(); chart.moveTo(L, Y(0)); chart.lineTo(R, Y(0)); chart.stroke(); chart.setLineDash([]);
-        chart.fillStyle = "#64748b"; chart.font = "600 22px 'JetBrains Mono', monospace";
-        chart.fillText("0", 34, Y(0) + 8); chart.fillText("2", 34, Y(2) + 8); chart.fillText("time to expiry →", L + 6, Bt + 34);
-        const N = nAt(t), E = errAt(N);
-        const rev = clamp((t - P.chart0) / (P.chart1 - P.chart0), 0, 1);
-        if (rev <= 0) return;
-        const steps = Math.max(1, Math.round(N));
-        chart.strokeStyle = mixc("#f43f5e", "#08a9a2", clamp((2.32 - E) / 1.6, 0, 1)); chart.lineWidth = 6; chart.lineJoin = "round";
-        chart.beginPath();
-        const M = 400, upto = Math.floor(M * rev);
-        for (let i = 0; i <= upto; i++) {
-          const x = i / M, xq = Math.floor(x * steps) / steps, j = Math.min(M - 1, Math.floor(xq * M));
-          const v = E * (xq + 0.55 * NOISE[j] * Math.sin(Math.PI * xq));
-          if (i === 0) chart.moveTo(L + x * (R - L), Y(v)); else chart.lineTo(L + x * (R - L), Y(v));
-        }
-        chart.stroke();
-        const endCol = chart.strokeStyle;
-        if (rev >= 1) { chart.fillStyle = endCol; chart.beginPath(); chart.arc(R, Y(E), 11, 0, 6.2832); chart.fill(); }
-        // the rebalances themselves: one tick per hedge on the time axis, popping in on "five", a dense comb at 200
-        const shown = t < P.slide0 ? Math.min(5, Math.floor(clamp((t - P.ticks0) / 0.5, 0, 1) * 5.999)) : steps;
-        for (let k = 1; k <= shown; k++) {
-          const x = L + (k / steps) * (R - L);
-          const pop = t < P.slide0 ? clamp((t - P.ticks0 - (k - 1) * 0.1) / 0.15, 0, 1) : 1;
-          chart.strokeStyle = "rgba(8,169,162," + (steps > 40 ? 0.55 : 0.9) * pop + ")";
-          chart.lineWidth = steps > 40 ? 2 : 4;
-          chart.beginPath(); chart.moveTo(x, Bt + 2); chart.lineTo(x, Bt - (steps > 40 ? 10 : 18 * pop)); chart.stroke();
-          if (steps <= 40) { chart.setLineDash([6, 8]); chart.strokeStyle = "rgba(8,169,162," + 0.25 * pop + ")"; chart.lineWidth = 2;
-            chart.beginPath(); chart.moveTo(x, Bt - 18); chart.lineTo(x, Tp); chart.stroke(); chart.setLineDash([]); }
-        }
-        // a rose pulse on the path's end while the error is named
-        if (rev >= 1 && t > P.pulse0 && t < P.pulse1) {
-          const ph = ((t - P.pulse0) % 0.55) / 0.55;
-          chart.strokeStyle = "rgba(244,63,94," + (0.6 * (1 - ph)).toFixed(3) + ")"; chart.lineWidth = 4;
-          chart.beginPath(); chart.arc(R, Y(E), 14 + 30 * ph, 0, 6.2832); chart.stroke();
-        }
+      // the stopwatch dial: minute ticks, a hand and a wedge of time left that ticks down with the chip (00:45 → ...)
+      const NS = "http://www.w3.org/2000/svg", tg = document.getElementById("s3-ticks");
+      for (let i = 0; i < 12; i++) {
+        const a = (i * 30 * Math.PI) / 180, r0 = i % 3 === 0 ? 40 : 44, r1 = 50;
+        const ln = document.createElementNS(NS, "line");
+        ln.setAttribute("x1", (r0 * Math.sin(a)).toFixed(2)); ln.setAttribute("y1", (-r0 * Math.cos(a)).toFixed(2));
+        ln.setAttribute("x2", (r1 * Math.sin(a)).toFixed(2)); ln.setAttribute("y2", (-r1 * Math.cos(a)).toFixed(2));
+        ln.setAttribute("stroke", i % 3 === 0 ? "#111418" : "#8a94a1"); ln.setAttribute("stroke-width", i % 3 === 0 ? "3.2" : "2");
+        ln.setAttribute("stroke-linecap", "round"); tg.appendChild(ln);
       }
-      function drawSlider(t) {
-        const p = ease(clamp((t - P.slide0) / (P.slide1 - P.slide0), 0, 1));
-        knob.style.transform = "translateX(" + (p * 600).toFixed(1) + "px)";
-        slv.style.transform = "translateX(" + (p * 600).toFixed(1) + "px)";
-        fill.style.width = (p * 600).toFixed(1) + "px";
-        slv.textContent = String(Math.round(nAt(t)));
-        const c = clamp((t - P.count0) / (P.count1 - P.count0), 0, 1);
-        const E = c >= 1 ? 0.07 : 2.32 * Math.pow(0.07 / 2.32, ease(c));
-        let s = E.toFixed(2);
-        if (c > 0.04 && c < 0.86) { const f = Math.floor(t * 30); s = s.slice(0, -2) + ((f * 7) % 10) + ((f * 3 + 5) % 10); }
-        err.textContent = s;
-        err.style.color = mixc("#f43f5e", "#08a9a2", clamp((2.32 - E) / 1.2, 0, 1));
-        err.style.opacity = String(clamp((t - P.errIn) / 0.25, 0, 1));
-      }
+      const hand = document.getElementById("s3-hand"), wedge = document.getElementById("s3-wedge");
+      const ss = document.getElementById("s3-ss"), dot = document.getElementById("s3-dot");
+      const T0 = w(2) + 0.06, TICK = 0.5;
+      const backOut = (x) => { const s = 2.4; x -= 1; return x * x * ((s + 1) * x + s) + 1; };
       const st = { t: 0 };
-      tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: () => { drawChart(st.t); drawSlider(st.t); } }, 0);
+      function draw() {
+        const t = st.t, el = Math.max(0, t - T0), k = t > T0 ? Math.floor(el / TICK) : 0, n = Math.max(0, 45 - k);
+        const ft = el - k * TICK, snap = k > 0 ? backOut(Math.min(1, ft / 0.09)) : 1;
+        const A = 6 * (n + 1 - snap), a = (A * Math.PI) / 180, r = 40;
+        const x = r * Math.sin(a), y = -r * Math.cos(a);
+        wedge.setAttribute("d", "M 0 0 L 0 " + -r + " A " + r + " " + r + " 0 " + (A > 180 ? 1 : 0) + " 1 " + x.toFixed(2) + " " + y.toFixed(2) + " Z");
+        hand.setAttribute("x2", (44 * Math.sin(a)).toFixed(2)); hand.setAttribute("y2", (-44 * Math.cos(a)).toFixed(2));
+        hand.setAttribute("x1", (-9 * Math.sin(a)).toFixed(2)); hand.setAttribute("y1", (9 * Math.cos(a)).toFixed(2));
+        ss.textContent = String(n).padStart(2, "0");
+        const bump = k > 0 ? Math.max(0, 1 - ft / 0.18) : 0;
+        ss.style.transform = "scale(" + (1 + 0.16 * bump * bump).toFixed(3) + ")";
+        dot.style.boxShadow = "0 0 0 " + (6 + 7 * bump).toFixed(1) + "px rgba(22,163,74," + (0.16 + 0.18 * bump).toFixed(3) + ")";
+      }
+      tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: draw }, 0);
+      draw();
       window.__timelines["s3"] = tl;
     })();
   </script>

@@ -1,0 +1,87 @@
+<template>
+  <style>
+    @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
+    @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
+    #root { position: absolute; inset: 0; overflow: hidden; }
+    #s12-cam { position: absolute; inset: 0; transform-origin: 540px 1100px; }
+    /* the sign and its face text wiggle together about the foot of the post */
+    #s12-sway { position: absolute; inset: 0; transform-origin: 540px 1530px; }
+    #s12-plate { position: absolute; left: -40px; top: 500px; width: 1160px; height: 1160px; }
+    /* p11 sign face (frame): outer x 290-850 y 722-945, inner panel x 312-760 y 745-920, arrow tip x 848 y 830 */
+    #s12-face { position: absolute; left: 314px; top: 746px; width: 452px; height: 172px; display: flex; align-items: center; justify-content: center; }
+    #s12-txt { font: 900 70px/1 "D2QSans", sans-serif; color: #ffffff; letter-spacing: -0.01em; white-space: nowrap; opacity: 0;
+               text-shadow: 0 4px 0 #0f7a37, 0 10px 22px rgba(4,40,18,0.55); }
+    #s12-flash { position: absolute; left: 300px; top: 732px; width: 540px; height: 200px; border-radius: 30px; opacity: 0;
+                 background: radial-gradient(ellipse at 45% 50%, rgba(220,255,232,0.85) 0%, rgba(134,239,172,0.35) 45%, rgba(34,197,94,0) 75%); }
+    #s12-shinec { position: absolute; left: 300px; top: 730px; width: 470px; height: 204px; overflow: hidden; border-radius: 26px; }
+    #s12-shine { position: absolute; left: 0; top: -40px; width: 110px; height: 290px;
+                 background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.55), rgba(255,255,255,0)); }
+    /* glass "?" bubbles */
+    .s12-q { position: absolute; left: 0; top: 0; }
+    .s12-qin { position: absolute; inset: 0; border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.18);
+               background: radial-gradient(circle at 34% 26%, rgba(255,255,255,0.24) 0%, rgba(255,255,255,0.08) 38%, rgba(255,255,255,0.03) 70%), rgba(18,22,28,0.55);
+               box-shadow: 0 30px 70px rgba(0,0,0,0.45), 0 0 60px rgba(34,197,94,0.16), inset 0 2px 0 rgba(255,255,255,0.22), inset 0 -8px 18px rgba(0,0,0,0.25);
+               display: flex; align-items: center; justify-content: center; color: #22c55e; font-family: "D2QSans", sans-serif; font-weight: 900;
+               text-shadow: 0 0 26px rgba(34,197,94,0.75); }
+    .s12-ring { position: absolute; inset: 0; border-radius: 50%; border: 4px solid #22c55e; opacity: 0; }
+  </style>
+  <div id="root" data-composition-id="s12" data-width="1080" data-height="1920">
+    <div id="s12-cam">
+      <div id="s12-sway">
+        <img id="s12-plate" src="assets/plates/p11.png" alt="" />
+        <div id="s12-flash"></div>
+        <div id="s12-face"><div id="s12-txt">START HERE</div></div>
+        <div id="s12-shinec"><div id="s12-shine"></div></div>
+      </div>
+      <div id="s12-qs"></div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      /*DATA*/ const DUR = 1.08; const W = [0.16, 0.48, 0.58, 0.72, 0.84]; /*END*/
+      // words: 0 Don't 1 know 2 where 3 to 4 start?
+      const w = (i) => Math.max(0, W.length > i ? W[i] : 0.16 + i * 0.17);
+      const tl = gsap.timeline({ paused: true });
+
+      // camera: a whip in from the right with motion blur, settling fast; then a slow push
+      tl.fromTo("#s12-cam", { x: 140, filter: "blur(12px)" }, { x: 0, filter: "blur(0px)", duration: 0.4, ease: "expo.out" }, 0);
+      tl.fromTo("#s12-cam", { scale: 1 }, { scale: 1.03, duration: Math.max(0.2, DUR - 0.4), ease: "none" }, 0.4);
+
+      // "?" bubbles pop around the sign on "Don't" and "know": [centre x, y, size, glyph px, tilt, word]
+      const Q = [[200, 1020, 184, 112, -10, 0], [878, 1146, 164, 100, 9, 1], [282, 1350, 140, 86, 6, 2]];
+      const qs = document.getElementById("s12-qs");
+      const TS = w(4) - 0.08;                                    // the stamp starts so it lands on "start?"
+      Q.forEach(([x, y, s, f, r, wi], k) => {
+        const q = document.createElement("div"); q.className = "s12-q"; q.id = "s12-q" + k;
+        q.style.width = s + "px"; q.style.height = s + "px"; q.style.left = (-s / 2) + "px"; q.style.top = (-s / 2) + "px";
+        q.innerHTML = '<div class="s12-qin" style="font-size:' + f + 'px; line-height:' + s + 'px">?</div><div class="s12-ring"></div>';
+        qs.appendChild(q);
+        const t0 = Math.max(0.04, w(wi) - 0.05 + (k === 2 ? 0.02 : 0));
+        tl.fromTo(q, { x: x, y: y + 30, scale: 0, rotation: r - 24 }, { x: x, y: y, scale: 1, rotation: r, duration: 0.34, ease: "back.out(2.4)" }, t0);
+        // "start?": they burst away (a quick swell, a ring, gone)
+        const tp = TS + 0.02 + k * 0.03;
+        tl.fromTo(q, { scale: 1, opacity: 1 }, { scale: 1.35, opacity: 0, duration: 0.14, ease: "power2.out", immediateRender: false }, tp);
+        const ring = q.querySelector(".s12-ring");
+        tl.fromTo(ring, { opacity: 0 }, { opacity: 0.9, duration: 0.01 }, tp);
+        tl.fromTo(ring, { opacity: 0.9, scale: 1 }, { opacity: 0, scale: 1.7, duration: 0.3, ease: "power2.out", immediateRender: false }, tp + 0.01);
+      });
+
+      // "start?": START HERE stamps onto the face, the face flashes, the sign wiggles, a shine runs toward the arrow
+      tl.fromTo("#s12-txt", { opacity: 0, scale: 1.9 }, { opacity: 1, scale: 1, duration: 0.1, ease: "power3.in" }, TS);
+      tl.fromTo("#s12-txt", { scale: 1 }, { scale: 1.06, duration: 0.05, ease: "power2.out", immediateRender: false }, TS + 0.1);
+      tl.fromTo("#s12-txt", { scale: 1.06 }, { scale: 1, duration: 0.2, ease: "back.out(3)", immediateRender: false }, TS + 0.15);
+      tl.fromTo("#s12-flash", { opacity: 0 }, { opacity: 1, duration: 0.05, ease: "power2.out" }, TS + 0.09);
+      tl.fromTo("#s12-flash", { opacity: 1 }, { opacity: 0, duration: 0.3, ease: "power2.out", immediateRender: false }, TS + 0.14);
+      tl.fromTo("#s12-shine", { x: -140, rotation: 16 }, { x: 560, rotation: 16, duration: 0.32, ease: "power2.inOut" }, TS + 0.12);
+      const LAND = TS + 0.1, sway = document.getElementById("s12-sway");
+      function draw(t) {
+        const u = t - LAND;
+        const th = u <= 0 ? 0 : -3.4 * Math.exp(-6.5 * u) * Math.sin(29 * u);
+        sway.style.transform = "rotate(" + th.toFixed(3) + "deg)";
+      }
+      const st = { t: 0 };
+      tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: () => draw(st.t) }, 0);
+      window.__timelines["s12"] = tl;
+    })();
+  </script>
+</template>
