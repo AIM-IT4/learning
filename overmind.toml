@@ -1,0 +1,8 @@
+base-url = "https://api.overmindlab.ai"
+project-id = ""
+project-name = "learning"
+repo_summary = ""
+trace-provider = "overmind"
+version = "0.2.1"
+
+[capabilities]
