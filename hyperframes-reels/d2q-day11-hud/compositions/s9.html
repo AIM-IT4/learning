@@ -1,0 +1,1163 @@
+<template>
+  <style>
+    @font-face { font-family: "Fredoka"; font-weight: 300 700; src: url("assets/fonts/fredoka-700.woff2"); }
+    @font-face { font-family: "Rajdhani"; font-weight: 300; src: url("assets/fonts/rajdhani-300.woff2"); }
+    @font-face { font-family: "Rajdhani"; font-weight: 400; src: url("assets/fonts/rajdhani-400.woff2"); }
+    @font-face { font-family: "Rajdhani"; font-weight: 500; src: url("assets/fonts/rajdhani-500.woff2"); }
+    @font-face { font-family: "Rajdhani"; font-weight: 600; src: url("assets/fonts/rajdhani-600.woff2"); }
+    @font-face { font-family: "ShareTechMono"; font-weight: 400; src: url("assets/fonts/sharetechmono.woff2"); }
+    @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
+    #root { position: absolute; inset: 0; overflow: hidden; }
+    #s9-cv { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+  </style>
+  <div id="root" data-composition-id="s9" data-width="1080" data-height="1920">
+    <canvas id="s9-cv" width="1080" height="1920"></canvas>
+  </div>
+  <script>
+    (function () {
+      /*DATA*/ const DUR = 5.68; const W = [0.16, 0.7, 1.0, 1.34, 1.42, 1.64, 1.82, 2.46, 2.94, 3.28, 3.64, 4.24, 4.5, 4.76, 5.0, 5.22]; /*END*/
+// HOLOHUD: the Sci-fi Hologram HUD engine as one classic script, for HyperFrames scenes (copy it verbatim into a
+// scene's IIFE). HOLO = wireframe engine (holo.js), HUD = UI layer (hud.js), MKM = model builder (mkmodel.mjs), unchanged
+// except that ES-module exports became closures and the fetch-based model loader was dropped.
+// MIT License
+//
+// Copyright (c) 2026 Lemomo (LemoLab), https://github.com/lemomo-ai/lemo-opuscar
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+// associated documentation files (the "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all copies or substantial
+// portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
+// LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO
+// EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+const HOLOHUD = (function () {
+  // LIGHT: a light-mode variant for Desk2Quant (light stage, deep-blue lines, white plates, an orange accent).
+  const LIGHT = true, ADD = LIGHT ? 'source-over' : 'lighter';
+  const PLATEC = (a) => LIGHT ? `rgba(255,255,255,${Math.min(1, a * 1.22)})` : `rgba(1,8,12,${a})`;
+  const HOLO = (function () {
+    // hologram-hud · holographic wireframe engine
+    // Reads a JSON wireframe model (vertices / edges / quad faces) and handles: perspective projection, turntable rotation, scan growth, partial explode,
+    // per-part spin, solid hologram faces (Fresnel), depth falloff, two-level glow. Pure Canvas 2D, deterministic (depends only on parameters).
+    //
+    //   const model = await loadModel('models/volt.json');
+    //   const H = new Holo(1920, 1080);
+    //   const info = H.draw(ctx, model, cam, { hue: 190, scan: { y: 0.6 }, explode: { battery: 1 } });
+    //   info.bbox.battery -> [x0, y0, x1, y1]   info.anchor.battery -> [sx, sy]
+    //
+    // cam = { target:[x,y,z], yaw, pitch, dist, fov(radians), cx, cy(position of target on screen), roll }
+
+    const TAU = Math.PI * 2;
+    const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+
+    function prepModel(j) {
+      let ymin = 1e9, ymax = -1e9;
+      for (const P of j.parts) for (const C of P.pieces) {
+        C.v = Float32Array.from(C.v); C.e = Uint32Array.from(C.e); C.q = Uint32Array.from(C.q || []);
+        C.part = P.id; C.n = C.v.length / 3;
+        for (let i = 1; i < C.v.length; i += 3) { ymin = Math.min(ymin, C.v[i]); ymax = Math.max(ymax, C.v[i]); }
+      }
+      j.ymin = ymin; j.ymax = ymax;
+      j.byId = Object.fromEntries(j.parts.map(P => [P.id, P]));
+      return j;
+    }
+
+    // Normalise: scale a model of any size to a common "stage size" (bounding-box diagonal = diag, default 2.3117 = the bike in the demo),
+    // centred on x/z, standing on y = 0. Anchors, centres, explode vectors and spin axes are scaled with it, so camera parameters can be reused across products.
+    function normalizeModel(m, diag = 2.3117) {
+      let mn = [1e9, 1e9, 1e9], mx = [-1e9, -1e9, -1e9];
+      for (const P of m.parts) for (const C of P.pieces) for (let i = 0; i < C.v.length; i += 3) for (let k = 0; k < 3; k++) { mn[k] = Math.min(mn[k], C.v[i + k]); mx[k] = Math.max(mx[k], C.v[i + k]); }
+      const s = diag / Math.hypot(mx[0] - mn[0], mx[1] - mn[1], mx[2] - mn[2]);
+      const o = [(mn[0] + mx[0]) / 2, mn[1], (mn[2] + mx[2]) / 2];
+      const T = p => [(p[0] - o[0]) * s, (p[1] - o[1]) * s, (p[2] - o[2]) * s];
+      for (const P of m.parts) {
+        P.anchor = T(P.anchor); if (P.center) P.center = T(P.center);
+        for (const C of P.pieces) {
+          for (let i = 0; i < C.v.length; i += 3) { C.v[i] = (C.v[i] - o[0]) * s; C.v[i + 1] = (C.v[i + 1] - o[1]) * s; C.v[i + 2] = (C.v[i + 2] - o[2]) * s; }
+          C.explode = C.explode.map(x => x * s);
+          if (C.axis) C.axis = { c: T(C.axis.c), d: C.axis.d };
+        }
+      }
+      m.ymin = 0; m.ymax = (mx[1] - mn[1]) * s; m.scale = s;
+      return m;
+    }
+
+    // Camera: returns project(p) -> [sx, sy, z]
+    function makeCamera(cam, W, H) {
+      const { target: T, yaw, pitch, dist } = cam;
+      const cp = Math.cos(pitch), sp = Math.sin(pitch), cy = Math.cos(yaw), sy = Math.sin(yaw);
+      const eye = [T[0] + dist * sy * cp, T[1] + dist * sp, T[2] + dist * cy * cp];
+      // forward f = T - eye; right r = f × up; up u = r × f
+      let f = [T[0] - eye[0], T[1] - eye[1], T[2] - eye[2]]; const fl = Math.hypot(...f); f = f.map(x => x / fl);
+      let r = [f[1] * 0 - f[2] * 1, f[2] * 0 - f[0] * 0, f[0] * 1 - f[1] * 0]; const rl = Math.hypot(...r); r = r.map(x => x / rl);
+      const u = [r[1] * f[2] - r[2] * f[1], r[2] * f[0] - r[0] * f[2], r[0] * f[1] - r[1] * f[0]];
+      const foc = (H / 2) / Math.tan((cam.fov || 0.6) / 2);
+      const cx = cam.cx ?? W / 2, cyy = cam.cy ?? H / 2, roll = cam.roll || 0, cr = Math.cos(roll), sr = Math.sin(roll);
+      const project = (x, y, z, out) => {
+        const dx = x - eye[0], dy = y - eye[1], dz = z - eye[2];
+        const zc = dx * f[0] + dy * f[1] + dz * f[2];
+        const xc = dx * r[0] + dy * r[1] + dz * r[2], yc = dx * u[0] + dy * u[1] + dz * u[2];
+        const k = foc / Math.max(zc, 0.02);
+        const X = xc * k, Y = -yc * k;
+        out[0] = cx + X * cr - Y * sr; out[1] = cyy + X * sr + Y * cr; out[2] = zc;
+        return out;
+      };
+      return { project, eye, f, dist, foc };
+    }
+
+    // Subject renderer (owns offscreen layers, reused)
+    class Holo {
+      constructor(W = 1920, H = 1080) {
+        this.W = W; this.H = H;
+        this.L = mk(W, H);                         // wireframe layer
+        this.G1 = mk(W / 4, H / 4); this.G2 = mk(W / 8, H / 8);   // glow
+        this.F = mk(W, H);                                          // solid-face layer (interlaced scanline texture)
+        const pc = mk(1, 4), pg = pc.getContext('2d');
+        pg.fillStyle = 'rgba(0,0,0,1)'; pg.fillRect(0, 0, 1, 2); pg.fillStyle = 'rgba(0,0,0,0.38)'; pg.fillRect(0, 2, 1, 2);
+        this.scanPat = this.F.getContext('2d').createPattern(pc, 'repeat');
+        this.tmp = new Float32Array(3);
+      }
+      // opts:
+      //  hue            main hue (0–360)
+      //  spin           turntable angle (radians, around the y axis, centre spinC)
+      //  scan           { y, band=0.06, hot=1 }: draw only below y (world height), the scan front glows white; null = everything
+      //  scanDown       { y }: reverse — draw only below y (erasing from the top down), used for the ending
+      //  explode        { partId | pieceId : 0–1 }
+      //  angle          { pieceId : radians } spin around piece.axis
+      //  solid          0–1 solid hologram faces
+      //  focus          partId: all other parts are dimmed to dim
+      //  dim            0–1 (brightness outside focus)
+      //  gain           overall brightness
+      //  only           [partId] draw only these
+      //  keep           { pieceId: color } the single accent colour: these parts keep their own colour (hex)
+      //  glow           glow strength (default 1)
+      //  wave           { y, w }: edges and faces within ±w of world height y are brightened (a light wave travelling up the body)
+      //  piece.hot      pieces marked hot in the model glow white as a whole when exploded (e.g. battery cells)
+      //  flash          { partId: 0–1 }: > 0.5 turns the whole part white (a flash when a hotspot is marked)
+      draw(ctx, model, cam, o = {}) {
+        const { W, H } = this, L = this.L, g = L.getContext('2d');
+        g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, W, H);
+        const C = makeCamera(cam, W, H), P = C.project, t3 = this.tmp;
+        const hue = o.hue ?? 190, gain = o.gain ?? 1, solid = o.solid || 0;
+        const spin = o.spin || 0, cs = Math.cos(spin), sn = Math.sin(spin), sc = o.spinC || [0, 0, 0];
+        const scan = o.scan, sy = scan ? scan.y : Infinity, band = scan?.band ?? 0.06;
+        const down = o.scanDown, wave = o.wave;
+        const info = { bbox: {}, anchor: {}, project: P, cam: C, dots: 0 };
+        // depth range (for fog)
+        const dN = C.dist - 1.1, dF = C.dist + 1.1;
+        const LV = 7;                                        // number of alpha quantisation levels
+        const paths = [], hot = [], fills = [];
+        for (let i = 0; i < LV; i++) { paths.push(new Path2D()); hot.push(new Path2D()); fills.push(new Path2D()); }
+        const keepPaths = {};
+        const dots = new Path2D();
+        const tr = (x, y, z, out) => {   // turntable
+          const dx = x - sc[0], dz = z - sc[2];
+          out[0] = sc[0] + dx * cs + dz * sn; out[1] = y; out[2] = sc[2] - dx * sn + dz * cs;
+          return out;
+        };
+        for (const Pt of model.parts) {
+          if (o.only && !o.only.includes(Pt.id)) continue;
+          const focusMul = o.focus && o.focus !== Pt.id ? (o.dim ?? 0.25) : 1;
+          let bx0 = 1e9, by0 = 1e9, bx1 = -1e9, by1 = -1e9;
+          for (const Pc of Pt.pieces) {
+            const k = o.explode ? (o.explode[Pc.id] ?? o.explode[Pt.id] ?? 0) : 0;
+            const vis = Pc.internal ? clamp(k * 3) : 1;
+            if (vis <= 0.001) continue;
+            const ang = o.angle ? (o.angle[Pc.id] || 0) : 0;
+            const ex = Pc.explode[0] * k, ey = Pc.explode[1] * k, ez = Pc.explode[2] * k;
+            const n = Pc.n, V = Pc.v;
+            const S = new Float32Array(n * 3), Y = new Float32Array(n);   // screen coords + world height
+            let ca = 1, sa = 0, ax = null;
+            if (ang && Pc.axis) { ca = Math.cos(ang); sa = Math.sin(ang); ax = Pc.axis; }
+            for (let i = 0; i < n; i++) {
+              let x = V[i * 3], y = V[i * 3 + 1], z = V[i * 3 + 2];
+              if (ax) { const dx = x - ax.c[0], dy = y - ax.c[1]; x = ax.c[0] + dx * ca - dy * sa; y = ax.c[1] + dx * sa + dy * ca; }   // only z-axis spin is supported
+              x += ex; y += ey; z += ez;
+              Y[i] = y;
+              tr(x, y, z, t3); P(t3[0], t3[1], t3[2], t3);
+              S[i * 3] = t3[0]; S[i * 3 + 1] = t3[1]; S[i * 3 + 2] = t3[2];
+              if (y <= sy && !Pc.internal && Pc.box !== false) {   // target box uses the rest pose (no explode offset, no internal parts)
+                let bx = t3[0], by = t3[1];
+                if (k) { tr(x - ex, y - ey, z - ez, t3); P(t3[0], t3[1], t3[2], t3); bx = t3[0]; by = t3[1]; }
+                if (bx < bx0) bx0 = bx; if (bx > bx1) bx1 = bx; if (by < by0) by0 = by; if (by > by1) by1 = by;
+              }
+            }
+            const keep = o.keep && o.keep[Pc.id];
+            let kp = null; if (keep) kp = keepPaths[keep] || (keepPaths[keep] = { p: new Path2D(), f: new Path2D() });
+            const E = Pc.e, mulA = focusMul * vis * gain;
+            for (let j = 0; j < E.length; j += 2) {
+              const a = E[j], b = E[j + 1];
+              let ya = Y[a], yb = Y[b];
+              let x0 = S[a * 3], y0 = S[a * 3 + 1], x1 = S[b * 3], y1 = S[b * 3 + 1];
+              const zm = (S[a * 3 + 2] + S[b * 3 + 2]) / 2;
+              if (scan) {
+                if (ya > sy && yb > sy) continue;
+                if (ya > sy || yb > sy) {   // clip to the scan plane
+                  const tcut = (sy - ya) / (yb - ya);
+                  const xi = x0 + (x1 - x0) * tcut, yi = y0 + (y1 - y0) * tcut;
+                  if (ya > sy) { x0 = xi; y0 = yi; ya = sy; } else { x1 = xi; y1 = yi; yb = sy; }
+                  dots.rect(xi - 1.5, yi - 1.5, 3, 3); info.dots++;
+                }
+              }
+              if (down) {   // reverse erase: keep only below y, put a dot where it is cut
+                if (ya > down.y && yb > down.y) continue;
+                if (ya > down.y || yb > down.y) {
+                  const tcut = (down.y - ya) / (yb - ya);
+                  const xi = x0 + (x1 - x0) * tcut, yi = y0 + (y1 - y0) * tcut;
+                  if (ya > down.y) { x0 = xi; y0 = yi; ya = down.y; } else { x1 = xi; y1 = yi; yb = down.y; }
+                  dots.rect(xi - 1.5, yi - 1.5, 3, 3);
+                }
+              }
+              const fog = clamp(1 - (zm - dN) / (dF - dN) * 0.75, 0.22, 1);
+              const lv = Math.min(LV - 1, Math.floor(fog * mulA * LV));
+              if (lv < 0 || fog * mulA < 0.03) continue;
+              const ymid = (ya + yb) / 2;
+              const isHot = (scan && Math.max(ya, yb) > sy - band) || (down && Math.max(ya, yb) > down.y - 0.05) || (Pc.hot && k > 0.02) || (wave && Math.abs(ymid - wave.y) < wave.w) || (o.flash && o.flash[Pt.id] > 0.5);
+              const target = kp ? kp.p : (isHot ? hot[lv] : paths[lv]);
+              target.moveTo(x0, y0); target.lineTo(x1, y1);
+            }
+            if (solid > 0) {
+              const Q = Pc.q;
+              for (let j = 0; j < Q.length; j += 4) {
+                const a = Q[j], b = Q[j + 1], c = Q[j + 2], d = Q[j + 3];
+                if (scan && Math.max(Y[a], Y[b], Y[c], Y[d]) > sy) continue;
+                if (down && Math.max(Y[a], Y[b], Y[c], Y[d]) > down.y) continue;
+                // approximate Fresnel from screen-space area/normal: the more edge-on the face (narrower projection), the brighter
+                const ax_ = S[a * 3], ay_ = S[a * 3 + 1], bx_ = S[b * 3], by_ = S[b * 3 + 1], cx_ = S[c * 3], cy_ = S[c * 3 + 1], dx_ = S[d * 3], dy_ = S[d * 3 + 1];
+                const area = Math.abs((cx_ - ax_) * (dy_ - by_) - (dx_ - bx_) * (cy_ - ay_)) / 2;
+                const e1 = Math.hypot(bx_ - ax_, by_ - ay_), e2 = Math.hypot(dx_ - ax_, dy_ - ay_);
+                const facing = clamp(area / Math.max(1e-3, e1 * e2));   // 1 = facing, 0 = edge-on
+                let fr = 0.3 + 0.7 * Math.pow(1 - facing, 1.6);   // Fresnel: edge-on faces (silhouette) are brighter
+                if (wave) { const ym = (Y[a] + Y[c]) / 2, dw = Math.abs(ym - wave.y); if (dw < wave.w * 2) fr += (1 - dw / (wave.w * 2)) * 0.9; }
+                const lv = Math.min(LV - 1, Math.floor(fr * solid * focusMul * vis * gain * LV));
+                if (lv < 1) continue;
+                const T = kp ? kp.f : fills[lv];
+                T.moveTo(ax_, ay_); T.lineTo(bx_, by_); T.lineTo(cx_, cy_); T.lineTo(dx_, dy_); T.closePath();
+              }
+            }
+          }
+          if (bx1 > bx0) info.bbox[Pt.id] = [bx0, by0, bx1, by1];
+          const an = Pt.anchor; tr(an[0], an[1], an[2], t3); P(t3[0], t3[1], t3[2], t3); info.anchor[Pt.id] = [t3[0], t3[1], t3[2]];
+        }
+        // draw order: faces → lines → hot lines → vertices
+        g.globalCompositeOperation = ADD;
+        g.lineCap = 'round';
+        if (solid > 0) {
+          const F = this.F, f = F.getContext('2d');
+          f.globalCompositeOperation = 'source-over'; f.clearRect(0, 0, W, H);
+          f.globalCompositeOperation = ADD;
+          for (let i = 1; i < LV; i++) { f.fillStyle = LIGHT ? `hsla(${hue},90%,${62 - i * 3}%,${0.06 + (i / LV) * 0.34})` : `hsla(${hue},90%,${55 + i * 5}%,${0.1 + (i / LV) * 0.6})`; f.fill(fills[i]); }
+          f.globalCompositeOperation = 'destination-in'; f.setTransform(1, 0, 0, 1, 0, (o.scanOffset || 0) % 4); f.fillStyle = this.scanPat; f.fillRect(0, -8, W, H + 16); f.setTransform(1, 0, 0, 1, 0, 0);
+          f.globalCompositeOperation = 'source-over';
+          g.drawImage(F, 0, 0);
+        }
+        const lw = o.lineWidth || 1.35;
+        for (let i = 0; i < LV; i++) {
+          const a = (i + 1) / LV;
+          g.strokeStyle = LIGHT ? `hsla(${hue},85%,${66 - a * 26}%,${0.10 + a * 0.85})` : `hsla(${hue},100%,${50 + a * 30}%,${0.06 + a * 0.84})`; g.lineWidth = lw * (0.7 + a * 0.5) * (LIGHT ? 1.1 : 1);
+          g.stroke(paths[i]);
+        }
+        for (let i = 0; i < LV; i++) { const a = (i + 1) / LV; g.strokeStyle = LIGHT ? `hsla(${hue + 8},85%,22%,${0.4 + a * 0.6})` : `hsla(${hue},70%,92%,${0.35 + a * 0.65})`; g.lineWidth = lw * (LIGHT ? 1.6 : 1.3); g.stroke(hot[i]); }
+        for (const col in keepPaths) { g.fillStyle = col + '30'; g.fill(keepPaths[col].f); g.strokeStyle = col; g.lineWidth = lw * 1.2; g.stroke(keepPaths[col].p); }
+        if ((scan && sy < 1e8) || down) { g.fillStyle = LIGHT ? `hsla(${hue + 8},85%,24%,1)` : `hsla(${hue},60%,96%,1)`; g.fill(dots); }
+        g.globalCompositeOperation = 'source-over';
+        this.composite(ctx, o.glow ?? 1, o.alpha ?? 1);
+        return info;
+      }
+      // composite the wireframe layer + two glow levels onto the target canvas
+      composite(ctx, glow = 1, alpha = 1) {
+        const { L, G1, G2, W, H } = this;
+        const g1 = G1.getContext('2d'), g2 = G2.getContext('2d');
+        g1.clearRect(0, 0, G1.width, G1.height); g1.filter = 'blur(3px)'; g1.drawImage(L, 0, 0, G1.width, G1.height); g1.filter = 'none';
+        g2.clearRect(0, 0, G2.width, G2.height); g2.filter = 'blur(4px)'; g2.drawImage(L, 0, 0, G2.width, G2.height); g2.filter = 'none';
+        ctx.save(); ctx.globalCompositeOperation = LIGHT ? 'multiply' : 'lighter';
+        ctx.globalAlpha = (LIGHT ? 0.30 : 0.85) * glow * alpha; ctx.drawImage(G1, 0, 0, W, H);
+        ctx.globalAlpha = (LIGHT ? 0.22 : 0.7) * glow * alpha; ctx.drawImage(G2, 0, 0, W, H);
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.globalAlpha = alpha; ctx.drawImage(L, 0, 0);
+        ctx.restore();
+      }
+    }
+
+    // Scan plane: at world height y draw a projected ring + radial ticks + an on-screen light curtain
+    function drawScanPlane(ctx, cam, W, H, y, o = {}) {
+      const C = makeCamera(cam, W, H), P = C.project, t = new Float32Array(3);
+      const hue = o.hue ?? 190, R = o.r ?? 0.95, c = o.c || [0, 0, 0], a = o.alpha ?? 1;
+      const pts = [];
+      for (let i = 0; i <= 96; i++) { const th = i / 96 * TAU; P(c[0] + Math.cos(th) * R, y, c[2] + Math.sin(th) * R, t); pts.push([t[0], t[1]]); }
+      ctx.save(); ctx.globalCompositeOperation = ADD;
+      // light curtain: fill inside the ellipse
+      ctx.beginPath(); pts.forEach((p, i) => i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])); ctx.closePath();
+      ctx.fillStyle = LIGHT ? `hsla(${hue},90%,55%,${0.06 * a})` : `hsla(${hue},90%,60%,${0.07 * a})`; ctx.fill();
+      ctx.strokeStyle = LIGHT ? `hsla(${hue},85%,38%,${0.8 * a})` : `hsla(${hue},80%,85%,${0.75 * a})`; ctx.lineWidth = 1.6; ctx.stroke();
+      // ticks
+      ctx.beginPath();
+      for (let i = 0; i < 72; i++) {
+        const th = i / 72 * TAU + (o.rot || 0), r2 = R * (i % 6 ? 1.03 : 1.07);
+        P(c[0] + Math.cos(th) * R, y, c[2] + Math.sin(th) * R, t); ctx.moveTo(t[0], t[1]);
+        P(c[0] + Math.cos(th) * r2, y, c[2] + Math.sin(th) * r2, t); ctx.lineTo(t[0], t[1]);
+      }
+      ctx.strokeStyle = LIGHT ? `hsla(${hue},80%,42%,${0.5 * a})` : `hsla(${hue},80%,80%,${0.5 * a})`; ctx.lineWidth = 1; ctx.stroke();
+      // screen-space light curtain (fades out horizontally)
+      P(c[0], y, c[2], t); const yy = t[1];
+      const gr = ctx.createLinearGradient(0, yy - 60, 0, yy + 60);
+      gr.addColorStop(0, `hsla(${hue},90%,60%,0)`); gr.addColorStop(0.5, LIGHT ? `hsla(${hue},90%,55%,${0.08 * a})` : `hsla(${hue},90%,70%,${0.10 * a})`); gr.addColorStop(1, `hsla(${hue},90%,60%,0)`);
+      ctx.fillStyle = gr; ctx.fillRect(0, yy - 60, W, 120);
+      const gl = ctx.createLinearGradient(0, 0, W, 0);
+      gl.addColorStop(0, `hsla(${hue},90%,80%,0)`); gl.addColorStop(0.5, LIGHT ? `hsla(${hue},90%,40%,${0.5 * a})` : `hsla(${hue},90%,85%,${0.55 * a})`); gl.addColorStop(1, `hsla(${hue},90%,80%,0)`);
+      ctx.fillStyle = gl; ctx.fillRect(0, yy - 0.75, W, 1.5);
+      ctx.restore();
+    }
+
+    // Projector pad: concentric rings on the ground + ticks + radial grid (in camera perspective)
+    function drawPad(ctx, cam, W, H, o = {}) {
+      const C = makeCamera(cam, W, H), P = C.project, t = new Float32Array(3);
+      const hue = o.hue ?? 190, a = o.alpha ?? 1, rot = o.rot || 0, y = o.y ?? 0, c = o.c || [0, 0, 0];
+      ctx.save(); ctx.globalCompositeOperation = ADD;
+      const ring = (R, al, w = 1, dash = 0) => {
+        ctx.beginPath();
+        for (let i = 0; i <= 128; i++) { const th = i / 128 * TAU; P(c[0] + Math.cos(th) * R, y, c[2] + Math.sin(th) * R, t); i ? ctx.lineTo(t[0], t[1]) : ctx.moveTo(t[0], t[1]); }
+        ctx.setLineDash(dash ? [dash, dash * 1.6] : []);
+        ctx.strokeStyle = LIGHT ? `hsla(${hue},80%,45%,${al * a * 1.1})` : `hsla(${hue},80%,70%,${al * a})`; ctx.lineWidth = w; ctx.stroke();
+      };
+      ring(1.05, 0.55, 1.4); ring(1.12, 0.3, 1, 6); ring(0.7, 0.18, 1); ring(1.45, 0.14, 1); ring(2.1, 0.07, 1);
+      ctx.setLineDash([]);
+      ctx.beginPath();
+      for (let i = 0; i < 120; i++) {
+        const th = i / 120 * TAU + rot, big = i % 10 === 0, r0 = 1.05, r1 = big ? 1.2 : 1.1;
+        P(c[0] + Math.cos(th) * r0, y, c[2] + Math.sin(th) * r0, t); ctx.moveTo(t[0], t[1]);
+        P(c[0] + Math.cos(th) * r1, y, c[2] + Math.sin(th) * r1, t); ctx.lineTo(t[0], t[1]);
+      }
+      ctx.strokeStyle = LIGHT ? `hsla(${hue},80%,45%,${0.5 * a})` : `hsla(${hue},80%,78%,${0.5 * a})`; ctx.lineWidth = 1; ctx.stroke();
+      // radial lines + ground grid (fade with distance)
+      for (let i = 0; i < 24; i++) {
+        const th = i / 24 * TAU + rot * 0.25;
+        ctx.beginPath();
+        P(c[0] + Math.cos(th) * 1.2, y, c[2] + Math.sin(th) * 1.2, t); ctx.moveTo(t[0], t[1]);
+        P(c[0] + Math.cos(th) * 2.4, y, c[2] + Math.sin(th) * 2.4, t); ctx.lineTo(t[0], t[1]);
+        ctx.strokeStyle = LIGHT ? `hsla(${hue},70%,45%,${0.10 * a})` : `hsla(${hue},70%,60%,${0.08 * a})`; ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function mk(w, h) { const c = document.createElement('canvas'); c.width = Math.round(w); c.height = Math.round(h); return c; }
+
+    // Any shape → wireframe model: give a closed 2D path (metres) and it is extruded into a wireframe solid with thickness (front and back outlines + side edges + side quad faces + a few intermediate cross-sections).
+    // e.g. modelFromPath(starPts, { depth: 0.12, id: 'star', slices: 3 }) → can be passed straight to Holo.draw (scannable, explodable, solid-capable)
+    function modelFromPath(pts, o = {}) {
+      const d = o.depth ?? 0.1, id = o.id || 'shape', sl = Math.max(2, o.slices ?? 3), n = pts.length;
+      const v = [], e = [], q = [];
+      for (let k = 0; k < sl; k++) {
+        const z = -d / 2 + d * k / (sl - 1);
+        for (const [x, y] of pts) v.push(x, y, z);
+        for (let i = 0; i < n; i++) e.push(k * n + i, k * n + (i + 1) % n);
+      }
+      for (let k = 0; k < sl - 1; k++) for (let i = 0; i < n; i++) {
+        if (k === 0 || i % (o.ribEvery || 1) === 0) e.push(k * n + i, (k + 1) * n + i);
+        q.push(k * n + i, k * n + (i + 1) % n, (k + 1) * n + (i + 1) % n, (k + 1) * n + i);
+      }
+      const cx = pts.reduce((s, p) => s + p[0], 0) / n, cy = pts.reduce((s, p) => s + p[1], 0) / n;
+      return prepModel({ name: id, parts: [{ id, anchor: [cx, cy, d / 2], pieces: [{ id, explode: o.explode || [0, 0, 0], v, e, q }] }] });
+    }
+    return { Holo, prepModel, normalizeModel, makeCamera, drawScanPlane, drawPad, modelFromPath };
+  })();
+  const HUD = (function () {
+    // hologram-hud · UI layer: target boxes, leader-line callouts, rolling numbers, panels, frame, subtitles, background grid, glitch flicker
+    // All Canvas 2D functions, parametric, deterministic. Colours come from theme(hue, accent).
+    const TAU = Math.PI * 2;
+    const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+    const lerp = (a, b, t) => a + (b - a) * t;
+    const eo = t => 1 - Math.pow(1 - clamp(t), 3);
+    const hash = n => { n = Math.sin(n * 127.1 + 311.7) * 43758.5453; return n - Math.floor(n); };
+
+    const FONT = { ui: 'Fredoka, D2QSans', mono: 'ShareTechMono, D2QSans' };   // D2QSans (Inter) supplies σ, superscripts and arrows
+
+    function theme(hue = 190, accent = 38) {
+      return {
+        hue, accentHue: accent,
+        line: a => LIGHT ? `hsla(${hue},85%,42%,${a})` : `hsla(${hue},100%,72%,${a})`,
+        hi: a => LIGHT ? `hsla(${hue + 8},80%,21%,${a})` : `hsla(${hue},60%,93%,${a})`,
+        dim: a => LIGHT ? `hsla(${hue},55%,58%,${a})` : `hsla(${hue},70%,52%,${a})`,
+        acc: a => LIGHT ? `hsla(${accent},95%,48%,${a})` : `hsla(${accent},100%,64%,${a})`,
+        bg0: LIGHT ? `hsl(${hue},60%,97%)` : `hsl(${hue + 12},70%,2.4%)`, bg1: LIGHT ? '#ffffff' : `hsl(${hue + 6},65%,7%)`,
+      };
+    }
+
+    // ---------- Background: dark field + faint central glow + distant dot grid (parallax) ----------
+    function background(ctx, W, H, T, o = {}) {
+      ctx.fillStyle = T.bg0; ctx.fillRect(0, 0, W, H);
+      const cx = o.cx ?? W * 0.5, cy = o.cy ?? H * 0.55;
+      const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, W * 0.62);
+      g.addColorStop(0, T.bg1); g.addColorStop(1, LIGHT ? 'rgba(255,255,255,0)' : 'rgba(0,0,0,0)');   // fade to transparent white on a light stage (no grey band)
+      ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+      // dot grid
+      const px = o.px || 0, py = o.py || 0, step = 48, a = o.alpha ?? 1;
+      ctx.fillStyle = T.dim(0.16 * a);
+      const ox = ((px % step) + step) % step, oy = ((py % step) + step) % step;
+      for (let y = -step + oy; y < H + step; y += step) for (let x = -step + ox; x < W + step; x += step) {
+        const d = Math.hypot(x - cx, y - cy) / (W * 0.6);
+        if (d > 1) continue;
+        const s = (1 - d) * 1.6 + 0.4;
+        ctx.fillRect(x - s / 2, y - s / 2, s, s);
+      }
+    }
+
+    // vignette
+    function vignette(ctx, W, H, k = 0.6) {
+      const g = ctx.createRadialGradient(W / 2, H / 2, H * 0.35, W / 2, H / 2, W * 0.72);
+      g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, LIGHT ? `rgba(30,58,138,${k * 0.16})` : `rgba(0,0,0,${k})`);
+      ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    }
+
+    // ---------- Backing plate: dark translucent (~70%) + thin border + short corner ticks, so text never interferes with the wireframe ----------
+    function plate(ctx, T, x, y, w, h, a = 1, o = {}) {
+      if (a <= 0 || w <= 0 || h <= 0) return;
+      ctx.save(); ctx.globalCompositeOperation = 'source-over';
+      ctx.fillStyle = PLATEC((o.op ?? 0.72) * a); ctx.fillRect(x, y, w, h);
+      ctx.globalCompositeOperation = ADD;
+      ctx.strokeStyle = T.line(0.28 * a); ctx.lineWidth = 1; ctx.strokeRect(x + .5, y + .5, w - 1, h - 1);
+      ctx.strokeStyle = T.line(0.7 * a); ctx.lineWidth = 1.4; corners(ctx, x, y, x + w, y + h, 10);
+      ctx.restore();
+    }
+
+    // ---------- Viewfinder frame: corners + edge ticks + top status ----------
+    function chrome(ctx, W, H, T, o = {}) {
+      const a = o.alpha ?? 1, m = 44, L = 46, px = o.px || 0;
+      ctx.save(); ctx.globalCompositeOperation = ADD;
+      ctx.strokeStyle = T.line(0.55 * a); ctx.lineWidth = 1.5;
+      corners(ctx, m, m, W - m, H - m, L);
+      // left and right tick rulers (foreground parallax)
+      ctx.strokeStyle = T.dim(0.45 * a); ctx.lineWidth = 1;
+      ctx.beginPath();
+      const off = ((px * 1.4) % 24 + 24) % 24;
+      for (let y = 160 + off; y < H - 160; y += 24) {
+        const big = Math.round((y - off) / 24) % 5 === 0;
+        ctx.moveTo(m + 8, y); ctx.lineTo(m + 8 + (big ? 14 : 7), y);
+        ctx.moveTo(W - m - 8, y); ctx.lineTo(W - m - 8 - (big ? 14 : 7), y);
+      }
+      ctx.stroke();
+      // top status
+      ctx.font = `20px ${FONT.mono}`; ctx.textBaseline = 'middle';
+      ctx.fillStyle = T.line(0.75 * a);
+      if (o.tl) { ctx.textAlign = 'left'; ctx.fillText(o.tl, m + 22, m + 26); }
+      if (o.tr) { ctx.textAlign = 'right'; ctx.fillText(o.tr, W - m - 22, m + 26); }
+      if (o.bl) { ctx.textAlign = 'left'; ctx.fillStyle = T.dim(0.7 * a); ctx.fillText(o.bl, m + 22, H - m - 22); }
+      if (o.br) { ctx.textAlign = 'right'; ctx.fillStyle = T.dim(0.7 * a); ctx.fillText(o.br, W - m - 22, H - m - 22); }
+      ctx.restore();
+    }
+
+    function corners(ctx, x0, y0, x1, y1, L) {
+      ctx.beginPath();
+      ctx.moveTo(x0, y0 + L); ctx.lineTo(x0, y0); ctx.lineTo(x0 + L, y0);
+      ctx.moveTo(x1 - L, y0); ctx.lineTo(x1, y0); ctx.lineTo(x1, y0 + L);
+      ctx.moveTo(x1, y1 - L); ctx.lineTo(x1, y1); ctx.lineTo(x1 - L, y1);
+      ctx.moveTo(x0 + L, y1); ctx.lineTo(x0, y1); ctx.lineTo(x0, y1 - L);
+      ctx.stroke();
+    }
+
+    // ---------- Target box: k=0 large and tilted, k=1 locked and fitted; flash is the white flash at the moment of lock ----------
+    function targetBox(ctx, T, bb, k, o = {}) {
+      if (!bb || k <= 0) return;
+      const pad = o.pad ?? 26;
+      let [x0, y0, x1, y1] = bb; x0 -= pad; y0 -= pad; x1 += pad; y1 += pad;
+      const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+      const e = o.lockK ?? eo(k);
+      const s = lerp(1.9, 1, e), rot = lerp(Math.PI / 4, 0, e);
+      const hw = (x1 - x0) / 2 * s, hh = (y1 - y0) / 2 * s;
+      const a = (o.alpha ?? 1) * clamp(k * 4);
+      ctx.save(); ctx.translate(cx, cy); ctx.rotate(rot); ctx.globalCompositeOperation = ADD;
+      const L = Math.min(hw, hh) * 0.38 + 8;
+      ctx.strokeStyle = o.flash ? T.hi(a) : T.line(0.9 * a); ctx.lineWidth = o.flash ? 3 : 2;
+      corners(ctx, -hw, -hh, hw, hh, L);
+      // centre cross + ticks at edge midpoints
+      ctx.lineWidth = 1; ctx.strokeStyle = T.line(0.5 * a);
+      ctx.beginPath();
+      ctx.moveTo(-10, 0); ctx.lineTo(10, 0); ctx.moveTo(0, -10); ctx.lineTo(0, 10);
+      ctx.moveTo(-hw, 0); ctx.lineTo(-hw + 10, 0); ctx.moveTo(hw, 0); ctx.lineTo(hw - 10, 0);
+      ctx.moveTo(0, -hh); ctx.lineTo(0, -hh + 10); ctx.moveTo(0, hh); ctx.lineTo(0, hh - 10);
+      ctx.stroke();
+      ctx.restore();
+      // label (appears after lock)
+      if (o.tag && e > 0.8) {
+        const ta = a * clamp((e - 0.8) * 5);
+        ctx.save(); ctx.globalCompositeOperation = ADD;
+        ctx.font = `600 19px ${FONT.ui}`; ctx.textBaseline = 'bottom'; ctx.textAlign = 'left';
+        const tx = cx - hw, ty = cy - hh - 8;
+        const w = ctx.measureText(o.tag).width + 20;
+        ctx.fillStyle = o.flash ? T.hi(0.95 * ta) : T.line(0.9 * ta);
+        ctx.fillRect(tx, ty - 26, w, 26);
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.globalAlpha = Math.min(1, ta); ctx.fillStyle = T.bg0; ctx.fillText(o.tag, tx + 10, ty - 3); ctx.globalAlpha = 1;   // fades with its box
+        ctx.restore();
+      }
+    }
+
+    // ---------- Leader line: anchor circle → diagonal → horizontal; prog 0–1 draws it segment by segment ----------
+    function leader(ctx, T, from, elbow, to, prog, o = {}) {
+      if (prog <= 0) return;
+      const a = o.alpha ?? 1;
+      const d1 = Math.hypot(elbow[0] - from[0], elbow[1] - from[1]), d2 = Math.hypot(to[0] - elbow[0], to[1] - elbow[1]);
+      let L = (d1 + d2) * clamp(prog);
+      ctx.save(); ctx.globalCompositeOperation = ADD;
+      ctx.strokeStyle = T.line(0.85 * a); ctx.lineWidth = 1.6;
+      ctx.beginPath(); ctx.moveTo(from[0], from[1]);
+      if (L <= d1) ctx.lineTo(lerp(from[0], elbow[0], L / d1), lerp(from[1], elbow[1], L / d1));
+      else { ctx.lineTo(elbow[0], elbow[1]); L -= d1; ctx.lineTo(lerp(elbow[0], to[0], L / d2), lerp(elbow[1], to[1], L / d2)); }
+      ctx.stroke();
+      // anchor
+      const ra = clamp(prog * 5);
+      ctx.beginPath(); ctx.arc(from[0], from[1], 9 * ra, 0, TAU); ctx.stroke();
+      ctx.fillStyle = T.hi(a); ctx.beginPath(); ctx.arc(from[0], from[1], 3, 0, TAU); ctx.fill();
+      if (o.pulse) { ctx.strokeStyle = T.line(a * (1 - o.pulse)); ctx.beginPath(); ctx.arc(from[0], from[1], 9 + 26 * o.pulse, 0, TAU); ctx.stroke(); }
+      ctx.restore();
+    }
+
+    // ---------- Rolling number: rolls from garbage to the true value ----------
+    // k 0–1: characters lock one by one from right to left; frame picks the garbage frame (changes every frame at 24fps)
+    const GLY_D = '0123456789', GLY_A = 'ABCDEFGHJKLMNPRSTUVWXYZ#%/<>=';
+    function rollText(str, k, frame, seed = 0) {
+      if (k >= 1) return str;
+      const n = str.length; let out = '';
+      for (let i = 0; i < n; i++) {
+        const ch = str[i];
+        const order = (n - 1 - i) / Math.max(1, n);          // right side locks first
+        const lockAt = 0.25 + order * 0.7;
+        if (k >= lockAt || ch === ' ' || ch === '.' || ch === ',' || ch === '·') { out += ch; continue; }
+        if (k <= 0) { out += ' '; continue; }
+        const set = /\d/.test(ch) ? GLY_D : GLY_A;
+        out += set[Math.floor(hash(frame * 13.7 + i * 7.1 + seed) * set.length)];
+      }
+      return out;
+    }
+
+    // monospaced layout (spacing set by the widest digit, so it does not jitter while rolling)
+    function monoText(ctx, s, x, y, adv) {
+      let cx = x;
+      for (let i = 0; i < s.length; i++) {
+        const ch = s[i], w = ctx.measureText(ch).width;
+        const narrow = ch === '.' || ch === ',' || ch === ' ' || ch === ':';
+        const a = narrow ? w * 1.1 : adv;
+        if (ch === '.') {   // draw the decimal point as a square dot (a thin-weight period looks like a comma under glow)
+          const m = ctx.measureText('0'), d = Math.max(3, m.width * 0.13);
+          ctx.fillRect(cx + (a - d) / 2, y - d, d, d);
+        } else ctx.fillText(ch, cx + (a - w) / 2, y);
+        cx += a;
+      }
+      return cx - x;
+    }
+
+    // text fit: shrink the font size when too wide
+    function fitFont(ctx, text, weight, size, family, maxW, minSize = 12) {   // note: set letterSpacing before calling
+      let s = size; ctx.font = `${weight} ${s}px ${family}`;
+      while (ctx.measureText(text).width > maxW && s > minSize) { s -= 1; ctx.font = `${weight} ${s}px ${family}`; }
+      return s;
+    }
+
+    // word wrap
+    function wrap(ctx, text, maxW) {
+      const words = text.split(' '), lines = []; let cur = '';
+      for (const w of words) { const t = cur ? cur + ' ' + w : w; if (ctx.measureText(t).width > maxW && cur) { lines.push(cur); cur = w; } else cur = t; }
+      if (cur) lines.push(cur);
+      return lines;
+    }
+
+    // ---------- Spec card: index / name / big value + unit / detail ----------
+    // st: { reveal 0–1(frame), roll 0–1(value), detail 0–1, frame, flash }
+    function specCard(ctx, T, x, y, c, st, o = {}) {
+      const w = o.w ?? 460, a = o.alpha ?? 1, big = o.big ?? 132;
+      if (st.reveal <= 0) return { w, h: 0 };
+      const r = eo(st.reveal);
+      {   // backing plate: drawn once at its final height (follows the unfold)
+        ctx.save(); ctx.font = `500 25px ${FONT.ui}`;
+        const dl = c.detail ? wrap(ctx, c.detail, w).length : 0; ctx.restore();
+        const hh = 48 + big * 0.9 + 12 + (dl ? 36 + dl * 30 : 0) + 20;
+        plate(ctx, T, x - 22, y - 20, (w + 44) * r, hh + 20, a * clamp(st.reveal * 2));
+      }
+      ctx.save(); ctx.globalCompositeOperation = ADD;
+      // top line unfolds left to right
+      ctx.strokeStyle = T.line(0.9 * a); ctx.lineWidth = 1.6;
+      ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + w * r, y); ctx.stroke();
+      ctx.fillStyle = T.line(0.9 * a); ctx.fillRect(x, y - 3, 34 * r, 6);
+      // index + name
+      ctx.textBaseline = 'alphabetic'; ctx.textAlign = 'left';
+      ctx.font = `20px ${FONT.mono}`; ctx.fillStyle = T.dim(0.95 * a * r);
+      ctx.fillText(o.index || '', x, y + 34);
+      const lab = (c.label || '').toUpperCase().replace(/Σ/g, 'σ');   // keep sigma lower-case (volatility, not a sum)
+      ctx.letterSpacing = '3px';                       // set before fitting, so the spacing is measured too
+      fitFont(ctx, lab, 600, 30, FONT.ui, w - 60, 18);
+      ctx.fillStyle = T.hi(0.95 * a * clamp(r * 2 - 0.6));
+      ctx.fillText(rollText(lab, clamp(st.reveal * 1.6 - 0.2), st.frame, 3), x + 52, y + 36);
+      ctx.letterSpacing = '0px';
+      // big value
+      let h = 48;
+      if (st.roll > 0) {
+        const val = String(c.value), unit = c.unit || '';
+        const bs = fitFont(ctx, val, 300, big, FONT.ui, w - 110, 60);
+        const adv = ctx.measureText('0').width * 1.02;
+        const locked = st.roll >= 1;
+        const col = locked ? (st.flash ? T.hi(a) : T.acc(a)) : T.line(0.85 * a);
+        ctx.fillStyle = col;
+        const s = rollText(val, st.roll, st.frame, 11);
+        const vw = monoText(ctx, s, x - 4, y + 48 + bs * 0.78, adv);
+        ctx.font = `500 ${Math.round(bs * 0.3)}px ${FONT.ui}`; ctx.fillStyle = locked ? T.acc(0.9 * a) : T.line(0.6 * a);
+        ctx.fillText(unit, x + vw + 10, y + 48 + bs * 0.78);
+        h = 48 + bs * 0.9;
+        // progress bar (fills while the value rolls)
+        ctx.fillStyle = T.dim(0.35 * a); ctx.fillRect(x, y + h + 8, w, 2);
+        ctx.fillStyle = locked ? T.acc(0.9 * a) : T.line(0.9 * a); ctx.fillRect(x, y + h + 8, w * clamp(st.roll), 2);
+        h += 12;
+      }
+      if (c.detail && st.detail > 0) {
+        ctx.font = `500 25px ${FONT.ui}`; ctx.fillStyle = T.line(0.8 * a * clamp(st.detail * 2));
+        const lines = wrap(ctx, c.detail, w);
+        lines.forEach((ln, i) => ctx.fillText(rollText(ln, clamp(st.detail * 1.5 - i * 0.2), st.frame, 21 + i), x, y + h + 36 + i * 30));
+        h += 36 + lines.length * 30;
+      }
+      ctx.restore();
+      return { w, h };
+    }
+
+    // ---------- Spec chip: docked in the side column, stays until the end lock-up (name + value + detail) ----------
+    function chip(ctx, T, x, y, c, a = 1, o = {}) {
+      if (a <= 0) return 0;
+      const w = o.w ?? 360;
+      plate(ctx, T, x - 16, y - 16, w + 32, (c.detail ? 72 : 44) + 28, a);
+      ctx.save(); ctx.globalCompositeOperation = ADD;
+      ctx.strokeStyle = T.line(0.5 * a); ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + w, y); ctx.stroke();
+      ctx.fillStyle = T.line(0.9 * a); ctx.fillRect(x, y - 2, 14, 4);
+      ctx.textBaseline = 'alphabetic'; ctx.textAlign = 'left';
+      ctx.font = `18px ${FONT.mono}`; ctx.fillStyle = T.dim(0.9 * a); ctx.fillText(o.index || '', x, y + 30);
+      const lab = (c.label || '').toUpperCase().replace(/Σ/g, 'σ');   // keep sigma lower-case (volatility, not a sum)
+      ctx.letterSpacing = '2px'; fitFont(ctx, lab, 600, 21, FONT.ui, w - 170, 13);
+      ctx.fillStyle = T.line(0.95 * a); ctx.fillText(lab, x + 40, y + 30); ctx.letterSpacing = '0px';
+      ctx.textAlign = 'right';
+      const u = c.unit || '';
+      ctx.font = `500 18px ${FONT.ui}`; const uw = ctx.measureText(u).width;
+      ctx.fillStyle = T.acc(0.95 * a); ctx.fillText(u, x + w, y + 32);
+      ctx.font = `400 42px ${FONT.ui}`; ctx.textAlign = 'left';
+      const vw = ctx.measureText(String(c.value)).width;
+      monoTextFit(ctx, String(c.value), x + w - uw - 6 - vw, y + 34);
+      let h = 44;
+      if (c.detail) {
+        ctx.textAlign = 'left';
+        fitFont(ctx, c.detail, 500, 20, FONT.ui, w - 40, 13);
+        ctx.fillStyle = T.line(0.72 * a); ctx.fillText(c.detail, x + 40, y + 62); h = 72;
+      }
+      ctx.restore();
+      return h;
+    }
+    function monoTextFit(ctx, s, x, y) {   // normal layout, but the decimal point is drawn as a square dot
+      let cx = x;
+      for (const ch of s) {
+        const w = ctx.measureText(ch).width;
+        if (ch === '.') { const d = Math.max(3, ctx.measureText('0').width * 0.13); ctx.fillRect(cx + (w - d) / 2, y - d, d, d); }
+        else ctx.fillText(ch, cx, y);
+        cx += w;
+      }
+    }
+
+    // ---------- Subtitles: a "speech transcript" bar inside the UI ----------
+    function subtitle(ctx, W, H, T, text, a, o = {}) {
+      if (!text || a <= 0) return;
+      ctx.save();
+      const y = o.y ?? H - 118, maxW = o.maxW ?? 1180;
+      ctx.font = `500 38px ${FONT.ui}`;
+      const lines = wrap(ctx, text, maxW);
+      const tw = Math.max(...lines.map(l => ctx.measureText(l).width));
+      const x = (o.x ?? W / 2) - tw / 2, lh = 46, h = lines.length * lh;
+      // backing plate
+      ctx.fillStyle = PLATEC(0.62 * a);
+      ctx.fillRect(x - 58, y - h - 18, tw + 86, h + 30);
+      ctx.globalCompositeOperation = ADD;
+      ctx.strokeStyle = T.line(0.55 * a); ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(x - 58, y - h - 18 + 12); ctx.lineTo(x - 58, y - h - 18); ctx.lineTo(x - 46, y - h - 18);
+      ctx.moveTo(x + tw + 28 - 12, y + 12); ctx.lineTo(x + tw + 28, y + 12); ctx.lineTo(x + tw + 28, y);
+      ctx.stroke();
+      // voiceprint indicator
+      ctx.fillStyle = T.line(0.9 * a);
+      for (let i = 0; i < 4; i++) { const hh = 6 + 14 * Math.abs(Math.sin((o.t || 0) * 9 + i * 1.7)); ctx.fillRect(x - 42 + i * 7, y - h / 2 - 3 - hh / 2, 3, hh); }
+      ctx.fillStyle = T.hi(0.96 * a); ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+      lines.forEach((l, i) => ctx.fillText(l, x, y - h + (i + 1) * lh - 10));
+      ctx.restore();
+    }
+
+    // ---------- Glitch flicker: horizontal slice offsets + colour shift (restrained, only one or two frames) ----------
+    function glitch(ctx, W, H, amt, seed) {
+      if (amt <= 0) return;
+      const src = ctx.canvas;
+      const tmp = glitch.tmp || (glitch.tmp = Object.assign(document.createElement('canvas'), { width: W, height: H }));
+      const g = tmp.getContext('2d'); g.clearRect(0, 0, W, H); g.drawImage(src, 0, 0);
+      const n = 9;
+      for (let i = 0; i < n; i++) {
+        const y = Math.floor(hash(seed + i * 3.1) * H), h = 6 + Math.floor(hash(seed + i * 5.7) * 60), dx = (hash(seed + i * 9.3) - 0.5) * 120 * amt;
+        ctx.drawImage(tmp, 0, y, W, h, dx, y, W, h);
+      }
+      ctx.save(); ctx.globalCompositeOperation = ADD; ctx.globalAlpha = 0.35 * amt;
+      ctx.drawImage(tmp, 8 * amt, 0); ctx.restore();
+    }
+
+    // ---------- Hotspot marker: a numbered circle pinned on the part itself, with the number tag tight against one side of the circle (for the end lock-up) ----------
+    function marker(ctx, T, p, label, a = 1, pulse = 0, dir = 1) {
+      if (!p || a <= 0) return;
+      ctx.save(); ctx.globalCompositeOperation = ADD;
+      const r = 17;
+      ctx.strokeStyle = T.hi(0.95 * a); ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(p[0], p[1], r, 0, TAU); ctx.stroke();
+      ctx.lineWidth = 1.4; ctx.beginPath();
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { ctx.moveTo(p[0] + dx * (r - 6), p[1] + dy * (r - 6)); ctx.lineTo(p[0] + dx * (r + 6), p[1] + dy * (r + 6)); }
+      ctx.stroke();
+      ctx.fillStyle = T.hi(a); ctx.beginPath(); ctx.arc(p[0], p[1], 4, 0, TAU); ctx.fill();
+      if (pulse > 0) { ctx.strokeStyle = T.line(0.8 * a * (1 - pulse)); ctx.beginPath(); ctx.arc(p[0], p[1], r + 36 * pulse, 0, TAU); ctx.stroke(); }
+      ctx.font = `600 22px ${FONT.ui}`; ctx.textBaseline = 'middle';
+      const tw = ctx.measureText(label).width + 18, gap = r + 12, bx = dir > 0 ? p[0] + gap : p[0] - gap - tw;
+      ctx.strokeStyle = T.hi(0.9 * a); ctx.beginPath(); ctx.moveTo(p[0] + dir * (r + 6), p[1]); ctx.lineTo(dir > 0 ? bx : bx + tw, p[1]); ctx.stroke();
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.fillStyle = PLATEC(0.88 * a); ctx.fillRect(bx, p[1] - 15, tw, 30);
+      ctx.globalCompositeOperation = ADD;
+      ctx.strokeStyle = T.line(0.9 * a); ctx.lineWidth = 1.2; ctx.strokeRect(bx, p[1] - 15, tw, 30);
+      ctx.fillStyle = T.hi(a); ctx.textAlign = 'left'; ctx.fillText(label, bx + 9, p[1] + 1);
+      ctx.restore();
+    }
+
+    // ---------- Projection beam: a cone of light rising from the projector pad + rising light dust ----------
+    function beam(ctx, T, project, a, t, o = {}) {
+      if (a <= 0) return;
+      const r0 = o.r0 ?? 1.05, r1 = o.r1 ?? 0.9, y1 = o.y1 ?? 1.25, c = o.c || [0, 0, 0];
+      const p = new Float32Array(3);
+      const bot = [], top = [];
+      for (let i = 0; i < 96; i++) {
+        const th = i / 96 * TAU;
+        project(c[0] + Math.cos(th) * r0, 0, c[2] + Math.sin(th) * r0, p); bot.push([p[0], p[1]]);
+        project(c[0] + Math.cos(th) * r1, y1, c[2] + Math.sin(th) * r1, p); top.push([p[0], p[1]]);
+      }
+      const ext = arr => { let l = 0, r = 0; arr.forEach((q, i) => { if (q[0] < arr[l][0]) l = i; if (q[0] > arr[r][0]) r = i; }); return [l, r]; };
+      const [bl, br] = ext(bot), [tl, tr] = ext(top);
+      const L0 = bot[bl][0], R0 = bot[br][0], L1 = top[tl][0], R1 = top[tr][0];
+      const yb = Math.max(...bot.map(q => q[1])), yt = Math.min(...top.map(q => q[1]));
+      project(c[0], 0, c[2], p); const ym = p[1]; project(c[0], y1, c[2], p); const ytc = p[1];
+      // lower arc (the half lower on screen) and upper arc (the upper half)
+      const arc = (arr, from, to, lower) => { const out = []; const n = arr.length; const cy = arr.reduce((s, q) => s + q[1], 0) / n; for (let k = 0; k <= n; k++) { const q = arr[(from + k) % n]; if ((lower ? q[1] >= cy - 1 : q[1] <= cy + 1)) out.push(q); if ((from + k) % n === to && k > 0) break; } return out; };
+      ctx.save(); ctx.globalCompositeOperation = ADD;
+      const g = ctx.createLinearGradient(0, yb, 0, yt);
+      g.addColorStop(0, T.line(0.10 * a)); g.addColorStop(0.45, T.line(0.04 * a)); g.addColorStop(1, T.line(0));
+      ctx.fillStyle = g;
+      // one path with three subpaths (bottom ellipse + side trapezoid + top ellipse); a single nonzero fill = their union, so overlaps do not double the brightness
+      ctx.beginPath();
+      const poly = arr => { arr.forEach((q, i) => i ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1])); ctx.closePath(); };
+      const cw = arr => { let a = 0; for (let i = 0; i < arr.length; i++) { const p0 = arr[i], p1 = arr[(i + 1) % arr.length]; a += p0[0] * p1[1] - p1[0] * p0[1]; } return a > 0 ? arr : arr.slice().reverse(); };
+      poly(cw(bot)); poly(cw(top)); poly(cw([[L0, bot[bl][1]], [L1, top[tl][1]], [R1, top[tr][1]], [R0, bot[br][1]]]));
+      ctx.fill('nonzero');
+      const yT = ytc;
+      // vertical light streaks
+      ctx.lineWidth = 1;
+      for (let i = 0; i < 26; i++) {
+        const u = (i + 0.5) / 26, w = 0.5 + 0.5 * Math.sin(i * 12.9898 + t * 1.3);
+        ctx.strokeStyle = T.line(0.05 * a * w);
+        ctx.beginPath(); ctx.moveTo(L0 + (R0 - L0) * u, ym + (yb - ym) * Math.sin(u * Math.PI)); ctx.lineTo(L1 + (R1 - L1) * u, yT); ctx.stroke();
+      }
+      // light dust
+      for (let i = 0; i < 70; i++) {
+        const h1 = hash(i * 3.7), h2 = hash(i * 9.1), h3 = hash(i * 1.3);
+        const life = (t * (0.12 + 0.1 * h3) + h1) % 1;
+        const th = h2 * TAU, rr = r0 * (0.3 + 0.7 * hash(i * 5.3)) * (1 - life * 0.15);
+        project(c[0] + Math.cos(th) * rr, life * y1, c[2] + Math.sin(th) * rr, p);
+        const al = Math.sin(life * Math.PI) * a * 0.8;
+        ctx.fillStyle = T.hi(al); ctx.fillRect(p[0] - 1, p[1] - 1, 2, 2);
+      }
+      ctx.restore();
+    }
+    return { clamp, FONT, theme, background, vignette, plate, chrome, corners, targetBox, leader, rollText, monoText, fitFont, wrap, specCard, chip, subtitle, glitch, marker, beam };
+  })();
+  const MKM = (function () {
+    // Wireframe model builder: geometric primitives → {v, e, q} (vertices / edges / quad faces)
+    // Output format (read by engine/holo.js):
+    // { name, parts: [{ id, anchor:[x,y,z], pieces: [{ id, v:[x,y,z,...], e:[a,b,...], q:[a,b,c,d,...], explode:[dx,dy,dz], axis?:{c,d} }] }] }
+    const TAU = Math.PI * 2;
+    const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+    const add = (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
+    const mul = (a, s) => [a[0] * s, a[1] * s, a[2] * s];
+    const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+    const len = a => Math.hypot(a[0], a[1], a[2]);
+    const norm = a => mul(a, 1 / (len(a) || 1));
+    const lerp3 = (a, b, t) => add(a, mul(sub(b, a), t));
+    function basis(d) {
+      d = norm(d);
+      const ref = Math.abs(d[1]) < 0.9 ? [0, 1, 0] : [1, 0, 0];
+      const u = norm(cross(d, ref)), w = cross(d, u);
+      return [d, u, w];
+    }
+
+    class Model {
+      constructor(name) { this.name = name; this.parts = []; }
+      part(id, o = {}) { this.P = { id, anchor: o.anchor || [0, 0, 0], ...(o.center ? { center: o.center } : {}), ...(o.tagDir ? { tagDir: o.tagDir } : {}), pieces: [] }; this.parts.push(this.P); }
+      piece(id, o = {}) { this.C = { id, v: [], e: [], q: [], explode: o.explode || [0, 0, 0] }; if (o.axis) this.C.axis = o.axis; if (o.internal) this.C.internal = true; if (o.box === false) this.C.box = false; if (o.hot) this.C.hot = true; this.P.pieces.push(this.C); }
+      vtx(p) { this.C.v.push(p); return this.C.v.length - 1; }
+      edge(a, b) { this.C.e.push([a, b]); }
+      quad(a, b, c, d) { this.C.q.push([a, b, c, d]); }
+      // ring (optional thickness: two circles + connecting lines)
+      circle(c, n, r, seg, [u, w] = basis(n).slice(1), a0 = 0, a1 = TAU, closed = true) {
+        const ids = [];
+        const cnt = closed ? seg : seg + 1;
+        for (let i = 0; i < cnt; i++) { const a = a0 + (a1 - a0) * i / seg; ids.push(this.vtx(add(c, add(mul(u, Math.cos(a) * r), mul(w, Math.sin(a) * r))))); }
+        for (let i = 0; i < ids.length - (closed ? 0 : 1); i++) this.edge(ids[i], ids[(i + 1) % ids.length]);
+        return ids;
+      }
+      ring(c, n, r, seg, width = 0) {
+        if (!width) return this.circle(c, n, r, seg);
+        const d = norm(n);
+        const A = this.circle(add(c, mul(d, -width / 2)), n, r, seg), B = this.circle(add(c, mul(d, width / 2)), n, r, seg);
+        for (let i = 0; i < seg; i++) { if (i % 4 === 0) this.edge(A[i], B[i]); this.quad(A[i], A[(i + 1) % seg], B[(i + 1) % seg], B[i]); }
+        return [A, B];
+      }
+      // tube: rings + lengthwise lines + faces; arc = [start, end] (in turns, can be just half a turn); zA = z offset at the start point (fork splay)
+      tube(a, b, r, o = {}) {
+        const rings = o.rings || 6, seg = o.seg || 10, longs = o.longs || 4;
+        if (o.zA) a = add(a, [0, 0, o.zA]);
+        const [d, u, w] = basis(sub(b, a));
+        const arc = o.arc || [0, 1], full = arc[1] - arc[0] >= 1 - 1e-6;
+        const segN = full ? seg : Math.max(2, Math.round(seg * (arc[1] - arc[0])));
+        const R = [];
+        for (let k = 0; k < rings; k++) {
+          const c = lerp3(a, b, k / (rings - 1));
+          R.push(this.circle(c, d, r, segN, [u, w], arc[0] * TAU, arc[1] * TAU, full));
+        }
+        const m = R[0].length;
+        for (let k = 0; k < rings - 1; k++) for (let i = 0; i < m - (full ? 0 : 1); i++) this.quad(R[k][i], R[k][(i + 1) % m], R[k + 1][(i + 1) % m], R[k + 1][i]);
+        const step = Math.max(1, Math.floor(m / longs));
+        for (let i = 0; i < m; i += step) for (let k = 0; k < rings - 1; k++) this.edge(R[k][i], R[k + 1][i]);
+        if (!full) for (const i of [0, m - 1]) for (let k = 0; k < rings - 1; k++) this.edge(R[k][i], R[k + 1][i]);
+        return R;
+      }
+      polyTube(pts, r, o = {}) {
+        for (let i = 0; i < pts.length - 1; i++) this.tube(pts[i], pts[i + 1], r, { rings: o.ringsPer || 3, seg: o.seg || 8, longs: o.longs || 3 });
+      }
+      box(c, s) {
+        const [hx, hy, hz] = s.map(x => x / 2), ids = [];
+        for (const z of [-hz, hz]) for (const y of [-hy, hy]) for (const x of [-hx, hx]) ids.push(this.vtx([c[0] + x, c[1] + y, c[2] + z]));
+        const E = [[0, 1], [2, 3], [4, 5], [6, 7], [0, 2], [1, 3], [4, 6], [5, 7], [0, 4], [1, 5], [2, 6], [3, 7]];
+        for (const [a, b] of E) this.edge(ids[a], ids[b]);
+        const F = [[0, 1, 3, 2], [4, 5, 7, 6], [0, 1, 5, 4], [2, 3, 7, 6], [0, 2, 6, 4], [1, 3, 7, 5]];
+        for (const f of F) this.quad(...f.map(i => ids[i]));
+      }
+      disc(c, n, r, o = {}) {
+        const rs = o.rings || [r], seg = o.seg || 16, R = rs.map(x => this.circle(c, n, x, seg));
+        for (let k = 0; k < R.length - 1; k++) for (let i = 0; i < seg; i++) { this.quad(R[k][i], R[k][(i + 1) % seg], R[k + 1][(i + 1) % seg], R[k + 1][i]); if (i % 4 === 0) this.edge(R[k][i], R[k + 1][i]); }
+      }
+      saddle(c) {
+        // saddle made of 5 cross-section rings
+        const secs = [[-0.13, 0.075, 0.018], [-0.08, 0.08, 0.024], [-0.01, 0.06, 0.022], [0.06, 0.028, 0.016], [0.12, 0.018, 0.012]];
+        const seg = 12, R = [];
+        for (const [x, hw, hh] of secs) {
+          const ids = [];
+          for (let i = 0; i < seg; i++) { const a = i / seg * TAU; ids.push(this.vtx([c[0] + x, c[1] + Math.sin(a) * hh + hh * 0.3, c[2] + Math.cos(a) * hw])); }
+          for (let i = 0; i < seg; i++) this.edge(ids[i], ids[(i + 1) % seg]);
+          R.push(ids);
+        }
+        for (let k = 0; k < R.length - 1; k++) for (let i = 0; i < seg; i++) { this.quad(R[k][i], R[k][(i + 1) % seg], R[k + 1][(i + 1) % seg], R[k + 1][i]); if (i % 3 === 0) this.edge(R[k][i], R[k + 1][i]); }
+      }
+      fender(c, r, w, a0, a1, front) {
+        const seg = 30, A = [], B = [], M = [];
+        for (let i = 0; i <= seg; i++) {
+          const a = a0 + (a1 - a0) * i / seg, x = c[0] + Math.cos(a) * r, y = c[1] + Math.sin(a) * r;
+          const rr = r + 0.012;
+          A.push(this.vtx([x, y, -w / 2])); B.push(this.vtx([x, y, w / 2])); M.push(this.vtx([c[0] + Math.cos(a) * rr, c[1] + Math.sin(a) * rr, 0]));
+        }
+        for (let i = 0; i < seg; i++) { this.edge(A[i], A[i + 1]); this.edge(B[i], B[i + 1]); this.edge(M[i], M[i + 1]); this.quad(A[i], A[i + 1], M[i + 1], M[i]); this.quad(M[i], M[i + 1], B[i + 1], B[i]); if (i % 5 === 0) { this.edge(A[i], M[i]); this.edge(M[i], B[i]); } }
+        this.edge(A[0], M[0]); this.edge(M[0], B[0]); this.edge(A[seg], M[seg]); this.edge(M[seg], B[seg]);
+      }
+      wheel(c, R, o) {
+        const n = [0, 0, 1];
+        // tyre: 3 rings (outer diameter + both sidewalls) + cross treads
+        const tw = 0.022, seg = 72;
+        const T0 = this.circle([c[0], c[1], -tw], n, R - 0.02, seg), T1 = this.circle(c, n, R, seg), T2 = this.circle([c[0], c[1], tw], n, R - 0.02, seg);
+        for (let i = 0; i < seg; i++) { this.quad(T0[i], T0[(i + 1) % seg], T1[(i + 1) % seg], T1[i]); this.quad(T1[i], T1[(i + 1) % seg], T2[(i + 1) % seg], T2[i]); if (i % 3 === 0) { this.edge(T0[i], T1[i]); this.edge(T1[i], T2[i]); } }
+        // rim
+        const r1 = R - 0.045, r2 = R - 0.07;
+        const A = this.circle([c[0], c[1], -0.012], n, r1, 60), B = this.circle([c[0], c[1], 0.012], n, r1, 60), C = this.circle(c, n, r2, 60);
+        for (let i = 0; i < 60; i++) { this.quad(A[i], A[(i + 1) % 60], C[(i + 1) % 60], C[i]); this.quad(C[i], C[(i + 1) % 60], B[(i + 1) % 60], B[i]); }
+        // spokes
+        const k = o.spokes, rf = o.spokeFrom;
+        for (let i = 0; i < k; i++) {
+          const s = i % 2 ? 1 : -1, a = i / k * TAU, a2 = a + (s > 0 ? 0.35 : -0.35);
+          const p = this.vtx([c[0] + Math.cos(a) * rf, c[1] + Math.sin(a) * rf, 0.03 * s]);
+          const q = this.vtx([c[0] + Math.cos(a2) * r2, c[1] + Math.sin(a2) * r2, 0]);
+          this.edge(p, q);
+        }
+        if (o.hub) { this.tube([c[0], c[1], -0.045], [c[0], c[1], 0.045], o.hub, { rings: 3, seg: 12, longs: 6 }); }
+      }
+      beltLines(a, ra, b, rb) {
+        for (const s of [1, -1]) { const p = this.vtx([a[0], a[1] + ra * s, a[2]]), q = this.vtx([b[0], b[1] + rb * s, b[2]]); this.edge(p, q); }
+      }
+      // battery cells: two rows of cylinders along the down tube
+      cells(a, b, r, n, rows) {
+        const [d, u, w] = basis(sub(b, a)), L = len(sub(b, a)), cl = L / n * 0.86;
+        for (let row = 0; row < rows; row++) for (let i = 0; i < n; i++) {
+          const c = add(lerp3(a, b, (i + 0.5) / n), mul(w, (row - (rows - 1) / 2) * r * 0.95));
+          const p0 = add(c, mul(d, -cl / 2)), p1 = add(c, mul(d, cl / 2));
+          this.tube(p0, p1, r * 0.46, { rings: 2, seg: 10, longs: 3 });
+        }
+      }
+      board(a, b, t0, t1) {
+        const [d, u, w] = basis(sub(b, a));
+        const p0 = lerp3(a, b, t0), p1 = lerp3(a, b, t1), wv = mul(w, 0.028), off = mul(u, 0.03);
+        const P = [add(add(p0, off), wv), add(add(p1, off), wv), add(add(p1, off), mul(wv, -1)), add(add(p0, off), mul(wv, -1))].map(p => this.vtx(p));
+        for (let i = 0; i < 4; i++) this.edge(P[i], P[(i + 1) % 4]);
+        this.quad(...P);
+        for (let i = 1; i < 6; i++) { const q = lerp3(p0, p1, i / 6); const A = this.vtx(add(add(q, off), mul(wv, 0.6))), B = this.vtx(add(add(add(q, off), mul(d, 0.02)), mul(wv, 0.6))), C = this.vtx(add(add(add(q, off), mul(d, 0.02)), mul(wv, 0.1))), D = this.vtx(add(add(q, off), mul(wv, 0.1))); this.edge(A, B); this.edge(B, C); this.edge(C, D); this.edge(D, A); }
+      }
+      hubCap(c, s) {
+        const n = [0, 0, 1];
+        this.disc(c, n, 0.095, { rings: [0.095, 0.08, 0.04, 0.015], seg: 32 });
+        const b = this.circle([c[0], c[1], c[2] + 0.012 * s], n, 0.092, 32), a = this.circle(c, n, 0.095, 32);
+        for (let i = 0; i < 32; i++) { this.quad(a[i], a[(i + 1) % 32], b[(i + 1) % 32], b[i]); if (i % 4 === 0) this.edge(a[i], b[i]); }
+        for (let i = 0; i < 6; i++) { const ang = i / 6 * TAU; this.box([c[0] + Math.cos(ang) * 0.06, c[1] + Math.sin(ang) * 0.06, c[2] + 0.004 * s], [0.008, 0.008, 0.006]); }
+      }
+      magnetRing(c, ro, ri, w, n) {
+        this.ring(c, [0, 0, 1], ro, 48, w); this.ring(c, [0, 0, 1], ri, 48, w);
+        for (let i = 0; i < n; i++) { const a = i / n * TAU, a2 = a + TAU / n * 0.7; const P = [[ri, a], [ro, a], [ro, a2], [ri, a2]].map(([r, t]) => this.vtx([c[0] + Math.cos(t) * r, c[1] + Math.sin(t) * r, c[2] + w / 2])); for (let k = 0; k < 4; k++) this.edge(P[k], P[(k + 1) % 4]); this.quad(...P); }
+      }
+      stator(c, ro, ri, w, n) {
+        this.ring(c, [0, 0, 1], ri, 36, w);
+        for (let i = 0; i < n; i++) {
+          const a = i / n * TAU, h = TAU / n * 0.28;
+          const P = [[ri, a - h * 0.6], [ro * 0.86, a - h * 0.6], [ro, a - h * 1.3], [ro, a + h * 1.3], [ro * 0.86, a + h * 0.6], [ri, a + h * 0.6]];
+          for (const z of [-w / 2, w / 2]) { const ids = P.map(([r, t]) => this.vtx([c[0] + Math.cos(t) * r, c[1] + Math.sin(t) * r, c[2] + z])); for (let k = 0; k < ids.length - 1; k++) this.edge(ids[k], ids[k + 1]); if (z > 0) { this.quad(ids[0], ids[1], ids[4], ids[5]); this.quad(ids[1], ids[2], ids[3], ids[4]); } }
+          // coil windings: two small rings
+          const mid = (ri + ro * 0.86) / 2;
+          this.circle([c[0] + Math.cos(a) * mid, c[1] + Math.sin(a) * mid, c[2]], [Math.cos(a), Math.sin(a), 0], 0.012, 8);
+        }
+        this.tube([c[0], c[1], -0.09], [c[0], c[1], 0.09], 0.008, { rings: 3, seg: 8, longs: 4 });   // axle
+      }
+      rotor(c, r) {
+        const n = [0, 0, 1];
+        this.disc(c, n, r, { rings: [r, r - 0.018], seg: 48 });
+        this.circle(c, n, 0.028, 16);
+        for (let i = 0; i < 6; i++) { const a = i / 6 * TAU; const p = this.vtx([c[0] + Math.cos(a) * 0.028, c[1] + Math.sin(a) * 0.028, c[2]]), q = this.vtx([c[0] + Math.cos(a + 0.5) * (r - 0.018), c[1] + Math.sin(a + 0.5) * (r - 0.018), c[2]]); this.edge(p, q); }
+        // two rings of vent holes (staggered)
+        for (let i = 0; i < 24; i++) { const a = i / 24 * TAU + 0.1; this.circle([c[0] + Math.cos(a) * (r - 0.006), c[1] + Math.sin(a) * (r - 0.006), c[2]], n, 0.0034, 8); }
+        for (let i = 0; i < 24; i++) { const a = (i + 0.5) / 24 * TAU + 0.1; this.circle([c[0] + Math.cos(a) * (r - 0.0135), c[1] + Math.sin(a) * (r - 0.0135), c[2]], n, 0.003, 8); }
+      }
+      // arc block: an annular-sector solid centred on c, radius r0–r1, angle a0–a1, z0–z1 (caliper body, brake pads)
+      arcBlock(c, r0, r1, a0, a1, z0, z1, seg = 10) {
+        const L = [];
+        for (const z of [z0, z1]) for (const r of [r0, r1]) { const ids = []; for (let i = 0; i <= seg; i++) { const a = a0 + (a1 - a0) * i / seg; ids.push(this.vtx([c[0] + Math.cos(a) * r, c[1] + Math.sin(a) * r, z])); } for (let i = 0; i < seg; i++) this.edge(ids[i], ids[i + 1]); L.push(ids); }
+        const [A, B, C, D] = L;   // z0r0 z0r1 z1r0 z1r1
+        for (const i of [0, seg]) { this.edge(A[i], B[i]); this.edge(C[i], D[i]); this.edge(A[i], C[i]); this.edge(B[i], D[i]); }
+        for (let i = 0; i < seg; i++) { this.quad(A[i], A[i + 1], B[i + 1], B[i]); this.quad(C[i], C[i + 1], D[i + 1], D[i]); this.quad(B[i], B[i + 1], D[i + 1], D[i]); this.quad(A[i], A[i + 1], C[i + 1], C[i]); }
+        for (let i = 2; i < seg; i += 3) { this.edge(B[i], D[i]); }
+      }
+      // one half of a hydraulic caliper (s = ±1 says which side of the rotor): arc-shaped body + two piston bores
+      caliperHalf(c, rc, ac, zr, s) {
+        this.arcBlock(c, rc - 0.024, rc + 0.02, ac - 0.42, ac + 0.42, zr + s * 0.007, zr + s * 0.03, 12);
+        for (const da of [-0.19, 0.19]) { const p = [c[0] + Math.cos(ac + da) * rc, c[1] + Math.sin(ac + da) * rc, zr + s * 0.007]; this.circle(p, [0, 0, 1], 0.0125, 16); }   // piston bores
+        const m = [c[0] + Math.cos(ac) * (rc + 0.03), c[1] + Math.sin(ac) * (rc + 0.03), zr + s * 0.02]; this.box(m, [0.02, 0.014, 0.016]);   // mounting tab
+      }
+      // piston: round when seen end-on (concentric circles on the end face + short cylinder)
+      pistons(c, rc, ac, zr, s) {
+        for (const da of [-0.19, 0.19]) {
+          const x = c[0] + Math.cos(ac + da) * rc, y = c[1] + Math.sin(ac + da) * rc;
+          this.tube([x, y, zr + s * 0.006], [x, y, zr + s * 0.02], 0.011, { rings: 3, seg: 16, longs: 6 });
+          this.disc([x, y, zr + s * 0.006], [0, 0, 1], 0.011, { rings: [0.011, 0.007, 0.003], seg: 16 });
+        }
+      }
+      // brake pad: an arc-shaped plate against the rotor (backing plate + friction block)
+      pad(c, rc, ac, zr, s) {
+        this.arcBlock(c, rc - 0.016, rc + 0.014, ac - 0.36, ac + 0.36, zr + s * 0.0035, zr + s * 0.0065, 10);
+        this.arcBlock(c, rc - 0.013, rc + 0.011, ac - 0.32, ac + 0.32, zr + s * 0.0065, zr + s * 0.0085, 8);
+      }
+      caliper(c, s) {
+        const z = c[2] + 0.018 * s;
+        this.box([c[0], c[1], z], [0.07, 0.035, 0.022]);
+        this.tube([c[0] - 0.02, c[1], z], [c[0] - 0.02, c[1], z + 0.012 * s], 0.012, { rings: 2, seg: 10, longs: 4 });   // piston
+        this.tube([c[0] + 0.02, c[1], z], [c[0] + 0.02, c[1], z + 0.012 * s], 0.012, { rings: 2, seg: 10, longs: 4 });
+        this.box([c[0], c[1] - 0.012, c[2] + 0.004 * s], [0.05, 0.016, 0.004]);   // brake pad
+      }
+      lever(p) {
+        this.box([p[0] + 0.01, p[1] + 0.005, p[2]], [0.035, 0.03, 0.03]);
+        this.polyTube([[p[0] + 0.02, p[1], p[2]], [p[0] + 0.06, p[1] - 0.01, p[2] + 0.04], [p[0] + 0.07, p[1] - 0.015, p[2] + 0.12]], 0.005, { seg: 6, longs: 2, ringsPer: 2 });
+      }
+      toJSON() {
+        const r = x => Math.round(x * 10000) / 10000;
+        return {
+          name: this.name, units: 'm', up: 'y',
+          parts: this.parts.map(P => ({
+            id: P.id, anchor: P.anchor, ...(P.center ? { center: P.center } : {}), ...(P.tagDir ? { tagDir: P.tagDir } : {}),
+            pieces: P.pieces.map(C => ({ id: C.id, explode: C.explode, ...(C.axis ? { axis: C.axis } : {}), ...(C.internal ? { internal: true } : {}), ...(C.box === false ? { box: false } : {}), ...(C.hot ? { hot: true } : {}), v: C.v.flat().map(r), e: C.e.flat(), q: C.q.flat() }))
+          }))
+        };
+      }
+    }
+    return { Model };
+  })();
+  return { HOLO, HUD, MKM, LIGHT, ADD };
+})();
+
+      // ---- the HUD scene scaffold (shared by every scene; keep it as is) ----
+      const { HOLO, HUD, MKM } = HOLOHUD;
+      const T = HUD.theme(218, 22), WF = 1080, HF = 1920, FPS = 24;
+      const holo = new HOLO.Holo(WF, HF);
+      const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x)), lerp = (a, b, k) => a + (b - a) * k;
+      const eo = (x) => 1 - Math.pow(1 - clamp(x), 3), eio = (x) => { x = clamp(x); return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
+      // HOME: every scene starts and ends on this camera, so the projector pad never jumps at a cut
+      const HOME = { target: [0, 0.5, 0], yaw: 0.35, pitch: 0.32, dist: 7.6, fov: 0.62, cx: 540, cy: 1010 };
+      const camMix = (a, b, k) => ({ target: a.target.map((v, i) => lerp(v, b.target[i], k)), yaw: lerp(a.yaw, b.yaw, k), pitch: lerp(a.pitch, b.pitch, k),
+        dist: lerp(a.dist, b.dist, k), fov: lerp(a.fov, b.fov, k), cx: lerp(a.cx, b.cx, k), cy: lerp(a.cy, b.cy, k) });
+      // build a model from MKM primitives in world units (no normalising: heights stay honest), ready for holo.draw
+      const build = (fn) => { const m = new MKM.Model("m"); fn(m); return HOLO.prepModel(m.toJSON()); };
+      // scan in over the first 0.6 s (the scan plane grows the subject), erase over the last 0.4 s; yTop = the subject's height
+      const scanState = (t, yTop) => {
+        const kin = clamp(t / 0.6), kout = clamp((t - (DUR - 0.42)) / 0.4);
+        if (kout > 0) return { scanDown: { y: lerp(yTop + 0.1, -0.05, eio(kout)) }, plane: lerp(yTop + 0.1, -0.05, eio(kout)), planeA: 1 - 0.3 * kout };
+        if (kin < 1) return { scan: { y: lerp(-0.05, yTop + 0.12, eio(kin)), band: 0.07 }, plane: lerp(-0.05, yTop + 0.12, eio(kin)), planeA: 1 };
+        return {};
+      };
+      const P3 = (cam, x, y, z) => { const c = HOLO.makeCamera(cam, WF, HF), o = new Float32Array(3); c.project(x, y, z, o); return [o[0], o[1], o[2]]; };
+
+      // words: 0 Let's 1 simulate 2 it. 3 A 4 stock 5 with 6 15% 7 volatility 8 that 9 crashes 10 20% 11 about 12 once
+      // 13 every 14 10 15 years.
+      const w = (i) => Math.max(0, W.length > i ? W[i] : 0.12 + i * 0.3);
+      // ---- s9: one simulated ten-year path of the illustrative model (15% volatility plus a -20% crash about once every ten
+      // years) drawn on as a wireframe ribbon over a time rail, the camera dollying along beside the pen. Height ∝ price
+      // (zero-based: 1 world unit = 205.5 price points, so the path's high of 174.71 stands 0.85 tall). The crash on day 1,101
+      // (133.76 -> 107.17) is a hot cliff with its own card ----
+      const PV = [100,103,102.32,101.74,101.99,102.13,106.43,103.63,107.1,110.48,113.46,113.8,115.54,119.52,121.45,122.5,124.14,123.12,128.65,130.34,133.28,133.33,132.54,131.13,130.07,125.87,130.78,128.93,128.84,128.21,129.96,132.11,135.41,131.11,129.37,133.16,128.9,128.92,129.86,133.3,130.47,131.05,129.1,129.92,128.79,127.99,128.24,129.7,129.14,126.59,127.66,125.36,126.19,126,126.35,124.73,126.32,127.32,125.66,125.28,125.1,122.53,122.16,121.96,118.73,116.84,117.72,118.77,118,117.28,116.59,116.77,119.78,121.87,119.68,118.89,120.8,117.78,115.5,112.36,113.53,114.1,114.11,111.51,115.08,115.13,113.1,118.41,121.15,125.21,128.22,128.13,127.1,126.8,125.3,127.65,127.93,127.81,125.45,122.44,124.31,129.84,130.54,135.87,134.37,139.65,141.24,140.43,138.74,138.88,137.8,133.14,133.12,137.01,136.97,133.23,134.4,133.03,132.65,132.11,129.98,135.29,137.38,133.16,132.98,134.31,131.03,129.81,129.54,134.2,133.52,134.34,134.76,138.94,138.38,140.56,142.95,142.04,144.9,148.54,143.9,139.01,137.23,136.53,139.31,137.86,138.38,138.83,142.79,144.02,148.91,145.58,141.8,140.79,142.98,141.3,141.09,141.5,138.79,141.57,136.63,135.99,137.27,141.43,142.94,141.48,143.52,143.41,142.15,141.93,149.5,145.39,145.63,145.46,148.47,148.9,152.27,162.71,174.71,170.86,170.69,171.05,167.26,163.06,160.78,160.57,158.77,156.26,155.41,153.06,153.73,160.81,159.38,155.4,156.26,156.07,155.92,158.3,154.68,152.94,152.45,145.94,148.91,147.56,148.83,152.48,152.13,152.28,150.92,147.25,145.65,143.89,144.15,150.11,144.86,143.54,142.06,145.8,142.66,138.23,134.7,107.44,104.02,99.68,101.64,100.7,98.78,99.48,99.86,98.01,98.36,100.09,98.53,97.32,98.2,96.5,99.49,102.59,101.61,101.1,101.11,100.13,101.5,100.04,100.16,100.39,99.39,100.73,101.27,101.29,98.52,97.71,97.21,97.26,95.55,95.51,96.28,96.29,95.18,94.06,95.62,97.5,95.88,91.61,91.26,88.02,86.61,87.6,86.13,87.43,82.82,85.22,88.1,89.27,93.65,94.68,95.18,92.93,91.95,90.26,87.44,88.7,90.15,92.4,92.48,91.43,92.71,95.05,93.99,92.32,92.98,88.92,85.84,88.73,87.47,86.44,84.49,87.37,87.19,87.79,83.79,81.87,82.37,83.64,86.9,85.41,88.46,87.39,88.28,90.03,90.74,94.15,93.1,91.26,89.29,90.39,89.26,90.31,91.04,90.1,92.53,93.75,95.46,93.52,94.45,96.32,96.44,97.83,97.47,96.61,96.88,97.27,94.53,91.08,89.42,90.35,91.78,91.7,93.31,96.33,91.93,92.76,94.14,95.54,95.66,98.14,97.97,98.31,100.1,98.55,101.97,104.14,108.09,106.92,105.73,103.81,103.17,104.64,103.41,103.53,103.48,103.88,102.21,100.04,97.51,96.69,96.13,93.79,93.49,92.27,95.18,92.63,96.75,98.73,97.49,99.54,97.36,93.56,92.59,88.78,88.72,89.86,92.7,95.36,94.66,96.21,94.98,95.53,98.58,96.42,95.5,93.94,91.44,91.38,92.77,92.74,92.33,94.13,90.95,92.19,93.9,95.62,94.03,93.08,94.89,97.64,97.64,98.26,97.26,100.26,99.37,99.67,95.69,95.04,97.33,100.51,101.57,99.63,97.31,100.26,101.54,100.27,103.59,106.52,104.31,100.42,101.94,101.74,98.44,99.89,101.24,101.82,104.54,109.16,106.65,103.48,101.21,100.94,99.56,99.01,97.82,96.2,92.32,91.19,91.09,92.62,96.72,94.98,95.21,91.9,91.13,93.42,93.48,94.36,94.16,94.13,94.09,92.03,95.54,96.04,94.7,93.42,93.72,92.16,91.72,91.66,90.11,91.78,93.44,93.73,92.53,91.62,89.37,89.02,86.6,87,85.71,83.55,83.29,81.54,81.16,82.42,80.45,81.56,83.97,84.77,82.16,81.09,81.12,83.52,82.38,79,80.42,77.2,76.8,76.58,74.9,74.47,72.88,71.12,69.48,68.77,67.91,68.89,65.12];                     // path.values: the price every 5th trading day, days 0..2520
+      const STEP = 5, DAYS_N = 2520, CD = 1101, C_BEFORE = 133.76, C_AFTER = 107.17;
+      const KY = 0.85 / 174.71, RZ = 0.022, XD = (d) => -0.95 + 1.9 * d / DAYS_N;
+      // the series with the crash day put in exactly (sampling every 5th day would blur the cliff)
+      const SD = [], SV = [];
+      PV.forEach((v, k) => { const d = k * STEP; if (d > CD && SD[SD.length - 1] < CD) { SD.push(CD, CD + 1); SV.push(C_BEFORE, C_AFTER); } SD.push(d); SV.push(v); });
+      const priceAt = (d) => { let k = 1; while (k < SD.length - 1 && SD[k] < d) k++; const u = clamp((d - SD[k - 1]) / (SD[k] - SD[k - 1])); return lerp(SV[k - 1], SV[k], u); };
+      const flash3 = (t, t0) => t >= t0 && t < t0 + 3 / FPS;
+      // the pen: it starts on "simulate", reaches the crash on "crashes", and finishes the ten years before "once"
+      const tP0 = Math.max(0.62, w(1) - 0.08), tC = w(9) + 0.02, tE = Math.max(tC + 0.6, w(11) + 0.28);
+      const penDay = (t) => t < tP0 ? -1 : t < tC ? CD * (t - tP0) / (tC - tP0) : t < tC + 2 / FPS ? CD + (t - tC) / (2 / FPS) : Math.min(DAYS_N, CD + 1 + (DAYS_N - CD - 1) * (t - tC - 2 / FPS) / (tE - tC - 2 / FPS));
+      const dA = CD * (w(6) - tP0) / (tC - tP0);             // where the pen is when "15%" is said: the stretch the first box locks on
+      function seg(d0, d1) {   // the drawn path between days d0..d1 as [[x, y]...], ending exactly at d1
+        const pts = [[XD(d0), priceAt(d0) * KY]];
+        SD.forEach((d, k) => { if (d > d0 && d < d1) pts.push([XD(d), SV[k] * KY]); });
+        pts.push([XD(d1), priceAt(d1) * KY]);
+        return pts;
+      }
+      function rail(m, pts) {   // the ribbon: two rails a little apart in depth, tied every few samples
+        const A = pts.map(([x, y]) => m.vtx([x, y, -RZ])), B = pts.map(([x, y]) => m.vtx([x, y, RZ]));
+        for (let k = 1; k < pts.length; k++) { m.edge(A[k - 1], A[k]); m.edge(B[k - 1], B[k]); }
+        for (let k = 0; k < pts.length; k += 4) m.edge(A[k], B[k]);
+        m.edge(A[pts.length - 1], B[pts.length - 1]);
+      }
+      function model(t) {
+        const D = penDay(t);
+        return build((m) => {
+          m.part("axis"); m.piece("axis");
+          m.box([0, 0.003, 0], [1.94, 0.006, 0.06]);                                         // the time rail: ten years
+          for (let y = 0; y <= 10; y++) m.box([XD(252 * y), 0.02, 0], [0.006, 0.04, 0.07]);  // a post at each year
+          m.box([XD(0), 50 * KY, 0], [0.012, 100 * KY, 2 * RZ]);                             // the start: price 100
+          const pieces = [["pA", 0, dA], ["pB", dA, CD], ["crash", CD, CD + 1], ["pC", CD + 1, DAYS_N]];
+          for (const [id, a, b] of pieces) {
+            if (D <= a) continue;
+            const e = Math.min(D, b), pts = seg(a, e);
+            m.part(id, { anchor: id === "crash" ? [XD(CD), C_BEFORE * KY, RZ] : id === "pA" ? [XD(dA), priceAt(dA) * KY, RZ] : [XD(a), priceAt(a) * KY, RZ] });
+            m.piece(id); rail(m, pts);
+          }
+          if (D >= 0 && t < tE + 0.05) { const y = priceAt(D) * KY; m.part("pen"); m.piece("pen"); m.edge(m.vtx([XD(D), 0, RZ]), m.vtx([XD(D), y, RZ])); }   // the pen: one hot line
+        });
+      }
+      // the curtain: a thin line from the floor up to the price every quarter (dim, so the ribbon reads as a height)
+      function curtain(t) {
+        const D = penDay(t);
+        return build((m) => { m.part("cur"); m.piece("cur");
+          for (let d = 63; d <= Math.min(D, DAYS_N); d += 63) { const a = m.vtx([XD(d), 0, 0]), b = m.vtx([XD(d), priceAt(d) * KY, 0]); m.edge(a, b); } });
+      }
+      // cameras: HOME -> beside the start -> a lateral dolly along the path with the pen -> crane back for all ten years -> HOME
+      const DOL = (xc) => ({ target: [xc, 0.40, 0], yaw: 0.12, pitch: 0.08, dist: 5.2, fov: 0.62, cx: 540, cy: 1080 });
+      const WIDE = { target: [0, 0.42, 0], yaw: 0.14, pitch: 0.13, dist: 6.0, fov: 0.62, cx: 540, cy: 1078 };
+      const xcAt = (t) => lerp(-0.40, 0.02, eio((t - 0.95) / (tC + 0.1 - 0.95)));
+      function camAt(t) {
+        if (t < 0.15 || t >= DUR - 0.15) return HOME;
+        if (t < 0.95) return camMix(HOME, DOL(-0.40), eio((t - 0.15) / 0.8));
+        if (t < tC + 0.25) return DOL(xcAt(t));
+        if (t < DUR - 0.75) return camMix(DOL(0.02), WIDE, eio((t - (tC + 0.25)) / Math.max(0.5, tE + 0.25 - (tC + 0.25))));
+        return camMix(WIDE, HOME, eio((t - (DUR - 0.75)) / 0.6));
+      }
+      function text(s, x, y, size, weight, col, align = "left", mono = false) {
+        g.font = (mono ? "" : weight + " ") + size + "px " + (mono ? HUD.FONT.mono : HUD.FONT.ui); g.textAlign = align; g.fillStyle = col; g.fillText(s, x, y);
+      }
+      // cards: A (volatility) and then C (once every ten years) on the left, B (the crash) on the right
+      const CY = 598, BIG = 84;
+      const CARDS = [
+        { id: "A", x: 70, w: 300, c: { label: "VOLATILITY", value: "15", unit: "%" }, wl: w(6), on: w(6) - 0.55, off: w(11), tgt: "pA" },
+        { id: "B", x: 640, w: 360, c: { label: "CRASH · DAY 1,101", value: "−20", unit: "%", detail: "133.76 → 107.17" }, wl: w(10), on: tC - 0.02, off: 99, tgt: "crash" },
+        { id: "C", x: 70, w: 360, c: { label: "ABOUT ONCE EVERY", value: "10", unit: "YEARS" }, wl: w(14), on: Math.max(w(11) + 0.24, w(14) - 0.6), off: 99, tgt: "all" },
+      ];
+      const plateBottom = (C) => CY + 80 + BIG * 0.9 + (C.c.detail ? 66 : 0);
+      const g = document.getElementById("s9-cv").getContext("2d");
+      const st = { t: 0 };
+      function draw() {
+        const t = st.t, f = Math.floor(t * FPS);
+        g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, WF, HF);
+        const cam = camAt(t), sc = scanState(t, t < 1 ? 0.5 : 0.86), out = 1 - clamp((t - (DUR - 0.42)) / 0.3), D = penDay(t);
+        HOLO.drawPad(g, cam, WF, HF, { hue: T.hue, rot: t * 0.06 });
+        if (D > 0) holo.draw(g, curtain(t), cam, Object.assign({ hue: T.hue, gain: 0.42 }, sc));
+        // the crash goes hot the moment the pen falls off the cliff, and stays hot: it is the part that matters
+        const info = holo.draw(g, model(t), cam, Object.assign({ hue: T.hue, glow: 1, flash: { crash: 1, pen: 1, pA: flash3(t, w(6)) ? 1 : 0 } }, sc));
+        if (sc.plane !== undefined) HOLO.drawScanPlane(g, cam, WF, HF, sc.plane, { hue: T.hue, r: 1.05, alpha: sc.planeA });
+        // the year ruler: a strip across the stage under the rail; the year marks ride with the camera (micro type, own plate)
+        const a0 = clamp((t - 0.3) / 0.3) * out;
+        if (a0 > 0) {
+          const ticks = []; for (let y = 0; y <= 10; y++) ticks.push(P3(cam, XD(252 * y), 0, 0.25));
+          const vis = ticks.filter((p) => p[0] > 30 && p[0] < 1050), y0 = Math.max(...(vis.length ? vis : ticks).map((p) => p[1])) + 16, x0 = 46, x1 = 1034;
+          HUD.plate(g, T, x0, y0, x1 - x0, 92, a0);
+          g.save(); g.globalCompositeOperation = HOLOHUD.ADD; g.textBaseline = "alphabetic";
+          text("YEAR", x0 + 20, y0 + 38, 22, 400, T.dim(0.95 * a0), "left", true);
+          ticks.forEach((p, y) => { if (p[0] < x0 + 96 || p[0] > x1 - 16) return;
+            text(String(y), p[0], y0 + 38, 24, 400, T.line(0.95 * a0), "center", true); g.fillRect(p[0] - 0.5, y0, 1, 8); });
+          g.letterSpacing = "1px";
+          text("ONE SIMULATED PATH · ILLUSTRATIVE MODEL", x0 + 22, y0 + 76, 22, 400, T.hi(0.9 * a0), "left", true);
+          text("HEIGHT ∝ PRICE", x1 - 22, y0 + 76, 22, 400, T.line(0.9 * a0), "right", true);
+          g.letterSpacing = "0px"; g.restore();
+        }
+        // the pen's live readout: day and price, rolling with the simulation
+        const ra = clamp((t - tP0) / 0.2) * (1 - clamp((t - tE) / 0.2)) * out;
+        if (ra > 0 && D >= 0) {
+          const p = P3(cam, XD(D), priceAt(D) * KY, 0), s = "DAY " + String(Math.round(D)).padStart(4, "0") + " · " + priceAt(D).toFixed(2);
+          g.save(); g.font = "22px " + HUD.FONT.mono; const tw = g.measureText(s).width; const px = Math.min(p[0] + 26, 1030 - tw - 24), py = p[1] - 78;
+          HUD.plate(g, T, px, py, tw + 24, 36, ra); g.globalCompositeOperation = HOLOHUD.ADD; g.textBaseline = "alphabetic";
+          text(s, px + 12, py + 26, 22, 400, T.line(0.95 * ra), "left", true);
+          g.strokeStyle = T.line(0.6 * ra); g.lineWidth = 1; g.beginPath(); g.moveTo(px, py + 36); g.lineTo(p[0] + 4, p[1] - 6); g.stroke();
+          g.restore();
+        }
+        // the locks: a target box, a leader from the subject to the card, the value rolls and locks in the accent on its word
+        const all = ["pA", "pB", "crash", "pC"].map((id) => info.bbox[id]).filter(Boolean);
+        const bbAll = all.length ? [Math.min(...all.map((b) => b[0])), Math.min(...all.map((b) => b[1])), Math.max(...all.map((b) => b[2])), Math.max(...all.map((b) => b[3]))] : null;
+        CARDS.forEach((C) => {
+          const ca = clamp((C.off - t) / 0.2 + 1) * out, rv = clamp((t - C.on) / 0.35);
+          if (rv <= 0 || ca <= 0) return;
+          HUD.specCard(g, T, C.x, CY, C.c, { reveal: rv, roll: clamp((t - (C.wl - 0.42)) / 0.47), detail: clamp((t - (C.wl + 0.1)) / 0.4), frame: f, flash: flash3(t, C.wl + 0.05) },
+            { w: C.w, big: BIG, index: C.id === "A" ? "01" : C.id === "B" ? "02" : "03", alpha: ca });
+          const fx = ca * (C.id === "A" ? 1 - clamp((t - (w(9) - 0.35)) / 0.25) : 1);
+          if (fx <= 0) return;
+          const bb = C.tgt === "all" ? bbAll : info.bbox[C.tgt];
+          if (bb) HUD.targetBox(g, T, bb, clamp((t - (C.wl - 0.22)) / 0.22), { flash: flash3(t, C.wl), alpha: fx, pad: 18 });
+          const an = C.tgt === "all" ? (info.anchor.pA ? P3(cam, XD(0), 100 * KY, RZ) : null) : info.anchor[C.tgt];
+          if (an) {
+            const pb = plateBottom(C), cxm = C.x + C.w / 2, dir = Math.sign(cxm - an[0]) || 1, dy = an[1] - pb;
+            const ex = an[0] + dir * Math.min(Math.max(dy, 20) * 0.5, Math.abs(cxm - an[0])); let tx = clamp(ex + dir * 70, C.x - 2, C.x + C.w + 2);
+            if (Math.abs(tx - ex) < 6) tx = ex + dir * 6;
+            HUD.leader(g, T, [an[0], an[1]], [ex, pb], [tx, pb], clamp((t - (C.wl - 0.5)) / 0.45), { alpha: fx, pulse: t > C.wl && t < C.wl + 0.4 ? (t - C.wl) / 0.4 : 0 });
+          }
+        });
+      }
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: draw }, 0);
+      draw();
+      window.__timelines["s9"] = tl;
+    })();
+  </script>
+</template>

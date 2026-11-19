@@ -1,0 +1,48 @@
+{
+ "tempo": 1.0,
+ "max_pause": 0.5,
+ "keep": 0.42,
+ "parts": [
+  [
+   "p1",
+   "voice/takes/p1_s11.wav"
+  ],
+  [
+   "p2",
+   "voice/takes/p2_r11.wav"
+  ],
+  [
+   "p3",
+   "voice/takes/p3_c11.wav"
+  ],
+  [
+   "p4",
+   "voice/takes/p4_r11.wav"
+  ],
+  [
+   "p5",
+   "voice/takes/p5_r11.wav"
+  ],
+  [
+   "p6",
+   "voice/takes/p6_r11.wav"
+  ],
+  [
+   "p7",
+   "voice/takes/p7_r11.wav"
+  ],
+  [
+   "p8",
+   "voice/takes/p8_r12.wav"
+  ]
+ ],
+ "gaps": [
+  0.45,
+  0.4,
+  0.5,
+  0.5,
+  0.35,
+  0.55,
+  0.5
+ ]
+}

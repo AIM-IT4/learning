@@ -1,0 +1,18 @@
+You know Black–Scholes uses one volatility for every option. Then the interviewer asks: so why does the market quote a different volatility for every strike? 🎯
+
+Day 11/30 · Making Quant Easy
+
+1️⃣ The worst day: on 19 October 1987 the S&P 500 fell 20.47% in a single day (282.70 → 224.84).
+2️⃣ At 20% volatility, a typical day moves 20% ÷ √252 = 1.26%. So the crash was a 16-sigma day (20.47 ÷ 1.26 = 16.2). On a normal curve, a day that bad has a chance of about 10⁻⁵⁹: not once since the Big Bang. It happened anyway. Real returns have fat tails.
+3️⃣ What pays in a crash? A low-strike put. So traders pay more for it than one volatility says. Put that higher price back into Black–Scholes and solve for the volatility: it comes out higher. That's implied volatility.
+4️⃣ Simulate it: a stock with 15% volatility that crashes 20% about once every ten years. Price one-month options on 1,000,000 simulated paths and solve for each one's volatility: 15.6% at the money, 20.7% at strike 90, 29.7% at strike 80. One stock, one model, and the flat line bends into a smile.
+
+🎤 Quant interview line: "Black–Scholes assumes normal returns with one volatility, so implied vol would be flat across strikes. Real returns have fat tails and crashes, so low-strike puts trade above their one-volatility price, and implied vol rises as the strike falls. That's the smile (on equities, a skew)."
+
+📅 Day 12 tomorrow.
+💬 Comment FORMULA and we'll DM you the free Quant Formula Sheet
+➡️ Save this, share it with a friend, and follow @desk2quant for all 30 days
+
+Illustrative example. The S&P 500 closes are real (16 and 19 October 1987); the 1.26% day assumes 20% volatility; the fat-tailed curve is illustrative. The smile comes from an illustrative model (15% volatility plus a 20% crash about once every ten years, zero rates), simulated with a fixed seed (1,000,000 paths). Not investment advice.
+
+#quantfinance #volatilitysmile #impliedvolatility #blackscholes #options #quantinterview #makingquanteasy #desk2quant

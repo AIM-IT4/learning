@@ -1,0 +1,57 @@
+{
+ "model": "~/vox2",
+ "threads": 4,
+ "note": "the chosen takes (voice/pick.json); run from the project root: python tools/vox_gen.py voice/vox_jobs.json",
+ "jobs": [
+  {
+   "out": "voice/takes/p1_s11.wav",
+   "text": "You know Black-Shoals uses one volatility for every option. Then the interviewer asks: so why does the market quote a different volatility for every strike?",
+   "voice": "(A warm, clear adult male narrator, calm and confident, medium pace)",
+   "seed": 11
+  },
+  {
+   "out": "voice/takes/p2_r11.wav",
+   "text": "On October nineteenth, nineteen eighty-seven, the S and P five hundred fell twenty point four seven percent in one day. At twenty percent volatility, a typical day moves one point two six percent. So that crash was a sixteen-sigma day.",
+   "ref": "voice/takes/p1_s11.wav",
+   "seed": 11
+  },
+  {
+   "out": "voice/takes/p3_c11.wav",
+   "text": "If returns were normal, like Black-Shoals assumes, a day like that would never happen. Not once since the Big Bang. But it did. Real returns have fat tails: crashes come far more often.",
+   "ref": "voice/takes/p1_s11.wav",
+   "seed": 11,
+   "prompt_wav": "voice/takes/p1_s11.wav",
+   "prompt_text": "You know Black-Shoals uses one volatility for every option. Then the interviewer asks: so why does the market quote a different volatility for every strike?"
+  },
+  {
+   "out": "voice/takes/p4_r11.wav",
+   "text": "And what pays in a crash? A low-strike put. So traders pay more for it. Put that higher price into Black-Shoals and solve for the volatility: it comes out higher. That's implied volatility.",
+   "ref": "voice/takes/p1_s11.wav",
+   "seed": 11
+  },
+  {
+   "out": "voice/takes/p5_r11.wav",
+   "text": "Let's simulate it. A stock with fifteen percent volatility that crashes twenty percent about once every ten years. Price one-month options at strikes from eighty to one twenty, on a million simulated paths.",
+   "ref": "voice/takes/p1_s11.wav",
+   "seed": 11
+  },
+  {
+   "out": "voice/takes/p6_r11.wav",
+   "text": "At the money, implied vol is fifteen point six percent. At ninety, twenty point seven. At eighty, twenty-nine point seven. One stock, one model, and the flat line bends into a smile.",
+   "ref": "voice/takes/p1_s11.wav",
+   "seed": 11
+  },
+  {
+   "out": "voice/takes/p7_r11.wav",
+   "text": "So here's the answer: with normal returns and one volatility, implied vol would be flat across strikes. Real returns have fat tails, so low-strike puts cost more, and implied vol rises as the strike falls.",
+   "ref": "voice/takes/p1_s11.wav",
+   "seed": 11
+  },
+  {
+   "out": "voice/takes/p8_r12.wav",
+   "text": "Comment Formula, and we'll DM you the free Quant Formula Sheet. Save this, share it, and follow Desk to Quant for Day twelve.",
+   "ref": "voice/takes/p1_s11.wav",
+   "seed": 12
+  }
+ ]
+}
