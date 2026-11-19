@@ -47,6 +47,24 @@ problems from parts ──► our tokenizer ──► our GPT ──► training
 | `solve.py` | Answers a question with live tools, or grades the test sets |
 | `chat.py` | Ganit's chat app: pick a model, watch the thinking and tool calls live |
 | `kaggle/` | Builds self-contained Kaggle kernels: the speed test and Stage 1 training |
+| `web/` | Ganit-15M in the browser: the page, a JavaScript copy of the model and tools, the export script |
+
+## Use Ganit in your browser (nothing to install)
+
+Ganit-15M runs entirely inside the browser: https://claude.ai/artifact/8oo1Jj8C8S9NcgC9FFh4xs
+(the link is private until you share it from the page's **Share** menu). Each visit downloads
+the model (about 40 MB); after that it answers on your own device and nothing you type is sent
+anywhere. Ganit-100M is too heavy for a browser, so use the chat app below for it.
+
+`web/ganit-core.js` is a JavaScript copy of our model, tokenizer, calculator and the 28 quant
+tools. Checked against the Python version, it gives identical tokens (283 of 283 cases), logits
+within 6e-6 and word-for-word identical answers (30 of 30). To rebuild the page's files after training:
+
+```bash
+python web/export.py --run runs/ganit-15m --out web/dist
+cp web/ganit.html web/ganit-core.js web/dist/
+cd web/dist && python -m http.server 8000      # open http://localhost:8000/ganit.html
+```
 
 ## Use Ganit (chat app)
 
