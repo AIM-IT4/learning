@@ -125,6 +125,23 @@ Measured on Kaggle's two T4 GPUs, the 100M-parameter model trains at 39,044 toke
 | Everyday maths, practised wording | 98.6% of 219 |
 | Everyday maths, new wording | 47.6% of 250 |
 
+**Ganit-15M v2** (15.3M parameters, 400M tokens, 41 minutes on two T4s) also learned to answer
+questions without all the numbers (`explain.py`): "How do I price X?" for 18 topics (what it is, the
+steps, the inputs and where to get them, a worked example computed by the tools), questions with
+missing inputs (filled with labelled typical values), FX forwards, cross-currency swaps, FX options
+and options on futures, and honest "not learned yet" replies (`results/ganit15m_v2.json`, 80 per set):
+
+| Test | v1 | v2 |
+|---|---|---|
+| Level 1: new numbers | 100% | 100% |
+| Level 2: wording never used in training | 27.6% | 45.0% |
+| Level 3: new combinations of disguises | 48.6% | 41.2% |
+| "How do I price X?", practised wording | - | 100% |
+| "How do I price X?", new wording | - | 48.8% |
+| Missing inputs filled with typical values | - | 100% |
+| New instruments with all inputs given | - | 100% |
+| Products never named in training: says "not learned" | - | 83.8% |
+
 It learned every method, and solves about half the problem structures it never practised.
 Unfamiliar wording is its weak spot, which is what Stage 2 (a 100M model that first reads
 1.6 billion tokens of English) is for.

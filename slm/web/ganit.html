@@ -187,7 +187,8 @@ const GROUPS = {
     ["USD/INR forward", "What is the 6-month USD/INR forward rate if spot is 88.2?"]],
   "Price with your numbers": [
     ["European call", "The risk-free rate is 3% a year, continuously compounded. The stock's annual volatility is 29%. The stock is at ₹805 today. What is a 3-month European call struck at ₹885 worth?"],
-    ["Hidden volatility", "The risk-free rate is 8% a year, compounded quarterly. A stock trades at ₹100. A European put on the same stock, same expiry, strike ₹100, trades at ₹4.2. What is a 6-month European call with strike ₹105 worth?"],
+    ["Cross-currency swap rate", "A new 5-year cross-currency swap pays USD 4.5% fixed twice a year. The INR zero rate is 6.5% and the USD zero rate is 4%, continuously compounded. What INR fixed rate makes the swap fair?"],
+    ["American put", "The share price is ₹50. The stock's annual volatility is 30%. The risk-free rate is 6% a year, continuously compounded. Price a 1-year American put with strike ₹52."],
     ["Bond price", "What is the price of a 5-year bond with face value ₹1000 paying a 8% coupon once a year, if its yield is 7.5%?"],
     ["Vasicek bond", "Under the Vasicek model with mean reversion a = 0.15, long-run rate b = 6%, volatility σ = 1% and a current short rate of 5%, what is a 3-year zero-coupon bond paying ₹100 worth?"],
     ["VaR of a portfolio", "A portfolio is worth ₹1000000. Its daily volatility is 1.2%. What is its 1-day 99% value at risk, assuming normal returns?"]]
@@ -245,8 +246,14 @@ function render(st) {
   const known = (think.match(/^Known:\s*(.*)$/m) || [])[1] || "", assumed = (think.match(/^Assume:\s*(.*)$/m) || [])[1];
   const example = /no numbers given/.test(known), said = st.end.text || "";
   const reply = st.end.answer === null && !st.end.error && /I haven't learned|I only know quant finance|I'm Ganit/.test(said);
+  // A "not learned" reply must name what was asked about; if it names something else, the wording was not understood.
+  const named = (said.match(/I haven't learned (.+?) yet/) || [])[1] || "";
+  const words = named.toLowerCase().split(/[^a-z0-9]+/).map((w) => w.replace(/s$/, "")).filter((w) => w.length > 2);
+  const distinct = words.filter((w) => !["option", "swap", "bond", "note", "contract", "security", "securitie", "charge", "price"].includes(w));
+  const lost = st.done && named && !(distinct.length ? distinct : words).every((w) => st.question.toLowerCase().includes(w));
   pill.className = "pill" + (st.end.error || bad.length ? " bad" : "");
   pill.textContent = st.end.error ? "Stopped: a tool call failed"
+    : lost ? "Didn't recognise the wording"
     : reply ? (/I haven't learned/.test(said) ? "Not learned yet" : /I only know/.test(said) ? "Outside quant finance" : `Done in ${st.end.seconds} s`)
     : `Done in ${st.end.seconds} s · ` + (bad.length ? "probably misread" : `${st.end.calls.length} tool call${st.end.calls.length === 1 ? "" : "s"}`);
   const slot = st.el.querySelector(".answerslot");
@@ -263,6 +270,10 @@ function render(st) {
       const b = e.currentTarget;
       if (navigator.clipboard) navigator.clipboard.writeText(st.end.answer).then(() => { b.textContent = "Copied"; setTimeout(() => (b.textContent = "Copy"), 1500); }).catch(() => {});
     });
+  } else if (lost) {
+    st.el.querySelector(".work").innerHTML = "";
+    slot.innerHTML = `<div class="answer warn"><div class="k">Ganit didn't recognise this wording</div>
+      <div class="meta">Try asking the way the examples do, for example "How do I price a European option?" or "How do I calculate VaR?". It can explain and price:</div>${SCOPE_HTML}</div>`;
   } else if (reply) slot.innerHTML = "";
   else slot.innerHTML = `<div class="err">${st.end.error ? esc(st.end.error) : "Ganit didn't reach a final answer. Try wording the question like the examples."}</div>`;
 }
