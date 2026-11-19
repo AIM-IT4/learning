@@ -1,0 +1,1098 @@
+{
+ "run": "runs/ganit-15m-v3",
+ "device": "cpu",
+ "sets": {
+  "explain_assumed_inputs": {
+   "n": 80,
+   "accuracy": 1.0,
+   "minutes": 0.7,
+   "bad_tool_calls": 0,
+   "by_task": {
+    "all": 1.0
+   },
+   "examples_right": [
+    {
+     "question": "USD/INR spot is 90.99. What is the 6-month forward?",
+     "answer": "91.9",
+     "split": "explain_assume_train",
+     "kind": "assume",
+     "topic": "fx_forward",
+     "output": " <think>\nGoal: the USD/INR forward rate.\nKnown: spot = 90.99, T = 6 months.\nMissing: the INR and USD interest rates.\nAssume: INR rate = 6% continuous (close to the Indian 1-year T-bill yield; use today's rate), USD rate = 4% continuous (close to the US 1-year Treasury yield; use today's rate).\nPlan: 1) forward = spot * exp((rd - rf) * T) by covered interest parity 2) check the direction\n</think>\nT = 6 / 12 = <<6/12=0.5>>0.5 years.\nForward = <<QL.fx_forward(spot=90.99, rd=0.06, rf=0.04, T=0.5)=91.9>>91.9\nCheck: the rupee rate is higher than the dollar rate, so the forward is above spot, as it is.\nThis uses the assumed interest rates; put in today's rates for an exact forward.\n#### 91.9",
+     "pred": "91.9",
+     "correct": true,
+     "tool_calls": 2,
+     "error": null,
+     "seconds": 1.38
+    },
+    {
+     "question": "USD/INR Spot Is 84.19. What Is The 1-year Forward?",
+     "answer": "85.89",
+     "split": "explain_assume_train",
+     "kind": "assume",
+     "topic": "fx_forward",
+     "output": " <think>\nGoal: the USD/INR forward rate.\nKnown: spot = 84.19, T = 1 year.\nMissing: the INR and USD interest rates.\nAssume: INR rate = 6% continuous (close to the Indian 1-year T-bill yield; use today's rate), USD rate = 4% continuous (close to the US 1-year Treasury yield; use today's rate).\nPlan: 1) forward = spot * exp((rd - rf) * T) by covered interest parity 2) check the direction\n</think>\nForward = <<QL.fx_forward(spot=84.19, rd=0.06, rf=0.04, T=1)=85.89>>85.89\nCheck: the rupee rate is higher than the dollar rate, so the forward is above spot, as it is.\nThis uses the assumed interest rates; put in today's rates for an exact forward.\n#### 85.89",
+     "pred": "85.89",
+     "correct": true,
+     "tool_calls": 1,
+     "error": null,
+     "seconds": 1.38
+    },
+    {
+     "question": "Price a 1-year put on a $190 stock with strike $210.",
+     "answer": "25.93",
+     "split": "explain_assume_train",
+     "kind": "assume",
+     "topic": "option_price",
+     "output": " <think>\nGoal: the price of a European put.\nKnown: S = 190, K = 210, T = 1 year.\nMissing: the volatility and the risk-free rate.\nAssume: vol = 25% (typical for a large stock; use the implied volatility from the option chain), r = 4% continuous (close to the US 1-year Treasury yield; use today's yield).\nPlan: 1) price the put with Black-Scholes, using the assumed inputs 2) check the no-arbitrage bounds\n</think>\nPrice = <<QL.european_option(put, S=190, K=210, T=1, r=0.04, vol=0.25)=25.93>>25.93\nCheck: K * exp(-r * T) = <<210*exp(-0.04*1)=201.77>>201.77. A put is worth between max(K * exp(-r * T) - S, 0) = <<max(201.77-190, 0)=11.77>>11.77 and K * exp(-r * T) = 201.77; 25.93 is inside.\nThis uses the assumed volatility and rate; put in your own for an exact answer.\n#### 25.93",
+     "pred": "25.93",
+     "correct": true,
+     "tool_calls": 3,
+     "error": null,
+     "seconds": 1.38
+    }
+   ],
+   "examples_wrong": []
+  },
+  "explain_method": {
+   "n": 80,
+   "accuracy": 0.9875,
+   "minutes": 1.1,
+   "bad_tool_calls": 0,
+   "by_task": {
+    "all": 0.988
+   },
+   "examples_right": [
+    {
+     "question": "Explain Calculating YTM In Simple Words",
+     "answer": "0.0725",
+     "split": "explain_method_train",
+     "kind": "method",
+     "topic": "bond_ytm",
+     "check": {
+      "goal": "explain how to calculate a bond's yield to maturity, then work an example"
+     },
+     "output": " <think>\nGoal: explain how to calculate a bond's yield to maturity, then work an example.\nKnown: no numbers given.\nPlan: 1) say what it is 2) how to calculate it 3) the inputs and where to get them 4) work an example with typical numbers 5) check the example\n</think>\nWhat it is: The yield to maturity is the one discount rate that makes the value of a bond's coupons and face value equal to its market price: the return you earn if you hold the bond to maturity.\nHow to calculate it:\n1) Write the bond's cash flows: the coupons and the face value at maturity.\n2) Find the rate y at which their discounted value equals the price, by trial and error (Newton's method).\n3) Quote y with the bond's compounding, for example twice a year.\nWhat you need: the bond's price, face value, coupon rate, payment frequency and maturity.\nExample with typical numbers (replace them with yours): a 4-year bond with face value ₹1000 and a 7.5% coupon paid twice a year, trading at ₹1025.1.\nYTM = <<QL.bond_ytm(face=1000, coupon=0.075, years=4, freq=2, price=1025.1)=0.0677>>0.0677\nCheck: at this yield the bond is worth <<QL.bond_price(face=1000, coupon=0.075, years=4, freq=2, ytm=0.0677)=1025.21>>1025.21, its market price.\n#### 0.0677",
+     "pred": "0.0677",
+     "correct": true,
+     "tool_calls": 2,
+     "error": null,
+     "seconds": 3.69
+    },
+    {
+     "question": "How are European calls priced?",
+     "answer": "33.01",
+     "split": "explain_method_train",
+     "kind": "method",
+     "topic": "european_option",
+     "check": {
+      "goal": "explain how to price a European option, then work an example"
+     },
+     "output": " <think>\nGoal: explain how to price a European option, then work an example.\nKnown: no numbers given.\nPlan: 1) say what it is 2) how to price it 3) the inputs and where to get them 4) work an example with typical numbers 5) check the example\n</think>\nWhat it is: A European option gives the right, but not the obligation, to buy (a call) or sell (a put) a stock at a fixed strike price on one expiry date.\nHow to price it:\n1) Write the time to expiry T in years and turn the risk-free rate into continuous compounding.\n2) Compute d1 = (ln(S / K) + (r + vol^2 / 2) * T) / (vol * sqrt(T)) and d2 = d1 - vol * sqrt(T).\n3) Call = S * N(d1) - K * exp(-r * T) * N(d2); put = K * exp(-r * T) * N(-d2) - S * N(-d1). This is the Black-Scholes formula.\n4) If the stock pays a dividend yield q, use S * exp(-q * T) in place of S.\nWhat you need: the share price S (live from NSE or BSE), the strike K and expiry (from the contract), the risk-free rate r (a T-bill or government bond yield for the same maturity) and the volatility (the implied volatility from the option chain, or the standard deviation of daily returns times sqrt(252)).\nExample with typical numbers (replace them with yours): a 3-month European call on a stock at ₹220 with strike ₹225, volatility 31% and a risk-free rate of 6.75% (continuous).\nT = 3 / 12 = <<3/12=0.25>>0.25 years.\nPrice = <<QL.european_option(call, S=220, K=225, T=0.25, r=0.0675, vol=0.31)=13.02>>13.02\nCheck: K * exp(-r * T) = <<225*exp(-0.0675*0.25)=221.23>>221.23. A call is worth between max(S - K * exp(-r * T), 0) = <<max(220-221.23, 0)=0>>0 and S = 220; 13.02 is inside.\n#### 13.02",
+     "pred": "13.02",
+     "correct": true,
+     "tool_calls": 4,
+     "error": null,
+     "seconds": 3.69
+    },
+    {
+     "question": "Need help with equivalent interest rates calculation",
+     "answer": "0.0591",
+     "split": "explain_method_train",
+     "kind": "method",
+     "topic": "rate_conversion",
+     "check": {
+      "goal": "explain how to calculate an equivalent rate with different compounding, then work an example"
+     },
+     "output": " <think>\nGoal: explain how to calculate an equivalent rate with different compounding, then work an example.\nKnown: no numbers given.\nPlan: 1) say what it is 2) how to calculate it 3) the inputs and where to get them 4) work an example with typical numbers 5) check the example\n</think>\nWhat it is: The same growth can be quoted with different compounding. Converting finds the rate that grows money by the same amount under the new convention.\nHow to calculate it:\n1) Growth over a year with m compounding periods is (1 + r / m)^m; with continuous compounding it is exp(r).\n2) Set the two growths equal: continuous from m times a year is r_c = m * ln(1 + r_m / m).\n3) And back again: r_m = m * (exp(r_c / m) - 1).\nWhat you need: the rate and its compounding (annual, twice a year, quarterly, monthly or continuous).\nExample with typical numbers (replace them with yours): 12% compounded twice a year, turned into a continuously compounded rate.\nContinuous rate = <<QL.convert_rate(0.12, semiannual, continuous)=0.1165>>0.1165\nCheck: converting back gives <<QL.convert_rate(0.1165, continuous, semiannual)=0.12>>0.12, the 12% we started with.\n#### 0.1165",
+     "pred": "0.1165",
+     "correct": true,
+     "tool_calls": 2,
+     "error": null,
+     "seconds": 2.07
+    }
+   ],
+   "examples_wrong": [
+    {
+     "question": "how is the price of an option calculated?",
+     "answer": "503",
+     "split": "explain_method_train",
+     "kind": "method",
+     "topic": "european_option",
+     "check": {
+      "goal": "explain how to price a European option, then work an example"
+     },
+     "output": " <think>\nGoal: explain how to calculate an option's theta, then work an example.\nKnown: no numbers given.\nPlan: 1) say what it is 2) how to calculate it 3) the inputs and where to get them 4) work an example with typical numbers 5) check the example\n</think>\nWhat it is: The Greeks measure how an option's price changes: delta for a ₹1 move in the stock, gamma for the change in delta, vega for a 1% change in volatility, theta for one day passing and rho for a 1% change in the interest rate.\nHow to calculate it:\n1) Compute d1 and d2 as in Black-Scholes.\n2) Delta = N(d1) for a call and N(d1) - 1 for a put; gamma = n(d1) / (S * vol * sqrt(T)), where n is the normal density.\n3) Vega = S * n(d1) * sqrt(T) / 100 per 1% of volatility; theta and rho also come from the formula, quoted per day and per 1% of rate.\n4) Or bump one input a little, reprice the option and divide the change in price by the bump.\nWhat you need: the same inputs as the option price: S, K, T, the risk-free rate and the volatility.\nExample with typical numbers (replace them with yours): a 3-month European call on a stock at ₹220 with strike ₹225, volatility 31% and a risk-free rate of 6.75% (continuous).\nT = 3 / 12 = <<3/12=0.25>>0.25 years.\nTheta = <<QL.theta(call, S=220, K=225, T=0.25, r=0.0675, vol=0.31)=-0.0931>>-0.0931\nCheck: theta is negative: the option loses value as time passes.\n#### -0.0931",
+     "pred": "-0.0931",
+     "correct": false,
+     "tool_calls": 2,
+     "error": null,
+     "seconds": 2.39
+    }
+   ]
+  },
+  "explain_method_new_wording": {
+   "n": 80,
+   "accuracy": 0.3125,
+   "minutes": 1.1,
+   "bad_tool_calls": 0,
+   "by_task": {
+    "all": 0.312
+   },
+   "examples_right": [
+    {
+     "question": "What goes into Macaulay duration",
+     "answer": "2.5982",
+     "split": "explain_method_heldout",
+     "kind": "method",
+     "topic": "duration",
+     "check": {
+      "goal": "explain how to calculate a bond's duration, then work an example"
+     },
+     "output": " <think>\nGoal: explain how to calculate a bond's duration, then work an example.\nKnown: no numbers given.\nPlan: 1) say what it is 2) how to calculate it 3) the inputs and where to get them 4) work an example with typical numbers 5) check the example\n</think>\nWhat it is: Duration measures how sensitive a bond's price is to its yield: with modified duration D, the price falls about D% when the yield rises by 1%. Convexity corrects this for large moves.\nHow to calculate it:\n1) Macaulay duration = the average time to the bond's cash flows, weighted by their present values.\n2) Modified duration = Macaulay duration / (1 + y / m), with m payments a year.\n3) Price change = -D * change in yield * price, plus 0.5 * convexity * (change in yield)^2 * price for big moves.\nWhat you need: the bond's face value, coupon, payment frequency, maturity and yield.\nExample with typical numbers (replace them with yours): a 5-year bond with face value ₹1000 and a 7% coupon paid twice a year, at a yield of 6.75%.\nModified duration = <<QL.bond_duration(face=1000, coupon=0.07, years=5, freq=2, ytm=0.0675, kind=modified)=4.1675>>4.1675\nPrice = <<QL.bond_price(face=1000, coupon=0.07, years=5, freq=2, ytm=0.0675)=1010.46>>1010.46\nIf the yield rises by 1%, the price falls by about <<4.1675*0.01*1010.46=42.11>>42.11.\nCheck: the duration is below the 5-year maturity, as it must be for a bond that pays coupons.\n#### 4.1675",
+     "pred": "4.1675",
+     "correct": true,
+     "tool_calls": 3,
+     "error": null,
+     "seconds": 3.16
+    },
+    {
+     "question": "what goes into forward rates?",
+     "answer": "0.075",
+     "split": "explain_method_heldout",
+     "kind": "method",
+     "topic": "forward_rate",
+     "check": {
+      "goal": "explain how to calculate a forward rate, then work an example"
+     },
+     "output": " <think>\nGoal: explain how to calculate a forward rate, then work an example.\nKnown: no numbers given.\nPlan: 1) say what it is 2) how to calculate it 3) the inputs and where to get them 4) work an example with typical numbers 5) check the example\n</think>\nWhat it is: A forward rate is the interest rate for a future period that today's zero rates already lock in.\nHow to calculate it:\n1) Take the zero rate r1 to time T1 and r2 to time T2.\n2) With continuous compounding, the forward rate is f = (r2 * T2 - r1 * T1) / (T2 - T1).\n3) Investing to T2 then grows the same as investing to T1 and rolling over at f, so there is no arbitrage.\nWhat you need: two zero rates and their maturities, from the zero-coupon yield curve.\nExample with typical numbers (replace them with yours): a 3-year zero rate of 6.5% and a 5-year zero rate of 7.5%, both continuous; find the forward rate from year 3 to year 5.\nForward rate = <<QL.forward_rate(r1=0.065, T1=3, r2=0.075, T2=5)=0.09>>0.09\nCheck: r1 * T1 + f * (T2 - T1) = <<0.065*3+0.09*2=0.375>>0.375 and r2 * T2 = <<0.075*5=0.375>>0.375, the same growth.\n#### 0.09",
+     "pred": "0.09",
+     "correct": true,
+     "tool_calls": 3,
+     "error": null,
+     "seconds": 3.78
+    },
+    {
+     "question": "how would a quant get bond duration?",
+     "answer": "6.8562",
+     "split": "explain_method_heldout",
+     "kind": "method",
+     "topic": "duration",
+     "check": {
+      "goal": "explain how to calculate a bond's duration, then work an example"
+     },
+     "output": " <think>\nGoal: explain how to calculate a bond's duration, then work an example.\nKnown: no numbers given.\nPlan: 1) say what it is 2) how to calculate it 3) the inputs and where to get them 4) work an example with typical numbers 5) check the example\n</think>\nWhat it is: Duration measures how sensitive a bond's price is to its yield: with modified duration D, the price falls about D% when the yield rises by 1%. Convexity corrects this for large moves.\nHow to calculate it:\n1) Macaulay duration = the average time to the bond's cash flows, weighted by their present values.\n2) Modified duration = Macaulay duration / (1 + y / m), with m payments a year.\n3) Price change = -D * change in yield * price, plus 0.5 * convexity * (change in yield)^2 * price for big moves.\nWhat you need: the bond's face value, coupon, payment frequency, maturity and yield.\nExample with typical numbers (replace them with yours): a 5-year bond with face value ₹1000 and a 7% coupon paid twice a year, at a yield of 6.75%.\nModified duration = <<QL.bond_duration(face=1000, coupon=0.07, years=5, freq=2, ytm=0.0675, kind=modified)=4.1675>>4.1675\nPrice = <<QL.bond_price(face=1000, coupon=0.07, years=5, freq=2, ytm=0.0675)=1010.46>>1010.46\nIf the yield rises by 1%, the price falls by about <<4.1675*0.01*1010.46=42.11>>42.11.\nCheck: the duration is below the 5-year maturity, as it must be for a bond that pays coupons.\n#### 4.1675",
+     "pred": "4.1675",
+     "correct": true,
+     "tool_calls": 3,
+     "error": null,
+     "seconds": 2.27
+    }
+   ],
+   "examples_wrong": [
+    {
+     "question": "How would a quant value a swap",
+     "answer": "-30244948.44",
+     "split": "explain_method_heldout",
+     "kind": "method",
+     "topic": "interest_rate_swap",
+     "check": {
+      "goal": "explain how to price an interest rate swap, then work an example"
+     },
+     "output": " <think>\nGoal: explain or price a pricing or price them reliably. I can explain and price: European and American options, the Greeks, implied volatility, put-call parity, bond prices, yields and duration, zero-coupon bonds, rate conversions, forward rates, interest rate swaps, the Vasicek and CIR models, VaR and expected shortfall, FX forwards, FX options, options on futures and cross-currency swaps.\n",
+     "pred": null,
+     "correct": false,
+     "tool_calls": 0,
+     "error": null,
+     "seconds": 0.64
+    },
+    {
+     "question": "What goes into pricing a swap?",
+     "answer": "-1833757.25",
+     "split": "explain_method_heldout",
+     "kind": "method",
+     "topic": "interest_rate_swap",
+     "check": {
+      "goal": "explain how to price an interest rate swap, then work an example"
+     },
+     "output": " <think>\nGoal: explain or price an FRA.\nKnown: a question about FRAs.\nPlan: 1) say that I have not learned them 2) list what I can do\n</think>\nI haven't learned FRAs yet, so I can't explain or price them reliably. I can explain and price: European and American options, the Greeks, implied volatility, put-call parity, bond prices, yields and duration, zero-coupon bonds, rate conversions, forward rates, interest rate swaps, the Vasicek and CIR models, VaR and expected shortfall, FX forwards, FX options, options on futures and cross-currency swaps.\n",
+     "pred": null,
+     "correct": false,
+     "tool_calls": 0,
+     "error": null,
+     "seconds": 0.64
+    },
+    {
+     "question": "break down commodity option pricing for me.",
+     "answer": "79.84",
+     "split": "explain_method_heldout",
+     "kind": "method",
+     "topic": "futures_option",
+     "check": {
+      "goal": "explain how to price an option on futures, then work an example"
+     },
+     "output": " <think>\nGoal: explain or price a equity swap.\nKnown: a question about equity swaps.\nPlan: 1) say that I have not learned them 2) list what I can do\n</think>\nI haven't learned equity swaps yet, so I can't explain or price them reliably. I can explain and price: European and American options, the Greeks, implied volatility, put-call parity, bond prices, yields and duration, zero-coupon bonds, rate conversions, forward rates, interest rate swaps, the Vasicek and CIR models, VaR and expected shortfall, FX forwards, FX options, options on futures and cross-currency swaps.\n",
+     "pred": null,
+     "correct": false,
+     "tool_calls": 0,
+     "error": null,
+     "seconds": 2.27
+    },
+    {
+     "question": "Break down Macaulay duration for me.",
+     "answer": "6.4096",
+     "split": "explain_method_heldout",
+     "kind": "method",
+     "topic": "duration",
+     "check": {
+      "goal": "explain how to calculate a bond's duration, then work an example"
+     },
+     "output": " <think>\nGoal: explain or price a Vexul bond.\nKnown: a question about Vexul bonds.\nPlan: 1) say that I have not learned them 2) list what I can do\n</think>\nI haven't learned Vexul bonds yet, so I can't explain or price them reliably. I can explain and price: European and American options, the Greeks, implied volatility, put-call parity, bond prices, yields and duration, zero-coupon bonds, rate conversions, forward rates, interest rate swaps, the Vasicek and CIR models, VaR and expected shortfall, FX forwards, FX options, options on futures and cross-currency swaps.\n",
+     "pred": null,
+     "correct": false,
+     "tool_calls": 0,
+     "error": null,
+     "seconds": 2.27
+    },
+    {
+     "question": "break down discount bond pricing for me.",
+     "answer": "712.99",
+     "split": "explain_method_heldout",
+     "kind": "method",
+     "topic": "zero_coupon_bond",
+     "check": {
+      "goal": "explain how to price a zero-coupon bond, then work an example"
+     },
+     "output": " <think>\nGoal: explain or price a tools. I can explain and price: European and American options, the Greeks, implied volatility, put-call parity, bond prices, yields and duration, zero-coupon bonds, rate conversions, forward rates, interest rate swaps, the Vasicek and CIR models, VaR and expected shortfall, FX forwards, FX options, options on futures and cross-currency swaps.\n",
+     "pred": null,
+     "correct": false,
+     "tool_calls": 0,
+     "error": null,
+     "seconds": 2.27
+    }
+   ]
+  },
+  "explain_new_instruments": {
+   "n": 80,
+   "accuracy": 0.8625,
+   "minutes": 0.6,
+   "bad_tool_calls": 0,
+   "by_task": {
+    "all": 0.863
+   },
+   "examples_right": [
+    {
+     "question": "USD/INR spot is 91.4. The INR interest rate is 5.5% and the USD rate is 4%, both continuously compounded. Find the 6-month USD/INR forward.",
+     "answer": "92.09",
+     "split": "explain_full_train",
+     "kind": "full",
+     "topic": "fx_forward",
+     "output": " <think>\nGoal: the USD/INR forward rate.\nKnown: spot = 91.4, INR rate = 5.5% (continuous), USD rate = 4% (continuous), T = 6 months.\nPlan: 1) forward = spot * exp((rd - rf) * T) by covered interest parity 2) check the direction\n</think>\nT = 6 / 12 = <<6/12=0.5>>0.5 years.\nForward = <<QL.fx_forward(spot=91.4, rd=0.055, rf=0.04, T=0.5)=92.09>>92.09\nCheck: the rupee rate is higher, so the forward is above spot, as it is.\n#### 92.09",
+     "pred": "92.09",
+     "correct": true,
+     "tool_calls": 2,
+     "error": null,
+     "seconds": 0.84
+    },
+    {
+     "question": "USD/INR spot is 86.63. The INR interest rate is 7% and the USD rate is 3.5%, both continuously compounded. What is the 1-year forward rate?",
+     "answer": "89.72",
+     "split": "explain_full_train",
+     "kind": "full",
+     "topic": "fx_forward",
+     "output": " <think>\nGoal: the USD/INR forward rate.\nKnown: spot = 86.63, INR rate = 7% (continuous), USD rate = 3.5% (continuous), T = 1 year.\nPlan: 1) forward = spot * exp((rd - rf) * T) by covered interest parity 2) check the direction\n</think>\nForward = <<QL.fx_forward(spot=86.63, rd=0.07, rf=0.035, T=1)=89.72>>89.72\nCheck: the rupee rate is higher, so the forward is above spot, as it is.\n#### 89.72",
+     "pred": "89.72",
+     "correct": true,
+     "tool_calls": 1,
+     "error": null,
+     "seconds": 0.84
+    },
+    {
+     "question": "USD/INR spot is 87. The INR interest rate is 5.5% and the USD rate is 4%, both continuously compounded. How many forward points is the 1-month forward above spot?",
+     "answer": "0.11",
+     "split": "explain_full_train",
+     "kind": "full",
+     "topic": "fx_forward",
+     "output": " <think>\nGoal: the forward points.\nKnown: spot = 87, INR rate = 5.5% (continuous), USD rate = 4% (continuous), T = 1 month.\nPlan: 1) forward = spot * exp((rd - rf) * T) by covered interest parity 2) points = forward - spot 3) check the direction\n</think>\nT = 1 / 12 = <<1/12=0.0833>>0.0833 years.\nForward = <<QL.fx_forward(spot=87, rd=0.055, rf=0.04, T=0.0833)=87.11>>87.11\nForward points = <<87.11-87=0.11>>0.11\nCheck: the rupee rate is higher, so the forward is above spot, as it is.\n#### 0.11",
+     "pred": "0.11",
+     "correct": true,
+     "tool_calls": 3,
+     "error": null,
+     "seconds": 1.03
+    }
+   ],
+   "examples_wrong": [
+    {
+     "question": "I receive INR 8% and pay USD 4% fixed, once a year, on a cross-currency swap with 2 years left. The notionals are USD 2000000 and ₹148000000. Spot is 83.21, the INR zero rate is 6.5% and the USD zero rate is 4.5% (continuous). What is the swap worth to me?",
+     "answer": "-13094516.24",
+     "split": "explain_full_train",
+     "kind": "full",
+     "topic": "ccs_mtm",
+     "output": " <think>\nGoal: the value of the cross-currency swap to me.\nKnown: receive INR 8%, pay USD 4%, twice a year, T = 2 years, USD notional = 2000000, INR notional = 148000000, spot = 83.21, INR zero = 6.5%, USD zero = 4.5%.\nPlan: 1) value each leg on its own curve 2) convert the USD leg at spot 3) value = INR leg - USD leg 4) check each leg against its notional\n</think>\nINR leg = <<QL.fixed_leg_pv(notional=148000000, rate=0.08, T=2, freq=2, zero=0.065)=151804626.88>>151804626.88\nUSD leg = <<QL.fixed_leg_pv(notional=2000000, rate=0.04, T=2, freq=2, zero=0.045)=1979158.68>>1979158.68 dollars, which is <<1979158.68*83.21=164685793.76>>164685793.76 rupees at today's spot.\nValue = INR leg - USD leg = <<151804626.88-164685793.76=-12881166.88>>-12881166.88 rupees.\nCheck: each leg is close to its notional: INR leg / notional = <<151804626.88/148000000=1.0257>>1.0257 and USD leg / notional = <<1979158.68/2000000=0.9896>>0.9896.\n#### -12881166.88",
+     "pred": "-12881166.88",
+     "correct": false,
+     "tool_calls": 6,
+     "error": null,
+     "seconds": 2.52
+    },
+    {
+     "question": "I receive INR 7.25% and pay USD 3% fixed, twice a year, on a cross-currency swap with 2 years left. The notionals are USD 10000000 and ₹832000000. Spot is 89.68, the INR zero rate is 7% and the USD zero rate is 4% (continuous). What is the swap worth to me?",
+     "answer": "-45123948.08",
+     "split": "explain_full_train",
+     "kind": "full",
+     "topic": "ccs_mtm",
+     "output": " <think>\nGoal: the value of the cross-currency swap to me.\nKnown: receive INR 7.25%, pay USD 3%, once a year, T = 2 years, USD notional = 10000000, INR notional = 832000000, spot = 89.68, INR zero = 7%, USD zero = 4%.\nPlan: 1) value each leg on its own curve 2) convert the USD leg at spot 3) value = INR leg - USD leg 4) check each leg against its notional\n</think>\nINR leg = <<QL.fixed_leg_pv(notional=832000000, rate=0.0725, T=2, freq=1, zero=0.07)=831987735.83>>831987735.83\nUSD leg = <<QL.fixed_leg_pv(notional=10000000, rate=0.03, T=2, freq=1, zero=0.04)=9796335.2>>9796335.2 dollars, which is <<9796335.2*89.68=878535340.74>>878535340.74 rupees at today's spot.\nValue = INR leg - USD leg = <<831987735.83-878535340.74=-46547604.91>>-46547604.91 rupees.\nCheck: each leg is close to its notional: INR leg / notional = <<831987735.83/832000000=1>>1 and USD leg / notional = <<9796335.2/10000000=0.9796>>0.9796.\n#### -46547604.91",
+     "pred": "-46547604.91",
+     "correct": false,
+     "tool_calls": 6,
+     "error": null,
+     "seconds": 2.52
+    },
+    {
+     "question": "I receive INR 7.5% and pay USD 3% fixed, twice a year, on a cross-currency swap with 2 years left. The notionals are USD 5000000 and ₹382500000. Spot is 87.37, the INR zero rate is 5.75% and the USD zero rate is 4.5% (continuous). What is the swap worth to me?",
+     "answer": "-29664987.45",
+     "split": "explain_full_train",
+     "kind": "full",
+     "topic": "ccs_mtm",
+     "output": " <think>\nGoal: the value of the cross-currency swap to me.\nKnown: receive INR 7.5%, pay USD 3%, once a year, T = 2 years, USD notional = 5000000, INR notional = 382500000, spot = 87.37, INR zero = 5.75%, USD zero = 4.5%.\nPlan: 1) value each leg on its own curve 2) convert the USD leg at spot 3) value = INR leg - USD leg 4) check each leg against its notional\n</think>\nINR leg = <<QL.fixed_leg_pv(notional=382500000, rate=0.075, T=2, freq=1, zero=0.0575)=393603113.03>>393603113.03\nUSD leg = <<QL.fixed_leg_pv(notional=5000000, rate=0.03, T=2, freq=1, zero=0.045)=4850145.23>>4850145.23 dollars, which is <<4850145.23*87.37=423757188.75>>423757188.75 rupees at today's spot.\nValue = INR leg - USD leg = <<393603113.03-423757188.75=-30154075.72>>-30154075.72 rupees.\nCheck: each leg is close to its notional: INR leg / notional = <<393603113.03/382500000=1.029>>1.029 and USD leg / notional = <<4850145.23/5000000=0.97>>0.97.\n#### -30154075.72",
+     "pred": "-30154075.72",
+     "correct": false,
+     "tool_calls": 6,
+     "error": null,
+     "seconds": 2.79
+    },
+    {
+     "question": "I receive INR 8% and pay USD 4.5% fixed, once a year, on a cross-currency swap with 2 years left. The notionals are USD 1000000 and ₹74000000. Spot is 91.05, the INR zero rate is 6.25% and the USD zero rate is 4.25% (continuous). What is the swap worth to me?",
+     "answer": "-15230205.67",
+     "split": "explain_full_train",
+     "kind": "full",
+     "topic": "ccs_mtm",
+     "output": " <think>\nGoal: the value of the cross-currency swap to me.\nKnown: receive INR 8%, pay USD 4.5%, twice a year, T = 2 years, USD notional = 1000000, INR notional = 74000000, spot = 91.05, INR zero = 6.25%, USD zero = 4.25%.\nPlan: 1) value each leg on its own curve 2) convert the USD leg at spot 3) value = INR leg - USD leg 4) check each leg against its notional\n</think>\nINR leg = <<QL.fixed_leg_pv(notional=74000000, rate=0.08, T=2, freq=2, zero=0.0625)=76261665.33>>76261665.33\nUSD leg = <<QL.fixed_leg_pv(notional=1000000, rate=0.045, T=2, freq=2, zero=0.0425)=1003879.9>>1003879.9 dollars, which is <<1003879.9*91.05=91403264.89>>91403264.89 rupees at today's spot.\nValue = INR leg - USD leg = <<76261665.33-91403264.89=-15141599.56>>-15141599.56 rupees.\nCheck: each leg is close to its notional: INR leg / notional = <<76261665.33/74000000=1.0306>>1.0306 and USD leg / notional = <<1003879.9/1000000=1.0039>>1.0039.\n#### -15141599.56",
+     "pred": "-15141599.56",
+     "correct": false,
+     "tool_calls": 6,
+     "error": null,
+     "seconds": 2.79
+    },
+    {
+     "question": "I receive INR 7.5% and pay USD 3.5% fixed, once a year, on a cross-currency swap with 2 years left. The notionals are USD 5000000 and ₹416000000. Spot is 91.14, the INR zero rate is 5.75% and the USD zero rate is 4% (continuous). What is the swap worth to me?",
+     "answer": "-22635931.43",
+     "split": "explain_full_train",
+     "kind": "full",
+     "topic": "ccs_mtm",
+     "output": " <think>\nGoal: the value of the cross-currency swap to me.\nKnown: receive INR 7.5%, pay USD 3.5%, twice a year, T = 2 years, USD notional = 5000000, INR notional = 416000000, spot = 91.14, INR zero = 5.75%, USD zero = 4%.\nPlan: 1) value each leg on its own curve 2) convert the USD leg at spot 3) value = INR leg - USD leg 4) check each leg against its notional\n</think>\nINR leg = <<QL.fixed_leg_pv(notional=416000000, rate=0.075, T=2, freq=2, zero=0.0575)=428910706.88>>428910706.88\nUSD leg = <<QL.fixed_leg_pv(notional=5000000, rate=0.035, T=2, freq=2, zero=0.04)=4948595.27>>4948595.27 dollars, which is <<4948595.27*91.14=451014972.91>>451014972.91 rupees at today's spot.\nValue = INR leg - USD leg = <<428910706.88-451014972.91=-22104266.03>>-22104266.03 rupees.\nCheck: each leg is close to its notional: INR leg / notional = <<428910706.88/416000000=1.031>>1.031 and USD leg / notional = <<4948595.27/5000000=0.9897>>0.9897.\n#### -22104266.03",
+     "pred": "-22104266.03",
+     "correct": false,
+     "tool_calls": 6,
+     "error": null,
+     "seconds": 2.79
+    }
+   ]
+  },
+  "explain_not_learned": {
+   "n": 80,
+   "accuracy": 0.8125,
+   "minutes": 0.6,
+   "bad_tool_calls": 0,
+   "by_task": {
+    "all": 0.812
+   },
+   "examples_right": [
+    {
+     "question": "valuing cms swaps?",
+     "answer": null,
+     "split": "explain_unknown_heldout",
+     "kind": "unknown",
+     "topic": "not_learned",
+     "check": {
+      "contains": "I haven't learned"
+     },
+     "output": " <think>\nGoal: explain or price a Vexul swap.\nKnown: a question about Vexul swaps.\nPlan: 1) say that I have not learned them 2) list what I can do\n</think>\nI haven't learned Vexul swaps yet, so I can't explain or price them reliably. I can explain and price: European and American options, the Greeks, implied volatility, put-call parity, bond prices, yields and duration, zero-coupon bonds, rate conversions, forward rates, interest rate swaps, the Vasicek and CIR models, VaR and expected shortfall, FX forwards, FX options, options on futures and cross-currency swaps.\n",
+     "pred": null,
+     "correct": true,
+     "tool_calls": 0,
+     "error": null,
+     "seconds": 0.96
+    },
+    {
+     "question": "correlation swap price calculation",
+     "answer": null,
+     "split": "explain_unknown_heldout",
+     "kind": "unknown",
+     "topic": "not_learned",
+     "check": {
+      "contains": "I haven't learned"
+     },
+     "output": " <think>\nGoal: explain or price a Vexul swap.\nKnown: a question about Vexul swaps.\nPlan: 1) say that I have not learned them 2) list what I can do\n</think>\nI haven't learned Vexul swaps yet, so I can't explain or price them reliably. I can explain and price: European and American options, the Greeks, implied volatility, put-call parity, bond prices, yields and duration, zero-coupon bonds, rate conversions, forward rates, interest rate swaps, the Vasicek and CIR models, VaR and expected shortfall, FX forwards, FX options, options on futures and cross-currency swaps.\n",
+     "pred": null,
+     "correct": true,
+     "tool_calls": 0,
+     "error": null,
+     "seconds": 1.73
+    },
+    {
+     "question": "Power option? How to price it",
+     "answer": null,
+     "split": "explain_unknown_heldout",
+     "kind": "unknown",
+     "topic": "not_learned",
+     "check": {
+      "contains": "I haven't learned"
+     },
+     "output": " <think>\nGoal: explain or price a Nimzor option.\nKnown: a question about Nimzor options.\nPlan: 1) say that I have not learned them 2) list what I can do\n</think>\nI haven't learned Nimzor options yet, so I can't explain or price them reliably. I can explain and price: European and American options, the Greeks, implied volatility, put-call parity, bond prices, yields and duration, zero-coupon bonds, rate conversions, forward rates, interest rate swaps, the Vasicek and CIR models, VaR and expected shortfall, FX forwards, FX options, options on futures and cross-currency swaps.\n",
+     "pred": null,
+     "correct": true,
+     "tool_calls": 0,
+     "error": null,
+     "seconds": 2.32
+    }
+   ],
+   "examples_wrong": [
+    {
+     "question": "what is a dividend swap briefly?",
+     "answer": null,
+     "split": "explain_unknown_heldout",
+     "kind": "unknown",
+     "topic": "not_learned",
+     "check": {
+      "contains": "I haven't learned"
+     },
+     "output": " <think>\nGoal: explain or price a dividend yield.\nKnown: a question about ₹10000 zero-coupon bond maturing in 10 years at a 11% yield compounded annually.\nA: <think>\nGoal: the zero-coupon bond's price.\nKnown: face = 10000, T = 10 years, yield = 11% compounded annual.\nPlan: 1) discount the face value at the yield 2) check with the formula\n</think>\nPrice = <<QL.zero_bond_price(face=10000, T=10, ytm=0.11, comp=annual)=3521.84>>3521.84\nCheck: face / (1 + y)^T = <<10000/(1+0.11)^10=3521.84>>3521.84, the same.\n#### 3521.84",
+     "pred": "3521.84",
+     "correct": false,
+     "tool_calls": 2,
+     "error": null,
+     "seconds": 2.48
+    },
+    {
+     "question": "How to value a compound option please?",
+     "answer": null,
+     "split": "explain_unknown_heldout",
+     "kind": "unknown",
+     "topic": "not_learned",
+     "check": {
+      "contains": "I haven't learned"
+     },
+     "output": " <think>\nGoal: explain how to price an equivalent rate with different compounding, then work an example.\nKnown: no numbers given.\nPlan: 1) say what it is 2) how to calculate it 3) the inputs and where to get them 4) work an example with typical numbers 5) check the example\n</think>\nWhat it is: The same growth can be quoted with different compounding. Converting finds the rate that grows money by the same amount under the new convention.\nHow to calculate it:\n1) Growth over a year with m compounding periods is (1 + r / m)^m; with continuous compounding it is exp(r).\n2) Set the two growths equal: continuous from m times a year is r_c = m * ln(1 + r_m / m).\n3) And back again: r_m = m * (exp(r_c / m) - 1).\nWhat you need: the rate and its compounding (annual, twice a year, quarterly, monthly or continuous).\nExample with typical numbers (replace them with yours): 12% compounded twice a year, turned into a continuously compounded rate.\nContinuous rate = <<QL.convert_rate(0.12, semiannual, continuous)=0.1165>>0.1165\nCheck: converting back gives <<QL.convert_rate(0.1165, continuous, semiannual)=0.12>>0.12, the 12% we started with.\n#### 0.1165",
+     "pred": "0.1165",
+     "correct": false,
+     "tool_calls": 2,
+     "error": null,
+     "seconds": 2.32
+    },
+    {
+     "question": "I'd like to understand compound option valuation",
+     "answer": null,
+     "split": "explain_unknown_heldout",
+     "kind": "unknown",
+     "topic": "not_learned",
+     "check": {
+      "contains": "I haven't learned"
+     },
+     "output": " <think>\nGoal: explain how to price an equivalent rate with different compounding, then work an example.\nKnown: no numbers given.\nPlan: 1) say what it is 2) how to calculate it 3) the inputs and where to get them 4) work an example with typical numbers 5) check the example\n</think>\nWhat it is: The same growth can be quoted with different compounding. Converting finds the rate that grows money by the same amount under the new convention.\nHow to calculate it:\n1) Growth over a year with m compounding periods is (1 + r / m)^m; with continuous compounding it is exp(r).\n2) Set the two growths equal: continuous from m times a year is r_c = m * ln(1 + r_m / m).\n3) And back again: r_m = m * (exp(r_c / m) - 1).\nWhat you need: the rate and its compounding (annual, twice a year, quarterly, monthly or continuous).\nExample with typical numbers (replace them with yours): 12% compounded twice a year, turned into a continuously compounded rate.\nContinuous rate = <<QL.convert_rate(0.12, semiannual, continuous)=0.1165>>0.1165\nCheck: converting back gives <<QL.convert_rate(0.1165, continuous, semiannual)=0.12>>0.12, the 12% we started with.\n#### 0.1165",
+     "pred": "0.1165",
+     "correct": false,
+     "tool_calls": 2,
+     "error": null,
+     "seconds": 2.32
+    },
+    {
+     "question": "Kindly tell me how volatility swaps get priced",
+     "answer": null,
+     "split": "explain_unknown_heldout",
+     "kind": "unknown",
+     "topic": "not_learned",
+     "check": {
+      "contains": "I haven't learned"
+     },
+     "output": " <think>\nGoal: explain how to price an interest rate swap, then work an example.\nKnown: no numbers given.\nPlan: 1) say what it is 2) how to price it 3) the inputs and where to get them 4) work an example with typical numbers 5) check the example\n</think>\nWhat it is: An interest rate swap exchanges fixed interest payments for floating ones on the same notional; only the interest changes hands, never the notional.\nHow to price it:\n1) The fixed leg is worth fixed rate * annuity * notional, where the annuity is the sum of the discount factors times the period length.\n2) The floating leg is worth notional * (1 - DF(T)) on a payment date, where DF(T) is the discount factor to maturity.\n3) The par swap rate makes the two equal: (1 - DF(T)) / annuity.\n4) An existing swap is worth notional * ((1 - DF(T)) - fixed rate * annuity) to the side paying fixed.\nWhat you need: the notional, fixed rate, payment frequency and maturity (from the trade) and a discount curve (the OIS curve: MIBOR OIS for INR, SOFR for USD).\nExample with typical numbers (replace them with yours): a 10-year swap on ₹1000000000 where you pay 6.14% fixed quarterly, with a flat zero curve at 5.5% (continuous).\nPar swap rate = <<QL.swap_par_rate(T=10, freq=4, rate=0.055)=0.0554>>0.0554\nValue of paying fixed = <<QL.swap_value(notional=1000000000, fixed=0.0614, T=10, freq=4, rate=0.055, side=payer)=-45988189.04>>-45988189.04\nCheck: the fixed rate 6.14% is above the par rate, so paying fixed is worth less than zero, as found.\n#### -45988189.04",
+     "pred": "-45988189.04",
+     "correct": false,
+     "tool_calls": 2,
+     "error": null,
+     "seconds": 2.32
+    },
+    {
+     "question": "Hello, how is a compound option valued",
+     "answer": null,
+     "split": "explain_unknown_heldout",
+     "kind": "unknown",
+     "topic": "not_learned",
+     "check": {
+      "contains": "I haven't learned"
+     },
+     "output": " <think>\nGoal: explain how to price an FX option, then work an example.\nKnown: no numbers given.\nPlan: 1) say what it is 2) how to price it 3) the inputs and where to get them 4) work an example with typical numbers 5) check the example\n</think>\nWhat it is: An FX option gives the right to buy (a call) or sell (a put) a currency at a fixed rate on the expiry date. It is priced with the Garman-Kohlhagen formula: Black-Scholes with the foreign interest rate in the role of a dividend yield.\nHow to price it:\n1) Compute d1 = (ln(S / K) + (rd - rf + vol^2 / 2) * T) / (vol * sqrt(T)) and d2 = d1 - vol * sqrt(T).\n2) Call = S * exp(-rf * T) * N(d1) - K * exp(-rd * T) * N(d2).\n3) Put = K * exp(-rd * T) * N(-d2) - S * exp(-rf * T) * N(-d1).\nWhat you need: the spot rate, the strike, the expiry, both interest rates and the implied volatility (USD/INR is usually 3% to 8%).\nExample with typical numbers (replace them with yours): a 1-month USD/INR put with strike 85, spot 84.19, INR rate 6.75%, USD rate 4.25% (continuous) and volatility 5%.\nT = 1 / 12 = <<1/12=0.0833>>0.0833 years.\nPrice = <<QL.fx_option(put, S=84.19, K=85, T=0.0833, rd=0.0675, rf=0.0425, vol=0.05)=0.8642>>0.8642 rupees per dollar.\nCheck: it must be worth at least <<max(85*exp(-0.0675*0.0833)-84.19*exp(-0.0425*0.0833), 0)=0.6309>>0.6309, and 0.8642 is.\n#### 0.8642",
+     "pred": "0.8642",
+     "correct": false,
+     "tool_calls": 3,
+     "error": null,
+     "seconds": 2.32
+    }
+   ]
+  },
+  "maths_new_wording": {
+   "n": 80,
+   "accuracy": 0.5125,
+   "minutes": 0.2,
+   "bad_tool_calls": 0,
+   "by_task": {
+    "ages": 0.6,
+    "average": 0.0,
+    "change": 0.0,
+    "compound_amount": 0.667,
+    "density": 1.0,
+    "discount": 0.8,
+    "distance": 1.0,
+    "distance_accel": 0.0,
+    "expected_value": 0.333,
+    "final_velocity": 0.0,
+    "fraction_left": 1.0,
+    "kinetic_energy": 1.0,
+    "ohms_law": 0.0,
+    "percent_of": 0.0,
+    "probability": 1.0,
+    "profit_percent": 0.0,
+    "ratio_share": 1.0,
+    "rect_area": 1.0,
+    "rect_perimeter": 1.0,
+    "savings": 0.0,
+    "simple_interest": 0.5,
+    "speed": 0.0,
+    "two_items": 0.0,
+    "unit_price": 0.667,
+    "value_range": 0.75,
+    "weight": 1.0,
+    "work_together": 1.0
+   },
+   "examples_right": [
+    {
+     "question": "Rohan paid ₹80 for 8 pens. What would 6 pens cost at that price?",
+     "answer": "60",
+     "split": "maths_new_wording",
+     "family": "unit_price",
+     "output": " One pen costs 80 / 8 = <<80/8=10>>10 rupees.\nSo 6 pens cost 6 * 10 = <<6*10=60>>60 rupees.\n#### 60",
+     "pred": "60",
+     "correct": true,
+     "tool_calls": 2,
+     "error": null,
+     "seconds": 2.25
+    },
+    {
+     "question": "What is the sale price of a ₹2075 lamp after a 15% discount?",
+     "answer": "1763.75",
+     "split": "maths_new_wording",
+     "family": "discount",
+     "output": " The discount is 15 / 100 * 2075 = <<15/100*2075=311.25>>311.25 rupees.\nThe sale price is 2075 - 311.25 = <<2075-311.25=1763.75>>1763.75 rupees.\n#### 1763.75",
+     "pred": "1763.75",
+     "correct": true,
+     "tool_calls": 2,
+     "error": null,
+     "seconds": 0.34
+    },
+    {
+     "question": "A rectangular pool has length 22 m and width 27 m. Work out its perimeter.",
+     "answer": "98",
+     "split": "maths_new_wording",
+     "family": "rect_perimeter",
+     "output": " Perimeter is 2 * (length + width) = 2 * (22 + 27) = <<2*(22+27)=98>>98 metres.\n#### 98",
+     "pred": "98",
+     "correct": true,
+     "tool_calls": 1,
+     "error": null,
+     "seconds": 0.34
+    }
+   ],
+   "examples_wrong": [
+    {
+     "question": "5% of 1775 is what number?",
+     "answer": "88.75",
+     "split": "maths_new_wording",
+     "family": "percent_of",
+     "output": " The total is 5% a year + 5 = <<5+1=6>>6.\nThe average is 6 / 5 = <<6/5=1.2>>1.2.\n#### 1.2",
+     "pred": "1.2",
+     "correct": false,
+     "tool_calls": 2,
+     "error": null,
+     "seconds": 0.48
+    },
+    {
+     "question": "80% of 1810 is what number?",
+     "answer": "1448",
+     "split": "maths_new_wording",
+     "family": "percent_of",
+     "output": " The total is 80 + 1810 = <<80+1810=1890>>1890.\nThe average is 1890 / 3 = <<1890/3=630>>630.\n#### 630",
+     "pred": "630",
+     "correct": false,
+     "tool_calls": 2,
+     "error": null,
+     "seconds": 0.52
+    },
+    {
+     "question": "45% of 1310 is what number?",
+     "answer": "589.5",
+     "split": "maths_new_wording",
+     "family": "percent_of",
+     "output": " The total is 45 + 1310 = <<45+1310=1355>>1355.\nThe average is 1355 / 3 = <<1355/3=451.67>>451.67.\n#### 451.67",
+     "pred": "451.67",
+     "correct": false,
+     "tool_calls": 2,
+     "error": null,
+     "seconds": 0.52
+    },
+    {
+     "question": "20% of 1320 is what number?",
+     "answer": "264",
+     "split": "maths_new_wording",
+     "family": "percent_of",
+     "output": " Hi! I'm Ganit, a small quant model built from scratch. I can explain and price European and American options, the Greeks, implied volatility, put-call parity, bond prices, yields and duration, zero-coupon bonds, rate conversions, forward rates, interest rate swaps, the Vasicek and CIR models, VaR and expected shortfall, FX forwards, FX options, options on futures and cross-currency swaps. Ask how to price something, or give me the numbers and I'll work it out; every exact number comes from my calculator and QuantLib tools. Try: \"How do I price a cross-currency swap?\"\n",
+     "pred": null,
+     "correct": false,
+     "tool_calls": 0,
+     "error": null,
+     "seconds": 0.52
+    },
+    {
+     "question": "40% of 1580 is what number?",
+     "answer": "632",
+     "split": "maths_new_wording",
+     "family": "percent_of",
+     "output": " The total is 40 + 1580 = <<40+1580=1620>>1620.\nThe average is 1620 / 3 = <<1620/3=540>>540.\n#### 540",
+     "pred": "540",
+     "correct": false,
+     "tool_calls": 2,
+     "error": null,
+     "seconds": 0.52
+    }
+   ]
+  },
+  "maths_seen": {
+   "n": 80,
+   "accuracy": 0.975,
+   "minutes": 0.1,
+   "bad_tool_calls": 0,
+   "by_task": {
+    "ages": 1.0,
+    "average": 1.0,
+    "change": 1.0,
+    "compound_amount": 1.0,
+    "density": 1.0,
+    "discount": 1.0,
+    "distance": 1.0,
+    "distance_accel": 1.0,
+    "expected_value": 1.0,
+    "final_velocity": 1.0,
+    "fraction_left": 1.0,
+    "kinetic_energy": 1.0,
+    "ohms_law": 1.0,
+    "percent_of": 1.0,
+    "ratio_share": 1.0,
+    "rect_area": 1.0,
+    "rect_perimeter": 1.0,
+    "savings": 1.0,
+    "simple_interest": 1.0,
+    "speed": 1.0,
+    "two_items": 1.0,
+    "unit_price": 1.0,
+    "value_range": 0.0,
+    "work_together": 1.0
+   },
+   "examples_right": [
+    {
+     "question": "Find 15 percent of 1065.",
+     "answer": "159.75",
+     "split": "maths_seen",
+     "family": "percent_of",
+     "output": " 15% of 1065 is 15 / 100 * 1065 = <<15/100*1065=159.75>>159.75.\n#### 159.75",
+     "pred": "159.75",
+     "correct": true,
+     "tool_calls": 1,
+     "error": null,
+     "seconds": 0.35
+    },
+    {
+     "question": "Find 40 percent of 1765.",
+     "answer": "706",
+     "split": "maths_seen",
+     "family": "percent_of",
+     "output": " 40% of 1765 is 40 / 100 * 1765 = <<40/100*1765=706>>706.\n#### 706",
+     "pred": "706",
+     "correct": true,
+     "tool_calls": 1,
+     "error": null,
+     "seconds": 0.35
+    },
+    {
+     "question": "What is 20% of 1555?",
+     "answer": "311",
+     "split": "maths_seen",
+     "family": "percent_of",
+     "output": " 20% of 1555 is 20 / 100 * 1555 = <<20/100*1555=311>>311.\n#### 311",
+     "pred": "311",
+     "correct": true,
+     "tool_calls": 1,
+     "error": null,
+     "seconds": 0.51
+    }
+   ],
+   "examples_wrong": [
+    {
+     "question": "Find the range of the data set 67, 64, 22, 31 and 49.",
+     "answer": "45",
+     "split": "maths_seen",
+     "family": "value_range",
+     "output": " The largest value is 69 and the smallest is 22.\nThe range is 69 - 22 = <<69-22=47>>47.\n#### 47",
+     "pred": "47",
+     "correct": false,
+     "tool_calls": 1,
+     "error": null,
+     "seconds": 0.28
+    },
+    {
+     "question": "What is the range of 97, 8, 61, 65, 45 and 41?",
+     "answer": "89",
+     "split": "maths_seen",
+     "family": "value_range",
+     "output": " The largest value is 97 and the smallest is 61.\nThe range is 97 - 61 = <<97-61=36>>36.\n#### 36",
+     "pred": "36",
+     "correct": false,
+     "tool_calls": 1,
+     "error": null,
+     "seconds": 0.21
+    }
+   ]
+  },
+  "quant_level1": {
+   "n": 80,
+   "accuracy": 1.0,
+   "minutes": 0.6,
+   "bad_tool_calls": 0,
+   "by_task": {
+    "american": 1.0,
+    "bond_duration": 1.0,
+    "bond_price": 1.0,
+    "bond_ytm": 1.0,
+    "convert": 1.0,
+    "forward": 1.0,
+    "greek": 1.0,
+    "implied_vol": 1.0,
+    "option_price": 1.0,
+    "parity": 1.0,
+    "var": 1.0,
+    "vasicek": 1.0
+   },
+   "examples_right": [
+    {
+     "question": "Convert 8% compounded semiannually into the equivalent rate compounded annually.",
+     "answer": "0.0816",
+     "split": "level1",
+     "target": "convert",
+     "disguises": [],
+     "output": " <think>\nGoal: the equivalent annual rate.\nKnown: 8% compounded semiannually.\nPlan: 1) convert from semiannual to annual compounding 2) check that one year's growth matches\n</think>\nRate = <<QL.convert_rate(0.08, semiannual, annual)=0.0816>>0.0816\nCheck: one year's growth at 8% compounded semiannually is <<(1+0.08/2)^2=1.0816>>1.0816, and at the new rate it is <<1+0.0816=1.0816>>1.0816, the same.\n#### 0.0816",
+     "pred": "0.0816",
+     "correct": true,
+     "tool_calls": 3,
+     "error": null,
+     "seconds": 1.62
+    },
+    {
+     "question": "What rate compounded monthly matches 8.75% compounded quarterly?",
+     "answer": "0.0869",
+     "split": "level1",
+     "target": "convert",
+     "disguises": [],
+     "output": " <think>\nGoal: the equivalent monthly rate.\nKnown: 8.75% compounded quarterly.\nPlan: 1) convert from quarterly to monthly compounding 2) check that one year's growth matches\n</think>\nRate = <<QL.convert_rate(0.0875, quarterly, monthly)=0.0869>>0.0869\nCheck: one year's growth at 8.75% compounded quarterly is <<(1+0.0875/4)^4=1.0904>>1.0904, and at the new rate it is <<(1+0.0869/12)^12=1.0904>>1.0904, the same.\n#### 0.0869",
+     "pred": "0.0869",
+     "correct": true,
+     "tool_calls": 3,
+     "error": null,
+     "seconds": 1.31
+    },
+    {
+     "question": "Find the fair price of a 4-year bond with face value ₹1000 paying a 7.5% coupon once a year when its yield is 6%.",
+     "answer": "1051.98",
+     "split": "level1",
+     "target": "bond_price",
+     "disguises": [],
+     "output": " <think>\nGoal: the bond's price.\nKnown: face = 1000, coupon = 7.5% paid once a year, 4 years, yield = 6%.\nPlan: 1) discount every coupon and the face value at the yield 2) check against the coupon-versus-yield rule\n</think>\nEach coupon is face * coupon / payments a year = <<1000*0.075/1=75>>75.\nPrice = <<75/(1+0.06)^1+75/(1+0.06)^2+75/(1+0.06)^3+(1000+75)/(1+0.06)^4=1051.98>>1051.98\nWith QuantLib: <<QL.bond_price(face=1000, coupon=0.075, years=4, freq=1, ytm=0.06)=1051.98>>1051.98\nCheck: the coupon 7.5% is higher than the yield 6%, so the price should be above face value 1000; it is.\n#### 1051.98",
+     "pred": "1051.98",
+     "correct": true,
+     "tool_calls": 3,
+     "error": null,
+     "seconds": 2.28
+    }
+   ],
+   "examples_wrong": []
+  },
+  "quant_level2": {
+   "n": 80,
+   "accuracy": 0.2875,
+   "minutes": 0.7,
+   "bad_tool_calls": 1,
+   "by_task": {
+    "american": 0.091,
+    "bond_duration": 0.0,
+    "bond_price": 0.0,
+    "bond_ytm": 0.0,
+    "convert": 0.5,
+    "forward": 0.0,
+    "greek": 0.364,
+    "implied_vol": 0.444,
+    "option_price": 0.133,
+    "parity": 0.0,
+    "swap_par": 1.0,
+    "var": 1.0,
+    "vasicek": 0.5,
+    "zero_bond": 0.0
+   },
+   "examples_right": [
+    {
+     "question": "Which annual rate gives the same growth as 11.5% compounded monthly?",
+     "answer": "0.1213",
+     "split": "level2",
+     "target": "convert",
+     "disguises": [],
+     "output": " <think>\nGoal: the equivalent annual rate.\nKnown: 11.5% compounded monthly.\nPlan: 1) convert from monthly to annual compounding 2) check that one year's growth matches\n</think>\nRate = <<QL.convert_rate(0.115, monthly, annual)=0.1213>>0.1213\nCheck: one year's growth at 11.5% compounded monthly is <<(1+0.115/12)^12=1.1213>>1.1213, and at the new rate it is <<1+0.1213=1.1213>>1.1213, the same.\n#### 0.1213",
+     "pred": "0.1213",
+     "correct": true,
+     "tool_calls": 3,
+     "error": null,
+     "seconds": 0.98
+    },
+    {
+     "question": "Take 5.5% a year (continuous compounding) as the flat zero rate. Set the fair fixed rate for a 3-year interest-rate swap paying twice a year.",
+     "answer": "0.0558",
+     "split": "level2",
+     "target": "swap_par",
+     "disguises": [],
+     "output": " <think>\nGoal: the 3-year par swap rate.\nKnown: r = 5.5% (continuous), swap tenor 3 years, fixed payments twice a year.\nPlan: 1) par rate = (1 - last discount factor) / annuity 2) check: on a flat curve it equals the semiannual-compounded version of the zero rate\n</think>\nPar swap rate = <<QL.swap_par_rate(T=3, freq=2, rate=0.055)=0.0558>>0.0558\nCheck: the same rate with semiannual compounding is <<QL.convert_rate(0.055, continuous, semiannual)=0.0558>>0.0558, equal, as it must be on a flat curve.\n#### 0.0558",
+     "pred": "0.0558",
+     "correct": true,
+     "tool_calls": 2,
+     "error": null,
+     "seconds": 0.83
+    },
+    {
+     "question": "Risk-free money grows at 10% a year, compounded once a year. Set the fair fixed rate for a 3-year interest-rate swap paying twice a year.",
+     "answer": "0.0976",
+     "split": "level2",
+     "target": "swap_par",
+     "disguises": [
+      "r_compounded"
+     ],
+     "output": " <think>\nGoal: the 3-year par swap rate.\nKnown: r = 10% compounded once a year, swap tenor 3 years, fixed payments twice a year.\nNeed: a continuously compounded rate.\nPlan: 1) convert the rate to continuous compounding 2) par rate = (1 - last discount factor) / annuity 3) check: on a flat curve it equals the semiannual-compounded version of the zero rate\n</think>\nr = <<QL.convert_rate(0.1, annual, continuous)=0.0953>>0.0953 (continuous).\nPar swap rate = <<QL.swap_par_rate(T=3, freq=2, rate=0.0953)=0.0976>>0.0976\nCheck: the same rate with semiannual compounding is <<QL.convert_rate(0.0953, continuous, semiannual)=0.0976>>0.0976, equal, as it must be on a flat curve.\n#### 0.0976",
+     "pred": "0.0976",
+     "correct": true,
+     "tool_calls": 3,
+     "error": null,
+     "seconds": 0.83
+    }
+   ],
+   "examples_wrong": [
+    {
+     "question": "Which annual rate gives the same growth as 7.25% compounded semiannually?",
+     "answer": "0.0738",
+     "split": "level2",
+     "target": "convert",
+     "disguises": [],
+     "output": " <think>\nGoal: the equivalent semiannual rate.\nKnown: 7.25% compounded semiannually.\nPlan: 1) convert from semiannual to semiannual compounding 2) check that one year's growth matches\n</think>\nRate = <<QL.convert_rate(0.0725, semiannual, semiannual)=0.0725>>0.0725\nCheck: one year's growth at 7.25% compounded semiannually is <<(1+0.0725/2)^2=1.0738>>1.0738, and at the new rate it is <<(1+0.0725/2)^2=1.0738>>1.0738, the same.\n#### 0.0725",
+     "pred": "0.0725",
+     "correct": false,
+     "tool_calls": 3,
+     "error": null,
+     "seconds": 0.98
+    },
+    {
+     "question": "How much would you pay today for ₹100 in 2 years, discounting at 5% compounded continuously?",
+     "answer": "90.48",
+     "split": "level2",
+     "target": "zero_bond",
+     "disguises": [],
+     "output": " Amount = P * (1 + R / 100)^n = 100 * (1 + 5 / 100)^2 = <<100*(1+0.05)=105>>105 rupees.\n#### 105",
+     "pred": "105",
+     "correct": false,
+     "tool_calls": 1,
+     "error": null,
+     "seconds": 0.47
+    },
+    {
+     "question": "How much would you pay today for ₹1000 in 10 years, discounting at 11.75% compounded continuously?",
+     "answer": "308.82",
+     "split": "level2",
+     "target": "zero_bond",
+     "disguises": [],
+     "output": " <think>\nGoal: the equivalent semiannual rate.\nKnown: 11.75% continuously compounded.\nPlan: 1) convert from continuous to semiannual compounding 2) check that one year's growth matches\n</think>\nRate = <<QL.convert_rate(0.1175, continuous, semiannual)=0.121>>0.121\nCheck: one year's growth at 11.75% continuously compounded is <<exp(0.1175)=1.1247>>1.1247, and at the new rate it is <<(1+0.121/2)^2=1.1247>>1.1247, the same.\n#### 0.121",
+     "pred": "0.121",
+     "correct": false,
+     "tool_calls": 3,
+     "error": null,
+     "seconds": 0.75
+    },
+    {
+     "question": "How much would you pay today for ₹1000 in 3 years, discounting at 4.25% compounded twice a year?",
+     "answer": "881.47",
+     "split": "level2",
+     "target": "zero_bond",
+     "disguises": [],
+     "output": " Amount = P * (1 + R / 100)^n = 1000 * (1 + 4 / 100)^3 = <<1000*(1+4/100)^3=1124.86>>1124.86 rupees.\n#### 1124.86",
+     "pred": "1124.86",
+     "correct": false,
+     "tool_calls": 1,
+     "error": null,
+     "seconds": 0.75
+    },
+    {
+     "question": "Which yield makes a 1-year, ₹100 bond whose 7% coupon is paid once a year worth what it costs, if it sells for ₹100?",
+     "answer": "0.07",
+     "split": "level2",
+     "target": "bond_ytm",
+     "disguises": [],
+     "output": " <think>\nGoal: the bond's yield to maturity.\nKnown: face = 100, coupon = 10% paid once a year, 7 years, price = 100.\nPlan: 1) solve for the yield that discounts the cash flows to the price 2) reprice at that yield\n</think>\nYield to maturity = <<QL.bond_ytm(face=100, coupon=0.1, years=7, freq=1, price=100)=0.1>>0.1\nCheck: repricing at that yield gives <<QL.bond_price(face=100, coupon=0.1, years=7, freq=1, ytm=0.1)=100>>100, the price 100.\n#### 0.1",
+     "pred": "0.1",
+     "correct": false,
+     "tool_calls": 2,
+     "error": null,
+     "seconds": 0.83
+    }
+   ]
+  },
+  "quant_level3": {
+   "n": 80,
+   "accuracy": 0.3875,
+   "minutes": 1.1,
+   "bad_tool_calls": 8,
+   "by_task": {
+    "american": 0.111,
+    "bond_duration": 0.6,
+    "greek": 0.375,
+    "implied_vol": 0.286,
+    "option_price": 0.567,
+    "parity": 0.0,
+    "swap_par": 0.0
+   },
+   "examples_right": [
+    {
+     "question": "Find the macaulay duration of a ₹100 face-value bond maturing in 4 years with a 11.75% coupon paid once a year when its continuously compounded yield is 6.5%.",
+     "answer": "3.4594",
+     "split": "level3",
+     "target": "bond_duration",
+     "disguises": [
+      "ytm_continuous"
+     ],
+     "output": " <think>\nGoal: the macaulay duration.\nKnown: face = 100, coupon = 11.75% paid once a year, 4 years, yield = 6.5%.\nPlan: 1) compute the macaulay duration 2) check that it is below the maturity\n</think>\nMacaulay duration = <<QL.bond_duration(face=100, coupon=0.1175, years=4, freq=1, ytm=0.065, kind=macaulay)=3.4614>>3.4614 years.\nCheck: duration is below the 4-year maturity, as it must be for a coupon bond.\n#### 3.4614",
+     "pred": "3.4614",
+     "correct": true,
+     "tool_calls": 1,
+     "error": null,
+     "seconds": 1.31
+    },
+    {
+     "question": "Compute the macaulay duration for a 6.75% coupon bond (paid once a year) with ₹100 face value and 2 years left, given that its continuously compounded yield is 9.75%.",
+     "answer": "1.9348",
+     "split": "level3",
+     "target": "bond_duration",
+     "disguises": [
+      "ytm_continuous"
+     ],
+     "output": " <think>\nGoal: the macaulay duration.\nKnown: face = 100, coupon = 6.75% paid once a year, 2 years, yield = 9.75%.\nPlan: 1) compute the macaulay duration 2) check that it is below the maturity\n</think>\nMacaulay duration = <<QL.bond_duration(face=100, coupon=0.0675, years=2, freq=1, ytm=0.0975, kind=macaulay)=1.9351>>1.9351 years.\nCheck: duration is below the 2-year maturity, as it must be for a coupon bond.\n#### 1.9351",
+     "pred": "1.9351",
+     "correct": true,
+     "tool_calls": 1,
+     "error": null,
+     "seconds": 1.23
+    },
+    {
+     "question": "It moves with 3.78% daily volatility. A stock trades at ₹1373. Use a risk-free rate of 5% with continuous compounding. Price a European call expiring in 91 days with strike ₹1645.",
+     "answer": "79.83",
+     "split": "level3",
+     "target": "option_price",
+     "disguises": [
+      "T_calendar_days",
+      "vol_daily"
+     ],
+     "output": " <think>\nGoal: the price of a European call.\nKnown: r = 5% (continuous), 91 days to expiry, S = 1373, K = 1645, daily vol = 3.78%.\nNeed: the yearly volatility.\nPlan: 1) turn calendar days into years (365 a year) 2) annualize the daily volatility (252 trading days) 3) price the European call with Black-Scholes (no dividends) 4) check the no-arbitrage bounds\n</think>\nT = 91 / 365 = <<91/365=0.2493>>0.2493 years.\nvol = daily vol * sqrt(252) = <<0.0378*sqrt(252)=0.6001>>0.6001.\nPrice = <<QL.european_option(call, S=1373, K=1645, T=0.2493, r=0.05, vol=0.6001)=79.83>>79.83\nCheck: K * exp(-r * T) = <<1645*exp(-0.05*0.2493)=1624.62>>1624.62. A call is worth between max(S - K * exp(-r * T), 0) = <<max(1373-1624.62, 0)=0>>0 and S = 1373; 79.83 is inside.\n#### 79.83",
+     "pred": "79.83",
+     "correct": true,
+     "tool_calls": 5,
+     "error": null,
+     "seconds": 3.21
+    }
+   ],
+   "examples_wrong": [
+    {
+     "question": "A 6-month zero-coupon government bond paying ₹100 costs ₹96.8. Which fixed rate should a new 2-year swap with quarterly payments carry?",
+     "answer": "0.0655",
+     "split": "level3",
+     "target": "swap_par",
+     "disguises": [
+      "r_zero_bond"
+     ],
+     "output": " <think>\nGoal: the 2-year par swap rate.\nKnown: a 6-month zero-coupon bond costs 96.8 per 100, T = 2 years, S = 100, K = 100, vol = 17%.\nNeed: the risk-free rate, hidden in the zero-coupon bond's price.\nPlan: 1) get the continuous rate from the zero-coupon bond 2) price the European put with Black-Scholes (no dividends) 3) check the no-arbitrage bounds\n</think>\nr = -ln(P / 100) / T = <<-ln(96.8/100)/0.5=0.065>>0.065 (continuous).\nPrice = <<QL.european_option(put, S=100, K=100, T=2, r=0.065, vol=0.17)=4.1638>>4.1638\nCheck: K * exp(-r * T) = <<100*exp(-0.065*2)=87.81>>87.81. A put is worth between max(K * exp(-r * T) - S, 0) = <<max(87.81-100, 0)=0>>0 and K * exp(-r * T) = 87.81; 4.1638 is inside.\n#### 4.1638",
+     "pred": "4.1638",
+     "correct": false,
+     "tool_calls": 4,
+     "error": null,
+     "seconds": 3.13
+    },
+    {
+     "question": "₹93.24 buys a 2-year government zero-coupon bond that pays ₹100. Which fixed rate should a new 7-year swap with annual payments carry?",
+     "answer": "0.0356",
+     "split": "level3",
+     "target": "swap_par",
+     "disguises": [
+      "r_zero_bond"
+     ],
+     "output": " <think>\nGoal: the 7-year par swap rate.\nKnown: a 2-year swap, then work an example.\nKnown: no numbers given.\nPlan: 1) say what it is 2) how to price it 3) the inputs and where to get them 4) work an example with typical numbers 5) check the example\n</think>\nWhat it is: A cross-currency swap exchanges interest payments in two currencies. Usually the notionals are exchanged at the start at the spot rate and swapped back at maturity, for example to turn a dollar loan into a rupee loan.\nHow to price it:\n1) Lay out each leg's cash flows in its own currency: the coupons and the notional paid back at the end.\n2) Discount each leg on its own currency's curve, for example SOFR for USD and MIBOR OIS for INR.\n3) Convert the foreign leg's value into rupees at today's spot rate.\n4) Value = the leg you receive minus the leg you pay. A new swap's fixed rate is set so that this is zero.\n5) Banks also add the cross-currency basis, a spread that reflects the demand for dollars.\nWhat you need: both notionals, the two fixed rates (or floating indices), the payment frequency and maturity (from the trade), a zero curve for each currency and today's spot rate.\nExample with typical numbers (replace them with yours): you receive INR 7.25% and pay USD 4.5% fixed, paid twice a year, with 5 years left, on USD 1000000 (₹76500000 at the trade's rate of 76.5); today's spot is 87.75, and the zero rates are 6.75% for INR and 4.25% for USD (continuous).\nINR leg = <<QL.fixed_leg_pv(notional=76500000, rate=0.0725, T=5, freq=2, zero=0.0675)=77728261.47>>77728261.47\nUSD leg = <<QL.fixed_leg_pv(notional=1000000, rate=0.045, T=5, freq=2, zero=0.0425)=1009115.09>>1009115.09 dollars, which is <<1009115.09*87.75=88549849.15>>88549849.15 rupees at today's spot.\nValue = INR leg - USD leg = <<77728261.47-88549849.15=-10821587.68>>-10821587.68 rupees.\nCheck: each leg is close to its notional: INR leg / notional = <<77728261.47/76500000=1.0161>>1.0161 and USD leg / notional = <<1009115.09/1000000=1.0091>>1.0091.\n#### -10821587.68",
+     "pred": "-10821587.68",
+     "correct": false,
+     "tool_calls": 6,
+     "error": null,
+     "seconds": 7.11
+    },
+    {
+     "question": "Compute the macaulay duration for a 10% coupon bond (paid once a year) with ₹100 face value and 5 years left, given that its yield is 8% with continuous compounding.",
+     "answer": "4.1982",
+     "split": "level3",
+     "target": "bond_duration",
+     "disguises": [
+      "ytm_continuous"
+     ],
+     "output": " <think>\nGoal: the macaulay duration.\nKnown: face = 100, coupon = 10% paid once a year, 5 years, yield = 8% continuously compounded.\nNeed: the yield compounded once a year, like the coupons.\nPlan: 1) convert the yield to annual compounding 2) discount every coupon and the face value at the yield 3) check against the coupon-versus-yield rule\n</think>\nYield = <<QL.convert_rate(0.08, continuous, annual)=0.0833>>0.0833 (annual compounding).\nPrice = <<QL.bond_price(face=100, coupon=0.1, years=5, freq=1, ytm=0.0833)=106.61>>106.61\nCheck: the coupon 10% is higher than the yield 8.33%, so the price should be above face value 100; it is.\n#### 106.61",
+     "pred": "106.61",
+     "correct": false,
+     "tool_calls": 2,
+     "error": null,
+     "seconds": 1.96
+    },
+    {
+     "question": "Find the macaulay duration of a ₹1000 face-value bond maturing in 4 years with a 4.25% coupon paid twice a year when it yields 11% a year on a continuous basis.",
+     "answer": "3.6742",
+     "split": "level3",
+     "target": "bond_duration",
+     "disguises": [
+      "ytm_continuous"
+     ],
+     "output": " <think>\nGoal: the macaulay duration.\nKnown: face = 1000, coupon = 4.25% paid twice a year, 4 years, yield = 11% continuously compounded.\nNeed: the yield compounded twice a year, like the coupons.\nPlan: 1) convert the yield to semiannual compounding 2) discount every coupon and the face value at the yield 3) check against the coupon-versus-yield rule\n</think>\nYield = <<QL.convert_rate(0.11, continuous, semiannual)=0.1131>>0.1131 (semiannual compounding).\nPrice = <<QL.bond_price(face=1000, coupon=0.0425, years=4, freq=2, ytm=0.1131)=777.77>>777.77\nCheck: the coupon 4.25% is lower than the yield 11.31%, so the price should be below face value 1000; it is.\n#### 777.77",
+     "pred": "777.77",
+     "correct": false,
+     "tool_calls": 2,
+     "error": null,
+     "seconds": 2.04
+    },
+    {
+     "question": "The continuously compounded risk-free rate is 2.5%. The stock's annual volatility is 30%. A share currently costs ₹169. Price a European call with 62 days to expiry at a strike of ₹185.",
+     "answer": "3.129",
+     "split": "level3",
+     "target": "option_price",
+     "disguises": [
+      "T_calendar_days"
+     ],
+     "output": " <think>\nGoal: the price of a European call.\nKnown: r = 2.5% (continuous), 62 trading days to expiry, S = 169, K = 185, vol = 30%.\nPlan: 1) turn trading days into years (252 a year) 2) price the European call with Black-Scholes (no dividends) 3) check the no-arbitrage bounds\n</think>\nT = 62 / 252 = <<62/252=0.246>>0.246 years.\nPrice = <<QL.european_option(call, S=169, K=185, T=0.2466, r=0.025, vol=0.3)=4.674>>4.674\nCheck: K * exp(-r * T) = <<185*exp(-0.025*0.2466)=183.86>>183.86. A call is worth between max(S - K * exp(-r * T), 0) = <<max(169-183.86, 0)=0>>0 and S = 169; 4.674 is inside.\n#### 4.674",
+     "pred": "4.674",
+     "correct": false,
+     "tool_calls": 4,
+     "error": null,
+     "seconds": 2.51
+    }
+   ]
+  }
+ }
+}

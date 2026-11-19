@@ -75,7 +75,7 @@ def main():
     p.add_argument("--out", default="data/stage1")
     p.add_argument("--problems", type=int, default=250000)
     p.add_argument("--maths-frac", type=float, default=0.15)
-    p.add_argument("--explain-frac", type=float, default=0.35, help="share of explain.py examples")
+    p.add_argument("--explain-frac", type=float, default=0.3, help="share of explain.py examples")
     p.add_argument("--vocab", type=int, default=4096)
     p.add_argument("--test", type=int, default=300, help="problems per quant test level")
     p.add_argument("--workers", type=int, default=os.cpu_count())

@@ -265,7 +265,8 @@ function render(st) {
       <div class="meta">Ganit used numbers that are not in your question (${esc(bad.slice(0, 4).join(", "))}), so it most likely misread it, or the question is outside what it has learned. It can work out:</div>${SCOPE_HTML}</div>`;
   } else if (st.end.answer !== null) {
     const label = assumed ? "Answer with assumed inputs" : example ? "Example result" : "Answer";
-    const meta = example ? "Worked out with the example numbers above: put in your own numbers for your trade."
+    const explained = (goal || "").replace(/^explain /, "").replace(/, then work an example$/, "");
+    const meta = example ? `Ganit explained ${esc(explained)}. This result uses the example numbers above: put in your own for your trade.`
       : assumed ? `Assumed ${esc(assumed.replace(/\s*\([^)]*\)/g, "").replace(/\.$/, ""))}. Replace them with your own for an exact answer.`
       : goal ? `Ganit read this as: ${esc(goal)}` : "Every number from the calculator or the quant tools";
     slot.innerHTML = `<div class="answer"><div><div class="k">${label}</div><div class="v">${esc(st.end.answer)}</div><div class="meta">${meta}</div></div><button class="copy" type="button">Copy</button></div>`;

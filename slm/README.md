@@ -142,6 +142,12 @@ and options on futures, and honest "not learned yet" replies (`results/ganit15m_
 | New instruments with all inputs given | - | 100% |
 | Products never named in training: says "not learned" | - | 83.8% |
 
+A second round (v3: questions built from many more parts, made-up and look-alike product names,
+500M tokens) scored lower on the same unseen questions (31% vs 43% for new wording, 81% vs 90% for
+"not learned", `results/ganit15m_v3.json`), so v2 stays published and the code is back at v2's settings.
+For a 15M model trained from scratch, unfamiliar wording remains the main weakness; the page shows when
+it did not recognise a question and says which method it explained.
+
 It learned every method, and solves about half the problem structures it never practised.
 Unfamiliar wording is its weak spot, which is what Stage 2 (a 100M model that first reads
 1.6 billion tokens of English) is for.
