@@ -1,10 +1,11 @@
 """Pick each sound-effect role from the CC0 uisfx packs (Real SFX's bundled library) by listening with earshot, then
 copy the winners to assets/sfx/<role>.mp3 and write assets/sfx/PICKS.json.
-usage: ~/.local/share/earshot/.venv/bin/python tools/pick_sfx.py"""
+usage: UISFX_SOUNDS=<uisfx>/sounds ~/.local/share/earshot/.venv/bin/python tools/pick_sfx.py"""
 import json, os, shutil
 from earshot import api
 
-U = "/home/user/desk2quant/.claude/skills/real-sfx/vendor/node_modules/uisfx/sounds"
+# the uisfx package's sounds folder (CC0 1.0), as bundled with the Real SFX skill: set UISFX_SOUNDS to it
+U = os.environ.get("UISFX_SOUNDS", "uisfx/sounds")
 OUT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "assets", "sfx")
 ROLES = {
     "pop": ("a short soft cartoon pop, a toy sticker popping onto a board",
