@@ -21,7 +21,7 @@ console.log(`tokenizer: ${vec.tokenizer.length - bad}/${vec.tokenizer.length} id
 let toolBad = 0;
 for (const c of vec.tools) {
   let got;
-  try { got = G.runTool(c.expr); } catch (e) { got = "ERROR " + e.message; }
+  try { got = G.runTool(c.expr); } catch (e) { got = c.result === "ERROR" ? "ERROR" : "ERROR " + e.message; }
   if (got !== c.result) {
     const [a, b] = [parseFloat(got), parseFloat(c.result)];
     const close = isFinite(a) && Math.abs(a - b) <= Math.max(Math.abs(b) * 2e-3, 1e-4);
