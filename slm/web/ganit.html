@@ -51,7 +51,7 @@ aside { border-right: 1px solid var(--line); background: var(--panel-2); padding
 .legend { margin-top: auto; display: grid; gap: 6px; font-size: 12.5px; color: var(--ink-3); }
 .legend div { display: flex; align-items: center; gap: 8px; }
 .sw { font: 600 11.5px/1.5 var(--mono); padding: 0 6px; border-radius: 5px; }
-.sw.m { color: var(--accent); background: var(--accent-soft); }
+.sw.m { color: var(--ink); background: var(--track); }
 .sw.c { color: var(--calc); background: var(--calc-bg); box-shadow: inset 0 0 0 1px var(--calc-line); }
 .sw.q { color: var(--ql); background: var(--ql-bg); box-shadow: inset 0 0 0 1px var(--ql-line); }
 main { display: flex; flex-direction: column; min-width: 0; height: 100%; }
@@ -85,12 +85,14 @@ details.think summary { cursor: pointer; font: 600 12px/1.6 var(--body); letter-
 details.think summary::-webkit-details-marker { display: none; }
 details.think summary::before { content: "▸ "; }
 details.think[open] summary::before { content: "▾ "; }
-.tk { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 8px; margin-top: 6px; font-size: 14.5px; }
+.tk { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 8px; margin-top: 6px; font-size: 14.5px; }
 .tk .k { font-weight: 600; color: var(--ink-2); }
 .tk ol { margin: 0; padding-left: 18px; }
-.work { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 12px 16px; font: 400 13.5px/1.75 var(--mono);
-  color: var(--accent); white-space: pre-wrap; overflow-wrap: anywhere; box-shadow: var(--shadow); }
+.work { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 12px 16px; font: 400 15px/1.7 var(--body);
+  color: var(--ink); white-space: pre-wrap; overflow-wrap: anywhere; box-shadow: var(--shadow); }
 .work:empty { display: none; }
+.work .h { font-weight: 600; }
+.call, .res { font-family: var(--mono); font-size: 13px; }
 .call { padding: 1px 6px; border-radius: 6px; font-size: 12.5px; }
 .call.c { color: var(--calc); background: var(--calc-bg); }
 .call.q { color: var(--ql); background: var(--ql-bg); }
@@ -140,7 +142,7 @@ textarea { flex: 1; min-width: 0; min-height: 26px; max-height: 180px; resize: n
 <div class="app">
 <aside>
   <div class="brand"><div class="logo" aria-hidden="true">ग</div><div><b>Ganit</b><span>गणित · a quant model built from scratch</span></div></div>
-  <div><p class="label">Model</p><div class="mcard"><b>Ganit-15M</b><span>14.9M parameters · runs in your browser</span></div></div>
+  <div><p class="label">Model</p><div class="mcard"><b>Ganit-15M</b><span><span class="params">14.9M</span> parameters · runs in your browser</span></div></div>
   <div><p class="label">Try asking</p><div id="groups"></div></div>
   <div class="legend">
     <div><span class="sw m">Abc</span> written by Ganit</div>
@@ -154,10 +156,10 @@ textarea { flex: 1; min-width: 0; min-height: 26px; max-height: 180px; resize: n
   <div class="scroll" id="scroll">
     <section class="hero" id="hero">
       <h1>Ask <em>Ganit</em> a quant question</h1>
-      <p>Option prices and Greeks, bonds and yields, interest-rate models, swaps and risk. Give the numbers: Ganit plans the steps, calls its calculator and quant tools for every exact number, and checks its answer. It runs entirely on your device.</p>
+      <p>Ask how to price something and Ganit explains the method with a worked example. Or give your numbers and it works out the answer: it plans the steps, calls its calculator and quant tools for every exact number, and checks the result. It runs entirely on your device.</p>
       <p class="label">Ganit can work out</p>
       <div class="scope" id="scope"></div>
-      <p class="note">It can't explain ideas yet, and it hasn't learned FX or cross-currency swaps, credit or exotic products. Ask with every number it needs, worded like the examples.</p>
+      <p class="note">Missing inputs get typical values that you can replace. It hasn't learned credit products, swaptions or exotic options yet, and it says so.</p>
       <div class="load" id="load"><div class="row"><span id="loadtext">Loading Ganit-15M (about 40 MB)…</span><span id="loadpct">0%</span></div><div class="bar"><span id="loadbar"></span></div></div>
       <div class="cards" id="cards"></div>
     </section>
@@ -165,10 +167,10 @@ textarea { flex: 1; min-width: 0; min-height: 26px; max-height: 180px; resize: n
   </div>
   <div class="composer">
     <form class="box" id="form">
-      <textarea id="q" rows="1" aria-label="Your question" placeholder="Ask with every number it needs"></textarea>
+      <textarea id="q" rows="1" aria-label="Your question" placeholder="Ask how to price something, or give your numbers"></textarea>
       <button class="send" id="send" type="submit" aria-label="Ask Ganit" disabled><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
     </form>
-    <div class="hint"><span>Enter to send · Shift + Enter for a new line</span><span>Ganit-15M · 14.9M parameters · on your device</span></div>
+    <div class="hint"><span>Enter to send · Shift + Enter for a new line</span><span>Ganit-15M · <span class="params">14.9M</span> parameters · on your device</span></div>
   </div>
 </main>
 </div>
@@ -176,21 +178,23 @@ textarea { flex: 1; min-width: 0; min-height: 26px; max-height: 180px; resize: n
 <script src="ganit-core.js"></script>
 <script>
 const GROUPS = {
-  "Options": [
+  "Explain a method": [
+    ["Cross-currency swap", "How can I price an FX cross currency swap?"],
+    ["VaR method", "How do I calculate VaR?"],
+    ["Option delta", "What is the delta of an option and how do I calculate it?"]],
+  "Missing inputs filled in": [
+    ["Call option", "Price a 6-month call on a ₹1,240 stock with strike ₹1,300."],
+    ["USD/INR forward", "What is the 6-month USD/INR forward rate if spot is 88.2?"]],
+  "Price with your numbers": [
     ["European call", "The risk-free rate is 3% a year, continuously compounded. The stock's annual volatility is 29%. The stock is at ₹805 today. What is a 3-month European call struck at ₹885 worth?"],
-    ["American put", "The share price is ₹50. The stock's annual volatility is 30%. The risk-free rate is 6% a year, continuously compounded. Price a 1-year American put with strike ₹52."],
-    ["Hidden volatility", "The risk-free rate is 8% a year, compounded quarterly. A stock trades at ₹100. A European put on the same stock, same expiry, strike ₹100, trades at ₹4.2. What is a 6-month European call with strike ₹105 worth?"]],
-  "Bonds and rates": [
+    ["Hidden volatility", "The risk-free rate is 8% a year, compounded quarterly. A stock trades at ₹100. A European put on the same stock, same expiry, strike ₹100, trades at ₹4.2. What is a 6-month European call with strike ₹105 worth?"],
     ["Bond price", "What is the price of a 5-year bond with face value ₹1000 paying a 8% coupon once a year, if its yield is 7.5%?"],
-    ["Rate conversion", "Convert 8% compounded quarterly into the equivalent rate continuously compounded."]],
-  "Rate models": [
-    ["Vasicek bond", "Under the Vasicek model with mean reversion a = 0.15, long-run rate b = 6%, volatility σ = 1% and a current short rate of 5%, what is a 3-year zero-coupon bond paying ₹100 worth?"]],
-  "Risk": [
-    ["Value at risk", "A portfolio is worth ₹1000000. Its daily volatility is 1.2%. What is its 1-day 99% value at risk, assuming normal returns?"]]
+    ["Vasicek bond", "Under the Vasicek model with mean reversion a = 0.15, long-run rate b = 6%, volatility σ = 1% and a current short rate of 5%, what is a 3-year zero-coupon bond paying ₹100 worth?"],
+    ["VaR of a portfolio", "A portfolio is worth ₹1000000. Its daily volatility is 1.2%. What is its 1-day 99% value at risk, assuming normal returns?"]]
 };
 const SCOPE = ["European options", "American options", "Greeks", "Implied volatility", "Put-call parity", "Bond price", "Bond yield",
   "Bond duration", "Zero-coupon bonds", "Rate conversion", "Forward rates", "Vasicek and CIR bonds", "Interest-rate swap rates",
-  "VaR and expected shortfall", "Everyday maths"];
+  "VaR and expected shortfall", "FX forwards", "FX options", "Options on futures", "Cross-currency swaps", "Everyday maths"];
 const SCOPE_HTML = `<div class="scope">${SCOPE.map((s) => `<span>${s}</span>`).join("")}</div>`;
 const $ = (s) => document.querySelector(s);
 const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -199,7 +203,7 @@ let MODEL = null, TOK = null, busy = false;
 function renderThink(t) {
   const rows = [];
   for (const line of t.split("\n")) {
-    const m = line.match(/^(Goal|Known|Need|Plan):\s*(.*)$/);
+    const m = line.match(/^(Goal|Known|Missing|Assume|Need|Plan):\s*(.*)$/);
     if (!m) { if (line.trim()) rows.push(`<div class="tk"><span class="k"></span><span>${esc(line)}</span></div>`); continue; }
     let body = esc(m[2]);
     if (m[1] === "Plan") body = "<ol>" + m[2].split(/\s*\d+\)\s+/).filter(Boolean).map((i) => `<li>${esc(i)}</li>`).join("") + "</ol>";
@@ -228,6 +232,7 @@ function render(st) {
     const sty = fresh ? ` style="animation-delay:-${Math.round(age)}ms"` : "";
     return `<span class="call ${q ? "q" : "c"}" title="${esc(t.expr)}">${q ? `<span class="fn">quant tool</span>${esc(fn)}${esc(args)}` : esc(args)}</span><span class="arrow">→</span><span class="res ${q ? "q" : "c"}${fresh ? " pop" : ""}"${sty}>${esc(res)}</span>`;
   });
+  html = html.replace(/^(What it is:|How to price it:|How to calculate it:|How it works:|What you need:|Example with typical numbers \(replace them with yours\):|Check:)/gm, '<b class="h">$1</b>');
   st.el.querySelector(".think").hidden = !think.trim() && (st.done || (a < 0 && text.trim().length > 0));
   const caret = st.done ? "" : '<span class="caret"></span>';
   st.el.querySelector(".thinkbody").innerHTML = renderThink(think) + (thinking ? caret : "");
@@ -237,33 +242,34 @@ function render(st) {
   // Inputs Ganit says it used that are not in the question mean it answered a different question.
   const bad = st.end.answer !== null ? Ganit.unexplained(st.question, st.end.text || "") : [];
   const goal = (think.match(/^Goal:\s*(.*?)\.?\s*$/m) || [])[1];
+  const known = (think.match(/^Known:\s*(.*)$/m) || [])[1] || "", assumed = (think.match(/^Assume:\s*(.*)$/m) || [])[1];
+  const example = /no numbers given/.test(known), said = st.end.text || "";
+  const reply = st.end.answer === null && !st.end.error && /I haven't learned|I only know quant finance|I'm Ganit/.test(said);
   pill.className = "pill" + (st.end.error || bad.length ? " bad" : "");
   pill.textContent = st.end.error ? "Stopped: a tool call failed"
+    : reply ? (/I haven't learned/.test(said) ? "Not learned yet" : /I only know/.test(said) ? "Outside quant finance" : `Done in ${st.end.seconds} s`)
     : `Done in ${st.end.seconds} s · ` + (bad.length ? "probably misread" : `${st.end.calls.length} tool call${st.end.calls.length === 1 ? "" : "s"}`);
   const slot = st.el.querySelector(".answerslot");
   if (st.end.answer !== null && bad.length) {
     slot.innerHTML = `<div class="answer warn"><div class="k">Probably wrong</div><div class="v">${esc(st.end.answer)}</div>
       <div class="meta">Ganit used numbers that are not in your question (${esc(bad.slice(0, 4).join(", "))}), so it most likely misread it, or the question is outside what it has learned. It can work out:</div>${SCOPE_HTML}</div>`;
   } else if (st.end.answer !== null) {
-    slot.innerHTML = `<div class="answer"><div><div class="k">Answer</div><div class="v">${esc(st.end.answer)}</div><div class="meta">${goal ? `Ganit read this as: ${esc(goal)}` : "Every number from the calculator or the quant tools"}</div></div><button class="copy" type="button">Copy</button></div>`;
+    const label = assumed ? "Answer with assumed inputs" : example ? "Example result" : "Answer";
+    const meta = example ? "Worked out with the example numbers above: put in your own numbers for your trade."
+      : assumed ? `Assumed ${esc(assumed.replace(/\s*\([^)]*\)/g, "").replace(/\.$/, ""))}. Replace them with your own for an exact answer.`
+      : goal ? `Ganit read this as: ${esc(goal)}` : "Every number from the calculator or the quant tools";
+    slot.innerHTML = `<div class="answer"><div><div class="k">${label}</div><div class="v">${esc(st.end.answer)}</div><div class="meta">${meta}</div></div><button class="copy" type="button">Copy</button></div>`;
     slot.querySelector(".copy").addEventListener("click", (e) => {
       const b = e.currentTarget;
       if (navigator.clipboard) navigator.clipboard.writeText(st.end.answer).then(() => { b.textContent = "Copied"; setTimeout(() => (b.textContent = "Copy"), 1500); }).catch(() => {});
     });
-  } else slot.innerHTML = `<div class="err">${st.end.error ? esc(st.end.error) : "Ganit didn't reach a final answer. Try wording the question like the examples."}</div>`;
+  } else if (reply) slot.innerHTML = "";
+  else slot.innerHTML = `<div class="err">${st.end.error ? esc(st.end.error) : "Ganit didn't reach a final answer. Try wording the question like the examples."}</div>`;
 }
 async function ask(question) {
   if (busy || !MODEL || !question.trim()) return;
   $("#hero").hidden = true;
   const u = document.createElement("div"); u.className = "user"; u.textContent = question;
-  if (!/\d/.test(question)) {                       // nothing to compute from: say so instead of guessing
-    const n = document.createElement("div"); n.className = "bot";
-    n.innerHTML = `<div class="bothead"><div class="avatar" aria-hidden="true">ग</div><b>Ganit-15M</b><span class="pill bad">Can't answer this</span></div>
-      <div class="answer warn"><div class="k">Ganit needs the numbers</div>
-      <div class="meta">Ganit doesn't explain ideas yet: it works out a number from the inputs you give. Ask about one of these, with every number it needs, worded like the examples:</div>${SCOPE_HTML}</div>`;
-    $("#thread").append(u, n); $("#scroll").scrollTop = $("#scroll").scrollHeight;
-    return;
-  }
   busy = true; $("#send").disabled = true;
   const b = document.createElement("div"); b.className = "bot";
   b.innerHTML = `<div class="bothead"><div class="avatar" aria-hidden="true">ग</div><b>Ganit-15M</b><span class="pill live">Thinking…</span></div>
@@ -294,7 +300,7 @@ function addExamples() {
     }
     $("#groups").append(g);
   }
-  for (const [label, q] of [GROUPS["Options"][0], GROUPS["Options"][2], GROUPS["Bonds and rates"][0], GROUPS["Risk"][0]]) {
+  for (const [label, q] of [GROUPS["Explain a method"][0], GROUPS["Missing inputs filled in"][0], GROUPS["Missing inputs filled in"][1], GROUPS["Price with your numbers"][1]]) {
     const c = document.createElement("button"); c.type = "button"; c.className = "card"; c.disabled = true;
     c.innerHTML = `<b>${esc(label)}</b><span>${esc(q.length > 120 ? q.slice(0, 118) + "…" : q)}</span>`;
     c.addEventListener("click", () => ask(q)); $("#cards").append(c);
@@ -345,6 +351,8 @@ async function load() {
     setP(1, "Starting Ganit…");
     await new Promise((r) => setTimeout(r, 30));
     MODEL = new Ganit.GPT(manifest, new Uint16Array(all.buffer, 0, all.byteLength / 2));
+    const params = manifest.tensors.reduce((n, t) => n + t.size, 0);
+    document.querySelectorAll(".params").forEach((e) => (e.textContent = (params / 1e6).toFixed(1) + "M"));
     $("#load").hidden = true;
     document.querySelectorAll(".ex, .card").forEach((b) => (b.disabled = false));
     $("#send").disabled = false;

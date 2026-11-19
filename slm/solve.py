@@ -184,12 +184,20 @@ def _init(run_dir, device="cpu"):
     _MODEL = (*load(run_dir, device), device)
 
 
+def right(row, x):
+    """Numbers are compared; explanations and refusals are graded by explain.grade."""
+    if row.get("check"):
+        import explain
+        return explain.grade(row["check"], x["text"], x["answer"])
+    return correct(x["answer"], row["answer"])
+
+
 def _grade_batch(rows):
     model, tok, device = _MODEL
     t0 = time.time()
     res = generate_batch(model, tok, [r["question"] for r in rows], device=device)
     secs = round((time.time() - t0) / len(rows), 2)
-    return [dict(r, output=x["text"], pred=x["answer"], correct=correct(x["answer"], r["answer"]),
+    return [dict(r, output=x["text"], pred=x["answer"], correct=right(r, x),
                  tool_calls=len(x["tool_calls"]), error=x["error"], seconds=secs) for r, x in zip(rows, res)]
 
 

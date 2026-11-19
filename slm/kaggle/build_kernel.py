@@ -20,12 +20,13 @@ import pathlib
 HERE = pathlib.Path(__file__).resolve().parent
 SLM = HERE.parent
 CORE = ["model.py", "train.py"]
-FULL = CORE + ["prepare.py", "mathgen.py", "quantgen.py", "calc.py", "qltools.py", "tools.py", "solve.py"]
+FULL = CORE + ["prepare.py", "mathgen.py", "quantgen.py", "explain.py", "calc.py", "qltools.py", "tools.py", "solve.py"]
 READ = {"name": "read", "data": "data2/read", "lr": 6e-4, "warmup": 1000, "out": "run"}
 JOBS = {
     "speed": dict(template="speed_test.py", title="SLM Speed Test", slug="slm-speed-test", files=CORE,
                   internet=False, gpu=True),
     "stage1": dict(template="stage1.py", title="SLM Stage 1", slug="slm-stage-1", files=FULL, internet=True, gpu=True),
+    "ganit15_v2": dict(template="stage1.py", title="SLM Ganit 15M v2", slug="slm-ganit-15m-v2", files=FULL, internet=True, gpu=True),
     "stage2_data": dict(template="stage2_data.py", title="SLM Stage 2 Data", slug="slm-stage-2-data", files=FULL,
                         internet=True, gpu=False),
     "stage1_rl": dict(template="rl_kernel.py", title="SLM Stage 1 RL", slug="slm-stage-1-rl", files=FULL + ["rl.py"],

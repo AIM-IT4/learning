@@ -21,6 +21,7 @@ import time
 import numpy as np
 from tokenizers import Regex, Tokenizer, decoders, models, pre_tokenizers, trainers
 
+import explain
 import mathgen
 import quantgen
 
@@ -40,12 +41,15 @@ def make_tokenizer():
 
 
 def generate(job):
-    seed, n, maths_frac = job
+    seed, n, maths_frac, explain_frac = job
     R = random.Random(seed)
     out = []
     for _ in range(n):
-        if R.random() < maths_frac:
+        u = R.random()
+        if u < maths_frac:
             out.append(mathgen.to_text(mathgen.problem(R, "train")))
+        elif u < maths_frac + explain_frac:
+            out.append(explain.to_text(explain.problem(R, "train")))
         else:
             out.append(quantgen.to_text(quantgen.problem(R, "train")))
     return out
@@ -58,6 +62,11 @@ def test_set(seed, n):
         rows[f"quant_{split}"] = [quantgen.problem(R, split) for _ in range(n)]
     rows["maths_seen"] = [mathgen.problem(R, "train") | {"split": "maths_seen"} for _ in range(n // 2)]
     rows["maths_new_wording"] = [mathgen.problem(R, "heldout") | {"split": "maths_new_wording"} for _ in range(n // 2)]
+    rows["explain_method"] = [explain.problem(R, "train", "method") for _ in range(n // 2)]
+    rows["explain_method_new_wording"] = [explain.problem(R, "heldout", "method") for _ in range(n // 2)]
+    rows["explain_assumed_inputs"] = [explain.problem(R, "train", "assume") for _ in range(n // 2)]
+    rows["explain_new_instruments"] = [explain.problem(R, "train", "full") for _ in range(n // 2)]
+    rows["explain_not_learned"] = [explain.problem(R, "heldout", "unknown") for _ in range(n // 4)]
     return rows
 
 
@@ -66,6 +75,7 @@ def main():
     p.add_argument("--out", default="data/stage1")
     p.add_argument("--problems", type=int, default=250000)
     p.add_argument("--maths-frac", type=float, default=0.15)
+    p.add_argument("--explain-frac", type=float, default=0.3, help="share of explain.py examples")
     p.add_argument("--vocab", type=int, default=4096)
     p.add_argument("--test", type=int, default=300, help="problems per quant test level")
     p.add_argument("--workers", type=int, default=os.cpu_count())
@@ -74,7 +84,7 @@ def main():
 
     t0 = time.time()
     per = a.problems // (a.workers * 8) + 1
-    jobs = [(1000 + i, per, a.maths_frac) for i in range(a.workers * 8)]
+    jobs = [(1000 + i, per, a.maths_frac, a.explain_frac) for i in range(a.workers * 8)]
     with mp.Pool(a.workers) as pool:
         texts = [t for chunk in pool.map(generate, jobs) for t in chunk][:a.problems]
     print(f"generated {len(texts)} problems in {time.time() - t0:.0f}s", flush=True)
@@ -86,7 +96,7 @@ def main():
         rows[:] = [r for r in rows if r["question"] not in train_q]
         with open(os.path.join(a.out, f"test_{name}.jsonl"), "w") as f:
             for r in rows:
-                f.write(json.dumps({k: r.get(k) for k in ("question", "answer", "split", "target", "family", "disguises")},
+                f.write(json.dumps({k: r.get(k) for k in ("question", "answer", "split", "target", "family", "disguises", "kind", "topic", "check") if k in r or k in ("question", "answer", "split")},
                                    ensure_ascii=False) + "\n")
         print(f"test_{name}: {len(rows)} problems ({before - len(rows)} dropped as duplicates of training)")
 
@@ -119,7 +129,7 @@ def main():
     meta = {"vocab_size": tok.get_vocab_size(), "eos_id": eos, "problems": len(texts), "tokens": counts,
             "tokens_per_problem": {"mean": round(float(L.mean()), 1), "p50": int(np.percentile(L, 50)),
                                    "p95": int(np.percentile(L, 95)), "p99": int(np.percentile(L, 99)), "max": int(L.max())},
-            "maths_frac": a.maths_frac}
+            "maths_frac": a.maths_frac, "explain_frac": a.explain_frac}
     with open(os.path.join(a.out, "meta.json"), "w") as f:
         json.dump(meta, f, indent=1)
     print(f"encoded in {time.time() - t0:.0f}s:", json.dumps(meta))

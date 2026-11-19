@@ -278,6 +278,35 @@ def swap_dv01(notional, T, freq, rate, comp="continuous"):
     return notional * _annuity(T, freq, rate, comp)[0] * 0.0001
 
 
+# ------------------------------------------------------------------ FX and cross-currency
+
+@tool
+def fx_forward(spot, rd, rf, T, comp="continuous"):
+    """Forward FX rate by covered interest parity: the price, in domestic currency, of one unit of
+    foreign currency delivered at T. rd and rf are the domestic and foreign zero rates."""
+    _need(spot > 0, "spot must be positive")
+    _need(T > 0, "T must be positive")
+    return spot * discount_factor(rf, T, comp) / discount_factor(rd, T, comp)
+
+
+@tool
+def fixed_leg_pv(notional, rate, T, freq, zero, comp="continuous"):
+    """Value of one fixed leg of a cross-currency swap: the coupons plus the notional paid back at
+    the end, discounted on that currency's flat zero curve."""
+    _need(notional > 0, "notional must be positive")
+    annuity, last = _annuity(T, freq, zero, comp)
+    return notional * (rate * annuity + last)
+
+
+@tool
+def ccs_par_rate(rate_for, T, freq, zero_dom, zero_for, comp="continuous"):
+    """Domestic fixed rate that makes a new fixed-for-fixed cross-currency swap (notionals exchanged
+    at today's spot at the start, and back at the end) worth zero, against the foreign fixed rate."""
+    a_dom, last_dom = _annuity(T, freq, zero_dom, comp)
+    a_for, last_for = _annuity(T, freq, zero_for, comp)
+    return (rate_for * a_for + last_for - last_dom) / a_dom
+
+
 # ------------------------------------------------------------------ risk
 
 @tool
@@ -348,6 +377,10 @@ if __name__ == "__main__":
         assert abs(x - want) <= tol, (x, want)
 
     near(call("QL.european_option(call, S=100, K=105, T=0.5, r=0.07, vol=0.2)"), 5.0090, 5e-4)
+    near(fx_forward(88, 0.06, 0.04, 1), 88 * math.exp(0.02), 1e-9)                       # covered interest parity
+    near(fixed_leg_pv(100, 0.05, 3, 1, 0.05, "annual"), 100, 1e-9)                        # coupon = rate: worth par
+    par = ccs_par_rate(0.04, 5, 2, 0.065, 0.04)                                            # new swap is worth zero
+    near(fixed_leg_pv(88, par, 5, 2, 0.065) - 88 * fixed_leg_pv(1, 0.04, 5, 2, 0.04), 0, 1e-9)
     near(call("QL.american_option(put, S=50, K=52, T=1, r=0.06, vol=0.3, steps=500)"), 5.819, 5e-4)
     near(call("QL.european_option(put, S=50, K=52, T=1, r=0.06, vol=0.3)"), 5.4004, 5e-4)
     c = european_option("call", 100, 95, 0.75, 0.05, 0.25, 0.01)

@@ -446,6 +446,12 @@
       const [an, last] = annuity(T, f, rate, c), v = nt * ((1 - last) - fixed * an);
       return side === "payer" ? v : -v; }],
     swap_dv01: [["notional", "T", "freq", "rate", "comp"], { comp: "continuous" }, (nt, T, f, rate, c) => nt * annuity(T, f, rate, c)[0] * 1e-4],
+    fx_forward: [["spot", "rd", "rf", "T", "comp"], { comp: "continuous" }, (spot, rd, rf, T, c) => {
+      need(spot > 0, "spot must be positive"); need(T > 0, "T must be positive"); return spot * growth(rd, T, c) / growth(rf, T, c); }],
+    fixed_leg_pv: [["notional", "rate", "T", "freq", "zero", "comp"], { comp: "continuous" }, (nt, rate, T, f, z, c) => {
+      need(nt > 0, "notional must be positive"); const [an, last] = annuity(T, f, z, c); return nt * (rate * an + last); }],
+    ccs_par_rate: [["rate_for", "T", "freq", "zero_dom", "zero_for", "comp"], { comp: "continuous" }, (rf, T, f, zd, zf, c) => {
+      const [ad, ld] = annuity(T, f, zd, c), [af, lf] = annuity(T, f, zf, c); return (rf * af + lf - ld) / ad; }],
     var_normal: [["value", "vol", "conf", "days"], { days: 1 }, (val, vol, conf, days) => { need(conf > 0.5 && conf < 1 && vol > 0 && days > 0, "need 0.5 < conf < 1, vol > 0, days > 0"); return val * vol * Math.sqrt(days) * invN(conf); }],
     es_normal: [["value", "vol", "conf", "days"], { days: 1 }, (val, vol, conf, days) => { need(conf > 0.5 && conf < 1 && vol > 0 && days > 0, "need 0.5 < conf < 1, vol > 0, days > 0"); return val * vol * Math.sqrt(days) * pdf(invN(conf)) / (1 - conf); }],
     var_historical: [["returns", "conf", "value"], { value: 1 }, (rets, conf, val) => {

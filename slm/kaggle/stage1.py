@@ -14,9 +14,10 @@ import sys
 
 CODE = {}
 WORK = os.environ.get("SLM_WORK", "/kaggle/working")
-PROBLEMS = os.environ.get("SLM_PROBLEMS", "400000")
-TOKENS = os.environ.get("SLM_TOKENS", "2.4e8")
-MINUTES = os.environ.get("SLM_MINUTES", "75")
+PROBLEMS = os.environ.get("SLM_PROBLEMS", "600000")
+TOKENS = os.environ.get("SLM_TOKENS", "4e8")
+SEQ = os.environ.get("SLM_SEQ", "1024")
+MINUTES = os.environ.get("SLM_MINUTES", "80")
 
 os.makedirs(f"{WORK}/slm", exist_ok=True)
 for name, b64 in CODE.items():
@@ -48,7 +49,7 @@ gpus = torch.cuda.device_count()
 print("GPUs:", [torch.cuda.get_device_name(i) for i in range(gpus)], flush=True)
 data, run = f"{WORK}/data", f"{WORK}/run"
 sh([sys.executable, "prepare.py", "--out", data, "--problems", PROBLEMS, "--test", "500", "--workers", str(os.cpu_count())])
-train = ["train.py", "--data", data, "--preset", "15m", "--seq", "768", "--micro-batch", "32", "--grad-accum", "1",
+train = ["train.py", "--data", data, "--preset", "15m", "--seq", SEQ, "--micro-batch", "32", "--grad-accum", "1",
          "--lr", "1.5e-3", "--warmup", "300", "--tokens", TOKENS, "--minutes", MINUTES, "--eval-every", "200",
          "--log-every", "50", "--save-every-min", "15", "--out", run] + (["--compile"] if gpus else [])
 if gpus > 1:
