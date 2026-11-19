@@ -1,4 +1,4 @@
-# Our own quant model, built from scratch
+# Ganit (गणित): our own quant model, built from scratch
 
 A small language model that reads quant questions in plain English, writes out its
 thinking (goal, known values, plan, steps, a check) and gets every exact number from
@@ -45,8 +45,24 @@ problems from parts ──► our tokenizer ──► our GPT ──► training
 | `model.py` | Our GPT: RMSNorm, rotary positions, SwiGLU, tied embeddings, KV cache |
 | `train.py` | Training on CPU, one GPU or several (torchrun), with resume across sessions |
 | `solve.py` | Answers a question with live tools, or grades the test sets |
-| `chat.py` | A chat page in your browser that shows the thinking and tool calls live |
+| `chat.py` | Ganit's chat app: pick a model, watch the thinking and tool calls live |
 | `kaggle/` | Builds self-contained Kaggle kernels: the speed test and Stage 1 training |
+
+## Use Ganit (chat app)
+
+Two models: **Ganit-100M** (Stage 2, best at new wording) and **Ganit-15M** (Stage 1, fastest).
+
+1. Get the code: clone this repo (or download it as a ZIP from GitHub) and open the `slm` folder.
+2. Install: `pip install torch numpy tokenizers QuantLib`
+   (on Windows, the small CPU build of torch: `pip install torch --index-url https://download.pytorch.org/whl/cpu`).
+3. Get the model files (too big for git) from your Kaggle notebooks' **Output** tab:
+   - `slm-stage-2-b` → `run-practice/model.pt` and `tokenizer.json` → save into `runs/ganit-100m/`
+   - `slm-stage-1` → `run/model.pt` and `tokenizer.json` → save into `runs/ganit-15m/`
+4. Run `python chat.py` and open http://localhost:8000
+
+On a 4-core laptop CPU, Ganit-100M writes about 58 tokens a second, so most answers take 5–10 seconds.
+Ask questions worded like the examples in the app; outside the kinds of problems it practised it can
+be wrong, which is why every step and tool result is shown.
 
 ## Run it on a laptop
 
