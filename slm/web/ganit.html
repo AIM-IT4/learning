@@ -11,7 +11,7 @@
   --accent: #7aa7ff; --accent-strong: #4f86f7; --accent-soft: rgba(122, 167, 255, .12); --on-accent: #ffffff;
   --brand: #ff9f43; --brand-ink: #1a0f02; --user: #1b2b4b; --user-ink: #e8edf5; --answer: #14233d; --answer-line: #2c4a7a;
   --calc: #ffb592; --calc-bg: #3a2419; --calc-line: #d95926; --ql: #7fe0b8; --ql-bg: #12291f; --ql-line: #199e70;
-  --think-bg: rgba(122, 167, 255, .06); --bad: #ff8a80; --track: #1c2638; --shadow: 0 10px 40px -20px rgba(0, 0, 0, .8);
+  --think-bg: rgba(122, 167, 255, .06); --bad: #ff8a80; --track: #1c2638; --warn-bg: #241a0b; --warn-line: #8a5a14; --warn-ink: #ffc46b; --shadow: 0 10px 40px -20px rgba(0, 0, 0, .8);
   --display: "Space Grotesk", "Segoe UI", system-ui, sans-serif; --body: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
   --mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace; --deva: "Noto Sans Devanagari", "Mangal", sans-serif;
   color-scheme: dark;
@@ -21,13 +21,13 @@
   --accent: #2563eb; --accent-strong: #1d4ed8; --accent-soft: rgba(37, 99, 235, .08); --on-accent: #ffffff;
   --brand: #f08c24; --brand-ink: #1a0f02; --user: #e7efff; --user-ink: #0f172a; --answer: #eef4ff; --answer-line: #bcd0f7;
   --calc: #9c3a14; --calc-bg: #fde8dd; --calc-line: #eb6834; --ql: #0b6b48; --ql-bg: #e3f6ee; --ql-line: #1baf7a;
-  --think-bg: rgba(37, 99, 235, .04); --bad: #b42318; --track: #e6ebf3; --shadow: 0 10px 40px -24px rgba(15, 23, 42, .35); color-scheme: light; } }
+  --think-bg: rgba(37, 99, 235, .04); --bad: #b42318; --track: #e6ebf3; --warn-bg: #fff6e6; --warn-line: #f0b450; --warn-ink: #8a4b00; --shadow: 0 10px 40px -24px rgba(15, 23, 42, .35); color-scheme: light; } }
 :root[data-theme="light"] {
   --bg: #f4f6fb; --panel: #ffffff; --panel-2: #f8fafd; --line: #e1e7f0; --ink: #0f172a; --ink-2: #475569; --ink-3: #64748b;
   --accent: #2563eb; --accent-strong: #1d4ed8; --accent-soft: rgba(37, 99, 235, .08); --on-accent: #ffffff;
   --brand: #f08c24; --brand-ink: #1a0f02; --user: #e7efff; --user-ink: #0f172a; --answer: #eef4ff; --answer-line: #bcd0f7;
   --calc: #9c3a14; --calc-bg: #fde8dd; --calc-line: #eb6834; --ql: #0b6b48; --ql-bg: #e3f6ee; --ql-line: #1baf7a;
-  --think-bg: rgba(37, 99, 235, .04); --bad: #b42318; --track: #e6ebf3; --shadow: 0 10px 40px -24px rgba(15, 23, 42, .35); color-scheme: light; }
+  --think-bg: rgba(37, 99, 235, .04); --bad: #b42318; --track: #e6ebf3; --warn-bg: #fff6e6; --warn-line: #f0b450; --warn-ink: #8a4b00; --shadow: 0 10px 40px -24px rgba(15, 23, 42, .35); color-scheme: light; }
 * { box-sizing: border-box; }
 html, body { height: 100%; }
 body { margin: 0; background: var(--bg); color: var(--ink); font: 400 15.5px/1.6 var(--body); }
@@ -107,6 +107,13 @@ details.think[open] summary::before { content: "▾ "; }
 .answer .k { font: 600 11.5px/1.3 var(--body); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
 .answer .v { font: 700 30px/1.15 var(--display); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
 .answer .meta { font-size: 13px; color: var(--ink-3); }
+.answer.warn { display: block; background: var(--warn-bg); border-color: var(--warn-line); }
+.answer.warn .k { color: var(--warn-ink); }
+.answer.warn .v { color: var(--ink-3); text-decoration: line-through; text-decoration-thickness: 2px; }
+.answer.warn .meta { font-size: 14px; color: var(--ink-2); margin: 4px 0 10px; max-width: 70ch; }
+.scope { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; }
+.scope span { font-size: 13px; line-height: 1.4; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); color: var(--ink-2); }
+.note { font-size: 13.5px; color: var(--ink-3); margin: 0 0 18px; max-width: 62ch; }
 .copy { border: 1px solid var(--line); background: var(--panel); border-radius: 10px; padding: 8px 12px; cursor: pointer; font-size: 13.5px; }
 .err { color: var(--bad); font-size: 14px; }
 .composer { padding: 12px max(24px, env(safe-area-inset-right, 0px)) calc(18px + env(safe-area-inset-bottom, 0px)) max(24px, env(safe-area-inset-left, 0px)); border-top: 1px solid var(--line); background: var(--bg); }
@@ -148,6 +155,9 @@ textarea { flex: 1; min-width: 0; min-height: 26px; max-height: 180px; resize: n
     <section class="hero" id="hero">
       <h1>Ask <em>Ganit</em> a quant question</h1>
       <p>Option prices and Greeks, bonds and yields, interest-rate models, swaps and risk. Give the numbers: Ganit plans the steps, calls its calculator and quant tools for every exact number, and checks its answer. It runs entirely on your device.</p>
+      <p class="label">Ganit can work out</p>
+      <div class="scope" id="scope"></div>
+      <p class="note">It can't explain ideas yet, and it hasn't learned FX or cross-currency swaps, credit or exotic products. Ask with every number it needs, worded like the examples.</p>
       <div class="load" id="load"><div class="row"><span id="loadtext">Loading Ganit-15M (about 40 MB)…</span><span id="loadpct">0%</span></div><div class="bar"><span id="loadbar"></span></div></div>
       <div class="cards" id="cards"></div>
     </section>
@@ -155,7 +165,7 @@ textarea { flex: 1; min-width: 0; min-height: 26px; max-height: 180px; resize: n
   </div>
   <div class="composer">
     <form class="box" id="form">
-      <textarea id="q" rows="1" aria-label="Your question" placeholder="Ask a quant question and give every number it needs, like the examples"></textarea>
+      <textarea id="q" rows="1" aria-label="Your question" placeholder="Ask with every number it needs"></textarea>
       <button class="send" id="send" type="submit" aria-label="Ask Ganit" disabled><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
     </form>
     <div class="hint"><span>Enter to send · Shift + Enter for a new line</span><span>Ganit-15M · 14.9M parameters · on your device</span></div>
@@ -178,6 +188,10 @@ const GROUPS = {
   "Risk": [
     ["Value at risk", "A portfolio is worth ₹1000000. Its daily volatility is 1.2%. What is its 1-day 99% value at risk, assuming normal returns?"]]
 };
+const SCOPE = ["European options", "American options", "Greeks", "Implied volatility", "Put-call parity", "Bond price", "Bond yield",
+  "Bond duration", "Zero-coupon bonds", "Rate conversion", "Forward rates", "Vasicek and CIR bonds", "Interest-rate swap rates",
+  "VaR and expected shortfall", "Everyday maths"];
+const SCOPE_HTML = `<div class="scope">${SCOPE.map((s) => `<span>${s}</span>`).join("")}</div>`;
 const $ = (s) => document.querySelector(s);
 const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 let MODEL = null, TOK = null, busy = false;
@@ -220,11 +234,18 @@ function render(st) {
   st.el.querySelector(".work").innerHTML = html + (!thinking && !st.done && !answer ? caret : "");
   const pill = st.el.querySelector(".pill");
   if (!st.done) { pill.textContent = thinking || !work ? "Thinking…" : "Working it out…"; pill.className = "pill live"; return; }
-  pill.className = "pill" + (st.end.error ? " bad" : "");
-  pill.textContent = st.end.error ? "Stopped: a tool call failed" : `Done in ${st.end.seconds} s · ${st.end.calls.length} tool call${st.end.calls.length === 1 ? "" : "s"}`;
+  // Inputs Ganit says it used that are not in the question mean it answered a different question.
+  const bad = st.end.answer !== null ? Ganit.unexplained(st.question, st.end.text || "") : [];
+  const goal = (think.match(/^Goal:\s*(.*?)\.?\s*$/m) || [])[1];
+  pill.className = "pill" + (st.end.error || bad.length ? " bad" : "");
+  pill.textContent = st.end.error ? "Stopped: a tool call failed"
+    : `Done in ${st.end.seconds} s · ` + (bad.length ? "probably misread" : `${st.end.calls.length} tool call${st.end.calls.length === 1 ? "" : "s"}`);
   const slot = st.el.querySelector(".answerslot");
-  if (st.end.answer !== null) {
-    slot.innerHTML = `<div class="answer"><div><div class="k">Answer</div><div class="v">${esc(st.end.answer)}</div><div class="meta">Ganit-15M · every number from the calculator or the quant tools</div></div><button class="copy" type="button">Copy</button></div>`;
+  if (st.end.answer !== null && bad.length) {
+    slot.innerHTML = `<div class="answer warn"><div class="k">Probably wrong</div><div class="v">${esc(st.end.answer)}</div>
+      <div class="meta">Ganit used numbers that are not in your question (${esc(bad.slice(0, 4).join(", "))}), so it most likely misread it, or the question is outside what it has learned. It can work out:</div>${SCOPE_HTML}</div>`;
+  } else if (st.end.answer !== null) {
+    slot.innerHTML = `<div class="answer"><div><div class="k">Answer</div><div class="v">${esc(st.end.answer)}</div><div class="meta">${goal ? `Ganit read this as: ${esc(goal)}` : "Every number from the calculator or the quant tools"}</div></div><button class="copy" type="button">Copy</button></div>`;
     slot.querySelector(".copy").addEventListener("click", (e) => {
       const b = e.currentTarget;
       if (navigator.clipboard) navigator.clipboard.writeText(st.end.answer).then(() => { b.textContent = "Copied"; setTimeout(() => (b.textContent = "Copy"), 1500); }).catch(() => {});
@@ -233,14 +254,22 @@ function render(st) {
 }
 async function ask(question) {
   if (busy || !MODEL || !question.trim()) return;
-  busy = true; $("#send").disabled = true;
   $("#hero").hidden = true;
   const u = document.createElement("div"); u.className = "user"; u.textContent = question;
+  if (!/\d/.test(question)) {                       // nothing to compute from: say so instead of guessing
+    const n = document.createElement("div"); n.className = "bot";
+    n.innerHTML = `<div class="bothead"><div class="avatar" aria-hidden="true">ग</div><b>Ganit-15M</b><span class="pill bad">Can't answer this</span></div>
+      <div class="answer warn"><div class="k">Ganit needs the numbers</div>
+      <div class="meta">Ganit doesn't explain ideas yet: it works out a number from the inputs you give. Ask about one of these, with every number it needs, worded like the examples:</div>${SCOPE_HTML}</div>`;
+    $("#thread").append(u, n); $("#scroll").scrollTop = $("#scroll").scrollHeight;
+    return;
+  }
+  busy = true; $("#send").disabled = true;
   const b = document.createElement("div"); b.className = "bot";
   b.innerHTML = `<div class="bothead"><div class="avatar" aria-hidden="true">ग</div><b>Ganit-15M</b><span class="pill live">Thinking…</span></div>
     <details class="think" open><summary>Thinking</summary><div class="thinkbody"></div></details><div class="work"></div><div class="answerslot"></div>`;
   $("#thread").append(u, b);
-  const st = { segs: [], el: b, done: false };
+  const st = { segs: [], el: b, done: false, question };
   const scroll = () => { const s = $("#scroll"); s.scrollTop = s.scrollHeight; };
   scroll();
   const t0 = performance.now();
@@ -328,6 +357,7 @@ const ta = $("#q");
 ta.addEventListener("input", () => { ta.style.height = "auto"; ta.style.height = Math.min(180, ta.scrollHeight) + "px"; });
 ta.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); $("#form").requestSubmit(); } });
 $("#form").addEventListener("submit", (e) => { e.preventDefault(); if (!MODEL) return; const q = ta.value; ta.value = ""; ta.style.height = "auto"; ask(q); });
+$("#scope").outerHTML = SCOPE_HTML;
 addExamples();
 load();
 </script>

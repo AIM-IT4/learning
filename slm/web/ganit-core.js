@@ -556,6 +556,34 @@
     yield { type: "end", text, answer: m ? m[1].replace(/,/g, "") : null, calls, error };
   }
 
-  const api = { Tokenizer, GPT, evaluate, fmt, qlCall, runTool, pendingCall, generate, N, invN, TOOLS };
+  // ---------- grounding: did Ganit read the question? ----------
+  // The inputs Ganit says it was given (its "Known:" line, or the first step of an everyday-maths
+  // answer) must appear in the question: as written, as a percentage or basis points turned into
+  // a decimal, or as a common constant. Inputs from nowhere mean it answered a different question.
+  const CONSTANTS = [0, 0.5, 1, 2, 3, 4, 7, 9.8, 9.81, 12, 24, 52, 60, 100, 252, 360, 365, 1000, 3600];
+  function numbersIn(s) {
+    const out = [];
+    for (const m of s.matchAll(/[A-Za-z_]?\d[\d,]*(?:\.\d+)?/g)) {
+      if (/^[A-Za-z_]/.test(m[0])) continue;               // part of a name such as d1
+      const v = parseFloat(m[0].replace(/,/g, ""));
+      if (isFinite(v)) out.push(v);
+    }
+    return out;
+  }
+  function givens(text) {
+    const known = text.match(/^Known:(.*)$/m);
+    if (known) return known[1];
+    const work = text.replace(/<think>[\s\S]*?(<\/think>|$)/, "").trim();
+    const first = work.split("\n")[0];
+    return first.includes("<<") ? first.slice(0, first.indexOf("<<")) : first;
+  }
+  function unexplained(question, text) {
+    const known = [...CONSTANTS];
+    for (const v of numbersIn(question)) known.push(v, v / 100, v / 10000);
+    const ok = (x) => known.some((k) => Math.abs(x - k) <= Math.max(1e-9, 5e-4 * Math.abs(k)));
+    return [...new Set(numbersIn(givens(text)).filter((x) => !ok(x)))];
+  }
+
+  const api = { Tokenizer, GPT, evaluate, fmt, qlCall, runTool, pendingCall, generate, N, invN, TOOLS, unexplained };
   if (typeof module !== "undefined" && module.exports) module.exports = api; else root.Ganit = api;
 })(typeof self !== "undefined" ? self : this);
