@@ -1,0 +1,325 @@
+<template>
+  <style>
+    @font-face { font-family: "Fredoka"; font-weight: 400; src: url("assets/fonts/fredoka-400.woff2"); }
+    @font-face { font-family: "Fredoka"; font-weight: 700; src: url("assets/fonts/fredoka-700.woff2"); }
+    @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
+    @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
+    #root { position: absolute; inset: 0; overflow: hidden; perspective: 2400px; perspective-origin: 540px 1150px; }
+    #s8-flip, #s8-cam, #s8-bob { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #s8-flip { transform-origin: 540px 1150px; }
+    #s8-cam { transform-origin: 540px 1000px; }
+    #s8-cv { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    .s8-t { font-family: "Fredoka", "D2QSans", "JetBrains Mono", sans-serif; font-weight: 700; color: #0b1b3a; white-space: nowrap; }
+    .s8-g { font-family: "D2QSans", "Fredoka", sans-serif; font-weight: 800; }
+    .s8-pw { position: absolute; opacity: 0; transform-origin: 50% 100%; }
+    .s8-hop { position: relative; transform-origin: 50% 100%; }
+    .s8-card { background: #ffffff; border-radius: 26px; box-shadow: 0 10px 0 #2563eb, 0 24px 36px rgba(30,64,175,0.22); }
+    .s8-map { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+    /* the machine's front face: title, display, buttons */
+    #s8-mf-t { position: absolute; left: 0; right: 0; top: 12px; text-align: center; font-size: 34px; line-height: 40px; letter-spacing: 0.03em; color: #bfdbfe; }
+    #s8-disp { position: absolute; left: 20px; right: 20px; top: 60px; height: 132px; border-radius: 16px; background: #0b1b3a;
+               box-shadow: inset 0 4px 0 rgba(0,0,0,0.35), inset 0 0 0 3px #3b82f6; }
+    #s8-d1 { position: absolute; left: 0; right: 0; top: 8px; text-align: center; font-size: 32px; line-height: 38px; color: #93c5fd; opacity: 0; }
+    #s8-d2 { position: absolute; left: 0; right: 0; top: 50px; text-align: center; font-size: 64px; line-height: 72px; color: #ffffff; }
+    #s8-d2 i { font-style: normal; color: #93c5fd; }
+    .s8-btn { position: absolute; top: 206px; width: 22px; height: 22px; border-radius: 11px; }
+    /* the price token's face */
+    #s8-tf { display: flex; align-items: center; justify-content: center; font-size: 46px; line-height: 1; color: #ffffff; }
+    #s8-tag { position: absolute; left: 0; width: 1080px; top: 1318px; display: flex; justify-content: center; padding-right: 20px; box-sizing: border-box; }
+    #s8-tagc { display: block; height: 48px; padding: 0 20px; border-radius: 24px; background: #ffffff; box-shadow: 0 6px 0 #93c5fd, 0 12px 18px rgba(30,64,175,0.18);
+               font-size: 30px; line-height: 48px; }
+    /* column boards */
+    #s8-gl { left: 605px; top: 858px; }
+    #s8-gl .s8-card { display: block; width: 190px; padding: 6px 0 10px; text-align: center; background: rgba(255,255,255,0.94); box-shadow: 0 9px 0 #93c5fd, 0 20px 30px rgba(30,64,175,0.16); }
+    #s8-gl1 { display: block; font-size: 44px; line-height: 50px; color: #2563eb; }
+    #s8-gl2 { display: block; font-size: 30px; line-height: 34px; color: #334155; }
+    #s8-bl { left: 795px; top: 786px; }
+    #s8-blc { display: block; width: 190px; padding: 6px 0 10px; text-align: center; border-radius: 26px; background: #2563eb; box-shadow: 0 10px 0 #1e40af, 0 24px 36px rgba(30,64,175,0.28); }
+    #s8-bl1 { display: block; font-size: 58px; line-height: 64px; color: #ffffff; }
+    #s8-bl2 { display: block; font-size: 30px; line-height: 34px; color: #dbeafe; }
+    /* the definition, on top */
+    #s8-defw { position: absolute; left: 0; width: 1080px; top: 616px; display: flex; justify-content: center; }
+    #s8-def { opacity: 0; transform-origin: 50% 100%; }
+    #s8-defc { display: block; padding: 10px 34px 14px; text-align: center; }
+    #s8-def1 { display: block; font-size: 34px; line-height: 42px; color: #2563eb; letter-spacing: 0.02em; }
+    #s8-def2 { display: block; font-size: 44px; line-height: 54px; }
+    /* under the stage */
+    #s8-io { left: 82px; top: 1496px; }
+    #s8-io .s8-card { display: block; padding: 10px 26px 14px; font-size: 36px; line-height: 44px; }
+    #s8-io b { color: #2563eb; }
+    #s8-nt { position: absolute; left: 86px; top: 1590px; font-size: 30px; line-height: 36px; font-weight: 400; color: #334155; opacity: 0; }
+  </style>
+  <div id="root" data-composition-id="s8" data-width="1080" data-height="1920">
+    <div id="s8-flip">
+      <div id="s8-cam">
+        <div id="s8-bob">
+          <canvas id="s8-cv" width="1080" height="1920"></canvas>
+          <div class="s8-map s8-t" id="s8-mf" data-layout-ignore>
+            <div id="s8-mf-t">BLACK–SCHOLES</div>
+            <div id="s8-disp"><div id="s8-d1">price 0.090</div><div id="s8-d2"><i class="s8-g">σ</i> = <span id="s8-sig">?</span></div></div>
+            <div class="s8-btn" style="left: 34px; background: #f59e0b;"></div>
+            <div class="s8-btn" style="left: 66px; background: #93c5fd;"></div>
+            <div class="s8-btn" style="left: 98px; background: #ffffff;"></div>
+          </div>
+          <div class="s8-map s8-t" id="s8-tf" data-layout-ignore>0.090</div>
+          <div id="s8-tag"><span class="s8-t" id="s8-tagc">90 put · simulated price</span></div>
+          <div class="s8-pw" id="s8-gl"><div class="s8-hop"><span class="s8-card s8-t"><span id="s8-gl1">15.6%</span><span id="s8-gl2">at the money</span></span></div></div>
+          <div class="s8-pw" id="s8-bl"><div class="s8-hop" id="s8-blh"><span class="s8-t" id="s8-blc"><span id="s8-bl1">20.7%</span><span id="s8-bl2">implied vol</span></span></div></div>
+          <div id="s8-defw"><div id="s8-def"><div class="s8-hop" id="s8-defh"><span class="s8-card s8-t" id="s8-defc">
+            <span id="s8-def1">IMPLIED VOL</span><span id="s8-def2">= the <span class="s8-g">σ</span> that gives the market price</span></span></div></div></div>
+          <div class="s8-pw" id="s8-io"><div class="s8-hop" id="s8-ioh"><span class="s8-card s8-t">price in → <b><span class="s8-g">σ</span> out</b></span></div></div>
+          <div class="s8-t" id="s8-nt">column height ∝ volatility · simulated, 1 month</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      /*DATA*/ const DUR = 5.59; const W = [0.16, 0.28, 0.44, 0.68, 0.98, 1.16, 1.72, 2.04, 2.28, 2.42, 2.5, 2.92, 3.34, 3.54, 3.68, 4.08, 4.3]; /*END*/
+      // words: 0 Put 1 that 2 higher 3 price 4 into 5 Black-Scholes 6 and 7 solve 8 for 9 the 10 volatility: 11 it 12 comes 13 out
+      //        14 higher. 15 That's 16 implied volatility.
+      const w = (i) => Math.max(0, W.length > i ? W[i] : 0.16 + i * 0.27);
+// ISO KIT v1: isometric toy-world drawing on a 2D canvas, matching the Flow dioramas' look.
+// Copy this block verbatim into a scene's <script> (inside its IIFE). World units: x to the right-back, y to the left-back,
+// z up. P(x, y, z) -> frame px. Visible faces of a box: top, the face at y+d (front-left) and the face at x+w (front-right).
+// Draw back to front: sort what you draw by (x + y) ascending, then z ascending (painter's order).
+const ISO = (function () {
+  const C30 = Math.cos(Math.PI / 6), S30 = 0.5;
+  const MAT = {
+    white: { top: "#ffffff", left: "#e3ebfb", right: "#c9d8f5" },
+    blue:  { top: "#7fb0ff", left: "#3b82f6", right: "#2563eb" },
+    navy:  { top: "#4f6fe0", left: "#1e40af", right: "#1e3a8a" },
+    sky:   { top: "#dbeafe", left: "#bfdbfe", right: "#93c5fd" },
+    rose:  { top: "#fda4af", left: "#f43f5e", right: "#e11d48" },
+    gold:  { top: "#fde68a", left: "#f59e0b", right: "#d97706" },
+    grey:  { top: "#f1f5f9", left: "#cbd5e1", right: "#94a3b8" },
+    wood:  { top: "#f3c58f", left: "#d99a5b", right: "#b97a3f" },
+  };
+  function make(g, ox, oy, u) {
+    const P = (x, y, z) => [ox + (x - y) * C30 * u, oy + (x + y) * S30 * u - (z || 0) * u];
+    function poly(pts, fill, stroke, lw) {
+      g.beginPath(); pts.forEach(([a, b], i) => (i ? g.lineTo(a, b) : g.moveTo(a, b))); g.closePath();
+      if (fill) { g.fillStyle = fill; g.fill(); }
+      if (stroke) { g.strokeStyle = stroke; g.lineWidth = lw || 1.5; g.stroke(); }
+    }
+    function box(x, y, z, w, d, h, mat, edge) {
+      if (h <= 0 || w <= 0 || d <= 0) return;
+      edge = edge === undefined ? "rgba(15,35,90,0.14)" : edge;
+      poly([P(x, y + d, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x, y + d, z + h)], mat.left, edge);
+      poly([P(x + w, y, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x + w, y, z + h)], mat.right, edge);
+      poly([P(x, y, z + h), P(x + w, y, z + h), P(x + w, y + d, z + h), P(x, y + d, z + h)], mat.top, edge);
+    }
+    // a soft contact shadow on the floor plane z
+    function shadow(x, y, z, w, d, a) {
+      const c = P(x + w / 2, y + d / 2, z); const rx = (w + d) * C30 * u * 0.55, ry = (w + d) * S30 * u * 0.55;
+      const gr = g.createRadialGradient(c[0], c[1], 0, c[0], c[1], rx);
+      gr.addColorStop(0, `rgba(30,64,175,${a || 0.18})`); gr.addColorStop(1, "rgba(30,64,175,0)");
+      g.save(); g.translate(c[0], c[1]); g.scale(1, ry / rx); g.translate(-c[0], -c[1]);
+      g.fillStyle = gr; g.beginPath(); g.arc(c[0], c[1], rx, 0, 6.2832); g.fill(); g.restore();
+    }
+    // the floating platform: white top slab, blue band, white band, blue base (like the dioramas), its top at z = 0
+    function platform(x, y, w, d) {
+      box(x, y, -1.5, w, d, 0.42, MAT.blue);
+      box(x, y, -1.08, w, d, 0.3, MAT.white);
+      box(x, y, -0.78, w, d, 0.28, MAT.blue);
+      box(x, y, -0.5, w, d, 0.5, MAT.white);
+    }
+    // a 2D affine matrix that maps a flat w x h DOM element onto a face given three projected corners (TL, TR, BL)
+    function faceMatrix(tl, tr, bl, w, h) {
+      const a = (tr[0] - tl[0]) / w, b = (tr[1] - tl[1]) / w, c = (bl[0] - tl[0]) / h, d = (bl[1] - tl[1]) / h;
+      return `matrix(${a.toFixed(5)},${b.toFixed(5)},${c.toFixed(5)},${d.toFixed(5)},${tl[0].toFixed(2)},${tl[1].toFixed(2)})`;
+    }
+    return { P, poly, box, shadow, platform, faceMatrix, u };
+  }
+  return { make, MAT };
+})();
+
+      const tl = gsap.timeline({ paused: true });
+      const g = document.getElementById("s8-cv").getContext("2d");
+      const U = 48, OX = 540, OY = 940;
+      const K = ISO.make(g, OX, OY, U), M = ISO.MAT, P = K.P;
+      const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+      const outBack = (p, s) => { if (p <= 0) return 0; if (p >= 1) return 1; p -= 1; return p * p * ((s + 1) * p + s) + 1; };
+      const land = (dt) => (dt < 0 ? 1 : 1 - 0.2 * Math.exp(-dt / 0.08) * Math.cos(dt * 26));
+      const hop = (t, t0, d, h) => { const p = (t - t0) / d; return p < 0 || p > 1 ? 0 : h * Math.sin(Math.PI * p); };
+
+      // boxes turned 30 degrees toward the camera (like Day 10's contract card): e along the box, n out of its front face
+      const TH = -Math.PI / 6, EX = Math.cos(TH), EY = Math.sin(TH), NX = -EY, NY = EX;
+      const ES = Math.hypot((EX - EY) * 0.8660254, (EX + EY) * 0.5);
+      function corners(c, L, T) {
+        const hx = (EX * L) / 2, hy = (EY * L) / 2, tx = (NX * T) / 2, ty = (NY * T) / 2;
+        return { FL: [c[0] - hx + tx, c[1] - hy + ty], FR: [c[0] + hx + tx, c[1] + hy + ty], BL: [c[0] - hx - tx, c[1] - hy - ty], BR: [c[0] + hx - tx, c[1] + hy - ty] };
+      }
+      function prism(c, L, T, z0, H, mat, front, ed) {
+        const q = corners(c, L, T), z1 = z0 + H; ed = ed || "rgba(15,35,90,0.18)";
+        if (H > 0) {
+          K.poly([P(q.FL[0], q.FL[1], z0), P(q.FR[0], q.FR[1], z0), P(q.FR[0], q.FR[1], z1), P(q.FL[0], q.FL[1], z1)], front || mat.left, ed);
+          K.poly([P(q.FR[0], q.FR[1], z0), P(q.BR[0], q.BR[1], z0), P(q.BR[0], q.BR[1], z1), P(q.FR[0], q.FR[1], z1)], mat.right, ed);
+        }
+        K.poly([P(q.BL[0], q.BL[1], z1), P(q.BR[0], q.BR[1], z1), P(q.FR[0], q.FR[1], z1), P(q.FL[0], q.FL[1], z1)], mat.top, ed);
+        return Object.assign(q, { z0, z1 });
+      }
+
+      // ---- beats ----
+      const tLift = w(3) - 0.12, tIn = w(4) + 0.02;                // "price into": the token lifts, arcs, drops into the slot
+      const tLit = w(5) - 0.04;                                    // "Black-Scholes": the machine lights up
+      const tSpin = w(7) - 0.04, tSet = Math.max(tSpin + 0.72, w(11) - 0.08);   // "solve": the display runs; settles on "it"
+      const tOut = w(12) - 0.06, tLandC = w(13) + 0.06;            // "comes out": a sigma cube pops out and lands
+      const tGrow = w(14) - 0.06;                                  // "higher.": the implied-vol column grows
+      const tDef = w(16) - 0.08;                                   // "implied volatility.": the definition
+
+      // ---- the Black-Scholes machine: a big navy box, its title, display and buttons on the front, a slot on top ----
+      const MCH = { c: [3.1, 6.1], L: 5.6, T: 2.6, H: 5.0 };
+      const MW = MCH.L * ES * U, MH = MCH.H * U;
+      const mf = document.getElementById("s8-mf");
+      mf.style.width = MW.toFixed(1) + "px"; mf.style.height = MH.toFixed(1) + "px";
+      const SLOT = { L: 3.2, T: 0.5 };
+      function drawMachine(t, sink) {
+        const sq = land(t - tIn - 0.1) * land(t - tLit - 0.2);
+        const jig = t > tSpin && t < tSet ? 0.035 * Math.abs(Math.sin((t - tSpin) * 46)) : 0;
+        const z0 = hop(t, tLit, 0.24, 0.28) + jig, H = MCH.H * sq, sx = 1 + (1 - sq) * 0.4;
+        K.shadow(MCH.c[0] - 3.2, MCH.c[1] - 3.2, 0, 6.4, 6.4, 0.24);
+        const b = prism(MCH.c, MCH.L * sx, MCH.T * sx, z0, H, M.navy, "#1e40af");
+        // the slot: a dark slit on the top, along the machine
+        const s = corners(MCH.c, SLOT.L, SLOT.T), zt = z0 + H;
+        K.poly([P(s.BL[0], s.BL[1], zt), P(s.BR[0], s.BR[1], zt), P(s.FR[0], s.FR[1], zt), P(s.FL[0], s.FL[1], zt)], "#0b1b3a", "#93c5fd", 3);
+        mf.style.transform = K.faceMatrix(P(b.FL[0], b.FL[1], b.z1), P(b.FR[0], b.FR[1], b.z1), P(b.FL[0], b.FL[1], b.z0), MW, MH);
+        return zt;
+      }
+
+      // ---- the price token: the 90 put's simulated price 0.090, a blue block that drops into the slot ----
+      const TOK = { c0: [7.4, 7.4], L: 2.6, T: 0.5, H: 1.4 };
+      const TW = TOK.L * ES * U, THp = TOK.H * U;
+      const tf = document.getElementById("s8-tf");
+      tf.style.width = TW.toFixed(1) + "px"; tf.style.height = THp.toFixed(1) + "px";
+      function tokenState(t, zt) {
+        const a = tLift, b = a + 0.12, c = tIn - 0.1, d = tIn + 0.1;
+        let x = TOK.c0[0], y = TOK.c0[1], z = 0;
+        if (t >= a && t < b) z = 0.9 * Math.sin((Math.PI / 2) * (t - a) / (b - a));
+        else if (t >= b && t < c) {
+          const p = (t - b) / (c - b), e = p * p * (3 - 2 * p);
+          x = TOK.c0[0] + (MCH.c[0] - TOK.c0[0]) * e; y = TOK.c0[1] + (MCH.c[1] - TOK.c0[1]) * e;
+          z = 0.9 + (zt + 1.5 - 0.9) * p + 3.2 * Math.sin(Math.PI * p);
+        } else if (t >= c) {
+          x = MCH.c[0]; y = MCH.c[1];
+          const p = clamp((t - c) / (d - c), 0, 1); z = zt + 1.5 - (TOK.H + 1.7) * p * p;
+        }
+        return { x, y, z, inside: t >= c };
+      }
+      function drawToken(t, zt) {
+        const s = tokenState(t, zt);
+        const z0 = s.z, z1 = s.z + TOK.H, zc = s.inside ? Math.max(z0, zt) : z0;
+        if (z1 <= zc + 0.01) { tf.style.opacity = "0"; return; }
+        if (!s.inside) K.shadow(s.x - 1.2, s.y - 1.2, 0, 2.4, 2.4, 0.22 * clamp(1 - z0 / 7, 0.2, 1));
+        const b = prism([s.x, s.y], TOK.L, TOK.T, zc, z1 - zc, M.blue, "#2563eb");
+        tf.style.opacity = "1";
+        tf.style.transform = K.faceMatrix(P(b.FL[0], b.FL[1], z1), P(b.FR[0], b.FR[1], z1), P(b.FL[0], b.FL[1], z0), TW, THp);
+        const cut = clamp((zc - z0) / TOK.H, 0, 1) * THp;
+        tf.style.clipPath = cut > 0.5 ? "inset(0px 0px " + cut.toFixed(1) + "px 0px)" : "none";
+      }
+
+      // ---- the volatility columns, height in proportion to vol (1 unit = 4%): 15.6% at the money (ghost), 20.7% implied ----
+      const PER = 4, CWD = 1.2;
+      const GH = { c: [6.985, 3.015], h: 15.6 / PER }, BL = { c: [9.21, 0.79], h: 20.7 / PER };
+      function dashedBox(x, y, wd, d, h, color, alpha) {
+        g.save(); g.globalAlpha = alpha; g.setLineDash([9, 7]); g.lineWidth = 3; g.strokeStyle = color; g.lineJoin = "round";
+        const pts = [P(x, y + d, 0), P(x + wd, y + d, 0), P(x + wd, y, 0), P(x + wd, y, h), P(x, y, h), P(x, y + d, h)];
+        g.beginPath(); pts.forEach(([a, b], i) => (i ? g.lineTo(a, b) : g.moveTo(a, b))); g.closePath(); g.stroke();
+        g.beginPath(); const m = P(x + wd, y + d, h); g.moveTo(...P(x, y + d, h)); g.lineTo(...m); g.lineTo(...P(x + wd, y, h));
+        g.moveTo(...m); g.lineTo(...P(x + wd, y + d, 0)); g.stroke(); g.restore();
+      }
+      function drawGhost(t) {
+        const k = outBack((t - 0.4) / 0.5, 1.6), a = clamp((t - 0.4) / 0.2, 0, 1); if (a <= 0) return;
+        const x = GH.c[0] - CWD / 2, y = GH.c[1] - CWD / 2, h = GH.h * k;
+        K.shadow(x, y, 0, CWD, CWD, 0.12 * a);
+        g.save(); g.globalAlpha = 0.4 * a; K.box(x, y, 0, CWD, CWD, h, { top: "#dbeafe", left: "#bfdbfe", right: "#93c5fd" }, null); g.restore();
+        dashedBox(x, y, CWD, CWD, h, "#3b82f6", 0.9 * a);
+      }
+      // the sigma cube that comes out of the machine, and the implied-vol column that grows from it
+      const OUT0 = [MCH.c[0] + EX * (MCH.L / 2 + 0.5), MCH.c[1] + EY * (MCH.L / 2 + 0.5)];
+      function drawSigma(t) {
+        if (t < tOut) return;
+        const x = BL.c[0] - CWD / 2, y = BL.c[1] - CWD / 2;
+        if (t < tLandC) {
+          const p = (t - tOut) / (tLandC - tOut), e = p;
+          const cx = OUT0[0] + (BL.c[0] - OUT0[0]) * e, cy = OUT0[1] + (BL.c[1] - OUT0[1]) * e, cz = 2.0 * (1 - p) + 3.0 * Math.sin(Math.PI * p);
+          K.shadow(cx - 0.5, cy - 0.5, 0, 1, 1, 0.18);
+          K.box(cx - 0.35, cy - 0.35, cz, 0.7, 0.7, 0.7, M.blue);
+          return;
+        }
+        const k = outBack((t - tGrow) / 0.46, 1.9), sq = land(t - tLandC);
+        const h = Math.max(0.7 * sq, BL.h * k);
+        K.shadow(x - 0.2, y - 0.2, 0, CWD + 0.4, CWD + 0.4, 0.22);
+        K.box(x, y, 0, CWD, CWD, h, M.blue);
+        // a white seam at the 15.6% level: how much higher than at the money
+        if (h > GH.h + 0.05) {
+          g.save(); g.setLineDash([10, 8]); g.strokeStyle = "rgba(255,255,255,0.9)"; g.lineWidth = 3;
+          const a = P(x, y + CWD, GH.h), b2 = P(x + CWD, y + CWD, GH.h), c2 = P(x + CWD, y, GH.h);
+          g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(b2[0], b2[1]); g.lineTo(c2[0], c2[1]); g.stroke(); g.restore();
+        }
+      }
+
+      // ---- the display: the price in, then a bisection on the Black-Scholes put price (S 100, K 90, 1 month, r 0) ----
+      // sigma tried (%): each guess too high or too low halves the range; it settles where BS(sigma) = 0.090
+      const TRIES = ["25.0%", "17.5%", "21.3%", "19.4%", "20.3%", "20.8%", "20.5%", "20.7%"];
+      const sigEl = document.getElementById("s8-sig");
+      function display(t) {
+        let txt = "?";
+        if (t >= tSpin) { const i = Math.min(TRIES.length - 1, Math.floor((t - tSpin) / ((tSet - tSpin) / TRIES.length))); txt = TRIES[i]; }
+        if (sigEl.textContent !== txt) sigEl.textContent = txt;
+      }
+
+      function floorShadow() {
+        const cx = OX + 10, cy = OY + 10 * U + 1.5 * U + 60, rx = 450, ry = 116;
+        g.save(); g.translate(cx, cy); g.scale(1, ry / rx);
+        const gr = g.createRadialGradient(0, 0, 0, 0, 0, rx);
+        gr.addColorStop(0, "rgba(37,99,235,0.28)"); gr.addColorStop(0.55, "rgba(37,99,235,0.11)"); gr.addColorStop(1, "rgba(37,99,235,0)");
+        g.fillStyle = gr; g.beginPath(); g.arc(0, 0, rx, 0, 6.2832); g.fill(); g.restore();
+      }
+
+      const st = { t: 0 }, bob = document.getElementById("s8-bob");
+      function draw() {
+        const t = st.t;
+        g.clearRect(0, 0, 1080, 1920);
+        bob.style.transform = "translateY(" + (-8 * Math.sin((2 * Math.PI * (t + 0.2)) / 3)).toFixed(2) + "px)";
+        floorShadow();
+        K.shadow(0, 0, -1.6, 10, 10, 0.2);
+        K.platform(0, 0, 10, 10);
+        // painter's order: the machine (left), the ghost and the implied-vol column (right), the token (front, or above the slot)
+        const zt = drawMachine(t);
+        drawGhost(t);
+        drawSigma(t);
+        drawToken(t, zt);
+        display(t);
+      }
+
+      // ---- camera: the cube flip in, a slow push; no flip out (the tile cascade covers this cut) ----
+      tl.fromTo("#s8-flip", { rotationY: -90, scale: 0.94 }, { rotationY: 0, scale: 1, duration: 0.36, ease: "power3.out" }, 0);
+      tl.fromTo("#s8-cam", { scale: 1 }, { scale: 1.04, duration: DUR, ease: "sine.inOut" }, 0);
+
+      const pop = (sel, t, d) => tl.fromTo(sel, { opacity: 0, scale: 0.3, y: 26 }, { opacity: 1, scale: 1, y: 0, duration: d || 0.4, ease: "back.out(2.8)" }, t);
+      const bump = (sel, t, h, sq) => {
+        tl.fromTo(sel, { y: 0 }, { y: -h, duration: 0.11, ease: "power2.out", immediateRender: false }, t);
+        tl.fromTo(sel, { y: -h }, { y: 0, duration: 0.12, ease: "power2.in", immediateRender: false }, t + 0.11);
+        tl.fromTo(sel, { scaleY: sq, scaleX: 1 + (1 - sq) * 0.6 }, { scaleY: 1, scaleX: 1, duration: 0.3, ease: "back.out(3)", immediateRender: false }, t + 0.23);
+      };
+      // the token's tag leaves with it; the ghost's board comes with the ghost
+      tl.fromTo("#s8-tag", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.26, ease: "power2.out" }, 0.3);
+      tl.fromTo("#s8-tag", { opacity: 1 }, { opacity: 0, duration: 0.16, immediateRender: false }, tLift + 0.06);
+      pop("#s8-gl", 0.62, 0.36);
+      // "into Black-Scholes": the price shows on the display, the title lights, price in -> sigma out
+      tl.fromTo("#s8-d1", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.2, ease: "back.out(2.4)" }, tIn + 0.12);
+      tl.fromTo("#s8-mf-t", { color: "#bfdbfe" }, { color: "#ffffff", duration: 0.12 }, tLit);
+      pop("#s8-io", tLit + 0.1, 0.36);
+      // "higher.": the implied-vol board rides in on its column; "That's implied volatility.": the definition, then the note
+      pop("#s8-bl", tGrow + 0.16, 0.36);
+      bump("#s8-blh", w(15) - 0.02, 12, 0.86);
+      pop("#s8-def", tDef, 0.4);
+      tl.fromTo("#s8-nt", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, tGrow + 0.3);
+
+      tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: draw }, 0);
+      draw();
+      window.__timelines["s8"] = tl;
+    })();
+  </script>
+</template>

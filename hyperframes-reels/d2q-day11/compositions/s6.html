@@ -1,0 +1,361 @@
+<template>
+  <style>
+    @font-face { font-family: "Fredoka"; font-weight: 400; src: url("assets/fonts/fredoka-400.woff2"); }
+    @font-face { font-family: "Fredoka"; font-weight: 700; src: url("assets/fonts/fredoka-700.woff2"); }
+    @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
+    @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
+    #root { position: absolute; inset: 0; overflow: hidden; perspective: 2400px; perspective-origin: 540px 1150px; }
+    #s6-flip, #s6-cam, #s6-bob { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #s6-flip { transform-origin: 540px 1150px; }
+    #s6-cam { transform-origin: 590px 1010px; }
+    #s6-cv { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    .s6-t { font-family: "Fredoka", "D2QSans", "JetBrains Mono", sans-serif; font-weight: 700; color: #0b1b3a; white-space: nowrap; }
+    .s6-pw { position: absolute; opacity: 0; transform-origin: 50% 100%; }
+    .s6-hop { position: relative; transform-origin: 50% 100%; }
+    .s6-card { background: #ffffff; border-radius: 26px; box-shadow: 0 10px 0 #2563eb, 0 24px 36px rgba(30,64,175,0.22); }
+    .s6-card.s6-r { box-shadow: 0 10px 0 #e11d48, 0 24px 36px rgba(159,18,57,0.22); }
+    .s6-g { font-family: "D2QSans", "Fredoka", sans-serif; font-weight: 800; }
+    /* the same axis labels and curve label as s5 */
+    .s6-tk { position: absolute; top: 1196px; width: 130px; margin-left: -65px; text-align: center; font-size: 30px; line-height: 34px;
+            text-shadow: 0 0 6px #ffffff, 0 0 3px #ffffff, 0 0 2px #ffffff; }
+    .s6-tk.s6-b { color: #2563eb; }
+    #s6-lab { left: 712px; top: 836px; opacity: 1; }
+    #s6-lab .s6-card { padding: 8px 22px 12px; }
+    .s6-l1 { display: block; font-size: 34px; line-height: 42px; }
+    .s6-l1 b { color: #2563eb; }
+    #s6-bs { left: 712px; top: 958px; opacity: 1; }
+    #s6-bsc { display: block; padding: 8px 18px 10px; border-radius: 24px; background: #1e3a8a; box-shadow: 0 9px 0 #0b1b3a, 0 22px 32px rgba(15,23,42,0.25); text-align: center; }
+    #s6-bs1 { display: block; font-size: 30px; line-height: 38px; letter-spacing: 0.03em; color: #ffffff; }
+    #s6-bs2 { display: block; font-size: 30px; line-height: 34px; color: #bfdbfe; }
+    #s6-nt { position: absolute; left: 84px; top: 1672px; font-size: 30px; line-height: 36px; font-weight: 400; color: #334155; }
+    /* the crash day's block face (mapped onto the rose block every frame) */
+    #s6-bf { position: absolute; left: 0; top: 0; transform-origin: 0 0; opacity: 0; color: #ffffff; text-align: center; }
+    #s6-bf1 { position: absolute; left: 0; right: 0; top: 12px; font-size: 30px; line-height: 34px; letter-spacing: 0.05em; color: #ffe4e6; }
+    #s6-bf2 { position: absolute; left: 0; right: 0; top: 46px; font-size: 46px; line-height: 50px; }
+    /* IT HAPPENED: a rose stamp over the block */
+    #s6-stw { position: absolute; left: 92px; top: 986px; width: 380px; height: 92px; display: flex; justify-content: center; }
+    #s6-st { opacity: 0; transform-origin: 50% 50%; }
+    #s6-sti { display: block; height: 84px; line-height: 72px; padding: 0 26px; border: 6px solid #e11d48; border-radius: 22px; background: #ffffff;
+              box-shadow: 0 8px 0 #9f1239, 0 20px 30px rgba(159,18,57,0.25); color: #e11d48; font-size: 50px; letter-spacing: 0.04em; transform-origin: 50% 50%; }
+    /* the fat-tailed curve's label, by its spike */
+    #s6-fl { left: 236px; top: 792px; }
+    #s6-fl .s6-card { padding: 8px 20px 12px; text-align: center; }
+    #s6-f1 { display: block; font-size: 30px; line-height: 36px; letter-spacing: 0.04em; color: #e11d48; }
+    #s6-f2 { display: block; font-size: 32px; line-height: 38px; }
+    /* the left tail, zoomed: a small chart on a card under the stage */
+    #s6-zm { left: 80px; top: 1488px; }
+    #s6-zmc { position: relative; width: 452px; height: 226px; }
+    #s6-z1 { position: absolute; left: 24px; top: 8px; font-size: 30px; line-height: 36px; color: #e11d48; letter-spacing: 0.05em; }
+    #s6-zcv { position: absolute; left: 24px; top: 48px; width: 404px; height: 132px; }
+    .s6-zt { position: absolute; top: 182px; width: 110px; margin-left: -55px; text-align: center; font-size: 30px; line-height: 34px; }
+    /* a tag on the right tail */
+    #s6-tg { position: absolute; left: 806px; top: 1076px; opacity: 0; transform-origin: 50% 100%; }
+    #s6-tgc { position: relative; display: block; height: 48px; padding: 0 18px; border-radius: 24px; background: #e11d48; box-shadow: 0 6px 0 #9f1239, 0 14px 22px rgba(159,18,57,0.22);
+              font-size: 30px; line-height: 48px; color: #ffffff; }
+    #s6-tgc svg { position: absolute; left: 50%; margin-left: -14px; top: 52px; width: 28px; height: 16px; overflow: visible; }
+    /* top: how much more often */
+    #s6-oftw { position: absolute; left: 0; width: 1080px; top: 616px; display: flex; justify-content: center; padding-left: 60px; box-sizing: border-box; }
+    #s6-oft { opacity: 0; transform-origin: 50% 100%; }
+    #s6-oftc { display: flex; align-items: center; gap: 14px; height: 100px; padding: 0 30px; border-radius: 28px; background: #ffffff;
+               box-shadow: 0 10px 0 #e11d48, 0 24px 36px rgba(159,18,57,0.22); }
+    #s6-oftc span { font-size: 36px; line-height: 100px; }
+    #s6-x97 { display: inline-block; font-size: 66px; line-height: 100px; color: #e11d48; transform-origin: 50% 70%; }
+    #s6-ill { position: absolute; left: 672px; top: 724px; opacity: 0; transform-origin: 50% 0%; }
+    #s6-illc { display: block; height: 46px; padding: 0 18px; border-radius: 23px; background: #ffe4e6; font-size: 30px; line-height: 46px; color: #9f1239; }
+  </style>
+  <div id="root" data-composition-id="s6" data-width="1080" data-height="1920">
+    <div id="s6-flip">
+      <div id="s6-cam">
+        <div id="s6-bob">
+          <canvas id="s6-cv" width="1080" height="1920"></canvas>
+          <div class="s6-t s6-tk" id="s6-tk0" style="left: 286px;">−5%</div>
+          <div class="s6-t s6-tk s6-b" id="s6-tk1" style="left: 519px;">−1.26%</div>
+          <div class="s6-t s6-tk" id="s6-tk2" style="left: 600px;">0</div>
+          <div class="s6-t s6-tk s6-b" id="s6-tk3" style="left: 681px;">+1.26%</div>
+          <div class="s6-t s6-tk" id="s6-tk4" style="left: 906px;">+5%</div>
+          <div class="s6-pw" id="s6-lab"><div class="s6-hop"><div class="s6-card s6-t">
+            <span class="s6-l1">normal curve</span><span class="s6-l1">sd <b>1.26%</b> a day</span></div></div></div>
+          <div class="s6-pw" id="s6-bs"><div class="s6-hop"><div class="s6-t" id="s6-bsc">
+            <span id="s6-bs1">BLACK–SCHOLES</span><span id="s6-bs2">assumes this</span></div></div></div>
+          <div class="s6-t" id="s6-nt">x: one day's move · height: how often</div>
+          <div class="s6-t" id="s6-bf" data-layout-ignore><div id="s6-bf1">19 OCT 1987</div><div id="s6-bf2">−20.47%</div></div>
+          <div id="s6-stw"><div id="s6-st"><span class="s6-t" id="s6-sti">IT HAPPENED</span></div></div>
+          <div class="s6-pw" id="s6-fl"><div class="s6-hop" id="s6-flh"><div class="s6-card s6-r s6-t">
+            <span id="s6-f1">ILLUSTRATIVE</span><span id="s6-f2">same 1.26% spread,</span><span id="s6-f2b" class="s6-l1" style="font-size: 32px; line-height: 38px;">fatter tails</span></div></div></div>
+          <div class="s6-pw" id="s6-zm"><div class="s6-hop" id="s6-zmh"><div class="s6-card s6-r s6-t" id="s6-zmc">
+            <div id="s6-z1">LEFT TAIL ×25</div>
+            <canvas id="s6-zcv" width="404" height="132"></canvas>
+            <div class="s6-zt" style="left: 24px; margin-left: -10px; text-align: left;">−5%</div>
+            <div class="s6-zt" style="left: 293px;">−4%</div>
+            <div class="s6-zt" style="left: 428px; margin-left: -96px; text-align: right;">−3.5%</div>
+          </div></div></div>
+          <div id="s6-oftw"><div id="s6-oft"><div class="s6-hop" id="s6-ofth"><div class="s6-t" id="s6-oftc">
+            <span>days worse than −4<span class="s6-g">σ</span>:</span><b id="s6-x97">×97</b><span>more often</span></div></div></div></div>
+          <div id="s6-ill"><span class="s6-t" id="s6-illc">illustrative</span></div>
+          <div id="s6-tg"><span class="s6-t" id="s6-tgc">tail<svg viewBox="0 0 28 16"><path d="M0 0 L28 0 L14 15 Z" fill="#9f1239" /></svg></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      /*DATA*/ const DUR = 4.08; const W = [0.16, 0.44, 0.54, 0.88, 1.14, 1.48, 1.64, 2.34, 2.7, 2.92, 3.14, 3.32]; /*END*/
+      // words: 0 But 1 it 2 did. 3 Real 4 returns 5 have 6 fat tails: 7 crashes 8 come 9 far 10 more 11 often.
+      const w = (i) => Math.max(0, W.length > i ? W[i] : 0.16 + i * 0.32);
+// ISO KIT v1: isometric toy-world drawing on a 2D canvas, matching the Flow dioramas' look.
+// Copy this block verbatim into a scene's <script> (inside its IIFE). World units: x to the right-back, y to the left-back,
+// z up. P(x, y, z) -> frame px. Visible faces of a box: top, the face at y+d (front-left) and the face at x+w (front-right).
+// Draw back to front: sort what you draw by (x + y) ascending, then z ascending (painter's order).
+const ISO = (function () {
+  const C30 = Math.cos(Math.PI / 6), S30 = 0.5;
+  const MAT = {
+    white: { top: "#ffffff", left: "#e3ebfb", right: "#c9d8f5" },
+    blue:  { top: "#7fb0ff", left: "#3b82f6", right: "#2563eb" },
+    navy:  { top: "#4f6fe0", left: "#1e40af", right: "#1e3a8a" },
+    sky:   { top: "#dbeafe", left: "#bfdbfe", right: "#93c5fd" },
+    rose:  { top: "#fda4af", left: "#f43f5e", right: "#e11d48" },
+    gold:  { top: "#fde68a", left: "#f59e0b", right: "#d97706" },
+    grey:  { top: "#f1f5f9", left: "#cbd5e1", right: "#94a3b8" },
+    wood:  { top: "#f3c58f", left: "#d99a5b", right: "#b97a3f" },
+  };
+  function make(g, ox, oy, u) {
+    const P = (x, y, z) => [ox + (x - y) * C30 * u, oy + (x + y) * S30 * u - (z || 0) * u];
+    function poly(pts, fill, stroke, lw) {
+      g.beginPath(); pts.forEach(([a, b], i) => (i ? g.lineTo(a, b) : g.moveTo(a, b))); g.closePath();
+      if (fill) { g.fillStyle = fill; g.fill(); }
+      if (stroke) { g.strokeStyle = stroke; g.lineWidth = lw || 1.5; g.stroke(); }
+    }
+    function box(x, y, z, w, d, h, mat, edge) {
+      if (h <= 0 || w <= 0 || d <= 0) return;
+      edge = edge === undefined ? "rgba(15,35,90,0.14)" : edge;
+      poly([P(x, y + d, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x, y + d, z + h)], mat.left, edge);
+      poly([P(x + w, y, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x + w, y, z + h)], mat.right, edge);
+      poly([P(x, y, z + h), P(x + w, y, z + h), P(x + w, y + d, z + h), P(x, y + d, z + h)], mat.top, edge);
+    }
+    // a soft contact shadow on the floor plane z
+    function shadow(x, y, z, w, d, a) {
+      const c = P(x + w / 2, y + d / 2, z); const rx = (w + d) * C30 * u * 0.55, ry = (w + d) * S30 * u * 0.55;
+      const gr = g.createRadialGradient(c[0], c[1], 0, c[0], c[1], rx);
+      gr.addColorStop(0, `rgba(30,64,175,${a || 0.18})`); gr.addColorStop(1, "rgba(30,64,175,0)");
+      g.save(); g.translate(c[0], c[1]); g.scale(1, ry / rx); g.translate(-c[0], -c[1]);
+      g.fillStyle = gr; g.beginPath(); g.arc(c[0], c[1], rx, 0, 6.2832); g.fill(); g.restore();
+    }
+    // the floating platform: white top slab, blue band, white band, blue base (like the dioramas), its top at z = 0
+    function platform(x, y, w, d) {
+      box(x, y, -1.5, w, d, 0.42, MAT.blue);
+      box(x, y, -1.08, w, d, 0.3, MAT.white);
+      box(x, y, -0.78, w, d, 0.28, MAT.blue);
+      box(x, y, -0.5, w, d, 0.5, MAT.white);
+    }
+    // a 2D affine matrix that maps a flat w x h DOM element onto a face given three projected corners (TL, TR, BL)
+    function faceMatrix(tl, tr, bl, w, h) {
+      const a = (tr[0] - tl[0]) / w, b = (tr[1] - tl[1]) / w, c = (bl[0] - tl[0]) / h, d = (bl[1] - tl[1]) / h;
+      return `matrix(${a.toFixed(5)},${b.toFixed(5)},${c.toFixed(5)},${d.toFixed(5)},${tl[0].toFixed(2)},${tl[1].toFixed(2)})`;
+    }
+    return { P, poly, box, shadow, platform, faceMatrix, u };
+  }
+  return { make, MAT };
+})();
+      const tl = gsap.timeline({ paused: true });
+      const g = document.getElementById("s6-cv").getContext("2d");
+      // the same set as s5: U 44, the platform 10 x 11.5, the normal wall at x + y = 9 ... 10, the floor axis at 11.3
+      const U = 44, OX = 600, OY = 940;
+      const K = ISO.make(g, OX, OY, U), M = ISO.MAT, P = K.P;
+      const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+      const outBack = (p, s) => { if (p <= 0) return 0; if (p >= 1) return 1; p -= 1; return p * p * ((s + 1) * p + s) + 1; };
+      const land = (dt) => (dt < 0 ? 1 : 1 - 0.2 * Math.exp(-dt / 0.08) * Math.cos(dt * 26));
+      const mix = (a, b, k) => { const A = parseInt(a.slice(1), 16), B = parseInt(b.slice(1), 16);
+        const c = [16, 8, 0].map((sh) => Math.round(((A >> sh) & 255) * (1 - k) + ((B >> sh) & 255) * k));
+        return "#" + c.map((v) => v.toString(16).padStart(2, "0")).join(""); };
+      const mixMat = (m0, m1, k) => ({ top: mix(m0.top, m1.top, k), left: mix(m0.left, m1.left, k), right: mix(m0.right, m1.right, k) });
+      // ---- the two curves of daily moves, x = -5% ... +5% step 0.05 (symmetric, half stored) ----
+      // bell.normal: normal, sd 1.26%. bell.fat: illustrative fat-tailed curve (Student-t, 3 degrees of freedom) with the same 1.26% spread.
+      const NH = [0.00012,0.00014,0.00016,0.00019,0.00022,0.00026,0.0003,0.00035,0.0004,0.00047,0.00054,0.00062,0.00071,0.00082,0.00094,0.00107,0.00122,0.00139,0.00159,0.00181,0.00205,0.00232,0.00263,0.00297,0.00335,0.00377,0.00424,0.00476,0.00534,0.00598,0.00668,0.00745,0.0083,0.00923,0.01025,0.01137,0.01258,0.0139,0.01534,0.0169,0.01859,0.02042,0.02239,0.02451,0.02679,0.02924,0.03186,0.03466,0.03765,0.04083,0.04421,0.0478,0.05159,0.0556,0.05983,0.06427,0.06894,0.07383,0.07894,0.08427,0.08982,0.09558,0.10156,0.10774,0.11411,0.12068,0.12741,0.13432,0.14137,0.14856,0.15587,0.16329,0.17078,0.17834,0.18594,0.19356,0.20118,0.20877,0.2163,0.22375,0.23109,0.2383,0.24534,0.2522,0.25884,0.26523,0.27136,0.27719,0.2827,0.28787,0.29267,0.29708,0.30109,0.30466,0.3078,0.31048,0.31269,0.31441,0.31565,0.3164,0.31665];
+      const FH = [0.0018,0.00187,0.00194,0.00202,0.0021,0.00218,0.00227,0.00236,0.00246,0.00256,0.00267,0.00278,0.0029,0.00303,0.00316,0.0033,0.00344,0.0036,0.00376,0.00393,0.00412,0.00431,0.00451,0.00473,0.00496,0.0052,0.00545,0.00573,0.00602,0.00632,0.00665,0.007,0.00737,0.00776,0.00818,0.00862,0.0091,0.00961,0.01015,0.01074,0.01136,0.01202,0.01274,0.0135,0.01432,0.01521,0.01616,0.01717,0.01827,0.01945,0.02073,0.0221,0.02358,0.02519,0.02692,0.02879,0.03082,0.03302,0.0354,0.03798,0.04078,0.04383,0.04713,0.05073,0.05463,0.05888,0.06351,0.06854,0.07402,0.07998,0.08646,0.09351,0.10117,0.1095,0.11853,0.12832,0.13892,0.15036,0.1627,0.17597,0.19018,0.20537,0.22153,0.23863,0.25663,0.27547,0.29503,0.31518,0.33574,0.35648,0.37715,0.39743,0.417,0.43549,0.45253,0.46774,0.48077,0.49127,0.49899,0.50371,0.5053];
+      const dN = (i) => NH[i <= 100 ? i : 200 - i], dF = (i) => FH[i <= 100 ? i : 200 - i];
+      const PXP = 64, DXY = PXP / (0.8660254 * U), HS = 5 / 0.31665;          // same scale as s5: normal peak = 5 units
+      const CB = 9.0, CF = 10.0, RB = 10.2, RF = 10.8, CA = 11.3, TAIL = 2.5 * 1.26;  // the tail regions: beyond +/-2.5 sd
+      const at = (s, c, z) => P((c + DXY * s) / 2, (c - DXY * s) / 2, z);
+      // ---- beats ----
+      const tLand = w(2), tFall = tLand - 0.26;              // "did.": the crash block slams onto the left end
+      const tStamp = tLand + 0.06;
+      const G1 = w(6) - 0.1;                                 // "fat tails:": the fat-tailed curve rises in front
+      const tFl = w(6) + 0.2;
+      const tZm = w(7) - 0.08;                               // "crashes": the left tail, zoomed
+      const tOft = w(9) - 0.06, tX = w(10) - 0.02;           // "far more often": x97
+
+      const L1 = 0.05 * DXY / Math.SQRT2;
+      const ROSE_DEEP = { top: "#e11d48", left: "#be123c", right: "#9f1239" };
+      const BODY_N = { mat: M.blue, face: ["#4b8df8", "#2563eb"] }, TAIL_N = { mat: M.rose, face: ["#fb7185", "#e11d48"] };
+      const BODY_F = { mat: M.rose, face: ["#fb7185", "#e11d48"] }, TAIL_F = { mat: ROSE_DEEP, face: ["#be123c", "#9f1239"] };
+      // a curve wall: front face, a ribbon along the top shaded by slope, white front edge; its tails (beyond 2.5 sd) shaded rose by tk
+      function wall(dens, cb, cf, gr0, body, tail, tk, t) {
+        if (gr0(0, t) <= 0) return;
+        const pts = [];
+        for (let i = 0; i <= 200; i++) {
+          const s = -5 + i * 0.05, h = HS * dens(i) * gr0(s, t);
+          pts.push({ s, h, b: at(s, cb, h), f: at(s, cf, h), f0: at(s, cf, 0) });
+        }
+        const segs = [[-5, -TAIL, true], [-TAIL, TAIL, false], [TAIL, 5, true]];
+        const tm = mixMat(body.mat, tail.mat, tk), tf0 = mix(body.face[0], tail.face[0], tk), tf1 = mix(body.face[1], tail.face[1], tk);
+        segs.forEach(([a, b, tail]) => {
+          const seg = pts.filter((p) => p.s >= a - 1e-9 && p.s <= b + 1e-9);
+          if (seg.length < 2) return;
+          const outline = seg.map((p) => p.f).concat(seg.slice().reverse().map((p) => p.f0));
+          const top = Math.min(...seg.map((p) => p.f[1])), bot = seg[0].f0[1];
+          const gr = g.createLinearGradient(0, Math.min(top, bot - 4), 0, bot);
+          const fc = tail ? [tf0, tf1] : body.face;
+          gr.addColorStop(0, fc[0]); gr.addColorStop(1, fc[1]);
+          K.poly(outline, gr);
+        });
+        for (let i = 0; i < pts.length - 1; i++) {
+          const p = pts[i], q = pts[i + 1], sm = (p.s + q.s) / 2, m = Math.abs(sm) > TAIL ? tm : body.mat;
+          const slope = (q.h - p.h) / L1, k = clamp(Math.abs(slope) / 2.6, 0, 1) * 0.75;
+          const col = mix(m.top, slope > 0 ? m.left : m.right, k);
+          K.poly([p.b, q.b, q.f, p.f], col, col, 1);
+        }
+        g.lineWidth = 2; g.strokeStyle = "rgba(255,255,255,0.6)";
+        g.beginPath(); pts.forEach((p, i) => (i ? g.lineTo(p.f[0], p.f[1]) : g.moveTo(p.f[0], p.f[1]))); g.stroke();
+        g.lineWidth = 1.5; g.strokeStyle = "rgba(15,35,90,0.16)";
+        g.beginPath(); pts.forEach((p, i) => (i ? g.lineTo(p.b[0], p.b[1]) : g.moveTo(p.b[0], p.b[1]))); g.stroke();
+        return pts;
+      }
+      const growN = () => 1;                                                  // the normal wall stands from the first frame (as s5 ends)
+      const growF = (s, t) => outBack((t - G1 - Math.abs(s) * 0.045) / 0.5, 1.7);
+      const tailK = (t) => clamp((t - G1 - 0.3) / 0.3, 0, 1);                // the normal curve's tails turn rose as the fat curve arrives
+      function sigmaLines() {
+        [-1.26, 1.26].forEach((s) => {
+          const i = Math.round((s + 5) / 0.05), h = HS * dN(i);
+          const a = at(s, CF, h), b = at(s, CF, 0);
+          g.lineWidth = 3; g.strokeStyle = "rgba(255,255,255,0.8)"; g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); g.stroke();
+        });
+      }
+      function drawAxis() {
+        const l = at(-5, CA, 0), r = at(5, CA, 0);
+        g.lineWidth = 3; g.strokeStyle = "#1e3a8a"; g.lineCap = "round"; g.beginPath(); g.moveTo(l[0], l[1]); g.lineTo(r[0], r[1]); g.stroke();
+        [-5, -1.26, 0, 1.26, 5].forEach((s) => {
+          const p0 = at(s, CA - 0.25, 0), p1 = at(s, CA + 0.25, 0);
+          g.lineWidth = Math.abs(s) === 1.26 ? 4 : 3; g.strokeStyle = Math.abs(s) === 1.26 ? "#2563eb" : "#1e3a8a";
+          g.beginPath(); g.moveTo(p0[0], p0[1]); g.lineTo(p1[0], p1[1]); g.stroke();
+        });
+      }
+
+      // ---- the crash day: a rose block turned toward the camera (like Day 10's contract card), slamming onto the left end ----
+      const TH = -Math.PI / 6, EX = Math.cos(TH), EY = Math.sin(TH), NX = -EY, NY = EX;
+      const ES = Math.hypot((EX - EY) * 0.8660254, (EX + EY) * 0.5);
+      const BLK = { c: [2.2, 10.0], L: 4.0, T: 1.0, H: 2.4 };
+      const BW = BLK.L * ES * U, BH = BLK.H * U;
+      const bf = document.getElementById("s6-bf");
+      bf.style.width = BW.toFixed(1) + "px"; bf.style.height = BH.toFixed(1) + "px";
+      function prism(c, L, T, z0, H, mat, front) {
+        const hx = (EX * L) / 2, hy = (EY * L) / 2, tx = (NX * T) / 2, ty = (NY * T) / 2, z1 = z0 + H, ed = "rgba(127,29,29,0.22)";
+        const FL = [c[0] - hx + tx, c[1] - hy + ty], FR = [c[0] + hx + tx, c[1] + hy + ty];
+        const BL = [c[0] - hx - tx, c[1] - hy - ty], BR = [c[0] + hx - tx, c[1] + hy - ty];
+        K.poly([P(FL[0], FL[1], z0), P(FR[0], FR[1], z0), P(FR[0], FR[1], z1), P(FL[0], FL[1], z1)], front || mat.left, ed);
+        K.poly([P(FR[0], FR[1], z0), P(BR[0], BR[1], z0), P(BR[0], BR[1], z1), P(FR[0], FR[1], z1)], mat.right, ed);
+        K.poly([P(BL[0], BL[1], z1), P(BR[0], BR[1], z1), P(FR[0], FR[1], z1), P(FL[0], FL[1], z1)], mat.top, ed);
+        return { FL, FR, z0, z1 };
+      }
+      function drawBlock(t) {
+        if (t < tFall) { bf.style.opacity = "0"; return; }
+        let z = 0;
+        if (t < tLand) { const p = (t - tFall) / (tLand - tFall); z = 10 * (1 - p * p); }
+        const sq = land(t - tLand), sx = 1 + (1 - sq) * 0.45;
+        const sh = clamp(1 - z / 10, 0.2, 1);
+        const pc = P(BLK.c[0], BLK.c[1], 0);
+        g.save(); g.translate(pc[0], pc[1]); g.scale(1, 0.32);
+        const gr = g.createRadialGradient(0, 0, 0, 0, 0, 150 * sh);
+        gr.addColorStop(0, `rgba(30,64,175,${0.3 * sh})`); gr.addColorStop(1, "rgba(30,64,175,0)");
+        g.fillStyle = gr; g.beginPath(); g.arc(0, 0, 150 * sh, 0, 6.2832); g.fill(); g.restore();
+        const b = prism(BLK.c, BLK.L * sx, BLK.T * sx, z, BLK.H * sq, M.rose, "#f43f5e");
+        bf.style.opacity = "1";
+        bf.style.transform = K.faceMatrix(P(b.FL[0], b.FL[1], b.z1), P(b.FR[0], b.FR[1], b.z1), P(b.FL[0], b.FL[1], b.z0), BW, BH);
+      }
+
+      // ---- the zoomed left tail (-5% ... -3.5%, where the fat-tailed curve is above the normal one), both curves at 25x the wall's height scale ----
+      const zg = document.getElementById("s6-zcv").getContext("2d");
+      const ZW = 404, ZHt = 132, ZB = ZHt - 2, ZPX = ZW / 1.5, ZH = HS * U * 25, ZN = 30;   // px per 1%; px per unit of density; points
+      function drawZoom(t) {
+        const k = outBack((t - tZm - 0.1) / 0.45, 1.6);
+        zg.clearRect(0, 0, ZW, ZHt);
+        zg.fillStyle = "#f4f7fe"; zg.fillRect(0, 0, ZW, ZHt);
+        zg.strokeStyle = "#dbe5f7"; zg.lineWidth = 2;
+        [ZPX / 2, ZPX, ZPX * 1.5].forEach((x) => { zg.beginPath(); zg.moveTo(x, 0); zg.lineTo(x, ZB); zg.stroke(); });
+        if (k > 0) {
+          const pts = (dens) => { const a = []; for (let i = 0; i <= ZN; i++) a.push([i * 0.05 * ZPX, ZB - dens(i) * ZH * k]); return a; };
+          const fillA = (a, fill) => { zg.beginPath(); zg.moveTo(0, ZB); a.forEach(([x, y]) => zg.lineTo(x, y)); zg.lineTo(ZW, ZB); zg.closePath(); zg.fillStyle = fill; zg.fill(); };
+          const lineA = (a, col, lw) => { zg.beginPath(); a.forEach(([x, y], i) => (i ? zg.lineTo(x, y) : zg.moveTo(x, y))); zg.strokeStyle = col; zg.lineWidth = lw; zg.lineJoin = "round"; zg.lineCap = "round"; zg.stroke(); };
+          const F = pts(dF), N = pts(dN);
+          fillA(F, "rgba(244,63,94,0.9)");                   // fat-tailed: rose area, behind
+          fillA(N, "#3b82f6");                               // normal: blue area, in front
+          lineA(N, "#1e40af", 4);
+          lineA(F, "#be123c", 5);                            // the fat-tailed curve's line, over both
+        }
+        zg.strokeStyle = "#1e3a8a"; zg.lineWidth = 3; zg.beginPath(); zg.moveTo(0, ZB + 0.5); zg.lineTo(ZW, ZB + 0.5); zg.stroke();
+      }
+
+      function floorShadow() {
+        const cx = OX - 20, cy = OY + 11 * U + 1.5 * U + 40, rx = 470, ry = 120;
+        g.save(); g.translate(cx, cy); g.scale(1, ry / rx);
+        const gr = g.createRadialGradient(0, 0, 0, 0, 0, rx);
+        gr.addColorStop(0, "rgba(37,99,235,0.26)"); gr.addColorStop(0.55, "rgba(37,99,235,0.1)"); gr.addColorStop(1, "rgba(37,99,235,0)");
+        g.fillStyle = gr; g.beginPath(); g.arc(0, 0, rx, 0, 6.2832); g.fill(); g.restore();
+      }
+
+      const st = { t: 0 }, bob = document.getElementById("s6-bob");
+      function draw() {
+        const t = st.t;
+        g.clearRect(0, 0, 1080, 1920);
+        bob.style.transform = "translateY(" + (-8 * Math.sin((2 * Math.PI * (t + 0.4 + 5.54)) / 3)).toFixed(2) + "px)";
+        floorShadow();
+        K.shadow(0, 0, -1.6, 10, 11.5, 0.2);
+        K.platform(0, 0, 10, 11.5);
+        K.shadow(1.6, 1.6, 0, 7.2, 7.2, 0.12);
+        wall(dN, CB, CF, growN, BODY_N, TAIL_N, tailK(t), t);
+        sigmaLines();
+        wall(dF, RB, RF, growF, BODY_F, TAIL_F, 1, t);
+        drawAxis();
+        drawBlock(t);
+        drawZoom(t);
+      }
+
+      // ---- camera: the cube flip in, a slow push; no flip out (the tile cascade covers this cut) ----
+      tl.fromTo("#s6-flip", { rotationY: -90, scale: 0.94 }, { rotationY: 0, scale: 1, duration: 0.36, ease: "power3.out" }, 0);
+      tl.fromTo("#s6-cam", { scale: 1 }, { scale: 1.04, duration: DUR, ease: "sine.inOut" }, 0);
+      // the landing jolts the set
+      tl.fromTo("#s6-cam", { y: 0 }, { y: 9, duration: 0.05, ease: "power2.out" }, tLand);
+      tl.fromTo("#s6-cam", { y: 9 }, { y: 0, duration: 0.32, ease: "back.out(3)", immediateRender: false }, tLand + 0.05);
+      // the -5% label is under the block once it lands
+      tl.fromTo("#s6-tk0", { opacity: 1 }, { opacity: 0, duration: 0.08 }, tLand - 0.04);
+
+      const pop = (sel, t, d) => tl.fromTo(sel, { opacity: 0, scale: 0.3, y: 26 }, { opacity: 1, scale: 1, y: 0, duration: d || 0.4, ease: "back.out(2.8)" }, t);
+      const hop = (sel, t, h, sq) => {
+        tl.fromTo(sel, { y: 0 }, { y: -h, duration: 0.11, ease: "power2.out", immediateRender: false }, t);
+        tl.fromTo(sel, { y: -h }, { y: 0, duration: 0.12, ease: "power2.in", immediateRender: false }, t + 0.11);
+        tl.fromTo(sel, { scaleY: sq, scaleX: 1 + (1 - sq) * 0.6 }, { scaleY: 1, scaleX: 1, duration: 0.3, ease: "back.out(3)", immediateRender: false }, t + 0.23);
+      };
+      // IT HAPPENED: the stamp thumps down over the block, then an ink squash
+      tl.fromTo("#s6-st", { opacity: 0, scale: 2.1, rotation: -16 }, { opacity: 1, scale: 1, rotation: -6, duration: 0.14, ease: "power3.in" }, tStamp);
+      tl.fromTo("#s6-sti", { scaleX: 1, scaleY: 1 }, { scaleX: 1.12, scaleY: 0.84, duration: 0.06, ease: "power2.out", immediateRender: false }, tStamp + 0.14);
+      tl.fromTo("#s6-sti", { scaleX: 1.12, scaleY: 0.84 }, { scaleX: 1, scaleY: 1, duration: 0.3, ease: "back.out(3)", immediateRender: false }, tStamp + 0.2);
+      // "fat tails:": the rose curve's label
+      pop("#s6-fl", tFl, 0.38);
+      // the normal curve keeps its label; the Black-Scholes tag steps aside for the fat-tailed curve
+      tl.fromTo("#s6-bs", { opacity: 1, scale: 1 }, { opacity: 0, scale: 0.4, duration: 0.2, ease: "power2.in" }, G1 + 0.04);
+      tl.fromTo("#s6-tg", { opacity: 0, scale: 0.3, y: 20 }, { opacity: 1, scale: 1, y: 0, duration: 0.32, ease: "back.out(2.8)" }, G1 + 0.42);
+      // "crashes": the note gives way to the zoomed tail
+      tl.fromTo("#s6-nt", { opacity: 1 }, { opacity: 0, duration: 0.14 }, tZm - 0.06);
+      pop("#s6-zm", tZm, 0.4);
+      // "far more often": x97
+      pop("#s6-oft", tOft, 0.38);
+      tl.fromTo("#s6-ill", { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.24, ease: "back.out(2.4)" }, tOft + 0.2);
+      tl.fromTo("#s6-x97", { scale: 1 }, { scale: 1.22, duration: 0.1, ease: "power2.out", immediateRender: false }, tX);
+      tl.fromTo("#s6-x97", { scale: 1.22 }, { scale: 1, duration: 0.3, ease: "back.out(3)", immediateRender: false }, tX + 0.1);
+      hop("#s6-ofth", w(11) - 0.02, 10, 0.9);
+
+      tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: draw }, 0);
+      draw();
+      window.__timelines["s6"] = tl;
+    })();
+  </script>
+</template>

@@ -1,0 +1,327 @@
+<template>
+  <style>
+    @font-face { font-family: "Fredoka"; font-weight: 400; src: url("assets/fonts/fredoka-400.woff2"); }
+    @font-face { font-family: "Fredoka"; font-weight: 700; src: url("assets/fonts/fredoka-700.woff2"); }
+    @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
+    @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
+    #root { position: absolute; inset: 0; overflow: hidden; perspective: 2400px; perspective-origin: 540px 1150px; }
+    #s13-flip, #s13-cam, #s13-bob { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #s13-flip { transform-origin: 540px 1150px; }
+    #s13-cam { transform-origin: 540px 1000px; }
+    #s13-cv { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    .s13-t { font-family: "Fredoka", "D2QSans", "JetBrains Mono", sans-serif; font-weight: 700; color: #0b1b3a; white-space: nowrap; }
+    /* strike pills (the same set as s1, s11, s12) */
+    .s13-k { position: absolute; left: 0; top: 0; width: 80px; margin-left: -40px; height: 46px; border-radius: 23px; background: #ffffff;
+             box-shadow: 0 6px 0 #2563eb, 0 12px 18px rgba(30,64,175,0.2); display: flex; align-items: center; justify-content: center;
+             font-size: 31px; line-height: 1; transform-origin: 50% 100%; }
+    .s13-k i { font-style: normal; font-size: 22px; color: #2563eb; margin-right: 3px; }
+    /* implied-vol values riding on the risen columns (bottom centre of the wrapper = anchor) */
+    .s13-vw { position: absolute; left: 0; top: 0; width: 160px; height: 56px; margin-left: -80px; margin-top: -56px; display: flex; justify-content: center; align-items: flex-end; }
+    .s13-v { height: 50px; padding: 0 15px; border-radius: 25px; background: #ffffff; box-shadow: 0 7px 0 #2563eb, 0 14px 22px rgba(30,64,175,0.2);
+             font-size: 36px; line-height: 50px; transform-origin: 50% 100%; opacity: 0; }
+    .s13-v.r { box-shadow: 0 7px 0 #e11d48, 0 14px 22px rgba(159,18,57,0.22); color: #e11d48; }
+    /* the header */
+    #s13-hd { position: absolute; right: 70px; top: 606px; padding: 10px 28px 12px; border-radius: 26px; background: #ffffff;
+              box-shadow: 0 9px 0 #2563eb, 0 20px 30px rgba(30,64,175,0.2); transform-origin: 50% 100%; opacity: 0; text-align: right; }
+    #s13-hd b { display: block; font-size: 36px; line-height: 42px; font-weight: 700; }
+    #s13-hd span { display: block; font-size: 30px; line-height: 36px; font-weight: 400; color: #334155; }
+    /* the bell's label: flips from "normal returns" to "fat tails · illustrative" */
+    #s13-blw { position: absolute; left: 60px; top: 1612px; width: 420px; height: 62px; }
+    .s13-bf { position: absolute; left: 0; top: 0; width: 420px; height: 62px; display: flex; justify-content: center; transform-origin: 50% 50%; }
+    .s13-bl { display: flex; align-items: baseline; gap: 10px; height: 56px; padding: 0 24px; border-radius: 28px; background: #ffffff;
+              box-shadow: 0 7px 0 #2563eb, 0 14px 22px rgba(30,64,175,0.2); font-size: 34px; line-height: 56px; }
+    .s13-bl.r { box-shadow: 0 7px 0 #e11d48, 0 14px 22px rgba(159,18,57,0.22); }
+    .s13-bl.r b { color: #e11d48; font-weight: 700; }
+    .s13-bl.r span { font-weight: 400; font-size: 30px; color: #334155; }
+    #s13-bf1 { opacity: 0; }
+    /* the scale note (as s12) */
+    #s13-note { position: absolute; left: 446px; top: 1500px; padding: 9px 22px 11px; border-radius: 22px; background: rgba(255,255,255,0.9); box-shadow: 0 6px 0 #bfdbfe; }
+    #s13-note span { display: block; font-size: 30px; line-height: 36px; font-weight: 400; color: #334155; }
+    #s13-note b { display: block; font-size: 32px; line-height: 40px; font-weight: 700; }
+    #s13-note b i { font-style: normal; color: #2563eb; }
+    /* the arrow along the row, under the strike pills */
+    #s13-arw { position: absolute; left: 140px; top: 1226px; width: 800px; height: 80px; }
+    #s13-arl { position: absolute; left: 0; top: 20px; width: 800px; height: 40px; transform-origin: 100% 50%; opacity: 0; }
+    #s13-arl svg { display: block; }
+    #s13-arp { position: absolute; left: 0; right: 0; top: 2px; height: 76px; display: flex; justify-content: center; }
+    #s13-ar { display: inline-flex; align-items: center; gap: 10px; height: 68px; padding: 0 28px; border-radius: 34px; background: #ffffff;
+              box-shadow: 0 9px 0 #2563eb, 0 20px 30px rgba(30,64,175,0.22); font-size: 40px; transform-origin: 50% 100%; opacity: 0; }
+    #s13-ar svg { display: block; flex: none; }
+    #s13-ar .b { color: #2563eb; }
+  </style>
+  <div id="root" data-composition-id="s13" data-width="1080" data-height="1920">
+    <div id="s13-flip">
+      <div id="s13-cam">
+        <div id="s13-bob">
+          <canvas id="s13-cv" width="1080" height="1920"></canvas>
+          <div id="s13-ks" data-layout-ignore></div>
+          <div id="s13-vs" data-layout-ignore></div>
+          <div id="s13-blw">
+            <div class="s13-bf" id="s13-bf0"><div class="s13-t s13-bl">normal returns</div></div>
+            <div class="s13-bf" id="s13-bf1"><div class="s13-t s13-bl r"><b>fat tails</b><span>· illustrative</span></div></div>
+          </div>
+          <div id="s13-arw">
+            <div id="s13-arl"><svg width="800" height="40" viewBox="0 0 800 40"><path d="M790 20 H22" fill="none" stroke="#1e3a8a" stroke-width="8" stroke-linecap="round" /><path d="M40 5 L16 20 L40 35" fill="none" stroke="#1e3a8a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" /></svg></div>
+            <div id="s13-arp"><div class="s13-t" id="s13-ar"><span>strike</span><svg width="30" height="42" viewBox="0 0 30 42"><path d="M15 5 V35 M5 25 L15 36 L25 25" fill="none" stroke="#0b1b3a" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" /></svg><svg width="50" height="30" viewBox="0 0 50 30"><path d="M5 15 H43 M31 5 L44 15 L31 25" fill="none" stroke="#64748b" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" /></svg><span class="b">implied vol</span><svg width="30" height="42" viewBox="0 0 30 42"><path d="M15 37 V7 M5 17 L15 6 L25 17" fill="none" stroke="#2563eb" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" /></svg></div></div>
+          </div>
+        </div>
+        <div class="s13-t" id="s13-hd"><b>implied vol by strike</b><span>simulated · 1 month</span></div>
+        <div class="s13-t" id="s13-note"><span>column height</span><b>1 unit = <i>4%</i> vol</b></div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      /*DATA*/ const DUR = 5.5; const W = [0.16, 0.42, 0.76, 0.92, 1.68, 1.76, 2.18, 2.38, 2.68, 3.02, 3.26, 3.54, 3.74, 4.08, 4.3, 4.4, 4.66]; /*END*/
+      // words: 0 Real 1 returns 2 have 3 fat tails, 4 so 5 low-strike 6 puts 7 cost 8 more, 9 and 10 implied 11 vol 12 rises 13 as 14 the 15 strike 16 falls.
+      const w = (i) => Math.max(0, W.length > i ? W[i] : 0.16 + i * 0.3);
+// ISO KIT v1: isometric toy-world drawing on a 2D canvas, matching the Flow dioramas' look.
+// Copy this block verbatim into a scene's <script> (inside its IIFE). World units: x to the right-back, y to the left-back,
+// z up. P(x, y, z) -> frame px. Visible faces of a box: top, the face at y+d (front-left) and the face at x+w (front-right).
+// Draw back to front: sort what you draw by (x + y) ascending, then z ascending (painter's order).
+const ISO = (function () {
+  const C30 = Math.cos(Math.PI / 6), S30 = 0.5;
+  const MAT = {
+    white: { top: "#ffffff", left: "#e3ebfb", right: "#c9d8f5" },
+    blue:  { top: "#7fb0ff", left: "#3b82f6", right: "#2563eb" },
+    navy:  { top: "#4f6fe0", left: "#1e40af", right: "#1e3a8a" },
+    sky:   { top: "#dbeafe", left: "#bfdbfe", right: "#93c5fd" },
+    rose:  { top: "#fda4af", left: "#f43f5e", right: "#e11d48" },
+    gold:  { top: "#fde68a", left: "#f59e0b", right: "#d97706" },
+    grey:  { top: "#f1f5f9", left: "#cbd5e1", right: "#94a3b8" },
+    wood:  { top: "#f3c58f", left: "#d99a5b", right: "#b97a3f" },
+  };
+  function make(g, ox, oy, u) {
+    const P = (x, y, z) => [ox + (x - y) * C30 * u, oy + (x + y) * S30 * u - (z || 0) * u];
+    function poly(pts, fill, stroke, lw) {
+      g.beginPath(); pts.forEach(([a, b], i) => (i ? g.lineTo(a, b) : g.moveTo(a, b))); g.closePath();
+      if (fill) { g.fillStyle = fill; g.fill(); }
+      if (stroke) { g.strokeStyle = stroke; g.lineWidth = lw || 1.5; g.stroke(); }
+    }
+    function box(x, y, z, w, d, h, mat, edge) {
+      if (h <= 0 || w <= 0 || d <= 0) return;
+      edge = edge === undefined ? "rgba(15,35,90,0.14)" : edge;
+      poly([P(x, y + d, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x, y + d, z + h)], mat.left, edge);
+      poly([P(x + w, y, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x + w, y, z + h)], mat.right, edge);
+      poly([P(x, y, z + h), P(x + w, y, z + h), P(x + w, y + d, z + h), P(x, y + d, z + h)], mat.top, edge);
+    }
+    // a soft contact shadow on the floor plane z
+    function shadow(x, y, z, w, d, a) {
+      const c = P(x + w / 2, y + d / 2, z); const rx = (w + d) * C30 * u * 0.55, ry = (w + d) * S30 * u * 0.55;
+      const gr = g.createRadialGradient(c[0], c[1], 0, c[0], c[1], rx);
+      gr.addColorStop(0, `rgba(30,64,175,${a || 0.18})`); gr.addColorStop(1, "rgba(30,64,175,0)");
+      g.save(); g.translate(c[0], c[1]); g.scale(1, ry / rx); g.translate(-c[0], -c[1]);
+      g.fillStyle = gr; g.beginPath(); g.arc(c[0], c[1], rx, 0, 6.2832); g.fill(); g.restore();
+    }
+    // the floating platform: white top slab, blue band, white band, blue base (like the dioramas), its top at z = 0
+    function platform(x, y, w, d) {
+      box(x, y, -1.5, w, d, 0.42, MAT.blue);
+      box(x, y, -1.08, w, d, 0.3, MAT.white);
+      box(x, y, -0.78, w, d, 0.28, MAT.blue);
+      box(x, y, -0.5, w, d, 0.5, MAT.white);
+    }
+    // a 2D affine matrix that maps a flat w x h DOM element onto a face given three projected corners (TL, TR, BL)
+    function faceMatrix(tl, tr, bl, w, h) {
+      const a = (tr[0] - tl[0]) / w, b = (tr[1] - tl[1]) / w, c = (bl[0] - tl[0]) / h, d = (bl[1] - tl[1]) / h;
+      return `matrix(${a.toFixed(5)},${b.toFixed(5)},${c.toFixed(5)},${d.toFixed(5)},${tl[0].toFixed(2)},${tl[1].toFixed(2)})`;
+    }
+    return { P, poly, box, shadow, platform, faceMatrix, u };
+  }
+  return { make, MAT };
+})();
+
+      const tl = gsap.timeline({ paused: true });
+      const g = document.getElementById("s13-cv").getContext("2d");
+      const K = ISO.make(g, 540, 900, 48), M = ISO.MAT, P = K.P;
+      const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+      const outBack = (p, s) => { if (p <= 0) return 0; if (p >= 1) return 1; p -= 1; return p * p * ((s + 1) * p + s) + 1; };
+      const hx = (s) => [1, 3, 5].map((i) => parseInt(s.substr(i, 2), 16));
+      const mixA = (a, b, k) => a.map((v, i) => v + (b[i] - v) * k);
+      const rgb = (c) => "rgb(" + c.map((v) => Math.round(v)).join(",") + ")";
+      const mix = (a, b, k) => rgb(mixA(hx(a), hx(b), k));
+
+      // ---- the same set as s12: the strike row, strike i at world (1 + i, 9 - i), tickets, vol columns 0.6 square ----
+      // height: 1 unit = 4% implied vol. The columns start flat at 15.6% (3.9 units) and end at the simulated one-month implied vols (model.iv_pct).
+      const KS = [80, 85, 90, 95, 100, 105, 110, 115, 120];
+      const IV = [29.7, 26.4, 20.7, 16.7, 15.6, 15.3, 15.2, 15.2, 15.1];
+      const UNIT = 4, FLAT = 15.6, CH = FLAT / UNIT;
+      const TK = 0.84, TH = 0.16, CW = 0.6;
+      const ROW = KS.map((k, i) => ({ k, i, x: 1 + i, y: 9 - i, hT: IV[i] / UNIT }));
+      // timing, on the words
+      const KM0 = w(3) - 0.04;                       // "fat tails": the small bell becomes the fat-tailed one
+      const LS = w(5) - 0.04;                        // "low-strike puts": the 80/85/90 pills hop
+      const PLK = w(7) - 0.2;                        // "cost": the flat plank pops off
+      // "cost more": 90, 85, 80 rise to their simulated heights; "rises": the rest settle onto the smile
+      ROW.forEach((r, i) => { r.R = i < 3 ? w(7) - 0.06 + (2 - i) * 0.08 : w(12) - 0.16 + (i - 3) * 0.03; r.D = i < 3 ? 0.5 : 0.42; r.S = i < 3 ? 1.8 : 2.6; });
+      const RB0 = w(12) + 0.02, RBD = clamp(w(15) - 0.12 - RB0, 0.45, 0.7);   // the smile ribbon draws on, right to left
+      const colH = (r, t) => CH + (r.hT - CH) * outBack((t - r.R) / r.D, r.S);
+
+      const ksEl = document.getElementById("s13-ks");
+      ROW.forEach((r) => {
+        const d = document.createElement("div"); d.className = "s13-k s13-t"; d.innerHTML = "<i>K</i>" + r.k; ksEl.appendChild(d); r.el = d;
+        const p = P(r.x + 0.62, r.y + 0.62, 0); d.style.left = p[0].toFixed(1) + "px"; d.style.top = (p[1] - 6).toFixed(1) + "px";
+      });
+      // value labels for the three columns that rise: 80 (rose edge, the biggest), 85, 90
+      const vsEl = document.getElementById("s13-vs");
+      const VL = [0, 1, 2].map((i) => {
+        const wrap = document.createElement("div"); wrap.className = "s13-vw";
+        const v = document.createElement("div"); v.className = "s13-v s13-t" + (i === 0 ? " r" : ""); v.id = "s13-v" + i; v.textContent = IV[i].toFixed(1) + "%";
+        wrap.appendChild(v); vsEl.appendChild(wrap);
+        return { i, wrap, dx: [-22, 18, 24][i], gap: [24, 26, 38][i] };   // up and to the right of the tops, clear of the ribbon
+      });
+
+      function ticket(r, t) {
+        const x0 = r.x - TK / 2, y0 = r.y - TK / 2;
+        K.shadow(x0 - 0.1, y0 - 0.1, 0, TK + 0.2, TK + 0.2, 0.14);
+        K.box(x0, y0, 0, TK, TK, TH, M.white, "rgba(15,35,90,0.18)");
+        K.poly([P(x0, y0, TH), P(x0 + TK, y0, TH), P(x0 + TK, y0 + 0.24, TH), P(x0, y0 + 0.24, TH)], "#3b82f6");
+        [0.46, 0.66].forEach((f) => K.poly([P(x0 + 0.14, y0 + f * TK, TH), P(x0 + TK - 0.14, y0 + f * TK, TH), P(x0 + TK - 0.14, y0 + (f + 0.08) * TK, TH), P(x0 + 0.14, y0 + (f + 0.08) * TK, TH)], "#c9d8f5"));
+      }
+      function column(r, t) {
+        const h = colH(r, t), x0 = r.x - CW / 2, y0 = r.y - CW / 2, z0 = TH, z1 = TH + h;
+        K.box(x0, y0, z0, CW, CW, h, M.blue);
+        if (r.i === 0 && t > r.R) {   // the 80 column is rose-edged once it rises
+          g.save(); g.globalAlpha = clamp((t - r.R) / 0.15, 0, 1); g.strokeStyle = "#e11d48"; g.lineWidth = 3.5; g.lineJoin = "round";
+          const A = P(x0, y0 + CW, z0), B = P(x0 + CW, y0 + CW, z0), C = P(x0 + CW, y0, z0);
+          const A1 = P(x0, y0 + CW, z1), B1 = P(x0 + CW, y0 + CW, z1), C1 = P(x0 + CW, y0, z1), D1 = P(x0, y0, z1);
+          g.beginPath(); g.moveTo(A[0], A[1]); g.lineTo(B[0], B[1]); g.lineTo(C[0], C[1]); g.lineTo(C1[0], C1[1]); g.lineTo(D1[0], D1[1]); g.lineTo(A1[0], A1[1]); g.closePath(); g.stroke();
+          g.beginPath(); g.moveTo(A1[0], A1[1]); g.lineTo(B1[0], B1[1]); g.lineTo(C1[0], C1[1]); g.moveTo(B1[0], B1[1]); g.lineTo(B[0], B[1]); g.stroke();
+          g.restore();
+        }
+      }
+      // the flat plank from s12: on "cost" it hops off the columns and fades
+      function plank(t) {
+        let z = TH + CH + 0.02, a = 1;
+        if (t > PLK) { const p = clamp((t - PLK) / 0.3, 0, 1); z += 1.3 * p - 0.4 * p * p; a = 1 - p; }
+        if (a <= 0) return;
+        const th = 0.16, o = 0.13, A = [0.55, 9.45], B = [9.45, 0.55];
+        g.globalAlpha = a;
+        K.poly([P(A[0] - o, A[1] - o, z + th), P(B[0] - o, B[1] - o, z + th), P(B[0] + o, B[1] + o, z + th), P(A[0] + o, A[1] + o, z + th)], "#ffffff", "rgba(15,35,90,0.18)");
+        K.poly([P(A[0] + o, A[1] + o, z + th), P(B[0] + o, B[1] + o, z + th), P(B[0] + o, B[1] + o, z), P(A[0] + o, A[1] + o, z)], "#c9d8f5", "rgba(15,35,90,0.18)");
+        g.globalAlpha = 1;
+      }
+      // ---- the smile: a blue ribbon through the nine column tops (monotone cubic through them), drawn on right to left ----
+      function mono(hs) {
+        const n = hs.length, dk = [], m = [];
+        for (let i = 0; i < n - 1; i++) dk.push(hs[i + 1] - hs[i]);
+        m[0] = dk[0]; m[n - 1] = dk[n - 2];
+        for (let i = 1; i < n - 1; i++) m[i] = dk[i - 1] * dk[i] <= 0 ? 0 : (dk[i - 1] + dk[i]) / 2;
+        for (let i = 0; i < n - 1; i++) {
+          if (Math.abs(dk[i]) < 1e-9) { m[i] = 0; m[i + 1] = 0; continue; }
+          const a = m[i] / dk[i], b = m[i + 1] / dk[i], q = a * a + b * b;
+          if (q > 9) { const k = 3 / Math.sqrt(q); m[i] = k * a * dk[i]; m[i + 1] = k * b * dk[i]; }
+        }
+        return (s) => {
+          if (s <= 0) return hs[0] + m[0] * s;
+          if (s >= n - 1) return hs[n - 1] + m[n - 1] * (s - n + 1);
+          const i = Math.floor(s), u = s - i, u2 = u * u, u3 = u2 * u;
+          return (2 * u3 - 3 * u2 + 1) * hs[i] + (u3 - 2 * u2 + u) * m[i] + (-2 * u3 + 3 * u2) * hs[i + 1] + (u3 - u2) * m[i + 1];
+        };
+      }
+      function ribbon(t) {
+        const p = clamp((t - RB0) / RBD, 0, 1); if (p <= 0) return;
+        const e = 1 - Math.pow(1 - p, 2.2), sR = 8.32, sL = -0.32, head = sR - (sR - sL) * e;
+        const H = mono(ROW.map((r) => colH(r, t))), zAt = (s) => TH + H(s) - 0.03;
+        const o = 0.17, th = 0.15, ss = [];
+        for (let s = sR; s > head; s -= 0.08) ss.push(s);
+        ss.push(head);
+        for (let j = 0; j < ss.length - 1; j++) {
+          const a = ss[j], b = ss[j + 1], za = zAt(a), zb = zAt(b), xa = 1 + a, ya = 9 - a, xb = 1 + b, yb = 9 - b;
+          K.poly([P(xa + o, ya + o, za + th), P(xb + o, yb + o, zb + th), P(xb + o, yb + o, zb), P(xa + o, ya + o, za)], "#1e40af", "#1e40af", 1);
+          K.poly([P(xa - o, ya - o, za + th), P(xb - o, yb - o, zb + th), P(xb + o, yb + o, zb + th), P(xa + o, ya + o, za + th)], "#93c5fd", "#93c5fd", 1);
+        }
+        g.lineWidth = 2.5; g.strokeStyle = "rgba(255,255,255,0.85)"; g.lineCap = "round";
+        g.beginPath(); ss.forEach((s, j) => { const q = P(1 + s + o, 9 - s + o, zAt(s) + th); if (j) g.lineTo(q[0], q[1]); else g.moveTo(q[0], q[1]); }); g.stroke();
+      }
+
+      // ---- the small bell of daily moves on its own tile (as s12): normal, sd 1.26%; on "fat tails" it becomes the illustrative
+      // fat-tailed curve (Student-t, 3 degrees of freedom, same 1.26% spread), and its tails beyond 2 sd (2.52%) turn rose.
+      // 25 px per 1% move; height: 3.2 units = the fat-tailed peak (0.5053 per %), the normal peak (0.3167) = 2.0 units.
+      const BN = [0.00012,0.00014,0.00016,0.00019,0.00022,0.00026,0.0003,0.00035,0.0004,0.00047,0.00054,0.00062,0.00071,0.00082,0.00094,0.00107,0.00122,0.00139,0.00159,0.00181,0.00205,0.00232,0.00263,0.00297,0.00335,0.00377,0.00424,0.00476,0.00534,0.00598,0.00668,0.00745,0.0083,0.00923,0.01025,0.01137,0.01258,0.0139,0.01534,0.0169,0.01859,0.02042,0.02239,0.02451,0.02679,0.02924,0.03186,0.03466,0.03765,0.04083,0.04421,0.0478,0.05159,0.0556,0.05983,0.06427,0.06894,0.07383,0.07894,0.08427,0.08982,0.09558,0.10156,0.10774,0.11411,0.12068,0.12741,0.13432,0.14137,0.14856,0.15587,0.16329,0.17078,0.17834,0.18594,0.19356,0.20118,0.20877,0.2163,0.22375,0.23109,0.2383,0.24534,0.2522,0.25884,0.26523,0.27136,0.27719,0.2827,0.28787,0.29267,0.29708,0.30109,0.30466,0.3078,0.31048,0.31269,0.31441,0.31565,0.3164,0.31665,0.3164,0.31565,0.31441,0.31269,0.31048,0.3078,0.30466,0.30109,0.29708,0.29267,0.28787,0.2827,0.27719,0.27136,0.26523,0.25884,0.2522,0.24534,0.2383,0.23109,0.22375,0.2163,0.20877,0.20118,0.19356,0.18594,0.17834,0.17078,0.16329,0.15587,0.14856,0.14137,0.13432,0.12741,0.12068,0.11411,0.10774,0.10156,0.09558,0.08982,0.08427,0.07894,0.07383,0.06894,0.06427,0.05983,0.0556,0.05159,0.0478,0.04421,0.04083,0.03765,0.03466,0.03186,0.02924,0.02679,0.02451,0.02239,0.02042,0.01859,0.0169,0.01534,0.0139,0.01258,0.01137,0.01025,0.00923,0.0083,0.00745,0.00668,0.00598,0.00534,0.00476,0.00424,0.00377,0.00335,0.00297,0.00263,0.00232,0.00205,0.00181,0.00159,0.00139,0.00122,0.00107,0.00094,0.00082,0.00071,0.00062,0.00054,0.00047,0.0004,0.00035,0.0003,0.00026,0.00022,0.00019,0.00016,0.00014,0.00012];
+      const BF = [0.0018,0.00187,0.00194,0.00202,0.0021,0.00218,0.00227,0.00236,0.00246,0.00256,0.00267,0.00278,0.0029,0.00303,0.00316,0.0033,0.00344,0.0036,0.00376,0.00393,0.00412,0.00431,0.00451,0.00473,0.00496,0.0052,0.00545,0.00573,0.00602,0.00632,0.00665,0.007,0.00737,0.00776,0.00818,0.00862,0.0091,0.00961,0.01015,0.01074,0.01136,0.01202,0.01274,0.0135,0.01432,0.01521,0.01616,0.01717,0.01827,0.01945,0.02073,0.0221,0.02358,0.02519,0.02692,0.02879,0.03082,0.03302,0.0354,0.03798,0.04078,0.04383,0.04713,0.05073,0.05463,0.05888,0.06351,0.06854,0.07402,0.07998,0.08646,0.09351,0.10117,0.1095,0.11853,0.12832,0.13892,0.15036,0.1627,0.17597,0.19018,0.20537,0.22153,0.23863,0.25663,0.27547,0.29503,0.31518,0.33574,0.35648,0.37715,0.39743,0.417,0.43549,0.45253,0.46774,0.48077,0.49127,0.49899,0.50371,0.5053,0.50371,0.49899,0.49127,0.48077,0.46774,0.45253,0.43549,0.417,0.39743,0.37715,0.35648,0.33574,0.31518,0.29503,0.27547,0.25663,0.23863,0.22153,0.20537,0.19018,0.17597,0.1627,0.15036,0.13892,0.12832,0.11853,0.1095,0.10117,0.09351,0.08646,0.07998,0.07402,0.06854,0.06351,0.05888,0.05463,0.05073,0.04713,0.04383,0.04078,0.03798,0.0354,0.03302,0.03082,0.02879,0.02692,0.02519,0.02358,0.0221,0.02073,0.01945,0.01827,0.01717,0.01616,0.01521,0.01432,0.0135,0.01274,0.01202,0.01136,0.01074,0.01015,0.00961,0.0091,0.00862,0.00818,0.00776,0.00737,0.007,0.00665,0.00632,0.00602,0.00573,0.00545,0.0052,0.00496,0.00473,0.00451,0.00431,0.00412,0.00393,0.00376,0.0036,0.00344,0.0033,0.00316,0.00303,0.0029,0.00278,0.00267,0.00256,0.00246,0.00236,0.00227,0.00218,0.0021,0.00202,0.00194,0.00187,0.0018];
+      const TX = 6.9, TY = 13.8, TS = 3.4, BC = TX + TY + TS, BU = TX - TY, BD = 0.3, SPX = 25, BH = 3.2 / 0.5053, TAIL = 2.52;
+      const bAt = (s, c, z) => { const u = BU + (SPX * s) / (0.8660254 * 48); return P((c + u) / 2, (c - u) / 2, z); };
+      const SS = [], NN = [], FF = [];
+      BN.forEach((n, i) => { SS.push(-5 + i * 0.05); NN.push(n); FF.push(BF[i]); });
+      [-TAIL, TAIL].forEach((b) => {
+        const j = SS.findIndex((s) => s > b), f = (b - SS[j - 1]) / (SS[j] - SS[j - 1]);
+        SS.splice(j, 0, b); NN.splice(j, 0, NN[j - 1] + (NN[j] - NN[j - 1]) * f); FF.splice(j, 0, FF[j - 1] + (FF[j] - FF[j - 1]) * f);
+      });
+      const kAt = (t) => outBack((t - KM0) / 0.5, 1.5);
+      function drawTile() {
+        K.shadow(TX, TY, -1.0, TS, TS, 0.16);
+        [[-0.84, 0.235, M.blue], [-0.605, 0.17, M.white], [-0.435, 0.155, M.blue], [-0.28, 0.28, M.white]].forEach(([zz, hh, m]) => K.box(TX, TY, zz, TS, TS, hh, m));
+      }
+      const BLUE = { top: hx(M.blue.top), left: hx(M.blue.left), right: hx(M.blue.right) }, ROSE = { top: hx(M.rose.top), left: hx(M.rose.left), right: hx(M.rose.right) };
+      function drawBell(t) {
+        const k = kAt(t), kc = clamp(k, 0, 1);
+        const pts = SS.map((s, i) => { const h = Math.max(0, BH * (NN[i] * (1 - k) + FF[i] * k)); return { s, h, b: bAt(s, BC - BD, h), f: bAt(s, BC + BD, h), f0: bAt(s, BC + BD, 0) }; });
+        [[-5, -TAIL, true], [-TAIL, TAIL, false], [TAIL, 5, true]].forEach(([a, b, tail]) => {
+          const seg = pts.filter((p) => p.s >= a - 1e-9 && p.s <= b + 1e-9);
+          const outline = seg.map((p) => p.f).concat(seg.slice().reverse().map((p) => p.f0));
+          const top = Math.min(...seg.map((p) => p.f[1])), bot = seg[0].f0[1];
+          const gr = g.createLinearGradient(0, top - 1, 0, bot + 1);
+          gr.addColorStop(0, tail ? mix("#4b8df8", "#fb5d7a", kc) : "#4b8df8"); gr.addColorStop(1, tail ? mix("#2563eb", "#e11d48", kc) : "#2563eb");
+          K.poly(outline, gr);
+        });
+        for (let i = 0; i < pts.length - 1; i++) {
+          const p = pts[i], q = pts[i + 1]; if (q.s - p.s < 1e-6) continue;
+          const slope = (q.h - p.h) / ((q.s - p.s) * (SPX / 48)), ks = clamp(Math.abs(slope) / 2.6, 0, 1) * 0.75, side = slope > 0 ? "left" : "right";
+          const cb = mixA(BLUE.top, BLUE[side], ks), tail = Math.abs((p.s + q.s) / 2) > TAIL;
+          K.poly([p.b, q.b, q.f, p.f], rgb(tail ? mixA(cb, mixA(ROSE.top, ROSE[side], ks), kc) : cb));
+        }
+        g.lineWidth = 2; g.strokeStyle = "rgba(255,255,255,0.6)";
+        g.beginPath(); pts.forEach((p, i) => (i ? g.lineTo(p.f[0], p.f[1]) : g.moveTo(p.f[0], p.f[1]))); g.stroke();
+        g.lineWidth = 1.5; g.strokeStyle = "rgba(15,35,90,0.16)";
+        g.beginPath(); pts.forEach((p, i) => (i ? g.lineTo(p.b[0], p.b[1]) : g.moveTo(p.b[0], p.b[1]))); g.stroke();
+      }
+
+      const st = { t: 0 }, bob = document.getElementById("s13-bob");
+      function draw() {
+        const t = st.t;
+        g.clearRect(0, 0, 1080, 1920);
+        bob.style.transform = "translateY(" + (-8 * Math.sin((2 * Math.PI * (t + 1.9)) / 3)).toFixed(2) + "px)";
+        K.shadow(0, 0, -1.6, 10, 10, 0.22);
+        K.platform(0, 0, 10, 10);
+        ROW.forEach((r) => ticket(r, t));
+        ROW.forEach((r) => column(r, t));
+        plank(t);
+        ribbon(t);
+        drawTile();
+        drawBell(t);
+        // the value labels ride on the risen columns' tops
+        VL.forEach((L) => { const r = ROW[L.i], a = P(r.x - CW / 2, r.y - CW / 2, TH + colH(r, t));
+          L.wrap.style.left = (a[0] + L.dx).toFixed(1) + "px"; L.wrap.style.top = (a[1] - L.gap).toFixed(1) + "px"; });
+      }
+
+      // ---- the cube flip in (no flip out: the tile cascade covers the cut), slow push ----
+      tl.fromTo("#s13-flip", { rotationY: -90, scale: 0.94 }, { rotationY: 0, scale: 1, duration: 0.36, ease: "power3.out" }, 0);
+      tl.fromTo("#s13-cam", { scale: 1 }, { scale: 1.04, duration: DUR, ease: "sine.inOut" }, 0);
+
+      const pop = (sel, t, d) => tl.fromTo(sel, { opacity: 0, scale: 0.3, y: 26 }, { opacity: 1, scale: 1, y: 0, duration: d || 0.4, ease: "back.out(2.8)" }, t);
+      const hop = (el, t, h, sq) => {
+        tl.fromTo(el, { y: 0 }, { y: -h, duration: 0.11, ease: "power2.out", immediateRender: false }, t);
+        tl.fromTo(el, { y: -h }, { y: 0, duration: 0.12, ease: "power2.in", immediateRender: false }, t + 0.11);
+        tl.fromTo(el, { scaleY: sq, scaleX: 1 + (1 - sq) * 0.6 }, { scaleY: 1, scaleX: 1, duration: 0.3, ease: "back.out(3)", immediateRender: false }, t + 0.23);
+      };
+      // "fat tails": the label flips over
+      tl.fromTo("#s13-bf0", { opacity: 1, rotationX: 0 }, { opacity: 0, rotationX: 90, transformPerspective: 600, duration: 0.08, ease: "power2.in", immediateRender: false }, KM0);
+      tl.fromTo("#s13-bf1", { opacity: 0, rotationX: -90 }, { opacity: 1, rotationX: 0, transformPerspective: 600, duration: 0.26, ease: "back.out(2.2)" }, KM0 + 0.07);
+      // "low-strike puts": the three low-strike pills hop
+      [0, 1, 2].forEach((i) => hop(ROW[i].el, LS + i * 0.06, 14, 0.86));
+      // "cost more": the values pop as their columns arrive (90, 85, 80)
+      [2, 1, 0].forEach((i) => pop("#s13-v" + i, ROW[i].R + 0.2, 0.36));
+      // "implied vol": the header
+      pop("#s13-hd", w(10) - 0.06);
+      // "strike falls": the arrow grows along the row toward the low strikes, its pill pops, and the strike pills hop right to left
+      tl.fromTo("#s13-arl", { opacity: 0, scaleX: 0 }, { opacity: 1, scaleX: 1, duration: 0.34, ease: "power3.out" }, w(14) - 0.08);
+      pop("#s13-ar", w(15) - 0.06, 0.38);
+      hop("#s13-ar", w(16) + 0.02, 12, 0.88);
+      ROW.slice().reverse().forEach((r, j) => hop(r.el, w(14) - 0.02 + j * 0.035, 12, 0.88));
+
+      tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: draw }, 0);
+      draw();
+      window.__timelines["s13"] = tl;
+    })();
+  </script>
+</template>

@@ -1,0 +1,332 @@
+<template>
+  <style>
+    @font-face { font-family: "Fredoka"; font-weight: 400; src: url("assets/fonts/fredoka-400.woff2"); }
+    @font-face { font-family: "Fredoka"; font-weight: 700; src: url("assets/fonts/fredoka-700.woff2"); }
+    @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
+    @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
+    #root { position: absolute; inset: 0; overflow: hidden; perspective: 2400px; perspective-origin: 540px 1150px; }
+    #s11-flip, #s11-cam, #s11-bob { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #s11-flip { transform-origin: 540px 1150px; }
+    #s11-cam { transform-origin: 540px 1000px; }
+    #s11-cv { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    .s11-t { font-family: "Fredoka", "D2QSans", "JetBrains Mono", sans-serif; font-weight: 700; color: #0b1b3a; white-space: nowrap; }
+    /* strike pills in front of the tickets (as in s1) */
+    .s11-k { position: absolute; left: 0; top: 0; width: 80px; margin-left: -40px; height: 46px; border-radius: 23px; background: #ffffff;
+             box-shadow: 0 6px 0 #2563eb, 0 12px 18px rgba(30,64,175,0.2); display: flex; align-items: center; justify-content: center;
+             font-size: 31px; line-height: 1; transform-origin: 50% 100%; }
+    .s11-k i { font-style: normal; font-size: 22px; color: #2563eb; margin-right: 3px; }
+    /* signboards: .s11-pw is placed and pops, .s11-hop hops and squashes */
+    .s11-pw { position: absolute; opacity: 0; transform-origin: 50% 100%; }
+    .s11-hop { position: relative; transform-origin: 50% 100%; }
+    .s11-card { position: relative; background: #ffffff; border-radius: 24px; box-shadow: 0 10px 0 #2563eb, 0 24px 36px rgba(30,64,175,0.22); }
+    .s11-card.s11-r { box-shadow: 0 10px 0 #e11d48, 0 24px 36px rgba(159,18,57,0.22); }
+    /* the implied-vol readouts above their columns: a card with a little tail pointing down at the column top */
+    .s11-iv { display: flex; justify-content: center; }
+    .s11-iv .s11-card { padding: 0 20px; font-size: 48px; line-height: 80px; letter-spacing: -0.01em; color: #2563eb; }
+    .s11-iv .s11-card::after { content: ""; position: absolute; left: 50%; bottom: -24px; margin-left: -13px; border: 13px solid transparent; border-top: 14px solid #2563eb; border-bottom: 0; }
+    #s11-v80 .s11-card { font-size: 60px; line-height: 92px; padding: 0 24px; color: #e11d48; }
+    #s11-v80 .s11-card::after { border-top-color: #e11d48; }
+    #s11-v100 .s11-card::after { left: 30%; }
+    #s11-v90 .s11-card::after { left: 26%; }
+    /* "at the money", under K100 */
+    #s11-atm { left: 0; width: 1080px; top: 1228px; display: flex; justify-content: center; transform-origin: 50% 0%; }
+    #s11-atmp { position: relative; display: inline-flex; align-items: center; height: 58px; padding: 0 26px; border-radius: 29px; background: #1e3a8a; color: #ffffff;
+                font-size: 32px; box-shadow: 0 8px 0 #0b1b3a, 0 18px 26px rgba(15,23,42,0.22); }
+    #s11-atmp::before { content: ""; position: absolute; left: 50%; top: -13px; margin-left: -12px; border: 12px solid transparent; border-bottom: 14px solid #1e3a8a; border-top: 0; }
+    /* one stock, one model */
+    .s11-om { top: 626px; }
+    .s11-om .s11-card { display: flex; align-items: center; gap: 12px; height: 80px; padding: 0 26px 0 20px; font-size: 40px; line-height: 80px; }
+    .s11-om svg { width: 46px; height: 46px; flex: none; }
+    #s11-o1 { left: 404px; }
+    #s11-o2 { left: 706px; }
+    /* one volatility: the flat plank's label */
+    #s11-ov { left: 680px; top: 846px; }
+    #s11-ov .s11-card { height: 64px; padding: 0 24px; font-size: 34px; line-height: 64px; color: #334155; box-shadow: 0 8px 0 #93c5fd, 0 18px 28px rgba(30,64,175,0.18); }
+    #s11-ov .s11-card::after { content: ""; position: absolute; left: 30%; bottom: -20px; border: 11px solid transparent; border-top: 12px solid #93c5fd; border-bottom: 0; }
+    /* the plaque and the scale note under the platform */
+    #s11-plq { left: 70px; width: 660px; top: 1474px; display: flex; justify-content: center; }
+    #s11-plq .s11-card { padding: 10px 34px 14px; text-align: center; border-radius: 26px; }
+    #s11-pl1 { font-size: 44px; line-height: 52px; }
+    #s11-pl1 b { color: #2563eb; }
+    #s11-pl2 { font-size: 30px; line-height: 36px; color: #475569; }
+    #s11-note { left: 70px; width: 660px; top: 1606px; display: flex; justify-content: center; transform-origin: 50% 0%; }
+    #s11-notex { padding: 0 24px; border-radius: 26px; background: rgba(255,255,255,0.86); font-size: 30px; line-height: 52px; color: #33415c; box-shadow: 0 6px 0 #bfdbfe; }
+    #s11-notex b { color: #2563eb; }
+  </style>
+  <div id="root" data-composition-id="s11" data-width="1080" data-height="1920">
+    <div id="s11-flip">
+      <div id="s11-cam">
+        <div id="s11-bob">
+          <canvas id="s11-cv" width="1080" height="1920"></canvas>
+          <div id="s11-ks" data-layout-ignore></div>
+          <div class="s11-pw s11-iv" id="s11-v100"><div class="s11-hop" id="s11-h100"><div class="s11-card s11-t">15.6%</div></div></div>
+          <div class="s11-pw s11-iv" id="s11-v90"><div class="s11-hop" id="s11-h90"><div class="s11-card s11-t">20.7%</div></div></div>
+          <div class="s11-pw s11-iv" id="s11-v80"><div class="s11-hop" id="s11-h80"><div class="s11-card s11-r s11-t">29.7%</div></div></div>
+          <div class="s11-pw" id="s11-atm"><div class="s11-t" id="s11-atmp">at the money</div></div>
+          <div class="s11-pw s11-om" id="s11-o1"><div class="s11-hop"><div class="s11-card s11-t">
+            <svg viewBox="0 0 46 46"><rect x="2" y="2" width="42" height="42" rx="11" fill="#dbeafe" /><path d="M9 31 L17 22 L23 27 L29 15 L33 21 L38 12" fill="none" stroke="#2563eb" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            <span>one stock</span></div></div></div>
+          <div class="s11-pw s11-om" id="s11-o2"><div class="s11-hop"><div class="s11-card s11-t">
+            <svg viewBox="0 0 46 46"><rect x="2" y="2" width="42" height="42" rx="11" fill="#dbeafe" /><rect x="10" y="12" width="26" height="6" rx="3" fill="#2563eb" /><rect x="10" y="22" width="20" height="6" rx="3" fill="#3b82f6" /><rect x="10" y="32" width="14" height="6" rx="3" fill="#e11d48" /></svg>
+            <span>one model</span></div></div></div>
+          <div class="s11-pw" id="s11-ov"><div class="s11-hop"><div class="s11-card s11-t">one volatility</div></div></div>
+          <div class="s11-pw" id="s11-plq"><div class="s11-hop" id="s11-plqh"><div class="s11-card s11-t">
+            <div id="s11-pl1">implied vol <b>by strike</b></div>
+            <div id="s11-pl2">simulated · 1-month options</div></div></div></div>
+          <div class="s11-pw" id="s11-note"><div class="s11-t" id="s11-notex">height: <b>1 unit = 4%</b> implied vol</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      /*DATA*/ const DUR = 9.99; const W = [0.16, 0.3, 0.4, 0.62, 1.04, 1.3, 1.5, 2.64, 3.04, 3.44, 4.44, 4.64, 5.076, 6.44, 6.62, 7.16, 7.3, 7.68, 7.76, 7.86, 8.12, 8.38, 8.7, 8.92, 9.06]; /*END*/
+      // words: 0 At 1 the 2 money, 3 implied 4 vol 5 is 6 15.6%. 7 At 8 90, 9 20.7. 10 At 11 80, 12 29.7. 13 One 14 stock, 15 one
+      //        16 model, 17 and 18 the 19 flat 20 line 21 bends 22 into 23 a 24 smile.
+      const w = (i) => Math.max(0, W.length > i ? W[i] : 0.16 + i * 0.38);
+// ISO KIT v1: isometric toy-world drawing on a 2D canvas, matching the Flow dioramas' look.
+// Copy this block verbatim into a scene's <script> (inside its IIFE). World units: x to the right-back, y to the left-back,
+// z up. P(x, y, z) -> frame px. Visible faces of a box: top, the face at y+d (front-left) and the face at x+w (front-right).
+// Draw back to front: sort what you draw by (x + y) ascending, then z ascending (painter's order).
+const ISO = (function () {
+  const C30 = Math.cos(Math.PI / 6), S30 = 0.5;
+  const MAT = {
+    white: { top: "#ffffff", left: "#e3ebfb", right: "#c9d8f5" },
+    blue:  { top: "#7fb0ff", left: "#3b82f6", right: "#2563eb" },
+    navy:  { top: "#4f6fe0", left: "#1e40af", right: "#1e3a8a" },
+    sky:   { top: "#dbeafe", left: "#bfdbfe", right: "#93c5fd" },
+    rose:  { top: "#fda4af", left: "#f43f5e", right: "#e11d48" },
+    gold:  { top: "#fde68a", left: "#f59e0b", right: "#d97706" },
+    grey:  { top: "#f1f5f9", left: "#cbd5e1", right: "#94a3b8" },
+    wood:  { top: "#f3c58f", left: "#d99a5b", right: "#b97a3f" },
+  };
+  function make(g, ox, oy, u) {
+    const P = (x, y, z) => [ox + (x - y) * C30 * u, oy + (x + y) * S30 * u - (z || 0) * u];
+    function poly(pts, fill, stroke, lw) {
+      g.beginPath(); pts.forEach(([a, b], i) => (i ? g.lineTo(a, b) : g.moveTo(a, b))); g.closePath();
+      if (fill) { g.fillStyle = fill; g.fill(); }
+      if (stroke) { g.strokeStyle = stroke; g.lineWidth = lw || 1.5; g.stroke(); }
+    }
+    function box(x, y, z, w, d, h, mat, edge) {
+      if (h <= 0 || w <= 0 || d <= 0) return;
+      edge = edge === undefined ? "rgba(15,35,90,0.14)" : edge;
+      poly([P(x, y + d, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x, y + d, z + h)], mat.left, edge);
+      poly([P(x + w, y, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x + w, y, z + h)], mat.right, edge);
+      poly([P(x, y, z + h), P(x + w, y, z + h), P(x + w, y + d, z + h), P(x, y + d, z + h)], mat.top, edge);
+    }
+    // a soft contact shadow on the floor plane z
+    function shadow(x, y, z, w, d, a) {
+      const c = P(x + w / 2, y + d / 2, z); const rx = (w + d) * C30 * u * 0.55, ry = (w + d) * S30 * u * 0.55;
+      const gr = g.createRadialGradient(c[0], c[1], 0, c[0], c[1], rx);
+      gr.addColorStop(0, `rgba(30,64,175,${a || 0.18})`); gr.addColorStop(1, "rgba(30,64,175,0)");
+      g.save(); g.translate(c[0], c[1]); g.scale(1, ry / rx); g.translate(-c[0], -c[1]);
+      g.fillStyle = gr; g.beginPath(); g.arc(c[0], c[1], rx, 0, 6.2832); g.fill(); g.restore();
+    }
+    // the floating platform: white top slab, blue band, white band, blue base (like the dioramas), its top at z = 0
+    function platform(x, y, w, d) {
+      box(x, y, -1.5, w, d, 0.42, MAT.blue);
+      box(x, y, -1.08, w, d, 0.3, MAT.white);
+      box(x, y, -0.78, w, d, 0.28, MAT.blue);
+      box(x, y, -0.5, w, d, 0.5, MAT.white);
+    }
+    // a 2D affine matrix that maps a flat w x h DOM element onto a face given three projected corners (TL, TR, BL)
+    function faceMatrix(tl, tr, bl, w, h) {
+      const a = (tr[0] - tl[0]) / w, b = (tr[1] - tl[1]) / w, c = (bl[0] - tl[0]) / h, d = (bl[1] - tl[1]) / h;
+      return `matrix(${a.toFixed(5)},${b.toFixed(5)},${c.toFixed(5)},${d.toFixed(5)},${tl[0].toFixed(2)},${tl[1].toFixed(2)})`;
+    }
+    return { P, poly, box, shadow, platform, faceMatrix, u };
+  }
+  return { make, MAT };
+})();
+
+      const tl = gsap.timeline({ paused: true });
+      const g = document.getElementById("s11-cv").getContext("2d");
+      const K = ISO.make(g, 540, 900, 48), M = ISO.MAT, P = K.P;
+      const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+      const outBack = (p, s) => { if (p <= 0) return 0; if (p >= 1) return 1; p -= 1; return p * p * ((s + 1) * p + s) + 1; };
+      const land = (dt) => (dt < 0 ? 1 : 1 - 0.18 * Math.exp(-dt / 0.08) * Math.cos(dt * 26));
+      const sine = (p) => { p = clamp(p, 0, 1); return 0.5 - 0.5 * Math.cos(Math.PI * p); };
+      const Q = (a, b, z) => P((a + b) / 2, (b - a) / 2, z);      // a = x - y along the strike row, b = x + y across it
+
+      // ---- the data: implied vol by strike, one-month options priced on 1,000,000 simulated paths of the illustrative
+      //      crash model (work/numbers.json model.iv_pct). Puts below 100, calls from 100 up.
+      const KS = [80, 85, 90, 95, 100, 105, 110, 115, 120];
+      const IV = [29.7, 26.4, 20.7, 16.7, 15.6, 15.3, 15.2, 15.2, 15.1];
+      // ---- the strike row, exactly as in s1: strike i at world (1 + i, 9 - i), tickets 0.84 x 0.84 x 0.16, columns 0.6 x 0.6
+      //      standing on the tickets; column height = implied vol at 1 unit = 4% (honest scale)
+      const TK = 0.84, TH = 0.16, CW = 0.6, PER = 4;
+      const ROW = KS.map((k, i) => ({ k, i, x: 1 + i, y: 9 - i, a: 2 * i - 8, H: IV[i] / PER }));
+
+      // ---- beats (scene seconds): each column grows to land on its number; the rest follow the 80
+      const GD = 0.42;
+      ROW[4].G = w(6) - 0.34;                                  // 100 lands on "15.6%."
+      ROW[2].G = w(9) - 0.34;                                  // 90 on "20.7."
+      ROW[0].G = w(12) - 0.38;                                 // 80 on "29.7."
+      [1, 3, 5, 6, 7, 8].forEach((i, j) => { ROW[i].G = w(12) + 0.32 + 0.12 * j; });
+      const PLANK = w(20) - 0.24, PLAND = PLANK + 0.22;        // the flat plank drops on "flat", lands on "line"
+      const RB0 = w(21) - 0.06, RB1 = Math.max(RB0 + 0.5, w(24) + 0.06);   // the smile draws on, "bends" .. "smile."
+      const ZP = TH + IV[4] / PER + 0.02;                      // the plank rests on the at-the-money column (15.6%)
+      ROW.forEach((r) => { r.TP = RB0 + (RB1 - RB0) * Math.acos(1 - 2 * (r.a + 8) / 16) / Math.PI; });   // when the smile's head passes it
+
+      // camera-facing strike pills, in front of the tickets
+      const ksEl = document.getElementById("s11-ks");
+      ROW.forEach((r) => {
+        const d = document.createElement("div"); d.className = "s11-k s11-t"; d.innerHTML = "<i>K</i>" + r.k; ksEl.appendChild(d); r.el = d;
+        const p = P(r.x + 0.62, r.y + 0.62, 0); d.style.left = p[0].toFixed(1) + "px"; d.style.top = (p[1] - 6).toFixed(1) + "px";
+      });
+
+      function ticket(r) {
+        const wd = TK, x0 = r.x - wd / 2, y0 = r.y - wd / 2;
+        K.shadow(x0 - 0.1, y0 - 0.1, 0, wd + 0.2, wd + 0.2, 0.14);
+        K.box(x0, y0, 0, wd, wd, TH, M.white, "rgba(15,35,90,0.18)");
+        const zt = TH;   // the blue header band along the ticket's back edge, and two printed lines
+        K.poly([P(x0, y0, zt), P(x0 + wd, y0, zt), P(x0 + wd, y0 + 0.24, zt), P(x0, y0 + 0.24, zt)], "#3b82f6");
+        [0.46, 0.66].forEach((f) => K.poly([P(x0 + 0.14, y0 + f * wd, zt), P(x0 + wd - 0.14, y0 + f * wd, zt), P(x0 + wd - 0.14, y0 + (f + 0.08) * wd, zt), P(x0 + 0.14, y0 + (f + 0.08) * wd, zt)], "#c9d8f5"));
+      }
+      const colH = (r, t) => { const p = (t - r.G) / GD; return p <= 0 ? 0 : r.H * outBack(p, 1.8); };
+      // the box's outline (silhouette and the three edges meeting at its front-top corner)
+      function outline(x, y, z, w, d, h, color, lw) {
+        const A = P(x, y + d, z), B = P(x + w, y + d, z), C = P(x + w, y, z), D = P(x + w, y, z + h), E = P(x, y, z + h), F = P(x, y + d, z + h), G = P(x + w, y + d, z + h);
+        g.save(); g.strokeStyle = color; g.lineWidth = lw; g.lineJoin = "round";
+        g.beginPath(); [A, B, C, D, E, F].forEach(([a, b], i) => (i ? g.lineTo(a, b) : g.moveTo(a, b))); g.closePath();
+        g.moveTo(F[0], F[1]); g.lineTo(G[0], G[1]); g.lineTo(D[0], D[1]); g.moveTo(G[0], G[1]); g.lineTo(B[0], B[1]); g.stroke(); g.restore();
+      }
+      function hexPath(x, y, z, w, d, h) {
+        const pts = [P(x, y + d, z), P(x + w, y + d, z), P(x + w, y, z), P(x + w, y, z + h), P(x, y, z + h), P(x, y + d, z + h)];
+        pts.forEach(([a, b], i) => (i ? g.lineTo(a, b) : g.moveTo(a, b))); g.closePath();
+      }
+      function column(r, t, flash) {
+        const h = colH(r, t); if (h <= 0.004) return;
+        const x0 = r.x - CW / 2, y0 = r.y - CW / 2;
+        K.box(x0, y0, TH, CW, CW, h, M.blue);
+        if (flash > 0) K.poly([P(x0, y0, TH + h), P(x0 + CW, y0, TH + h), P(x0 + CW, y0 + CW, TH + h), P(x0, y0 + CW, TH + h)], `rgba(255,255,255,${(0.75 * flash).toFixed(3)})`);
+        if (r.k === 80) outline(x0, y0, TH, CW, CW, h, "#e11d48", 3.5);
+      }
+
+      // the flat plank: one volatility (15.6%) for every strike, translucent, laid along the row on the column tops
+      function plank(t) {
+        const p = (t - PLANK) / 0.4; if (p <= 0) return;
+        const drop = 1.4 * (1 - clamp(p / 0.55, 0, 1)) ** 2, sq = land(t - PLAND);
+        const z = ZP + drop, th = 0.2 * sq, o = 0.16, A = [0.55, 9.45], B = [9.45, 0.55];
+        const al = clamp(p / 0.3, 0, 1);
+        g.save();
+        // the plank passes through the taller columns: hide it inside them
+        g.beginPath(); g.rect(0, 0, 1080, 1920);
+        ROW.forEach((r) => { const h = colH(r, t); if (TH + h > z + 0.001) hexPath(r.x - CW / 2, r.y - CW / 2, TH, CW, CW, h); });
+        g.clip("evenodd");
+        g.globalAlpha = al;
+        K.poly([P(A[0] - o, A[1] - o, z + th), P(B[0] - o, B[1] - o, z + th), P(B[0] + o, B[1] + o, z + th), P(A[0] + o, A[1] + o, z + th)], "rgba(255,255,255,0.8)", "#ffffff", 2.5);
+        K.poly([P(A[0] + o, A[1] + o, z + th), P(B[0] + o, B[1] + o, z + th), P(B[0] + o, B[1] + o, z), P(A[0] + o, A[1] + o, z)], "rgba(147,197,253,0.78)", "rgba(96,165,250,0.85)", 1.5);
+        g.restore();
+      }
+
+      // the smile: a monotone cubic through the nine column tops, drawn as a 3D ribbon (as Day 10's curve), left to right
+      const XS = ROW.map((r) => r.a), ZS = ROW.map((r) => TH + r.H);
+      const SL = (function () {
+        const n = XS.length, h = XS[1] - XS[0], d = [], m = [];
+        for (let i = 0; i < n - 1; i++) d.push((ZS[i + 1] - ZS[i]) / h);
+        m[0] = d[0]; m[n - 1] = d[n - 2];
+        for (let i = 1; i < n - 1; i++) m[i] = d[i - 1] * d[i] <= 0 ? 0 : 2 / (1 / d[i - 1] + 1 / d[i]);
+        return (a) => {
+          const i = Math.min(n - 2, Math.max(0, Math.floor((a - XS[0]) / h))), s = (a - XS[i]) / h, s2 = s * s, s3 = s2 * s;
+          return (2 * s3 - 3 * s2 + 1) * ZS[i] + (s3 - 2 * s2 + s) * h * m[i] + (-2 * s3 + 3 * s2) * ZS[i + 1] + (s3 - s2) * h * m[i + 1];
+        };
+      })();
+      const LIFT = 0.26, HW = 7, E1 = 14;
+      function band(pts, nrm, o1, o2, dy1, dy2, fill) {
+        const A = pts.map((p, i) => [p[0] + nrm[i][0] * o1, p[1] + nrm[i][1] * o1 + dy1]);
+        const B2 = pts.map((p, i) => [p[0] + nrm[i][0] * o2, p[1] + nrm[i][1] * o2 + dy2]).reverse();
+        K.poly(A.concat(B2), fill);
+      }
+      function normals(pts) {
+        return pts.map((p, i) => {
+          const a = pts[Math.max(0, i - 1)], b = pts[Math.min(pts.length - 1, i + 1)];
+          const dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy) || 1;
+          return [dy / L, -dx / L];
+        });
+      }
+      function smile(t) {
+        const p = sine((t - RB0) / (RB1 - RB0)); if (p <= 0) return -99;
+        const aEnd = -8 + 16 * p, pts = [];
+        for (let a = -8; a < aEnd; a += 0.05) pts.push(Q(a, 10, SL(a) + LIFT));
+        pts.push(Q(aEnd, 10, SL(aEnd) + LIFT));
+        if (pts.length < 2) return aEnd;
+        const n = normals(pts);
+        g.save(); g.shadowColor = "rgba(30,64,175,0.35)"; g.shadowBlur = 14; g.shadowOffsetY = 10;
+        band(pts, n, HW, -HW, E1, E1, "#1d4ed8"); g.restore();
+        band(pts, n, HW + 2.5, -HW - 2.5, 0, E1 + 2.5, "#ffffff");      // a white sticker edge so it reads over the blue columns
+        band(pts, n, HW, HW, 0, E1, "#93c5fd");                          // top side (faces up)
+        band(pts, n, HW, -HW, E1, E1, "#1d4ed8");                        // front face
+        const e = pts[pts.length - 1], s0 = pts[0];
+        g.fillStyle = "#1d4ed8"; g.beginPath(); g.arc(e[0], e[1] + E1 * 0.5, HW + 3, 0, 6.2832); g.fill();
+        g.beginPath(); g.arc(s0[0], s0[1] + E1 * 0.5, HW + 3, 0, 6.2832); g.fill();
+        return aEnd;
+      }
+
+      const st = { t: 0 }, bob = document.getElementById("s11-bob");
+      function draw() {
+        const t = st.t;
+        g.clearRect(0, 0, 1080, 1920);
+        bob.style.transform = "translateY(" + (-8 * Math.sin((2 * Math.PI * (t + 2.0)) / 3)).toFixed(2) + "px)";
+        K.shadow(0, 0, -1.6, 10, 10, 0.22);
+        K.platform(0, 0, 10, 10);
+        ROW.forEach((r) => ticket(r));
+        // the column tops flash white as the smile passes over them
+        ROW.forEach((r) => { const dt = t - r.TP; column(r, t, dt >= 0 && dt < 0.4 ? 1 - dt / 0.4 : 0); });
+        plank(t);
+        smile(t);
+      }
+
+      // ---- static anchors for the readouts: centred over each column's top, with room for the growth overshoot
+      const place = (id, r, dx, gap) => {
+        const e = document.getElementById(id), top = P(r.x - CW / 2, r.y - CW / 2, TH + r.H);
+        e.style.left = (top[0] - 200 + dx).toFixed(1) + "px"; e.style.width = "400px"; e.style.top = (top[1] - gap).toFixed(1) + "px";
+      };
+      const v80 = document.getElementById("s11-v80"), v90 = document.getElementById("s11-v90"), v100 = document.getElementById("s11-v100");
+      place("s11-v100", ROW[4], 38, 130);
+      place("s11-v90", ROW[2], 42, 150);
+      place("s11-v80", ROW[0], 0, 148);
+
+      // ---- camera: the cube flip in, slow push; the end sits under the tile cascade (no flip out)
+      tl.fromTo("#s11-flip", { rotationY: -90, scale: 0.94 }, { rotationY: 0, scale: 1, duration: 0.36, ease: "power3.out" }, 0);
+      tl.fromTo("#s11-cam", { scale: 1 }, { scale: 1.04, duration: DUR, ease: "sine.inOut" }, 0);
+
+      // ---- signboards on their words
+      const pop = (sel, t, d) => tl.fromTo(sel, { opacity: 0, scale: 0.3, y: 26 }, { opacity: 1, scale: 1, y: 0, duration: d || 0.4, ease: "back.out(2.8)" }, t);
+      const hop = (sel, t, h, sq) => {
+        tl.fromTo(sel, { y: 0 }, { y: -h, duration: 0.11, ease: "power2.out", immediateRender: false }, t);
+        tl.fromTo(sel, { y: -h }, { y: 0, duration: 0.12, ease: "power2.in", immediateRender: false }, t + 0.11);
+        tl.fromTo(sel, { scaleY: sq, scaleX: 1 + (1 - sq) * 0.6 }, { scaleY: 1, scaleX: 1, duration: 0.3, ease: "back.out(3)", immediateRender: false }, t + 0.23);
+      };
+      const squash = (sel, t) => {
+        tl.fromTo(sel, { scaleY: 1, scaleX: 1 }, { scaleY: 0.86, scaleX: 1.08, duration: 0.07, ease: "power2.out", immediateRender: false }, t);
+        tl.fromTo(sel, { scaleY: 0.86, scaleX: 1.08 }, { scaleY: 1, scaleX: 1, duration: 0.3, ease: "back.out(3)", immediateRender: false }, t + 0.07);
+      };
+      pop("#s11-plq", 0.34);
+      tl.fromTo("#s11-note", { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, 0.62);
+      // "At the money": K100 hops, the tag pops under it
+      hop(ROW[4].el, w(2) - 0.06, 12, 0.86);
+      tl.fromTo("#s11-atm", { opacity: 0, scale: 0.4, y: -12 }, { opacity: 1, scale: 1, y: 0, duration: 0.36, ease: "back.out(2.6)" }, w(2) - 0.02);
+      // the three readouts land with their columns
+      pop("#s11-v100", w(6) - 0.06);
+      squash("#s11-h100", ROW[4].G + GD);
+      hop(ROW[2].el, w(8) - 0.04, 12, 0.86);
+      pop("#s11-v90", w(9) - 0.06);
+      squash("#s11-h90", ROW[2].G + GD);
+      hop(ROW[0].el, w(11) - 0.04, 12, 0.86);
+      pop("#s11-v80", w(12) - 0.06, 0.44);
+      squash("#s11-h80", ROW[0].G + GD);
+      // one stock, one model
+      pop("#s11-o1", w(13) - 0.04);
+      pop("#s11-o2", w(15) - 0.04);
+      // the flat line: the plank lands, "one volatility"
+      pop("#s11-ov", PLAND - 0.06, 0.36);
+      // the smile: the plaque hops as the ribbon lands on "smile."
+      hop("#s11-plqh", w(24) + 0.02, 14, 0.86);
+
+      tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: draw }, 0);
+      draw();
+      window.__timelines["s11"] = tl;
+    })();
+  </script>
+</template>

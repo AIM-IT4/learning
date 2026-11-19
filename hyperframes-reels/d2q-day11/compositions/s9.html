@@ -1,0 +1,340 @@
+<template>
+  <style>
+    @font-face { font-family: "Fredoka"; font-weight: 400; src: url("assets/fonts/fredoka-400.woff2"); }
+    @font-face { font-family: "Fredoka"; font-weight: 700; src: url("assets/fonts/fredoka-700.woff2"); }
+    @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
+    @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
+    #root { position: absolute; inset: 0; overflow: hidden; perspective: 2400px; perspective-origin: 540px 1150px; }
+    #s9-flip, #s9-cam, #s9-bob { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #s9-flip { transform-origin: 540px 1150px; }
+    #s9-cam { transform-origin: 540px 1000px; }
+    #s9-cv { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    .s9-t { font-family: "Fredoka", "D2QSans", "JetBrains Mono", sans-serif; font-weight: 700; color: #0b1b3a; white-space: nowrap; }
+    /* signboards: .s9-pw is placed and pops, .s9-hop hops and squashes */
+    .s9-pw { position: absolute; opacity: 0; transform-origin: 50% 100%; }
+    .s9-hop { position: relative; transform-origin: 50% 100%; }
+    .s9-card { background: #ffffff; border-radius: 26px; box-shadow: 0 10px 0 #2563eb, 0 24px 36px rgba(30,64,175,0.22); }
+    .s9-card.s9-r { box-shadow: 0 10px 0 #e11d48, 0 24px 36px rgba(159,18,57,0.22); }
+    /* price levels at the left end of the chart (the white lines on the curtain) */
+    .s9-ax { position: absolute; width: 74px; margin-left: -74px; height: 40px; border-radius: 20px; text-align: center; font-size: 30px; line-height: 40px;
+             color: #334155; background: rgba(255,255,255,0.92); box-shadow: 0 4px 0 #bfdbfe; opacity: 0; }
+    /* "volatility 15%" */
+    #s9-vol { left: 64px; top: 618px; }
+    #s9-vol .s9-card { display: flex; align-items: center; gap: 14px; height: 100px; padding: 0 30px 0 24px; }
+    #s9-vol svg { width: 64px; height: 40px; flex: none; }
+    .s9-lab { font-size: 36px; line-height: 100px; }
+    .s9-big { font-size: 64px; line-height: 100px; color: #2563eb; letter-spacing: -0.01em; }
+    /* the crash */
+    #s9-crash { left: 566px; top: 706px; }
+    #s9-crash .s9-card { padding: 6px 28px 12px 26px; }
+    .s9-cr1 { display: flex; align-items: baseline; gap: 14px; }
+    .s9-cr1 .s9-big { color: #e11d48; line-height: 70px; }
+    .s9-cr1 .s9-lab { line-height: 70px; font-size: 40px; }
+    .s9-sm { font-size: 30px; line-height: 34px; color: #475569; }
+    .s9-sm b { color: #0b1b3a; }
+    /* about once every 10 years, under the 10-year bracket */
+    #s9-ten { left: 0; width: 1080px; top: 1196px; display: flex; justify-content: center; }
+    #s9-ten .s9-card { display: flex; align-items: center; gap: 14px; height: 84px; padding: 0 30px 0 24px; font-size: 40px; line-height: 84px; }
+    #s9-ten b { color: #2563eb; }
+    #s9-ten i { display: block; width: 22px; height: 22px; border-radius: 6px; background: #e11d48; transform: rotate(45deg); flex: none; }
+    /* the plaque under the platform */
+    #s9-plq { left: 70px; width: 660px; top: 1502px; display: flex; justify-content: center; }
+    #s9-plq .s9-card { padding: 10px 34px 14px; text-align: center; }
+    #s9-pl1 { font-size: 42px; line-height: 50px; }
+    #s9-pl2 { font-size: 30px; line-height: 36px; color: #475569; }
+    #s9-pl2 b { color: #2563eb; }
+  </style>
+  <div id="root" data-composition-id="s9" data-width="1080" data-height="1920">
+    <div id="s9-flip">
+      <div id="s9-cam">
+        <div id="s9-bob">
+          <canvas id="s9-cv" width="1080" height="1920"></canvas>
+          <div class="s9-t s9-ax" id="s9-ax0">50</div>
+          <div class="s9-t s9-ax" id="s9-ax1">100</div>
+          <div class="s9-t s9-ax" id="s9-ax2">150</div>
+          <div class="s9-pw" id="s9-vol"><div class="s9-hop" id="s9-volh"><div class="s9-card s9-t">
+            <svg viewBox="0 0 64 40"><path d="M3 28 L13 12 L22 30 L32 8 L41 26 L50 14 L61 22" fill="none" stroke="#2563eb" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            <span class="s9-lab">volatility</span><span class="s9-big">15%</span></div></div></div>
+          <div class="s9-pw" id="s9-crash"><div class="s9-hop" id="s9-crh"><div class="s9-card s9-r s9-t">
+            <div class="s9-cr1"><span class="s9-big">−20%</span><span class="s9-lab">crash</span></div>
+            <div class="s9-sm">day 1,101: <b>133.76 → 107.17</b></div></div></div></div>
+          <div class="s9-pw" id="s9-ten"><div class="s9-hop" id="s9-tenh"><div class="s9-card s9-t"><i></i><span>about once every <b>10 years</b></span></div></div></div>
+          <div class="s9-pw" id="s9-plq"><div class="s9-hop"><div class="s9-card s9-t">
+            <div id="s9-pl1">one simulated path</div>
+            <div id="s9-pl2">illustrative model · <b>height ∝ price</b></div></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      /*DATA*/ const DUR = 5.68; const W = [0.16, 0.7, 1.0, 1.34, 1.42, 1.64, 1.82, 2.46, 2.94, 3.28, 3.64, 4.24, 4.5, 4.76, 5.0, 5.22]; /*END*/
+      // words: 0 Let's 1 simulate 2 it. 3 A 4 stock 5 with 6 15% 7 volatility 8 that 9 crashes 10 20% 11 about 12 once 13 every 14 10 15 years.
+      const w = (i) => Math.max(0, W.length > i ? W[i] : 0.16 + i * 0.34);
+// ISO KIT v1: isometric toy-world drawing on a 2D canvas, matching the Flow dioramas' look.
+// Copy this block verbatim into a scene's <script> (inside its IIFE). World units: x to the right-back, y to the left-back,
+// z up. P(x, y, z) -> frame px. Visible faces of a box: top, the face at y+d (front-left) and the face at x+w (front-right).
+// Draw back to front: sort what you draw by (x + y) ascending, then z ascending (painter's order).
+const ISO = (function () {
+  const C30 = Math.cos(Math.PI / 6), S30 = 0.5;
+  const MAT = {
+    white: { top: "#ffffff", left: "#e3ebfb", right: "#c9d8f5" },
+    blue:  { top: "#7fb0ff", left: "#3b82f6", right: "#2563eb" },
+    navy:  { top: "#4f6fe0", left: "#1e40af", right: "#1e3a8a" },
+    sky:   { top: "#dbeafe", left: "#bfdbfe", right: "#93c5fd" },
+    rose:  { top: "#fda4af", left: "#f43f5e", right: "#e11d48" },
+    gold:  { top: "#fde68a", left: "#f59e0b", right: "#d97706" },
+    grey:  { top: "#f1f5f9", left: "#cbd5e1", right: "#94a3b8" },
+    wood:  { top: "#f3c58f", left: "#d99a5b", right: "#b97a3f" },
+  };
+  function make(g, ox, oy, u) {
+    const P = (x, y, z) => [ox + (x - y) * C30 * u, oy + (x + y) * S30 * u - (z || 0) * u];
+    function poly(pts, fill, stroke, lw) {
+      g.beginPath(); pts.forEach(([a, b], i) => (i ? g.lineTo(a, b) : g.moveTo(a, b))); g.closePath();
+      if (fill) { g.fillStyle = fill; g.fill(); }
+      if (stroke) { g.strokeStyle = stroke; g.lineWidth = lw || 1.5; g.stroke(); }
+    }
+    function box(x, y, z, w, d, h, mat, edge) {
+      if (h <= 0 || w <= 0 || d <= 0) return;
+      edge = edge === undefined ? "rgba(15,35,90,0.14)" : edge;
+      poly([P(x, y + d, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x, y + d, z + h)], mat.left, edge);
+      poly([P(x + w, y, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x + w, y, z + h)], mat.right, edge);
+      poly([P(x, y, z + h), P(x + w, y, z + h), P(x + w, y + d, z + h), P(x, y + d, z + h)], mat.top, edge);
+    }
+    // a soft contact shadow on the floor plane z
+    function shadow(x, y, z, w, d, a) {
+      const c = P(x + w / 2, y + d / 2, z); const rx = (w + d) * C30 * u * 0.55, ry = (w + d) * S30 * u * 0.55;
+      const gr = g.createRadialGradient(c[0], c[1], 0, c[0], c[1], rx);
+      gr.addColorStop(0, `rgba(30,64,175,${a || 0.18})`); gr.addColorStop(1, "rgba(30,64,175,0)");
+      g.save(); g.translate(c[0], c[1]); g.scale(1, ry / rx); g.translate(-c[0], -c[1]);
+      g.fillStyle = gr; g.beginPath(); g.arc(c[0], c[1], rx, 0, 6.2832); g.fill(); g.restore();
+    }
+    // the floating platform: white top slab, blue band, white band, blue base (like the dioramas), its top at z = 0
+    function platform(x, y, w, d) {
+      box(x, y, -1.5, w, d, 0.42, MAT.blue);
+      box(x, y, -1.08, w, d, 0.3, MAT.white);
+      box(x, y, -0.78, w, d, 0.28, MAT.blue);
+      box(x, y, -0.5, w, d, 0.5, MAT.white);
+    }
+    // a 2D affine matrix that maps a flat w x h DOM element onto a face given three projected corners (TL, TR, BL)
+    function faceMatrix(tl, tr, bl, w, h) {
+      const a = (tr[0] - tl[0]) / w, b = (tr[1] - tl[1]) / w, c = (bl[0] - tl[0]) / h, d = (bl[1] - tl[1]) / h;
+      return `matrix(${a.toFixed(5)},${b.toFixed(5)},${c.toFixed(5)},${d.toFixed(5)},${tl[0].toFixed(2)},${tl[1].toFixed(2)})`;
+    }
+    return { P, poly, box, shadow, platform, faceMatrix, u };
+  }
+  return { make, MAT };
+})();
+
+      const tl = gsap.timeline({ paused: true });
+      const g = document.getElementById("s9-cv").getContext("2d");
+      // a closer camera than s1's (u 48 -> 52) so the ten-year path reads big; the platform is the same 10 x 10
+      const U = 52, K = ISO.make(g, 540, 870, U), M = ISO.MAT, P = K.P;
+      const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+      const land = (dt) => (dt < 0 ? 1 : 1 - 0.2 * Math.exp(-dt / 0.08) * Math.cos(dt * 26));
+      const mild = (p) => { p = clamp(p, 0, 1); return 0.5 * p + 0.5 * (0.5 - 0.5 * Math.cos(Math.PI * p)); };
+
+      // ---- the data: one simulated ten-year daily path of the illustrative crash model (work/numbers.json path.values,
+      //      every 5th day, day 0 .. 2,520), with its one crash on day 1,101: 133.76 -> 107.17 put back in at full resolution
+      const V = [100.0,103.0,102.32,101.74,101.99,102.13,106.43,103.63,107.1,110.48,113.46,113.8,115.54,119.52,121.45,122.5,124.14,123.12,128.65,130.34,133.28,133.33,132.54,131.13,130.07,125.87,130.78,128.93,128.84,128.21,129.96,132.11,135.41,131.11,129.37,133.16,128.9,128.92,129.86,133.3,130.47,131.05,129.1,129.92,128.79,127.99,128.24,129.7,129.14,126.59,127.66,125.36,126.19,126.0,126.35,124.73,126.32,127.32,125.66,125.28,125.1,122.53,122.16,121.96,118.73,116.84,117.72,118.77,118.0,117.28,116.59,116.77,119.78,121.87,119.68,118.89,120.8,117.78,115.5,112.36,113.53,114.1,114.11,111.51,115.08,115.13,113.1,118.41,121.15,125.21,128.22,128.13,127.1,126.8,125.3,127.65,127.93,127.81,125.45,122.44,124.31,129.84,130.54,135.87,134.37,139.65,141.24,140.43,138.74,138.88,137.8,133.14,133.12,137.01,136.97,133.23,134.4,133.03,132.65,132.11,129.98,135.29,137.38,133.16,132.98,134.31,131.03,129.81,129.54,134.2,133.52,134.34,134.76,138.94,138.38,140.56,142.95,142.04,144.9,148.54,143.9,139.01,137.23,136.53,139.31,137.86,138.38,138.83,142.79,144.02,148.91,145.58,141.8,140.79,142.98,141.3,141.09,141.5,138.79,141.57,136.63,135.99,137.27,141.43,142.94,141.48,143.52,143.41,142.15,141.93,149.5,145.39,145.63,145.46,148.47,148.9,152.27,162.71,174.71,170.86,170.69,171.05,167.26,163.06,160.78,160.57,158.77,156.26,155.41,153.06,153.73,160.81,159.38,155.4,156.26,156.07,155.92,158.3,154.68,152.94,152.45,145.94,148.91,147.56,148.83,152.48,152.13,152.28,150.92,147.25,145.65,143.89,144.15,150.11,144.86,143.54,142.06,145.8,142.66,138.23,134.7,107.44,104.02,99.68,101.64,100.7,98.78,99.48,99.86,98.01,98.36,100.09,98.53,97.32,98.2,96.5,99.49,102.59,101.61,101.1,101.11,100.13,101.5,100.04,100.16,100.39,99.39,100.73,101.27,101.29,98.52,97.71,97.21,97.26,95.55,95.51,96.28,96.29,95.18,94.06,95.62,97.5,95.88,91.61,91.26,88.02,86.61,87.6,86.13,87.43,82.82,85.22,88.1,89.27,93.65,94.68,95.18,92.93,91.95,90.26,87.44,88.7,90.15,92.4,92.48,91.43,92.71,95.05,93.99,92.32,92.98,88.92,85.84,88.73,87.47,86.44,84.49,87.37,87.19,87.79,83.79,81.87,82.37,83.64,86.9,85.41,88.46,87.39,88.28,90.03,90.74,94.15,93.1,91.26,89.29,90.39,89.26,90.31,91.04,90.1,92.53,93.75,95.46,93.52,94.45,96.32,96.44,97.83,97.47,96.61,96.88,97.27,94.53,91.08,89.42,90.35,91.78,91.7,93.31,96.33,91.93,92.76,94.14,95.54,95.66,98.14,97.97,98.31,100.1,98.55,101.97,104.14,108.09,106.92,105.73,103.81,103.17,104.64,103.41,103.53,103.48,103.88,102.21,100.04,97.51,96.69,96.13,93.79,93.49,92.27,95.18,92.63,96.75,98.73,97.49,99.54,97.36,93.56,92.59,88.78,88.72,89.86,92.7,95.36,94.66,96.21,94.98,95.53,98.58,96.42,95.5,93.94,91.44,91.38,92.77,92.74,92.33,94.13,90.95,92.19,93.9,95.62,94.03,93.08,94.89,97.64,97.64,98.26,97.26,100.26,99.37,99.67,95.69,95.04,97.33,100.51,101.57,99.63,97.31,100.26,101.54,100.27,103.59,106.52,104.31,100.42,101.94,101.74,98.44,99.89,101.24,101.82,104.54,109.16,106.65,103.48,101.21,100.94,99.56,99.01,97.82,96.2,92.32,91.19,91.09,92.62,96.72,94.98,95.21,91.9,91.13,93.42,93.48,94.36,94.16,94.13,94.09,92.03,95.54,96.04,94.7,93.42,93.72,92.16,91.72,91.66,90.11,91.78,93.44,93.73,92.53,91.62,89.37,89.02,86.6,87.0,85.71,83.55,83.29,81.54,81.16,82.42,80.45,81.56,83.97,84.77,82.16,81.09,81.12,83.52,82.38,79.0,80.42,77.2,76.8,76.58,74.9,74.47,72.88,71.12,69.48,68.77,67.91,68.89,65.12];
+      const CD = 1101, PB = 133.76, PA = 107.17, NDAY = 2520;
+      const SD = [], SP = [];
+      V.forEach((v, i) => { if (i === 221) { SD.push(CD, CD + 1); SP.push(PB, PA); } SD.push(5 * i); SP.push(v); });
+      function priceAt(d) {
+        if (d <= 0) return SP[0];
+        if (d >= NDAY) return SP[SP.length - 1];
+        let lo = 0, hi = SD.length - 1;
+        while (hi - lo > 1) { const m = (lo + hi) >> 1; if (SD[m] <= d) lo = m; else hi = m; }
+        return SP[lo] + (SP[hi] - SP[lo]) * (d - SD[lo]) / (SD[hi] - SD[lo]);
+      }
+      function seg(d0, d1) {
+        const out = [[d0, priceAt(d0)]];
+        for (let j = 0; j < SD.length; j++) if (SD[j] > d0 && SD[j] < d1) out.push([SD[j], SP[j]]);
+        out.push([d1, priceAt(d1)]);
+        return out;
+      }
+
+      // ---- the chart: a 3D ribbon standing on the platform's screen-horizontal diagonal (b = x + y = BC), time along it
+      //      (a = x - y: year 0 at A0 -> year 10 at A1), height proportional to the price: 1 unit = 25 (price 100 = 4 units).
+      //      A translucent curtain fills from the platform up to the path, with white lines at 50, 100 and 150.
+      const A0 = -8.6, A1 = 9.0, BC = 9.7, RY = 0.3, RT = 0.34, ZS = 1 / 25;
+      const aOf = (d) => A0 + (A1 - A0) * d / NDAY;
+      const Q = (a, b, z) => P((a + b) / 2, (b - a) / 2, z);
+      const AC = aOf(CD + 0.5), CW = 0.21;
+
+      // ---- beats (scene seconds)
+      const T0 = Math.max(0.5, w(1) - 0.02);                 // the path starts drawing on "simulate"
+      const TB0 = T0 - 0.3;                                  // the gold marker ball drops onto the start
+      const TC = w(9) - 0.12;                                // the head reaches day 1,101 just before "crashes"
+      const DF = 0.18;                                       // the fall down the cliff
+      const TL1 = TC + DF;                                   // the ball lands on 107.17
+      const TH0 = w(10) - 0.08;                              // the crash highlights rose on "20%"
+      const TR = Math.max(TL1 + 0.36, w(10) + 0.16);         // the path carries on
+      const TE = Math.max(TR + 0.8, w(14) + 0.02);           // and reaches year 10 on "10"
+      const TBR = Math.max(TR + 0.1, w(11) - 0.3);          // the 10-year bracket draws on just before "about once every 10 years""
+      function dayAt(t) {
+        if (t <= T0) return 0;
+        if (t < TC) return CD * mild((t - T0) / (TC - T0));
+        if (t < TL1) { const p = (t - TC) / DF; return CD + p * p; }
+        if (t < TR) return CD + 1;
+        if (t < TE) return CD + 1 + (NDAY - CD - 1) * mild((t - TR) / (TE - TR));
+        return NDAY;
+      }
+
+      // ---- drawing helpers
+      function line(pts, color, lw, dash) {
+        g.save(); g.strokeStyle = color; g.lineWidth = lw; g.lineCap = "round"; g.lineJoin = "round"; if (dash) g.setLineDash(dash);
+        g.beginPath(); pts.forEach(([a, b], i) => (i ? g.lineTo(a, b) : g.moveTo(a, b))); g.stroke(); g.restore();
+      }
+      function rail(pts, top, front, edge) {
+        if (pts.length < 2) return;
+        const bk = [], fr = [], fb = [];
+        pts.forEach(([d, p]) => { const a = aOf(d), z = p * ZS; bk.push(Q(a, BC - RY, z)); fr.push(Q(a, BC + RY, z)); fb.push(Q(a, BC + RY, z - RT)); });
+        K.poly(bk.concat(fr.slice().reverse()), top);
+        K.poly(fr.concat(fb.slice().reverse()), front);
+        if (edge) line(fr, edge, 2);
+      }
+      function curtain(pts, dh) {
+        if (pts.length < 2) return;
+        const b = BC - RY, poly = [Q(aOf(pts[0][0]), b, 0)];
+        pts.forEach(([d, p]) => poly.push(Q(aOf(d), b, p * ZS)));
+        poly.push(Q(aOf(pts[pts.length - 1][0]), b, 0));
+        const top = Q(0, b, 7)[1], bot = Q(0, b, 0)[1], gr = g.createLinearGradient(0, top, 0, bot);
+        gr.addColorStop(0, "rgba(59,130,246,0.34)"); gr.addColorStop(1, "rgba(59,130,246,0.1)");
+        K.poly(poly, gr);
+        g.save(); g.beginPath(); poly.forEach(([x, y], i) => (i ? g.lineTo(x, y) : g.moveTo(x, y))); g.closePath(); g.clip();
+        [2, 4, 6].forEach((z) => line([Q(A0, b, z), Q(aOf(dh), b, z)], "rgba(255,255,255,0.95)", 3));
+        g.restore();
+      }
+      // the cliff: the one-day drop of the crash, as a short upright piece of the ribbon
+      function cliff(zTop, zBot, top, front) {
+        if (zTop - zBot < 0.01) return;
+        K.poly([Q(AC - CW, BC - RY, zTop), Q(AC + CW, BC - RY, zTop), Q(AC + CW, BC + RY, zTop), Q(AC - CW, BC + RY, zTop)], top);
+        K.poly([Q(AC - CW, BC + RY, zTop), Q(AC + CW, BC + RY, zTop), Q(AC + CW, BC + RY, zBot), Q(AC - CW, BC + RY, zBot)], front);
+      }
+      // the gold marker ball (the stock's price as it is simulated), with a stripe that turns as it rolls
+      function ball(c, r, roll, sq) {
+        g.save(); g.translate(c[0], c[1] + r * sq * 0.5); g.scale(1 + sq * 0.6, 1 - sq);
+        const gr = g.createRadialGradient(-r * 0.35, -r * 0.4, r * 0.1, 0, 0, r);
+        gr.addColorStop(0, "#fff6d5"); gr.addColorStop(0.35, "#fcd34d"); gr.addColorStop(0.8, "#f59e0b"); gr.addColorStop(1, "#d97706");
+        g.fillStyle = gr; g.beginPath(); g.arc(0, 0, r, 0, 6.2832); g.fill();
+        g.beginPath(); g.arc(0, 0, r, 0, 6.2832); g.clip();
+        g.rotate(roll); g.strokeStyle = "rgba(255,255,255,0.75)"; g.lineWidth = r * 0.28;
+        g.beginPath(); g.ellipse(0, 0, r * 0.98, r * 0.42, 0, 0, 6.2832); g.stroke();
+        g.restore();
+      }
+      // a soft shadow of the chart on the platform, along the diagonal
+      function chartShadow(k) {
+        const c = Q(0, BC + 0.5, 0);
+        g.save(); g.translate(c[0], c[1]); g.scale(1, 0.075);
+        const gr = g.createRadialGradient(0, 0, 0, 0, 0, 470);
+        gr.addColorStop(0, `rgba(30,64,175,${(0.2 * k).toFixed(3)})`); gr.addColorStop(1, "rgba(30,64,175,0)");
+        g.fillStyle = gr; g.beginPath(); g.arc(0, 0, 470, 0, 6.2832); g.fill(); g.restore();
+      }
+
+      const R = 19;                                           // ball radius, px
+      const bob = document.getElementById("s9-bob");
+      const st = { t: 0 };
+      function draw() {
+        const t = st.t;
+        g.clearRect(0, 0, 1080, 1920);
+        bob.style.transform = "translateY(" + (-8 * Math.sin((2 * Math.PI * (t + 0.4)) / 3)).toFixed(2) + "px)";
+        K.shadow(0, 0, -1.6, 10, 10, 0.22);
+        K.platform(0, 0, 10, 10);
+
+        // the year ticks on the platform in front of the chart: 0 .. 10 years
+        const ta = clamp((t - 0.3) / 0.3, 0, 1);
+        if (ta > 0) {
+          g.save(); g.globalAlpha = ta;
+          for (let y = 0; y <= 10; y++) { const a = aOf(252 * y); line([Q(a, 10.1, 0), Q(a, y % 5 ? 10.6 : 10.85, 0)], "#1e3a8a", y % 5 ? 3 : 4.5); }
+          g.restore();
+        }
+        // the 10-year bracket: draws on along the axis with "once every", a rose mark where the one crash came
+        const bp = clamp((t - TBR) / 0.42, 0, 1);
+        if (bp > 0) {
+          const bb = 10.98, aE = A0 + (A1 - A0) * mild(bp);
+          line([Q(A0, bb, 0), Q(aE, bb, 0)], "#2563eb", 7);
+          if (aE > AC) { const m = Q(AC, bb, 0); g.save(); g.fillStyle = "#e11d48"; g.strokeStyle = "#ffffff"; g.lineWidth = 3;
+            g.beginPath(); g.moveTo(m[0], m[1] - 12); g.lineTo(m[0] + 12, m[1]); g.lineTo(m[0], m[1] + 12); g.lineTo(m[0] - 12, m[1]); g.closePath(); g.fill(); g.stroke(); g.restore(); }
+        }
+
+        const dh = dayAt(t);
+        chartShadow(clamp((t - T0) / 0.5, 0.25, 1));
+        if (ta > 0) { g.save(); g.globalAlpha = ta; [2, 4, 6].forEach((z) => line([Q(A0, BC - RY, z), Q(A1, BC - RY, z)], "rgba(37,99,235,0.22)", 2.5, [10, 10])); g.restore(); }
+        if (dh > 0) {
+          const pts = seg(0, dh);
+          curtain(pts, dh);
+          rail(pts, M.blue.top, M.blue.left, "rgba(255,255,255,0.7)");
+          // the cliff grows down with the fall; then the crash turns rose
+          const hk = clamp((t - TH0) / 0.12, 0, 1);
+          if (dh > CD) {
+            const zBot = priceAt(Math.min(dh, CD + 1)) * ZS - RT;
+            cliff(PB * ZS, zBot, M.blue.top, M.blue.left);
+            if (hk > 0) {
+              g.save(); g.globalAlpha = hk;
+              rail(seg(CD - 40, CD), M.rose.top, M.rose.left);
+              if (dh > CD + 1) rail(seg(CD + 1, Math.min(dh, CD + 44)), M.rose.top, M.rose.left);
+              cliff(PB * ZS, zBot, M.rose.top, M.rose.right);
+              g.restore();
+            }
+          }
+          // the dotted leader from the crash signboard to the cliff
+          const lk = clamp((t - (w(10) + 0.04)) / 0.2, 0, 1);
+          if (lk > 0) {
+            const mid = Q(AC + CW, BC + RY, (PB + PA) / 2 * ZS), bx = 592, by = 822;
+            g.save(); g.globalAlpha = lk; g.strokeStyle = "#e11d48"; g.lineWidth = 6; g.lineCap = "round"; g.setLineDash([0.1, 13]);
+            g.beginPath(); g.moveTo(bx, by); g.lineTo(bx + (mid[0] + 10 - bx) * lk, by + (mid[1] - by) * lk); g.stroke(); g.restore();
+          }
+        }
+
+        // the gold ball: drops onto the start, rides the head, falls down the cliff with two bounces, rides on to year 10
+        if (t >= TB0) {
+          let d = dh, lift = 0, sq = 0;
+          if (t < T0) { const p = (t - TB0) / (T0 - TB0); lift = 3.2 * (1 - p * p); }
+          if (t >= TL1 && t < TR) {
+            const q = t - TL1;
+            if (q < 0.22) lift = 0.45 * 4 * (q / 0.22) * (1 - q / 0.22);
+            else if (q < 0.36) { const k = (q - 0.22) / 0.14; lift = 0.14 * 4 * k * (1 - k); }
+          }
+          [T0, TL1, TL1 + 0.22, TL1 + 0.36].forEach((tt, i) => { const dt = t - tt; if (dt >= 0 && dt < 0.12) sq = Math.max(sq, (i ? 0.16 : 0.22) * (1 - dt / 0.12)); });
+          // down the cliff it falls straight (at the cliff's foot), then waits there until the path carries on
+          const dB = d > CD ? Math.max(d, CD + 2) : d;
+          const a = aOf(dB);
+          const z = (d > CD && d < CD + 1 ? priceAt(d) : priceAt(dB)) * ZS + lift + R / U;
+          const c = Q(a, BC, z);
+          ball(c, R, (c[0] - 153) / R, sq);
+        }
+      }
+
+      // ---- static label positions (frame px from the projection)
+      const at = (id, p, dx, dy) => { const e = document.getElementById(id); e.style.left = (p[0] + dx).toFixed(1) + "px"; e.style.top = (p[1] + dy).toFixed(1) + "px"; };
+      at("s9-ax0", Q(A0 - 0.2, BC - RY, 2), 0, -20);
+      at("s9-ax1", Q(A0 - 0.2, BC - RY, 4), 0, -20);
+      at("s9-ax2", Q(A0 - 0.2, BC - RY, 6), 0, -20);
+
+      // ---- camera: enter under the tile cascade (scale + fade), slow push, cube flip out
+      tl.fromTo("#s9-flip", { scale: 1.1, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.35, ease: "power2.out" }, 0);
+      tl.fromTo("#s9-cam", { scale: 1 }, { scale: 1.04, duration: DUR, ease: "sine.inOut" }, 0);
+      tl.fromTo("#s9-flip", { rotationY: 0 }, { rotationY: 90, duration: 0.26, ease: "power2.in", immediateRender: false }, DUR - 0.26);
+
+      // ---- signboards on their words
+      const pop = (sel, t, d) => tl.fromTo(sel, { opacity: 0, scale: 0.3, y: 26 }, { opacity: 1, scale: 1, y: 0, duration: d || 0.4, ease: "back.out(2.8)" }, t);
+      const hop = (sel, t, h, sq) => {
+        tl.fromTo(sel, { y: 0 }, { y: -h, duration: 0.11, ease: "power2.out", immediateRender: false }, t);
+        tl.fromTo(sel, { y: -h }, { y: 0, duration: 0.12, ease: "power2.in", immediateRender: false }, t + 0.11);
+        tl.fromTo(sel, { scaleY: sq, scaleX: 1 + (1 - sq) * 0.6 }, { scaleY: 1, scaleX: 1, duration: 0.3, ease: "back.out(3)", immediateRender: false }, t + 0.23);
+      };
+      pop("#s9-plq", 0.3);
+      tl.fromTo(".s9-ax", { opacity: 0, x: 12 }, { opacity: 1, x: 0, duration: 0.3, ease: "power2.out", stagger: 0.06 }, 0.42);
+      pop("#s9-vol", w(6) - 0.04);
+      hop("#s9-volh", w(7) + 0.02, 12, 0.88);
+      pop("#s9-crash", w(10) - 0.04, 0.36);
+      pop("#s9-ten", Math.max(TR + 0.14, w(11) - 0.24));
+      hop("#s9-tenh", w(14) + 0.02, 14, 0.86);
+
+      tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: draw }, 0);
+      draw();
+      window.__timelines["s9"] = tl;
+    })();
+  </script>
+</template>

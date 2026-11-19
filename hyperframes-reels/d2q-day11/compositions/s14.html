@@ -1,0 +1,294 @@
+<template>
+  <style>
+    @font-face { font-family: "Fredoka"; font-weight: 400; src: url("assets/fonts/fredoka-400.woff2"); }
+    @font-face { font-family: "Fredoka"; font-weight: 700; src: url("assets/fonts/fredoka-700.woff2"); }
+    @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
+    @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
+    #root { position: absolute; inset: 0; overflow: hidden; perspective: 2400px; perspective-origin: 540px 1150px; }
+    #s14-flip, #s14-cam, #s14-bob { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #s14-flip { transform-origin: 540px 1150px; }
+    #s14-cam { transform-origin: 540px 1250px; }
+    #s14-cv { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    .s14-t { font-family: "Fredoka", "D2QSans", "JetBrains Mono", sans-serif; font-weight: 700; color: #0b1b3a; white-space: nowrap; }
+    .s14-pw { position: absolute; opacity: 0; transform-origin: 50% 100%; }
+    .s14-hop { position: absolute; inset: 0; transform-origin: 50% 100%; }
+    .s14-card { position: absolute; inset: 0; background: #ffffff; border-radius: 28px; box-shadow: 0 10px 0 #2563eb, 0 24px 36px rgba(30,64,175,0.22); }
+
+    /* ---- the phone screen: a flat 360×668 UI, mapped every frame onto the screen face of the code-drawn phone ---- */
+    #s14-scr { position: absolute; left: 0; top: 0; width: 360px; height: 668px; transform-origin: 0 0; overflow: hidden; border-radius: 34px; background: #ffffff; }
+    #s14-hdr { position: absolute; left: 0; top: 0; width: 360px; height: 84px; background: #eff6ff; border-bottom: 3px solid #dbeafe; }
+    #s14-hav { position: absolute; left: 16px; top: 16px; width: 52px; height: 52px; border-radius: 14px; }
+    #s14-hnm { position: absolute; left: 80px; top: 0; font-size: 32px; line-height: 84px; }
+    #s14-ub { position: absolute; right: 14px; top: 100px; height: 74px; padding: 0 22px; border-radius: 37px 37px 10px 37px; background: #2563eb;
+              box-shadow: 0 6px 0 #1e40af; font-size: 44px; line-height: 74px; color: #ffffff; opacity: 0; transform-origin: 100% 100%; }
+    #s14-db { position: absolute; left: 14px; top: 194px; width: 272px; padding: 10px 16px; border-radius: 22px 22px 22px 8px; background: #f1f5f9;
+              border: 3px solid #e2e8f0; font-size: 25px; line-height: 31px; white-space: normal; opacity: 0; transform-origin: 0% 100%; }
+    #s14-dcv { position: absolute; left: 16px; top: 332px; width: 142px; height: 201px; border-radius: 14px; overflow: hidden; border: 5px solid #ffffff;
+               box-shadow: 0 7px 0 #2563eb, 0 12px 20px rgba(30,64,175,0.25); opacity: 0; transform-origin: 0% 100%; }
+    #s14-dcv img { display: block; width: 100%; height: 100%; }
+    #s14-cmp { position: absolute; left: 0; top: 548px; width: 360px; height: 120px; border-top: 3px solid #e2e8f0; background: #ffffff; }
+    #s14-in { position: absolute; left: 10px; top: 14px; width: 274px; height: 88px; border-radius: 44px; background: #f1f5f9; border: 3px solid #dbe3ee; }
+    #s14-ph { position: absolute; left: 22px; top: 0; font-size: 26px; line-height: 82px; color: #94a3b8; font-weight: 400; }
+    #s14-ty { position: absolute; left: 16px; top: 0; height: 82px; display: flex; align-items: center; font-size: 50px; line-height: 1; }
+    #s14-ty span { display: none; }
+    #s14-car { display: block; width: 5px; height: 48px; border-radius: 3px; background: #2563eb; margin-left: 3px; }
+    #s14-sb { position: absolute; left: 290px; top: 21px; width: 62px; height: 62px; border-radius: 50%; background: #2563eb; box-shadow: 0 6px 0 #1e40af; }
+    #s14-sb svg { position: absolute; left: 0; top: 0; }
+
+    /* ---- the DM, popping up out of the phone as a big camera-facing bubble ---- */
+    #s14-dm { left: 64px; top: 702px; width: 952px; height: 204px; transform-origin: 40% 100%; }
+    #s14-dav { position: absolute; left: 0; top: 108px; width: 92px; height: 92px; border-radius: 24px; overflow: hidden; background: #ffffff;
+               box-shadow: 0 8px 0 #1e40af, 0 16px 24px rgba(30,64,175,0.25); }
+    #s14-dav img { display: block; width: 92px; height: 92px; }
+    #s14-dbb { position: absolute; left: 112px; top: 0; width: 840px; height: 200px; }
+    #s14-dbb .s14-card { border-radius: 32px 32px 32px 10px; }
+    #s14-dnm { position: absolute; left: 30px; top: 20px; font-size: 28px; line-height: 30px; color: #2563eb; }
+    #s14-dtx { position: absolute; left: 30px; top: 60px; font-size: 42px; line-height: 54px; }
+    #s14-dtx b { color: #2563eb; }
+    #s14-fcv { position: absolute; left: 680px; top: -2px; width: 134px; height: 190px; }
+    #s14-fcvi { position: absolute; inset: 0; border-radius: 16px; overflow: hidden; border: 6px solid #ffffff; transform: rotate(4deg);
+                box-shadow: 0 9px 0 #2563eb, 0 16px 26px rgba(30,64,175,0.28); background: #ffffff; }
+    #s14-fcvi img { display: block; width: 100%; height: 100%; }
+
+    /* ---- the three action pills ---- */
+    .s14-pill { position: absolute; left: 0; right: 0; top: 0; height: 84px; display: flex; align-items: center; justify-content: center; gap: 12px; border-radius: 42px;
+                background: #2563eb; border: 5px solid #ffffff; box-shadow: 0 9px 0 #1e40af, 0 20px 30px rgba(15,23,42,0.22);
+                font-size: 40px; line-height: 1; color: #ffffff; letter-spacing: 0.02em; }
+    #s14-p1 { left: 138px; top: 600px; width: 214px; height: 84px; }
+    #s14-p2 { left: 372px; top: 600px; width: 248px; height: 84px; }
+    #s14-p3 { left: 640px; top: 600px; width: 290px; height: 84px; }
+
+    /* ---- the profile signboard (no counts), lower left, clear of the guide ---- */
+    #s14-pro { left: 60px; top: 1478px; width: 680px; height: 186px; }
+    #s14-lg { position: absolute; left: 24px; top: 22px; width: 142px; height: 142px; border-radius: 36px; overflow: hidden;
+              box-shadow: 0 8px 0 #1e40af, 0 16px 24px rgba(15,23,42,0.25); }
+    #s14-lg img { display: block; width: 142px; height: 142px; }
+    #s14-pn { position: absolute; left: 192px; top: 14px; font-size: 58px; line-height: 66px; }
+    #s14-ph2 { position: absolute; left: 195px; top: 82px; font-size: 32px; line-height: 36px; color: #475569; }
+    #s14-site { position: absolute; left: 192px; top: 124px; height: 48px; display: flex; align-items: center; gap: 8px; padding: 0 20px 0 12px; border-radius: 24px;
+                background: #dbeafe; font-size: 30px; line-height: 1; color: #1e40af; }
+    /* ---- the next-day sticker ---- */
+    #s14-day { left: 540px; top: 1368px; width: 320px; height: 104px; }
+    #s14-dayr { position: absolute; inset: 0; transform: rotate(-6deg); }
+    #s14-dayc { position: absolute; inset: 0; border-radius: 52px; background: #2563eb; border: 8px solid #ffffff; box-shadow: 0 13px 0 #1e40af, 0 28px 44px rgba(15,23,42,0.28); }
+    #s14-dayt { position: absolute; left: 0; right: 0; top: 0; display: flex; align-items: center; justify-content: center; gap: 14px; font-size: 54px; line-height: 104px; color: #ffffff; }
+  </style>
+  <div id="root" data-composition-id="s14" data-width="1080" data-height="1920">
+    <div id="s14-flip">
+      <div id="s14-cam">
+        <div id="s14-bob">
+          <canvas id="s14-cv" width="1080" height="1920"></canvas>
+          <div id="s14-scr" data-layout-ignore>
+            <div id="s14-hdr"><img id="s14-hav" src="assets/logo.png" alt="" /><div class="s14-t" id="s14-hnm">Desk2Quant</div></div>
+            <div class="s14-t" id="s14-ub">FORMULA</div>
+            <div class="s14-t" id="s14-db">Hey! Here's your free Quant Formula Sheet 📐</div>
+            <div id="s14-dcv"><img src="assets/covers/formula-sheet.png" alt="" /></div>
+            <div id="s14-cmp">
+              <div id="s14-in">
+                <div class="s14-t" id="s14-ph">Add a comment…</div>
+                <div class="s14-t" id="s14-ty"><span>F</span><span>O</span><span>R</span><span>M</span><span>U</span><span>L</span><span>A</span><i id="s14-car"></i></div>
+              </div>
+              <div id="s14-sb"><svg width="62" height="62" viewBox="0 0 62 62"><path d="M31 46 V17 M19 28 L31 16 L43 28" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" /></svg></div>
+            </div>
+          </div>
+          <div class="s14-pw" id="s14-dm"><div class="s14-hop" id="s14-dmh">
+            <div id="s14-dav"><img src="assets/logo.png" alt="" /></div>
+            <div id="s14-dbb"><div class="s14-card"></div>
+              <div class="s14-t" id="s14-dnm">Desk2Quant</div>
+              <div class="s14-t" id="s14-dtx">Hey! Here's your free<br /><b>Quant Formula Sheet</b> 📐</div>
+              <div id="s14-fcv"><div id="s14-fcvi"><img src="assets/covers/formula-sheet.png" alt="" /></div></div>
+            </div>
+          </div></div>
+        </div>
+        <div class="s14-pw" id="s14-p1"><div class="s14-hop"><div class="s14-pill s14-t">
+          <svg width="40" height="40" viewBox="0 0 40 40"><path d="M11 5 H29 V35 L20 27 L11 35 Z" fill="none" stroke="#ffffff" stroke-width="5" stroke-linejoin="round" /></svg>SAVE</div></div></div>
+        <div class="s14-pw" id="s14-p2"><div class="s14-hop"><div class="s14-pill s14-t">
+          <svg width="40" height="40" viewBox="0 0 40 40"><path d="M6 21 L34 7 L25 35 L19 23 Z M19 23 L34 7" fill="none" stroke="#ffffff" stroke-width="4.5" stroke-linejoin="round" stroke-linecap="round" /></svg>SHARE</div></div></div>
+        <div class="s14-pw" id="s14-p3"><div class="s14-hop"><div class="s14-pill s14-t">
+          <svg width="40" height="40" viewBox="0 0 40 40"><path d="M20 7 V33 M7 20 H33" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" /></svg>FOLLOW</div></div></div>
+        <div class="s14-pw" id="s14-pro"><div class="s14-hop" id="s14-proh"><div class="s14-card"></div>
+          <div id="s14-lg"><img src="assets/logo.png" alt="" /></div>
+          <div class="s14-t" id="s14-pn">Desk2Quant</div>
+          <div class="s14-t" id="s14-ph2">@desk2quant</div>
+          <div class="s14-t" id="s14-site"><svg width="32" height="32" viewBox="0 0 34 34" fill="none"><circle cx="17" cy="17" r="13" stroke="#1e40af" stroke-width="3.4" /><path d="M4 17 H30 M17 4 C10 10 10 24 17 30 M17 4 C24 10 24 24 17 30" stroke="#1e40af" stroke-width="3" stroke-linecap="round" /></svg>desk2quant.com</div>
+        </div></div>
+        <div class="s14-pw" id="s14-day"><div class="s14-hop" id="s14-dayh"><div id="s14-dayr"><div id="s14-dayc"></div>
+          <div class="s14-t" id="s14-dayt">DAY 12<svg width="46" height="46" viewBox="0 0 46 46"><path d="M8 23 H36 M24 11 L36 23 L24 35" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" /></svg></div>
+        </div></div></div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      /*DATA*/ const DUR = 8.94; const W = [0.16, 0.46, 0.82, 1.2, 1.38, 1.7, 1.88, 2.06, 2.3, 2.68, 3.06, 3.5, 3.86, 4.38, 4.72, 4.98, 5.22, 5.56, 6.34, 6.52, 6.68]; /*END*/
+      // words: 0 Comment 1 FORMULA, 2 and 3 we'll 4 DM 5 you 6 the 7 free 8 Quant 9 Formula 10 Sheet. 11 Save 12 this, 13 share 14 it, 15 and 16 follow 17 Desk2Quant 18 for 19 Day 20 12.
+      const w = (i) => Math.max(0, W.length > i ? W[i] : 0.16 + i * 0.27);
+// ISO KIT v1: isometric toy-world drawing on a 2D canvas, matching the Flow dioramas' look.
+// Copy this block verbatim into a scene's <script> (inside its IIFE). World units: x to the right-back, y to the left-back,
+// z up. P(x, y, z) -> frame px. Visible faces of a box: top, the face at y+d (front-left) and the face at x+w (front-right).
+// Draw back to front: sort what you draw by (x + y) ascending, then z ascending (painter's order).
+const ISO = (function () {
+  const C30 = Math.cos(Math.PI / 6), S30 = 0.5;
+  const MAT = {
+    white: { top: "#ffffff", left: "#e3ebfb", right: "#c9d8f5" },
+    blue:  { top: "#7fb0ff", left: "#3b82f6", right: "#2563eb" },
+    navy:  { top: "#4f6fe0", left: "#1e40af", right: "#1e3a8a" },
+    sky:   { top: "#dbeafe", left: "#bfdbfe", right: "#93c5fd" },
+    rose:  { top: "#fda4af", left: "#f43f5e", right: "#e11d48" },
+    gold:  { top: "#fde68a", left: "#f59e0b", right: "#d97706" },
+    grey:  { top: "#f1f5f9", left: "#cbd5e1", right: "#94a3b8" },
+    wood:  { top: "#f3c58f", left: "#d99a5b", right: "#b97a3f" },
+  };
+  function make(g, ox, oy, u) {
+    const P = (x, y, z) => [ox + (x - y) * C30 * u, oy + (x + y) * S30 * u - (z || 0) * u];
+    function poly(pts, fill, stroke, lw) {
+      g.beginPath(); pts.forEach(([a, b], i) => (i ? g.lineTo(a, b) : g.moveTo(a, b))); g.closePath();
+      if (fill) { g.fillStyle = fill; g.fill(); }
+      if (stroke) { g.strokeStyle = stroke; g.lineWidth = lw || 1.5; g.stroke(); }
+    }
+    function box(x, y, z, w, d, h, mat, edge) {
+      if (h <= 0 || w <= 0 || d <= 0) return;
+      edge = edge === undefined ? "rgba(15,35,90,0.14)" : edge;
+      poly([P(x, y + d, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x, y + d, z + h)], mat.left, edge);
+      poly([P(x + w, y, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x + w, y, z + h)], mat.right, edge);
+      poly([P(x, y, z + h), P(x + w, y, z + h), P(x + w, y + d, z + h), P(x, y + d, z + h)], mat.top, edge);
+    }
+    // a soft contact shadow on the floor plane z
+    function shadow(x, y, z, w, d, a) {
+      const c = P(x + w / 2, y + d / 2, z); const rx = (w + d) * C30 * u * 0.55, ry = (w + d) * S30 * u * 0.55;
+      const gr = g.createRadialGradient(c[0], c[1], 0, c[0], c[1], rx);
+      gr.addColorStop(0, `rgba(30,64,175,${a || 0.18})`); gr.addColorStop(1, "rgba(30,64,175,0)");
+      g.save(); g.translate(c[0], c[1]); g.scale(1, ry / rx); g.translate(-c[0], -c[1]);
+      g.fillStyle = gr; g.beginPath(); g.arc(c[0], c[1], rx, 0, 6.2832); g.fill(); g.restore();
+    }
+    // the floating platform: white top slab, blue band, white band, blue base (like the dioramas), its top at z = 0
+    function platform(x, y, w, d) {
+      box(x, y, -1.5, w, d, 0.42, MAT.blue);
+      box(x, y, -1.08, w, d, 0.3, MAT.white);
+      box(x, y, -0.78, w, d, 0.28, MAT.blue);
+      box(x, y, -0.5, w, d, 0.5, MAT.white);
+    }
+    // a 2D affine matrix that maps a flat w x h DOM element onto a face given three projected corners (TL, TR, BL)
+    function faceMatrix(tl, tr, bl, w, h) {
+      const a = (tr[0] - tl[0]) / w, b = (tr[1] - tl[1]) / w, c = (bl[0] - tl[0]) / h, d = (bl[1] - tl[1]) / h;
+      return `matrix(${a.toFixed(5)},${b.toFixed(5)},${c.toFixed(5)},${d.toFixed(5)},${tl[0].toFixed(2)},${tl[1].toFixed(2)})`;
+    }
+    return { P, poly, box, shadow, platform, faceMatrix, u };
+  }
+  return { make, MAT };
+})();
+
+      const tl = gsap.timeline({ paused: true });
+      const g = document.getElementById("s14-cv").getContext("2d");
+      const K = ISO.make(g, 540, 960, 48), M = ISO.MAT, P = K.P;
+      const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+      // ---- timing, on the words ----
+      // "Comment FORMULA,": the letters type into the comment box, then the send button is tapped and the comment lands in the thread
+      const TY0 = w(0) + 0.14, TYG = clamp((w(1) + 0.15 - TY0) / 7, 0.05, 0.12);
+      const TAP = Math.max(TY0 + 7 * TYG + 0.08, w(2) - 0.1);
+      // "DM": the reply arrives on the phone with the real cover, and pops up out of it as a big bubble
+      const DM = w(4) - 0.06;
+
+      // ---- the smartphone, drawn in code: a navy slab lying on the platform, propped up 22° on a wood wedge and turned 25° toward the camera ----
+      // local axes: a along its width (hv), b down its length (dv), c out of its screen (nv); the bottom end rests on the platform (z = 0)
+      const ROT = (-25 * Math.PI) / 180, TILT = (22 * Math.PI) / 180;
+      const hv = [Math.cos(ROT), Math.sin(ROT), 0], gv = [-Math.sin(ROT), Math.cos(ROT), 0];
+      const dv = [gv[0] * Math.cos(TILT), gv[1] * Math.cos(TILT), -Math.sin(TILT)];
+      const nv = [hv[1] * dv[2] - hv[2] * dv[1], hv[2] * dv[0] - hv[0] * dv[2], hv[0] * dv[1] - hv[1] * dv[0]];
+      const PW = 4.4, PL = 8.2, PT = 0.42, PCX = 5.6, PCY = 5.6;
+      const O = [PCX - (hv[0] * PW) / 2 - (gv[0] * PL * Math.cos(TILT)) / 2, PCY - (hv[1] * PW) / 2 - (gv[1] * PL * Math.cos(TILT)) / 2, PL * Math.sin(TILT)];
+      const W3 = (a, b, c) => [O[0] + hv[0] * a + dv[0] * b + nv[0] * c, O[1] + hv[1] * a + dv[1] * b + nv[1] * c, O[2] + hv[2] * a + dv[2] * b + nv[2] * c];
+      const at3 = (a, b, c, lift) => { const p = W3(a, b, c); return P(p[0], p[1], p[2] + (lift || 0)); };
+      // the phone hops when the comment is sent and buzzes when the DM arrives
+      const hopZ = (t, t0, h, d) => { const p = (t - t0) / d; return p <= 0 || p >= 1 ? 0 : h * Math.sin(Math.PI * p); };
+      const lift = (t) => hopZ(t, TAP, 0.22, 0.26) + hopZ(t, DM, 0.3, 0.3) + hopZ(t, DM + 0.3, 0.12, 0.2);
+      function rrect(x, y, wd, ht, r) {
+        g.moveTo(x + r, y); g.lineTo(x + wd - r, y); g.quadraticCurveTo(x + wd, y, x + wd, y + r);
+        g.lineTo(x + wd, y + ht - r); g.quadraticCurveTo(x + wd, y + ht, x + wd - r, y + ht);
+        g.lineTo(x + r, y + ht); g.quadraticCurveTo(x, y + ht, x, y + ht - r);
+        g.lineTo(x, y + r); g.quadraticCurveTo(x, y, x + r, y); g.closePath();
+      }
+      // a path on the phone's plane c (in local units), then back to the identity transform
+      function onPlane(c, lf, fn) {
+        const o = at3(0, 0, c, lf), ha = at3(1, 0, c, lf), db = at3(0, 1, c, lf);
+        g.setTransform(ha[0] - o[0], ha[1] - o[1], db[0] - o[0], db[1] - o[1], o[0], o[1]);
+        g.beginPath(); fn(); g.setTransform(1, 0, 0, 1, 0, 0);
+      }
+      function drawPhone(t) {
+        const lf = lift(t);
+        // soft shadow of the phone on the platform (its footprint)
+        const f = [[0, 0], [PW, 0], [PW, PL], [0, PL]].map(([a, b]) => { const p = W3(a, b, 0); return P(p[0], p[1], 0); });
+        g.save(); g.filter = "blur(10px)"; K.poly(f, "rgba(30,64,175," + (0.2 - lf * 0.2).toFixed(3) + ")"); g.restore();
+        // the wood wedge stand under it: only its right face shows
+        const a1 = PW - 0.55, b1 = 0.7, top = W3(a1, b1, 0), end = W3(a1, PL, 0);
+        K.poly([P(top[0], top[1], top[2]), P(top[0], top[1], 0), P(end[0], end[1], 0)], M.wood.right, "rgba(15,35,90,0.18)");
+        // the body: rounded slab extruded along its normal (the sides), then the top face (navy bezel)
+        for (let k = 0; k <= 8; k++) { onPlane((PT * k) / 8, lf, () => rrect(0, 0, PW, PL, 0.72)); g.fillStyle = k < 8 ? "#172a6b" : "#1e3a8a"; g.fill(); }
+        onPlane(PT, lf, () => rrect(0, 0, PW, PL, 0.72)); g.fillStyle = "#1e40af"; g.fill();
+        g.lineWidth = 2.5; g.strokeStyle = "rgba(147,197,253,0.75)"; g.stroke();
+        // the speaker slot in the top bezel
+        onPlane(PT, lf, () => rrect(PW / 2 - 0.42, 0.17, 0.84, 0.16, 0.08)); g.fillStyle = "#0b1b3a"; g.fill();
+        // map the screen UI onto the face (inset 0.26 at the sides, 0.5 at the ends)
+        scr.style.transform = K.faceMatrix(at3(0.26, 0.5, PT, lf), at3(PW - 0.26, 0.5, PT, lf), at3(0.26, PL - 0.5, PT, lf), 360, 668);
+      }
+
+      // ---- typing, placeholder, caret (pure functions of t) ----
+      const scr = document.getElementById("s14-scr");
+      const letters = Array.from(document.querySelectorAll("#s14-ty span"));
+      const ph = document.getElementById("s14-ph"), car = document.getElementById("s14-car");
+      function typing(t) {
+        const sent = t >= TAP + 0.08;
+        let n = 0;
+        letters.forEach((s, k) => { const on = !sent && t >= TY0 + k * TYG; s.style.display = on ? "inline" : "none"; if (on) n++; });
+        ph.style.opacity = n > 0 ? "0" : "1";
+        const typ = t >= TY0 - 0.05 && t < TY0 + 7 * TYG + 0.05;
+        car.style.opacity = sent ? "0" : typ || Math.floor(t * 2.4) % 2 === 0 ? "1" : "0";
+      }
+
+      const st = { t: 0 }, bob = document.getElementById("s14-bob");
+      function draw() {
+        const t = st.t;
+        g.clearRect(0, 0, 1080, 1920);
+        bob.style.transform = "translateY(" + (-8 * Math.sin((2 * Math.PI * (t + 0.2)) / 3)).toFixed(2) + "px)";
+        K.shadow(0, 0, -1.6, 10, 10, 0.22);
+        K.platform(0, 0, 10, 10);
+        drawPhone(t);
+        typing(t);
+      }
+
+      // ---- entrance under the tile cascade, slow push; no exit (the end card holds) ----
+      tl.fromTo("#s14-flip", { scale: 1.1, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.35, ease: "power2.out" }, 0);
+      tl.fromTo("#s14-cam", { scale: 1 }, { scale: 1.04, duration: DUR, ease: "sine.inOut" }, 0);
+      const pop = (sel, t, d) => tl.fromTo(sel, { opacity: 0, scale: 0.3, y: 26 }, { opacity: 1, scale: 1, y: 0, duration: d || 0.42, ease: "back.out(2.8)" }, t);
+
+      // "FORMULA,": the send button is tapped, the comment lands in the thread
+      tl.fromTo("#s14-sb", { scale: 1 }, { scale: 0.78, duration: 0.07, ease: "power2.in" }, TAP);
+      tl.fromTo("#s14-sb", { scale: 0.78 }, { scale: 1, duration: 0.36, ease: "back.out(3)", immediateRender: false }, TAP + 0.07);
+      tl.fromTo("#s14-ub", { opacity: 0, scale: 0.3 }, { opacity: 1, scale: 1, duration: 0.36, ease: "back.out(2.8)" }, TAP + 0.1);
+      // "DM": the reply on the phone, its cover, and the big bubble popping up out of the phone
+      tl.fromTo("#s14-db", { opacity: 0, scale: 0.3 }, { opacity: 1, scale: 1, duration: 0.36, ease: "back.out(2.8)" }, DM);
+      tl.fromTo("#s14-dcv", { opacity: 0, scale: 0.3 }, { opacity: 1, scale: 1, duration: 0.36, ease: "back.out(2.8)" }, DM + 0.12);
+      tl.fromTo("#s14-dm", { opacity: 0, scale: 0.2, y: 230 }, { opacity: 1, scale: 1, y: 0, duration: 0.5, ease: "back.out(1.6)" }, DM + 0.04);
+      // "Quant Formula Sheet": the cover hops
+      tl.fromTo("#s14-fcv", { y: 0 }, { y: -20, duration: 0.12, ease: "power2.out", immediateRender: false }, w(9) - 0.02);
+      tl.fromTo("#s14-fcv", { y: -20 }, { y: 0, duration: 0.13, ease: "power2.in", immediateRender: false }, w(9) + 0.1);
+      tl.fromTo("#s14-fcv", { scaleY: 0.86, scaleX: 1.08 }, { scaleY: 1, scaleX: 1, duration: 0.3, ease: "back.out(3)", immediateRender: false }, w(9) + 0.23);
+      // "Save", "share", "follow": the three pills pop in turn
+      pop("#s14-p1", w(11) - 0.06);
+      pop("#s14-p2", w(13) - 0.06);
+      pop("#s14-p3", w(16) - 0.06);
+      // "Desk2Quant": the profile board rises and lands with a squash
+      tl.fromTo("#s14-pro", { opacity: 0, scale: 0.3, y: 30 }, { opacity: 1, scale: 1, y: 0, duration: 0.46, ease: "back.out(2.4)" }, w(17) - 0.06);
+      // "Day 12.": the sticker slaps down onto the board's corner, and the board takes the hit
+      tl.fromTo("#s14-day", { opacity: 0, scale: 1.7, y: -90 }, { opacity: 1, scale: 1, y: 0, duration: 0.22, ease: "power3.in" }, w(19) - 0.08);
+      tl.fromTo("#s14-dayh", { scaleY: 0.78, scaleX: 1.12 }, { scaleY: 1, scaleX: 1, duration: 0.36, ease: "back.out(3)", immediateRender: false }, w(19) + 0.14);
+      tl.fromTo("#s14-proh", { y: 0 }, { y: 7, duration: 0.06, ease: "power2.out", immediateRender: false }, w(19) + 0.14);
+      tl.fromTo("#s14-proh", { y: 7 }, { y: 0, duration: 0.3, ease: "back.out(3)", immediateRender: false }, w(19) + 0.2);
+
+      tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: draw }, 0);
+      draw();
+      window.__timelines["s14"] = tl;
+    })();
+  </script>
+</template>

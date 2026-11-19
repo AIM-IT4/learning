@@ -1,0 +1,244 @@
+<template>
+  <style>
+    @font-face { font-family: "Fredoka"; font-weight: 400; src: url("assets/fonts/fredoka-400.woff2"); }
+    @font-face { font-family: "Fredoka"; font-weight: 700; src: url("assets/fonts/fredoka-700.woff2"); }
+    @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
+    @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
+    #root { position: absolute; inset: 0; overflow: hidden; perspective: 2400px; perspective-origin: 540px 1150px; }
+    #s12-flip, #s12-cam, #s12-bob { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #s12-flip { transform-origin: 540px 1150px; }
+    #s12-cam { transform-origin: 540px 1000px; }
+    #s12-cv { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    .s12-t { font-family: "Fredoka", "D2QSans", "JetBrains Mono", sans-serif; font-weight: 700; color: #0b1b3a; white-space: nowrap; }
+    /* strike pills (the same set as s1), placed at a projected point just in front of each ticket */
+    .s12-k { position: absolute; left: 0; top: 0; width: 80px; margin-left: -40px; height: 46px; border-radius: 23px; background: #ffffff;
+             box-shadow: 0 6px 0 #2563eb, 0 12px 18px rgba(30,64,175,0.2); display: flex; align-items: center; justify-content: center;
+             font-size: 31px; line-height: 1; transform-origin: 50% 100%; }
+    .s12-k i { font-style: normal; font-size: 22px; color: #2563eb; margin-right: 3px; }
+    /* THE ANSWER */
+    #s12-answ { position: absolute; left: 190px; top: 604px; width: 700px; height: 100px; display: flex; justify-content: center; }
+    #s12-ans { display: inline-flex; align-items: center; gap: 16px; height: 90px; padding: 0 42px 0 30px; border-radius: 45px; background: #2563eb; border: 6px solid #ffffff;
+               box-shadow: 0 10px 0 #1e40af, 0 24px 36px rgba(15,23,42,0.25); color: #ffffff; font-size: 50px; letter-spacing: 0.06em; transform-origin: 50% 100%; opacity: 0; }
+    #s12-ans svg { display: block; flex: none; }
+    /* the flat signboard */
+    #s12-sgw { position: absolute; left: 90px; top: 742px; width: 900px; height: 120px; display: flex; justify-content: center; }
+    #s12-sg { display: inline-flex; align-items: baseline; gap: 18px; height: 106px; padding: 11px 34px 0; border-radius: 28px; background: #ffffff;
+              box-shadow: 0 10px 0 #2563eb, 0 24px 36px rgba(30,64,175,0.22); transform-origin: 50% 100%; opacity: 0; }
+    #s12-sg em { font-style: normal; font-size: 36px; line-height: 84px; color: #334155; }
+    #s12-sg b { font-weight: 700; font-size: 76px; line-height: 84px; color: #2563eb; }
+    /* the bell's label, under its tile */
+    #s12-blw { position: absolute; left: 60px; top: 1612px; width: 420px; height: 62px; display: flex; justify-content: center; }
+    #s12-bl { height: 56px; padding: 0 26px; border-radius: 28px; background: #ffffff; box-shadow: 0 7px 0 #2563eb, 0 14px 22px rgba(30,64,175,0.2);
+              font-size: 34px; line-height: 56px; transform-origin: 50% 0%; opacity: 0; }
+    /* the scale note */
+    #s12-note { position: absolute; left: 446px; top: 1500px; padding: 9px 22px 11px; border-radius: 22px; background: rgba(255,255,255,0.9);
+                box-shadow: 0 6px 0 #bfdbfe; opacity: 0; transform-origin: 0 0; }
+    #s12-note span { display: block; font-size: 30px; line-height: 36px; font-weight: 400; color: #334155; }
+    #s12-note b { display: block; font-size: 32px; line-height: 40px; font-weight: 700; }
+    #s12-note b i { font-style: normal; color: #2563eb; }
+  </style>
+  <div id="root" data-composition-id="s12" data-width="1080" data-height="1920">
+    <div id="s12-flip">
+      <div id="s12-cam">
+        <div id="s12-bob">
+          <canvas id="s12-cv" width="1080" height="1920"></canvas>
+          <div id="s12-ks" data-layout-ignore></div>
+          <div id="s12-blw"><div class="s12-t" id="s12-bl">normal returns</div></div>
+        </div>
+        <div id="s12-answ"><div class="s12-t" id="s12-ans"><svg width="46" height="46" viewBox="0 0 46 46"><path d="M10 24 L19 33 L36 13" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" /></svg>THE ANSWER</div></div>
+        <div id="s12-sgw"><div class="s12-t" id="s12-sg"><em>implied vol</em><b>15.6%</b><em>at every strike</em></div></div>
+        <div class="s12-t" id="s12-note"><span>column height</span><b>1 unit = <i>4%</i> vol</b></div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      /*DATA*/ const DUR = 4.6; const W = [0.16, 0.34, 0.52, 0.62, 1.04, 1.16, 1.44, 1.8, 2.06, 2.26, 2.98, 3.28, 3.44, 3.6, 3.68, 3.94, 4.2]; /*END*/
+      // words: 0 So 1 here's 2 the 3 answer: 4 with 5 normal 6 returns 7 and 8 one 9 volatility, 10 implied 11 vol 12 would 13 be 14 flat 15 across 16 strikes.
+      const w = (i) => Math.max(0, W.length > i ? W[i] : 0.16 + i * 0.26);
+// ISO KIT v1: isometric toy-world drawing on a 2D canvas, matching the Flow dioramas' look.
+// Copy this block verbatim into a scene's <script> (inside its IIFE). World units: x to the right-back, y to the left-back,
+// z up. P(x, y, z) -> frame px. Visible faces of a box: top, the face at y+d (front-left) and the face at x+w (front-right).
+// Draw back to front: sort what you draw by (x + y) ascending, then z ascending (painter's order).
+const ISO = (function () {
+  const C30 = Math.cos(Math.PI / 6), S30 = 0.5;
+  const MAT = {
+    white: { top: "#ffffff", left: "#e3ebfb", right: "#c9d8f5" },
+    blue:  { top: "#7fb0ff", left: "#3b82f6", right: "#2563eb" },
+    navy:  { top: "#4f6fe0", left: "#1e40af", right: "#1e3a8a" },
+    sky:   { top: "#dbeafe", left: "#bfdbfe", right: "#93c5fd" },
+    rose:  { top: "#fda4af", left: "#f43f5e", right: "#e11d48" },
+    gold:  { top: "#fde68a", left: "#f59e0b", right: "#d97706" },
+    grey:  { top: "#f1f5f9", left: "#cbd5e1", right: "#94a3b8" },
+    wood:  { top: "#f3c58f", left: "#d99a5b", right: "#b97a3f" },
+  };
+  function make(g, ox, oy, u) {
+    const P = (x, y, z) => [ox + (x - y) * C30 * u, oy + (x + y) * S30 * u - (z || 0) * u];
+    function poly(pts, fill, stroke, lw) {
+      g.beginPath(); pts.forEach(([a, b], i) => (i ? g.lineTo(a, b) : g.moveTo(a, b))); g.closePath();
+      if (fill) { g.fillStyle = fill; g.fill(); }
+      if (stroke) { g.strokeStyle = stroke; g.lineWidth = lw || 1.5; g.stroke(); }
+    }
+    function box(x, y, z, w, d, h, mat, edge) {
+      if (h <= 0 || w <= 0 || d <= 0) return;
+      edge = edge === undefined ? "rgba(15,35,90,0.14)" : edge;
+      poly([P(x, y + d, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x, y + d, z + h)], mat.left, edge);
+      poly([P(x + w, y, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x + w, y, z + h)], mat.right, edge);
+      poly([P(x, y, z + h), P(x + w, y, z + h), P(x + w, y + d, z + h), P(x, y + d, z + h)], mat.top, edge);
+    }
+    // a soft contact shadow on the floor plane z
+    function shadow(x, y, z, w, d, a) {
+      const c = P(x + w / 2, y + d / 2, z); const rx = (w + d) * C30 * u * 0.55, ry = (w + d) * S30 * u * 0.55;
+      const gr = g.createRadialGradient(c[0], c[1], 0, c[0], c[1], rx);
+      gr.addColorStop(0, `rgba(30,64,175,${a || 0.18})`); gr.addColorStop(1, "rgba(30,64,175,0)");
+      g.save(); g.translate(c[0], c[1]); g.scale(1, ry / rx); g.translate(-c[0], -c[1]);
+      g.fillStyle = gr; g.beginPath(); g.arc(c[0], c[1], rx, 0, 6.2832); g.fill(); g.restore();
+    }
+    // the floating platform: white top slab, blue band, white band, blue base (like the dioramas), its top at z = 0
+    function platform(x, y, w, d) {
+      box(x, y, -1.5, w, d, 0.42, MAT.blue);
+      box(x, y, -1.08, w, d, 0.3, MAT.white);
+      box(x, y, -0.78, w, d, 0.28, MAT.blue);
+      box(x, y, -0.5, w, d, 0.5, MAT.white);
+    }
+    // a 2D affine matrix that maps a flat w x h DOM element onto a face given three projected corners (TL, TR, BL)
+    function faceMatrix(tl, tr, bl, w, h) {
+      const a = (tr[0] - tl[0]) / w, b = (tr[1] - tl[1]) / w, c = (bl[0] - tl[0]) / h, d = (bl[1] - tl[1]) / h;
+      return `matrix(${a.toFixed(5)},${b.toFixed(5)},${c.toFixed(5)},${d.toFixed(5)},${tl[0].toFixed(2)},${tl[1].toFixed(2)})`;
+    }
+    return { P, poly, box, shadow, platform, faceMatrix, u };
+  }
+  return { make, MAT };
+})();
+
+      const tl = gsap.timeline({ paused: true });
+      const g = document.getElementById("s12-cv").getContext("2d");
+      const K = ISO.make(g, 540, 900, 48), M = ISO.MAT, P = K.P;
+      const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+      const outBack = (p, s) => { if (p <= 0) return 0; if (p >= 1) return 1; p -= 1; return p * p * ((s + 1) * p + s) + 1; };
+      const land = (dt) => (dt < 0 ? 1 : 1 - 0.18 * Math.exp(-dt / 0.08) * Math.cos(dt * 26));
+      const mix = (a, b, k) => { const A = parseInt(a.slice(1), 16), B = parseInt(b.slice(1), 16);
+        const c = [16, 8, 0].map((sh) => Math.round(((A >> sh) & 255) * (1 - k) + ((B >> sh) & 255) * k));
+        return "rgb(" + c.join(",") + ")"; };
+
+      // ---- the strike row (the same set as s1, s11, s13): strike i at world (1 + i, 9 - i), a ticket under each, a vol column on each ticket ----
+      // height: 1 unit = 4% implied vol. With normal returns and one volatility, implied vol is flat: 15.6% (the at-the-money value) = 3.9 units.
+      const KS = [80, 85, 90, 95, 100, 105, 110, 115, 120];
+      const UNIT = 4, FLAT = 15.6, CH = FLAT / UNIT;
+      const TK = 0.84, TH = 0.16, CW = 0.6;
+      const ROW = KS.map((k, i) => ({ k, i, x: 1 + i, y: 9 - i }));
+      // "one volatility ... would": the nine columns rise left to right; "flat": the level plank lands on them
+      const G0 = w(8) - 0.04, GS = clamp((w(12) - 0.45 - G0) / 8, 0.05, 0.12);
+      ROW.forEach((r, i) => { r.G = G0 + i * GS; });
+      const PLANK = Math.max(ROW[8].G + 0.5, w(14) - 0.02);      // the plank lands at PLANK
+
+      const ksEl = document.getElementById("s12-ks");
+      ROW.forEach((r) => {
+        const d = document.createElement("div"); d.className = "s12-k s12-t"; d.innerHTML = "<i>K</i>" + r.k; ksEl.appendChild(d); r.el = d;
+        const p = P(r.x + 0.62, r.y + 0.62, 0); d.style.left = p[0].toFixed(1) + "px"; d.style.top = (p[1] - 6).toFixed(1) + "px";
+      });
+
+      function ticket(r) {
+        const x0 = r.x - TK / 2, y0 = r.y - TK / 2;
+        K.shadow(x0 - 0.1, y0 - 0.1, 0, TK + 0.2, TK + 0.2, 0.14);
+        K.box(x0, y0, 0, TK, TK, TH, M.white, "rgba(15,35,90,0.18)");
+        K.poly([P(x0, y0, TH), P(x0 + TK, y0, TH), P(x0 + TK, y0 + 0.24, TH), P(x0, y0 + 0.24, TH)], "#3b82f6");
+        [0.46, 0.66].forEach((f) => K.poly([P(x0 + 0.14, y0 + f * TK, TH), P(x0 + TK - 0.14, y0 + f * TK, TH), P(x0 + TK - 0.14, y0 + (f + 0.08) * TK, TH), P(x0 + 0.14, y0 + (f + 0.08) * TK, TH)], "#c9d8f5"));
+      }
+      function column(r, t) {
+        const p = (t - r.G) / 0.45; if (p <= 0) return;
+        K.box(r.x - CW / 2, r.y - CW / 2, TH, CW, CW, CH * outBack(p, 2.2), M.blue);
+      }
+      // the level plank across the column tops (as s1): a beam along the row, dropping in with a bounce
+      function plank(t) {
+        const q = clamp((t - (PLANK - 0.22)) / 0.22, 0, 1); if (q <= 0) return;
+        const drop = 1.4 * (1 - q) * (1 - q), sq = land(t - PLANK);
+        const z = TH + CH + drop + 0.02, th = 0.16 * sq, o = 0.13;
+        const A = [0.55, 9.45], B = [9.45, 0.55];
+        g.globalAlpha = clamp(q * 4, 0, 1);
+        K.poly([P(A[0] - o, A[1] - o, z + th), P(B[0] - o, B[1] - o, z + th), P(B[0] + o, B[1] + o, z + th), P(A[0] + o, A[1] + o, z + th)], "#ffffff", "rgba(15,35,90,0.18)");
+        K.poly([P(A[0] + o, A[1] + o, z + th), P(B[0] + o, B[1] + o, z + th), P(B[0] + o, B[1] + o, z), P(A[0] + o, A[1] + o, z)], "#c9d8f5", "rgba(15,35,90,0.18)");
+        g.globalAlpha = 1;
+      }
+
+      // ---- the small bell of daily moves (normal, sd 1.26%) on its own tile, floating in front of the platform's left corner ----
+      // same world and scale: the tile spans x 6.9..10.3, y 13.8..17.2; the bell stands in the camera-facing plane through its centre.
+      // 25 px per 1% move (x -5% .. +5%); height: 3.2 units = the fat-tailed peak of s13 (0.5053 per %), so the normal peak (0.3167) is 2.0 units.
+      const BN = [0.00012,0.00014,0.00016,0.00019,0.00022,0.00026,0.0003,0.00035,0.0004,0.00047,0.00054,0.00062,0.00071,0.00082,0.00094,0.00107,0.00122,0.00139,0.00159,0.00181,0.00205,0.00232,0.00263,0.00297,0.00335,0.00377,0.00424,0.00476,0.00534,0.00598,0.00668,0.00745,0.0083,0.00923,0.01025,0.01137,0.01258,0.0139,0.01534,0.0169,0.01859,0.02042,0.02239,0.02451,0.02679,0.02924,0.03186,0.03466,0.03765,0.04083,0.04421,0.0478,0.05159,0.0556,0.05983,0.06427,0.06894,0.07383,0.07894,0.08427,0.08982,0.09558,0.10156,0.10774,0.11411,0.12068,0.12741,0.13432,0.14137,0.14856,0.15587,0.16329,0.17078,0.17834,0.18594,0.19356,0.20118,0.20877,0.2163,0.22375,0.23109,0.2383,0.24534,0.2522,0.25884,0.26523,0.27136,0.27719,0.2827,0.28787,0.29267,0.29708,0.30109,0.30466,0.3078,0.31048,0.31269,0.31441,0.31565,0.3164,0.31665,0.3164,0.31565,0.31441,0.31269,0.31048,0.3078,0.30466,0.30109,0.29708,0.29267,0.28787,0.2827,0.27719,0.27136,0.26523,0.25884,0.2522,0.24534,0.2383,0.23109,0.22375,0.2163,0.20877,0.20118,0.19356,0.18594,0.17834,0.17078,0.16329,0.15587,0.14856,0.14137,0.13432,0.12741,0.12068,0.11411,0.10774,0.10156,0.09558,0.08982,0.08427,0.07894,0.07383,0.06894,0.06427,0.05983,0.0556,0.05159,0.0478,0.04421,0.04083,0.03765,0.03466,0.03186,0.02924,0.02679,0.02451,0.02239,0.02042,0.01859,0.0169,0.01534,0.0139,0.01258,0.01137,0.01025,0.00923,0.0083,0.00745,0.00668,0.00598,0.00534,0.00476,0.00424,0.00377,0.00335,0.00297,0.00263,0.00232,0.00205,0.00181,0.00159,0.00139,0.00122,0.00107,0.00094,0.00082,0.00071,0.00062,0.00054,0.00047,0.0004,0.00035,0.0003,0.00026,0.00022,0.00019,0.00016,0.00014,0.00012];
+      const TX = 6.9, TY = 13.8, TS = 3.4, BC = TX + TY + TS, BU = TX - TY, BD = 0.3, SPX = 25, BH = 3.2 / 0.5053;
+      const bAt = (s, c, z) => { const u = BU + (SPX * s) / (0.8660254 * 48); return P((c + u) / 2, (c - u) / 2, z); };
+      const SS = BN.map((_, i) => -5 + i * 0.05);
+      const TD = w(5) - 0.02, BG = TD + 0.02;       // "normal": the tile lands, the bell rises out of it
+      function tileZ(t) {
+        if (t < TD - 0.24) return null;
+        if (t < TD) { const p = (t - (TD - 0.24)) / 0.24; return 2.0 * (1 - p * p); }
+        const dt = t - TD; return -0.2 * Math.exp(-dt / 0.09) * Math.sin(dt * 24);
+      }
+      function drawTile(z, a) {
+        g.globalAlpha = a;
+        K.shadow(TX, TY, -1.0, TS, TS, 0.16);
+        [[-0.84, 0.235, M.blue], [-0.605, 0.17, M.white], [-0.435, 0.155, M.blue], [-0.28, 0.28, M.white]].forEach(([zz, hh, m]) => K.box(TX, TY, z + zz, TS, TS, hh, m));
+        g.globalAlpha = 1;
+      }
+      const grow = (s, t) => outBack((t - BG - Math.abs(s) * 0.035) / 0.45, 1.7);
+      function drawBell(t, z0) {
+        if (t < BG) return;
+        const pts = SS.map((s, i) => { const h = BH * BN[i] * grow(s, t); return { s, h, b: bAt(s, BC - BD, z0 + h), f: bAt(s, BC + BD, z0 + h), f0: bAt(s, BC + BD, z0) }; });
+        const outline = pts.map((p) => p.f).concat(pts.slice().reverse().map((p) => p.f0));
+        const top = Math.min(...pts.map((p) => p.f[1])), bot = pts[0].f0[1];
+        const gr = g.createLinearGradient(0, top, 0, bot); gr.addColorStop(0, "#4b8df8"); gr.addColorStop(1, "#2563eb");
+        K.poly(outline, gr);
+        for (let i = 0; i < pts.length - 1; i++) {
+          const p = pts[i], q = pts[i + 1];
+          const slope = (q.h - p.h) / ((q.s - p.s) * (SPX / 48)), k = clamp(Math.abs(slope) / 2.6, 0, 1) * 0.75;
+          K.poly([p.b, q.b, q.f, p.f], mix(M.blue.top, slope > 0 ? M.blue.left : M.blue.right, k));
+        }
+        g.lineWidth = 2; g.strokeStyle = "rgba(255,255,255,0.6)";
+        g.beginPath(); pts.forEach((p, i) => (i ? g.lineTo(p.f[0], p.f[1]) : g.moveTo(p.f[0], p.f[1]))); g.stroke();
+        g.lineWidth = 1.5; g.strokeStyle = "rgba(15,35,90,0.16)";
+        g.beginPath(); pts.forEach((p, i) => (i ? g.lineTo(p.b[0], p.b[1]) : g.moveTo(p.b[0], p.b[1]))); g.stroke();
+      }
+
+      const st = { t: 0 }, bob = document.getElementById("s12-bob");
+      function draw() {
+        const t = st.t;
+        g.clearRect(0, 0, 1080, 1920);
+        bob.style.transform = "translateY(" + (-8 * Math.sin((2 * Math.PI * (t + 0.4)) / 3)).toFixed(2) + "px)";
+        K.shadow(0, 0, -1.6, 10, 10, 0.22);
+        K.platform(0, 0, 10, 10);
+        ROW.forEach(ticket);
+        ROW.forEach((r) => column(r, t));
+        plank(t);
+        const z = tileZ(t);
+        if (z !== null) { drawTile(z, clamp((t - (TD - 0.24)) / 0.08, 0, 1)); drawBell(t, z); }
+      }
+
+      // ---- entrance under the tile cascade, slow push, exit flip ----
+      tl.fromTo("#s12-flip", { scale: 1.1, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.35, ease: "power2.out" }, 0);
+      tl.fromTo("#s12-cam", { scale: 1 }, { scale: 1.04, duration: DUR, ease: "sine.inOut" }, 0);
+      tl.fromTo("#s12-flip", { rotationY: 0 }, { rotationY: 90, duration: 0.26, ease: "power2.in", immediateRender: false }, DUR - 0.26);
+
+      const pop = (sel, t, d) => tl.fromTo(sel, { opacity: 0, scale: 0.3, y: 26 }, { opacity: 1, scale: 1, y: 0, duration: d || 0.4, ease: "back.out(2.8)" }, t);
+      const hop = (el, t, h, sq) => {
+        tl.fromTo(el, { y: 0 }, { y: -h, duration: 0.11, ease: "power2.out", immediateRender: false }, t);
+        tl.fromTo(el, { y: -h }, { y: 0, duration: 0.12, ease: "power2.in", immediateRender: false }, t + 0.11);
+        tl.fromTo(el, { scaleY: sq, scaleX: 1 + (1 - sq) * 0.6 }, { scaleY: 1, scaleX: 1, duration: 0.3, ease: "back.out(3)", immediateRender: false }, t + 0.23);
+      };
+      // "answer:"
+      pop("#s12-ans", w(3) - 0.06);
+      // "normal returns": the tile lands, the bell rises, its label pops
+      tl.fromTo("#s12-bl", { opacity: 0, scale: 0.3, y: -16 }, { opacity: 1, scale: 1, y: 0, duration: 0.38, ease: "back.out(2.6)" }, w(6) - 0.06);
+      // "one volatility": the columns rise; the scale note comes with them
+      tl.fromTo("#s12-note", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, G0 + 0.1);
+      // "implied vol": the signboard; "flat": it takes the plank's landing with a squash
+      pop("#s12-sg", w(10) - 0.04);
+      tl.fromTo("#s12-sg", { scaleY: 0.86, scaleX: 1.08 }, { scaleY: 1, scaleX: 1, duration: 0.3, ease: "back.out(3)", immediateRender: false }, PLANK + 0.02);
+      // "across strikes": the strike pills hop in a wave, left to right
+      ROW.forEach((r, i) => hop(r.el, w(15) - 0.02 + i * 0.035, 14, 0.86));
+
+      tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: draw }, 0);
+      draw();
+      window.__timelines["s12"] = tl;
+    })();
+  </script>
+</template>

@@ -1,0 +1,20 @@
+{
+ "voice": "VoxCPM2 designed narrator: (A warm, clear adult male narrator, calm and confident, medium pace), seed 11; p2-p8 use p1 as the voice reference (r = reference only, c = reference + continuation prompt)",
+ "picks": [
+  "p1_s11",
+  "p2_r11",
+  "p3_c11",
+  "p4_r11",
+  "p5_r11",
+  "p6_r11",
+  "p7_r11",
+  "p8_r12"
+ ],
+ "why": {
+  "p2": "r11: c11/c12 slur 'S and P'",
+  "p3": "c11: r11 pitch drifts up (153 Hz)",
+  "p4": "r11: keeps the question; c12 says 'souls'",
+  "p5": "r11: c11/c12 say 'it/that strikes'",
+  "p8": "r12: clearest CTA, natural pauses; c11 'will DM', c12 run-on, r11 rushed, r13 'come out'"
+ }
+}

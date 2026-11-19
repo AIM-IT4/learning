@@ -1,0 +1,320 @@
+<template>
+  <style>
+    @font-face { font-family: "Fredoka"; font-weight: 400; src: url("assets/fonts/fredoka-400.woff2"); }
+    @font-face { font-family: "Fredoka"; font-weight: 700; src: url("assets/fonts/fredoka-700.woff2"); }
+    @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
+    @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
+    #root { position: absolute; inset: 0; overflow: hidden; perspective: 2400px; perspective-origin: 540px 1150px; }
+    #s3-flip, #s3-cam, #s3-bob { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #s3-flip { transform-origin: 540px 1150px; }
+    #s3-cam { transform-origin: 540px 1040px; }
+    #s3-cv { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    .s3-t { font-family: "Fredoka", "D2QSans", "JetBrains Mono", sans-serif; font-weight: 700; color: #0b1b3a; white-space: nowrap; }
+    /* the desk calendar's page, mapped onto the pad's front-right face every frame */
+    #s3-cf { position: absolute; left: 0; top: 0; width: 221px; height: 187px; transform-origin: 0 0; }
+    #s3-cfb { position: absolute; left: 0; right: 0; top: 0; height: 48px; display: flex; align-items: center; justify-content: center; gap: 12px;
+              color: #ffffff; font-size: 31px; letter-spacing: 0.06em; }
+    #s3-cfb span { display: block; opacity: 0; transform-origin: 50% 60%; }
+    #s3-cfd { position: absolute; left: 0; right: 0; top: 50px; height: 100px; display: flex; align-items: center; justify-content: center; }
+    #s3-day { display: block; font-size: 106px; line-height: 100px; letter-spacing: -0.02em; opacity: 0; transform-origin: 50% 70%; }
+    #s3-cfw { position: absolute; left: 0; right: 0; top: 148px; height: 36px; display: flex; justify-content: center; }
+    #s3-wd { display: block; font-size: 32px; line-height: 36px; letter-spacing: 0.1em; color: #2563eb; opacity: 0; transform-origin: 50% 60%; }
+    /* camera-facing signboards placed at projected points: .s3-anc is the point, the inner card pops */
+    .s3-anc { position: absolute; left: 0; top: 0; width: 0; height: 0; }
+    .s3-ctr { position: absolute; left: -150px; width: 300px; top: 0; display: flex; justify-content: center; }
+    .s3-ctr.s3-up { top: auto; bottom: 0; }
+    .s3-pl { position: relative; padding: 6px 16px 10px; border-radius: 24px; background: #ffffff; text-align: center;
+             box-shadow: 0 9px 0 #2563eb, 0 20px 30px rgba(30,64,175,0.2); opacity: 0; transform-origin: 50% 0%; }
+    .s3-pl.s3-r { box-shadow: 0 9px 0 #e11d48, 0 20px 30px rgba(159,18,57,0.22); }
+    .s3-pd { font-size: 29px; line-height: 34px; letter-spacing: 0.06em; color: #2563eb; }
+    .s3-pv { position: relative; height: 50px; font-size: 46px; line-height: 50px; }
+    #s3-pmd { color: #2563eb; }
+    #s3-pmv { color: #e11d48; opacity: 0; transform-origin: 50% 60%; }
+    #s3-slot { position: absolute; left: 50%; top: 11px; width: 120px; margin-left: -60px; height: 30px; border-radius: 15px; background: #e6eefc; }
+    /* the lost chunk's label, above its dashed outline */
+    #s3-lost { padding: 0 22px; height: 56px; border-radius: 28px; background: #ffffff; color: #e11d48; font-size: 34px; line-height: 56px;
+               box-shadow: 0 7px 0 #e11d48, 0 16px 24px rgba(159,18,57,0.2); opacity: 0; transform-origin: 50% 100%; }
+    #s3-lost i { font-style: normal; font-weight: 400; color: #475569; font-size: 30px; }
+    /* the big drop and "in one day" */
+    #s3-bigw { position: absolute; left: 220px; top: 642px; width: 760px; height: 130px; display: flex; justify-content: center; }
+    #s3-big { display: flex; align-items: center; height: 118px; padding: 0 40px; border-radius: 30px; background: #ffffff; color: #e11d48;
+              font-size: 102px; line-height: 118px; letter-spacing: -0.01em; box-shadow: 0 12px 0 #e11d48, 0 28px 40px rgba(159,18,57,0.24);
+              transform-origin: 50% 100%; opacity: 0; }
+    #s3-big svg { width: 66px; height: 66px; margin-right: 14px; flex: none; }
+    #s3-dayw { position: absolute; left: 120px; top: 776px; width: 400px; height: 70px; display: flex; justify-content: center; }
+    #s3-dayp { display: flex; align-items: center; height: 64px; padding: 0 28px; border-radius: 32px; background: #2563eb; color: #ffffff;
+               font-size: 40px; line-height: 64px; box-shadow: 0 8px 0 #1e40af, 0 18px 28px rgba(30,64,175,0.25); transform-origin: 50% 100%; opacity: 0; }
+    /* notes under the platform */
+    .s3-nw { position: absolute; left: 70px; width: 660px; height: 56px; display: flex; justify-content: center; }
+    #s3-n1w { top: 1508px; }
+    #s3-n2w { top: 1572px; }
+    .s3-n { display: flex; align-items: center; gap: 8px; height: 52px; padding: 0 24px; border-radius: 26px; background: rgba(255,255,255,0.9);
+            font-size: 30px; line-height: 52px; box-shadow: 0 6px 0 #bfdbfe; opacity: 0; transform-origin: 50% 0%; }
+    .s3-n i { font-style: normal; font-weight: 400; color: #475569; }
+    .s3-n svg { width: 30px; height: 20px; flex: none; }
+  </style>
+  <div id="root" data-composition-id="s3" data-width="1080" data-height="1920">
+    <div id="s3-flip">
+      <div id="s3-cam">
+        <div id="s3-bob">
+          <canvas id="s3-cv" width="1080" height="1920"></canvas>
+          <div class="s3-t" id="s3-cf" data-layout-ignore>
+            <div id="s3-cfb"><span id="s3-oct">OCT</span><span id="s3-yr">1987</span></div>
+            <div id="s3-cfd"><span id="s3-day">19</span></div>
+            <div id="s3-cfw"><span id="s3-wd">MON</span></div>
+          </div>
+          <div class="s3-anc" id="s3-af"><div class="s3-ctr"><div class="s3-pl s3-t" id="s3-pf"><div class="s3-pd">FRI 16 OCT</div><div class="s3-pv">282.70</div></div></div></div>
+          <div class="s3-anc" id="s3-am"><div class="s3-ctr"><div class="s3-pl s3-t" id="s3-pm"><div class="s3-pd" id="s3-pmd">MON 19 OCT</div><div class="s3-pv"><div id="s3-slot"></div><div id="s3-pmv">224.84</div></div></div></div></div>
+          <div class="s3-anc" id="s3-al"><div class="s3-ctr s3-up"><div class="s3-t" id="s3-lost">−57.86 <i>points</i></div></div></div>
+        </div>
+        <div id="s3-bigw"><div class="s3-t" id="s3-big"><svg viewBox="0 0 24 24"><path d="M12 3.5 V19 M5 12.5 L12 19.5 L19 12.5" fill="none" stroke="#e11d48" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" /></svg>−20.47%</div></div>
+        <div id="s3-dayw"><div class="s3-t" id="s3-dayp">in one day</div></div>
+        <div class="s3-nw" id="s3-n1w"><div class="s3-t s3-n" id="s3-n1">S&amp;P 500 daily closes <i>· 1987</i></div></div>
+        <div class="s3-nw" id="s3-n2w"><div class="s3-t s3-n" id="s3-n2">column height <svg viewBox="0 0 30 20"><path d="M27 4.5 C20 4.5 15 15.5 8.5 15.5 C4.5 15.5 3 12.5 3 10 C3 7.5 4.5 4.5 8.5 4.5 C15 4.5 20 15.5 27 15.5" fill="none" stroke="#0b1b3a" stroke-width="3" stroke-linecap="round" /></svg> S&amp;P 500 level <i>· from 0</i></div></div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      /*DATA*/ const DUR = 5.8; const W = [0.16, 0.32, 0.6, 1.217, 2.4, 2.48, 2.94, 3.4, 3.72, 5.08, 5.32, 5.52]; /*END*/
+      // words: 0 On 1 October 2 19th, 3 1987, 4 the 5 S&P 6 500 7 fell 8 20.47% 9 in 10 one 11 day.
+      const w = (i) => Math.max(0, W.length > i ? W[i] : 0.16 + i * 0.45);
+// ISO KIT v1: isometric toy-world drawing on a 2D canvas, matching the Flow dioramas' look.
+// Copy this block verbatim into a scene's <script> (inside its IIFE). World units: x to the right-back, y to the left-back,
+// z up. P(x, y, z) -> frame px. Visible faces of a box: top, the face at y+d (front-left) and the face at x+w (front-right).
+// Draw back to front: sort what you draw by (x + y) ascending, then z ascending (painter's order).
+const ISO = (function () {
+  const C30 = Math.cos(Math.PI / 6), S30 = 0.5;
+  const MAT = {
+    white: { top: "#ffffff", left: "#e3ebfb", right: "#c9d8f5" },
+    blue:  { top: "#7fb0ff", left: "#3b82f6", right: "#2563eb" },
+    navy:  { top: "#4f6fe0", left: "#1e40af", right: "#1e3a8a" },
+    sky:   { top: "#dbeafe", left: "#bfdbfe", right: "#93c5fd" },
+    rose:  { top: "#fda4af", left: "#f43f5e", right: "#e11d48" },
+    gold:  { top: "#fde68a", left: "#f59e0b", right: "#d97706" },
+    grey:  { top: "#f1f5f9", left: "#cbd5e1", right: "#94a3b8" },
+    wood:  { top: "#f3c58f", left: "#d99a5b", right: "#b97a3f" },
+  };
+  function make(g, ox, oy, u) {
+    const P = (x, y, z) => [ox + (x - y) * C30 * u, oy + (x + y) * S30 * u - (z || 0) * u];
+    function poly(pts, fill, stroke, lw) {
+      g.beginPath(); pts.forEach(([a, b], i) => (i ? g.lineTo(a, b) : g.moveTo(a, b))); g.closePath();
+      if (fill) { g.fillStyle = fill; g.fill(); }
+      if (stroke) { g.strokeStyle = stroke; g.lineWidth = lw || 1.5; g.stroke(); }
+    }
+    function box(x, y, z, w, d, h, mat, edge) {
+      if (h <= 0 || w <= 0 || d <= 0) return;
+      edge = edge === undefined ? "rgba(15,35,90,0.14)" : edge;
+      poly([P(x, y + d, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x, y + d, z + h)], mat.left, edge);
+      poly([P(x + w, y, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x + w, y, z + h)], mat.right, edge);
+      poly([P(x, y, z + h), P(x + w, y, z + h), P(x + w, y + d, z + h), P(x, y + d, z + h)], mat.top, edge);
+    }
+    // a soft contact shadow on the floor plane z
+    function shadow(x, y, z, w, d, a) {
+      const c = P(x + w / 2, y + d / 2, z); const rx = (w + d) * C30 * u * 0.55, ry = (w + d) * S30 * u * 0.55;
+      const gr = g.createRadialGradient(c[0], c[1], 0, c[0], c[1], rx);
+      gr.addColorStop(0, `rgba(30,64,175,${a || 0.18})`); gr.addColorStop(1, "rgba(30,64,175,0)");
+      g.save(); g.translate(c[0], c[1]); g.scale(1, ry / rx); g.translate(-c[0], -c[1]);
+      g.fillStyle = gr; g.beginPath(); g.arc(c[0], c[1], rx, 0, 6.2832); g.fill(); g.restore();
+    }
+    // the floating platform: white top slab, blue band, white band, blue base (like the dioramas), its top at z = 0
+    function platform(x, y, w, d) {
+      box(x, y, -1.5, w, d, 0.42, MAT.blue);
+      box(x, y, -1.08, w, d, 0.3, MAT.white);
+      box(x, y, -0.78, w, d, 0.28, MAT.blue);
+      box(x, y, -0.5, w, d, 0.5, MAT.white);
+    }
+    // a 2D affine matrix that maps a flat w x h DOM element onto a face given three projected corners (TL, TR, BL)
+    function faceMatrix(tl, tr, bl, w, h) {
+      const a = (tr[0] - tl[0]) / w, b = (tr[1] - tl[1]) / w, c = (bl[0] - tl[0]) / h, d = (bl[1] - tl[1]) / h;
+      return `matrix(${a.toFixed(5)},${b.toFixed(5)},${c.toFixed(5)},${d.toFixed(5)},${tl[0].toFixed(2)},${tl[1].toFixed(2)})`;
+    }
+    return { P, poly, box, shadow, platform, faceMatrix, u };
+  }
+  return { make, MAT };
+})();
+
+      const tl = gsap.timeline({ paused: true });
+      const g = document.getElementById("s3-cv").getContext("2d");
+      const U = 48, K = ISO.make(g, 540, 940, U), M = ISO.MAT, P = K.P;
+      const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+      const prog = (t, a, d) => clamp((t - a) / d, 0, 1);
+      const backOut = (p, s) => { if (p <= 0) return 0; if (p >= 1) return 1; const q = p - 1; return 1 + (s + 1) * q * q * q + s * q * q; };
+      const bounceOut = (p) => {
+        p = clamp(p, 0, 1); const n = 7.5625, d = 2.75;
+        if (p < 1 / d) return n * p * p;
+        if (p < 2 / d) { p -= 1.5 / d; return n * p * p + 0.75; }
+        if (p < 2.5 / d) { p -= 2.25 / d; return n * p * p + 0.9375; }
+        p -= 2.625 / d; return n * p * p + 0.984375;
+      };
+      const land = (dt, a) => (dt < 0 ? 1 : 1 - (a || 0.18) * Math.exp(-dt / 0.08) * Math.cos(dt * 26));
+      const hopZ = (t, t0, d, h) => { const p = (t - t0) / d; return p <= 0 || p >= 1 ? 0 : h * Math.sin(Math.PI * p); };
+
+      // ---- the numbers (work/numbers.json, crash): S&P 500 closes, Fri 16 Oct 1987 282.70, Mon 19 Oct 1987 224.84 ----
+      // Honest scale, from zero: 1 unit of height = 50 index points. 282.70 -> 5.654, 224.84 -> 4.497, the lost 57.86 -> 1.157.
+      const PTS = 50, H_FRI = 282.70 / PTS, H_MON = 224.84 / PTS, H_LOST = H_FRI - H_MON;
+      const CW = 1.8;
+      const FRI = { cx: 4.7, cy: 5.3 }, MON = { cx: 7.14, cy: 2.86 };          // both on the screen-horizontal line x + y = 10
+      // the desk calendar: a wood base and a tear-off pad, its page on the front-right face
+      const BASE = { x: 0.3, y: 4.4, w: 1.6, d: 5.0, h: 0.3 };
+      const PAD = { x: 0.5, y: 4.6, w: 1.2, d: 4.6, h: 3.9, band: 1.0 };
+      const FW = PAD.d * U, FH = PAD.h * U;
+
+      // ---- beats ----
+      const tCal = 0.06, dCal = 0.55;                                          // the calendar drops in with the flip
+      const tOct = Math.max(0.3, w(1) - 0.02), t19 = Math.max(tOct + 0.12, w(2) - 0.02), tYr = Math.max(t19 + 0.2, w(3) - 0.02);
+      const tFri = Math.max(tYr + 0.25, 1.45), dGrow = 0.5;                     // Friday's column grows in the pause
+      const tMon = Math.max(tFri + 0.45, w(5) - 0.06);                         // Monday's on "S&P 500", to the same height
+      const TB = Math.max(tMon + 0.6, w(7) - 0.02);                            // "fell": the 57.86-point chunk breaks off
+      const tBig = Math.max(TB + 0.2, w(8) - 0.04);                            // "20.47%"
+      const tDay = Math.min(DUR - 1.1, Math.max(tBig + 0.6, w(9) - 0.36));     // "in one day": up just before the words, so it can be read
+
+      // ---- drawing helpers ----
+      function seams(x, y, wd, z0, h) {
+        g.strokeStyle = "rgba(255,255,255,0.55)"; g.lineWidth = 2;
+        for (let k = 1; k < h - 0.05; k++) {
+          const a = P(x, y + wd, z0 + k), b = P(x + wd, y + wd, z0 + k), c = P(x + wd, y, z0 + k);
+          g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); g.lineTo(c[0], c[1]); g.stroke();
+        }
+      }
+      function column(C, h, mat, sx) {
+        const wq = CW * sx, x = C.cx - wq / 2, y = C.cy - wq / 2;
+        K.box(x, y, 0, wq, wq, h, mat);
+        seams(x, y, wq, 0, h);
+        g.lineWidth = 3; g.strokeStyle = "rgba(255,255,255,0.7)"; g.lineCap = "round";
+        const a = P(x, y + wq, h), b = P(x + wq, y + wq, h), c = P(x + wq, y, h);
+        g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); g.lineTo(c[0], c[1]); g.stroke();
+      }
+      function socket(C) {
+        const s = CW + 0.3, x0 = C.cx - s / 2, y0 = C.cy - s / 2;
+        K.poly([P(x0, y0, 0), P(x0 + s, y0, 0), P(x0 + s, y0 + s, 0), P(x0, y0 + s, 0)], "#e6eefd", "rgba(37,99,235,0.28)", 2);
+      }
+      // the dashed outline of what Monday lost
+      function ghost(alpha) {
+        if (alpha <= 0) return;
+        const x = MON.cx - CW / 2, y = MON.cy - CW / 2, z0 = H_MON, h = H_LOST;
+        g.save(); g.globalAlpha = 0.22 * alpha; K.box(x, y, z0, CW, CW, h, { top: "#fecdd3", left: "#fda4af", right: "#fb7185" }, null); g.restore();
+        g.save(); g.globalAlpha = 0.95 * alpha; g.setLineDash([9, 7]); g.lineWidth = 3; g.strokeStyle = "#e11d48"; g.lineJoin = "round";
+        const pts = [P(x, y + CW, z0), P(x + CW, y + CW, z0), P(x + CW, y, z0), P(x + CW, y, z0 + h), P(x, y, z0 + h), P(x, y + CW, z0 + h)];
+        g.beginPath(); pts.forEach(([a, c], i) => (i ? g.lineTo(a, c) : g.moveTo(a, c))); g.closePath(); g.stroke();
+        const m = P(x + CW, y + CW, z0 + h);
+        g.beginPath(); g.moveTo(...P(x, y + CW, z0 + h)); g.lineTo(...m); g.lineTo(...P(x + CW, y, z0 + h)); g.moveTo(...m); g.lineTo(...P(x + CW, y + CW, z0)); g.stroke();
+        g.restore();
+      }
+      // a box rotated about the world x axis (its top tips toward -y), drawn with back-face culling
+      const FACES = [
+        { n: [0, 0, 1], v: [[-1, -1, 1], [1, -1, 1], [1, 1, 1], [-1, 1, 1]] }, { n: [0, 0, -1], v: [[-1, -1, -1], [1, -1, -1], [1, 1, -1], [-1, 1, -1]] },
+        { n: [0, 1, 0], v: [[-1, 1, -1], [1, 1, -1], [1, 1, 1], [-1, 1, 1]] }, { n: [0, -1, 0], v: [[-1, -1, -1], [1, -1, -1], [1, -1, 1], [-1, -1, 1]] },
+        { n: [1, 0, 0], v: [[1, -1, -1], [1, 1, -1], [1, 1, 1], [1, -1, 1]] }, { n: [-1, 0, 0], v: [[-1, -1, -1], [-1, 1, -1], [-1, 1, 1], [-1, -1, 1]] },
+      ];
+      function rbox(c, hx, hy, hz, rot, mat) {
+        const cs = Math.cos(rot), sn = Math.sin(rot);
+        const R = ([x, y, z]) => [x, y * cs - z * sn, y * sn + z * cs];
+        for (const f of FACES) {
+          const n = R(f.n);
+          if (n[0] + n[1] + n[2] <= 0.002) continue;
+          const col = n[2] >= Math.max(n[0], n[1]) ? mat.top : n[1] >= n[0] ? mat.left : mat.right;
+          K.poly(f.v.map(([a, b, d]) => { const r = R([a * hx, b * hy, d * hz]); return P(c[0] + r[0], c[1] + r[1], c[2] + r[2]); }), col, "rgba(15,35,90,0.16)");
+        }
+      }
+      // the lost chunk's flight: it cracks off, arcs over the back edge of the platform and drops out of sight behind it
+      const CH0 = [MON.cx, MON.cy, H_MON + H_LOST / 2];
+      const ease2 = (p) => (p < 0.5 ? 2 * p * p : 1 - 2 * (1 - p) * (1 - p));
+      function chunk(t) {
+        const tau = t - TB;
+        if (tau < 0 || tau > 0.82) return null;
+        let y, z, r, a = 1;
+        if (tau < 0.12) { const p = tau / 0.12; y = CH0[1] - 0.16 * p; z = CH0[2] + 0.3 * Math.sin(p * Math.PI / 2); r = 0.3 * p; }
+        else if (tau < 0.5) { const p = (tau - 0.12) / 0.38; y = CH0[1] - 0.16 - (CH0[1] - 0.16 + 1.12) * ease2(p); z = CH0[2] + 0.3 + 0.5 * Math.sin(p * Math.PI) - (CH0[2] + 0.3 - 1.65) * p * p; r = 0.3 + 1.9 * p; }
+        else { const p = (tau - 0.5) / 0.3; y = -1.12 - 0.15 * p; z = 1.65 - 8 * p * p; r = 2.2 + 0.9 * p; a = 1 - clamp((p - 0.3) / 0.5, 0, 1); }
+        return { c: [CH0[0], y, z], r, a, behind: tau >= 0.5 };
+      }
+
+      // ---- DOM: the calendar page, the base pills, the lost-points pill ----
+      const cf = document.getElementById("s3-cf"), bob = document.getElementById("s3-bob");
+      const pin = (id, p, dy) => { const e = document.getElementById(id); e.style.left = p[0].toFixed(1) + "px"; e.style.top = (p[1] + (dy || 0)).toFixed(1) + "px"; };
+      pin("s3-af", P(FRI.cx + CW / 2 + 0.25, FRI.cy + CW / 2 + 0.25, 0), 4);
+      pin("s3-am", P(MON.cx + CW / 2 + 0.25, MON.cy + CW / 2 + 0.25, 0), 4);
+      pin("s3-al", P(MON.cx, MON.cy, H_FRI), -CW * 24 - 16);
+
+      const st = { t: 0 };
+      function draw() {
+        const t = st.t;
+        g.clearRect(0, 0, 1080, 1920);
+        bob.style.transform = "translateY(" + (-8 * Math.sin((2 * Math.PI * (t + 0.3)) / 3)).toFixed(2) + "px)";
+        const ch = chunk(t);
+        if (ch && ch.behind && ch.a > 0) { g.save(); g.globalAlpha = ch.a; rbox(ch.c, CW / 2, CW / 2, H_LOST / 2, ch.r, M.rose); g.restore(); }
+        K.shadow(0, 0, -1.6, 10, 10, 0.2);
+        K.platform(0, 0, 10, 10);
+        socket(FRI); socket(MON);
+
+        // the calendar: drops in on the flip, hops on "19th" and "1987"
+        const zc = (t < tCal ? 3.6 : t < tCal + dCal ? 3.6 * (1 - bounceOut((t - tCal) / dCal)) : 0) + hopZ(t, t19 + 0.02, 0.28, 0.35) + hopZ(t, tYr + 0.02, 0.28, 0.3);
+        const sq = land(t - tCal - dCal / 2.75, 0.14) * land(t - t19 - 0.3, 0.1) * land(t - tYr - 0.3, 0.1), sx = 1 + (1 - sq) * 0.4;
+        K.shadow(BASE.x - 0.2, BASE.y - 0.2, 0, BASE.w + 0.4, BASE.d + 0.4, 0.22 * clamp(1 - zc / 3.6, 0.2, 1));
+        const bw = BASE.w * sx, bd = BASE.d * sx, bx = BASE.x + (BASE.w - bw) / 2, by = BASE.y + (BASE.d - bd) / 2;
+        K.box(bx, by, zc, bw, bd, BASE.h * sq, M.wood);
+        const pw = PAD.w * sx, pd = PAD.d * sx, px = PAD.x + (PAD.w - pw) / 2, py = PAD.y + (PAD.d - pd) / 2;
+        const z0 = zc + BASE.h * sq, ph = PAD.h * sq, pb = PAD.band * sq;
+        K.box(px, py, z0, pw, pd, ph - pb, M.white, "rgba(15,35,90,0.16)");
+        K.box(px, py, z0 + ph - pb, pw, pd, pb, M.rose, "rgba(120,10,40,0.2)");
+        [0.28, 0.72].forEach((f) => K.box(px + pw * 0.3, py + pd * f - 0.14, z0 + ph, 0.3, 0.28, 0.22, M.navy));   // binder rings
+        const fx = px + pw;
+        cf.style.transform = K.faceMatrix(P(fx, py + pd, z0 + ph), P(fx, py, z0 + ph), P(fx, py + pd, z0), FW, FH);
+
+        // Friday's column (blue) and Monday's: same height until "fell", then it drops to 224.84 and turns rose
+        const hF = H_FRI * backOut(prog(t, tFri, dGrow), 1.8);
+        if (hF > 0.01) { K.shadow(FRI.cx - CW / 2, FRI.cy - CW / 2, 0, CW, CW, 0.2); column(FRI, hF, M.blue, 1); }
+        let hM = H_FRI * backOut(prog(t, tMon, dGrow), 1.8), matM = M.blue, sxM = 1;
+        if (t >= TB) {
+          const s2 = land(t - TB - 0.02, 0.22);
+          hM = H_MON * s2; sxM = 1 + (1 - s2) * 0.35;
+          matM = t >= TB + 0.03 ? M.rose : M.blue;
+        }
+        if (hM > 0.01) { K.shadow(MON.cx - CW / 2, MON.cy - CW / 2, 0, CW, CW, 0.2); column(MON, hM, matM, sxM); }
+        ghost(prog(t, TB + 0.14, 0.2));
+        if (ch && !ch.behind) rbox(ch.c, CW / 2, CW / 2, H_LOST / 2, ch.r, M.rose);
+      }
+
+      // ---- camera: cube flip in, slow push, a thump when the drop lands, cube flip out ----
+      tl.fromTo("#s3-flip", { rotationY: -90, scale: 0.94 }, { rotationY: 0, scale: 1, duration: 0.36, ease: "power3.out" }, 0);
+      tl.fromTo("#s3-cam", { scale: 1 }, { scale: 1.04, duration: DUR, ease: "sine.inOut" }, 0);
+      tl.fromTo("#s3-cam", { y: 0 }, { y: 8, duration: 0.05, ease: "power2.out" }, tBig + 0.16);
+      tl.fromTo("#s3-cam", { y: 8 }, { y: 0, duration: 0.32, ease: "back.out(3)", immediateRender: false }, tBig + 0.21);
+      tl.fromTo("#s3-flip", { rotationY: 0 }, { rotationY: 90, duration: 0.26, ease: "power2.in", immediateRender: false }, DUR - 0.26);
+
+      // ---- the calendar page fills on "October", "19th", "1987" ----
+      const popIn = (sel, t, d) => tl.fromTo(sel, { opacity: 0, scale: 0.3, y: 14 }, { opacity: 1, scale: 1, y: 0, duration: d || 0.32, ease: "back.out(3)" }, t);
+      popIn("#s3-oct", tOct);
+      popIn("#s3-day", t19, 0.36);
+      popIn("#s3-wd", t19 + 0.08);
+      popIn("#s3-yr", tYr);
+
+      // ---- the base pills: Friday's when its column lands, Monday's on "500"; Monday's close fills its slot on "fell" ----
+      const pop = (sel, t, d) => tl.fromTo(sel, { opacity: 0, scale: 0.3, y: -14 }, { opacity: 1, scale: 1, y: 0, duration: d || 0.36, ease: "back.out(2.8)" }, t);
+      pop("#s3-pf", tFri + 0.3);
+      pop("#s3-pm", Math.max(tMon + 0.3, w(6) - 0.1));
+      tl.fromTo("#s3-pm", { boxShadow: "0 9px 0 #2563eb, 0 20px 30px rgba(30,64,175,0.2)" }, { boxShadow: "0 9px 0 #e11d48, 0 20px 30px rgba(159,18,57,0.22)", duration: 0.02, ease: "none", immediateRender: false }, TB + 0.03);
+      tl.fromTo("#s3-pmd", { color: "#2563eb" }, { color: "#e11d48", duration: 0.02, ease: "none", immediateRender: false }, TB + 0.03);
+      tl.fromTo("#s3-slot", { opacity: 1 }, { opacity: 0, duration: 0.1, ease: "power1.out", immediateRender: false }, TB + 0.2);
+      tl.fromTo("#s3-pmv", { opacity: 0, scale: 0.3, y: 10 }, { opacity: 1, scale: 1, y: 0, duration: 0.32, ease: "back.out(3)" }, TB + 0.22);
+      tl.fromTo("#s3-pm", { y: 0 }, { y: 10, duration: 0.07, ease: "power2.out", immediateRender: false }, TB + 0.06);
+      tl.fromTo("#s3-pm", { y: 10 }, { y: 0, duration: 0.3, ease: "back.out(3)", immediateRender: false }, TB + 0.13);
+      tl.fromTo("#s3-n1", { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, tMon + 0.1);
+      tl.fromTo("#s3-n2", { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, tMon + 0.25);
+
+      // ---- "20.47%": the big rose board drops onto the stage with a squash; then the lost points; "in one day" ----
+      tl.fromTo("#s3-big", { opacity: 0, scale: 1.2, y: -20 }, { opacity: 1, scale: 1, y: 0, duration: 0.18, ease: "power3.in" }, tBig);
+      tl.fromTo("#s3-big", { scaleX: 1, scaleY: 1 }, { scaleX: 1.1, scaleY: 0.82, duration: 0.06, ease: "power2.out", immediateRender: false }, tBig + 0.18);
+      tl.fromTo("#s3-big", { scaleX: 1.1, scaleY: 0.82 }, { scaleX: 1, scaleY: 1, duration: 0.34, ease: "back.out(3)", immediateRender: false }, tBig + 0.24);
+      tl.fromTo("#s3-lost", { opacity: 0, scale: 0.3, y: 20 }, { opacity: 1, scale: 1, y: 0, duration: 0.34, ease: "back.out(2.8)" }, Math.max(TB + 0.62, tBig + 0.3));
+      tl.fromTo("#s3-dayp", { opacity: 0, scale: 0.3, y: 20 }, { opacity: 1, scale: 1, y: 0, duration: 0.32, ease: "back.out(2.8)" }, tDay);
+      tl.fromTo("#s3-dayp", { scaleX: 1, scaleY: 1 }, { scaleX: 1.08, scaleY: 0.86, duration: 0.06, ease: "power2.out", immediateRender: false }, Math.max(tDay + 0.32, w(10)));
+      tl.fromTo("#s3-dayp", { scaleX: 1.08, scaleY: 0.86 }, { scaleX: 1, scaleY: 1, duration: 0.24, ease: "back.out(3)", immediateRender: false }, Math.max(tDay + 0.32, w(10)) + 0.06);
+
+      tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: draw }, 0);
+      draw();
+      window.__timelines["s3"] = tl;
+    })();
+  </script>
+</template>

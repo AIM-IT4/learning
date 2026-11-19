@@ -1,0 +1,295 @@
+<template>
+  <style>
+    @font-face { font-family: "Fredoka"; font-weight: 400; src: url("assets/fonts/fredoka-400.woff2"); }
+    @font-face { font-family: "Fredoka"; font-weight: 700; src: url("assets/fonts/fredoka-700.woff2"); }
+    @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
+    @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
+    #root { position: absolute; inset: 0; overflow: hidden; perspective: 2400px; perspective-origin: 540px 1150px; }
+    #s10-flip, #s10-cam, #s10-bob { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #s10-flip { transform-origin: 540px 1150px; }
+    #s10-cam { transform-origin: 540px 1000px; }
+    #s10-cv { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    .s10-t { font-family: "Fredoka", "D2QSans", "JetBrains Mono", sans-serif; font-weight: 700; color: #0b1b3a; white-space: nowrap; }
+    /* strike pills, one in front of each option ticket */
+    .s10-k { position: absolute; left: 0; top: 0; width: 72px; margin-left: -36px; height: 46px; border-radius: 23px; background: #ffffff;
+             box-shadow: 0 6px 0 #2563eb, 0 12px 18px rgba(30,64,175,0.2); display: flex; align-items: center; justify-content: center;
+             font-size: 30px; line-height: 1; opacity: 0; transform-origin: 50% 0%; }
+    .s10-k i { font-style: normal; font-size: 20px; color: #2563eb; margin-right: 2px; }
+    /* signboards: .s10-pw is placed and pops, .s10-hop hops and squashes */
+    .s10-pw { position: absolute; opacity: 0; transform-origin: 50% 100%; }
+    .s10-hop { position: relative; transform-origin: 50% 100%; }
+    .s10-card { background: #ffffff; border-radius: 26px; box-shadow: 0 10px 0 #2563eb, 0 24px 36px rgba(30,64,175,0.22); }
+    .s10-card.s10-r { box-shadow: 0 10px 0 #e11d48, 0 24px 36px rgba(159,18,57,0.22); }
+    /* one-month options: a navy pill */
+    #s10-opt { left: 0; width: 996px; top: 616px; display: flex; justify-content: flex-end; transform-origin: 78% 100%; }
+    #s10-optp { display: inline-flex; align-items: center; gap: 12px; height: 74px; padding: 0 28px 0 22px; border-radius: 37px; background: #1e3a8a; color: #ffffff;
+                font-size: 36px; letter-spacing: 0.04em; box-shadow: 0 10px 0 #0b1b3a, 0 22px 32px rgba(15,23,42,0.25); }
+    #s10-optp svg { width: 40px; height: 40px; flex: none; }
+    /* the path counter */
+    #s10-cnt { left: 76px; top: 604px; transform-origin: 50% 50%; }
+    #s10-cnt .s10-card { width: 404px; padding: 8px 0 12px; text-align: center; }
+    #s10-cl { font-size: 30px; line-height: 34px; color: #475569; }
+    #s10-cn { font-size: 72px; line-height: 78px; letter-spacing: -0.01em; }
+    /* the crash months, over the rose hump */
+    #s10-cr { left: 112px; top: 850px; }
+    #s10-cr .s10-card { padding: 4px 22px 10px; text-align: center; }
+    #s10-crn { font-size: 46px; line-height: 52px; color: #e11d48; }
+    #s10-crl { font-size: 30px; line-height: 34px; }
+    /* the plaque and the scale note under the platform */
+    #s10-plq { left: 62px; width: 680px; top: 1460px; display: flex; justify-content: center; }
+    #s10-plq .s10-card { padding: 10px 30px 14px; text-align: center; }
+    #s10-pl1 { font-size: 40px; line-height: 48px; }
+    #s10-pl1 b { color: #2563eb; }
+    #s10-pl2 { font-size: 30px; line-height: 36px; color: #475569; }
+    #s10-note { left: 62px; width: 680px; top: 1592px; display: flex; justify-content: center; transform-origin: 50% 0%; }
+    #s10-notex { padding: 0 24px; border-radius: 26px; background: rgba(255,255,255,0.86); font-size: 30px; line-height: 52px; color: #33415c; box-shadow: 0 6px 0 #bfdbfe; }
+    #s10-notex b { color: #2563eb; }
+    #s10-notex em { font-style: normal; color: #e11d48; }
+  </style>
+  <div id="root" data-composition-id="s10" data-width="1080" data-height="1920">
+    <div id="s10-flip">
+      <div id="s10-cam">
+        <div id="s10-bob">
+          <canvas id="s10-cv" width="1080" height="1920"></canvas>
+          <div id="s10-ks" data-layout-ignore></div>
+          <div class="s10-pw" id="s10-opt"><div class="s10-hop" id="s10-opth"><div class="s10-t" id="s10-optp">
+            <svg viewBox="0 0 40 40"><rect x="4" y="7" width="32" height="29" rx="6" fill="#ffffff" /><rect x="4" y="7" width="32" height="10" rx="5" fill="#93c5fd" />
+              <rect x="11" y="3" width="4" height="9" rx="2" fill="#ffffff" /><rect x="25" y="3" width="4" height="9" rx="2" fill="#ffffff" />
+              <rect x="10" y="22" width="6" height="5" rx="1.5" fill="#2563eb" /><rect x="18" y="22" width="6" height="5" rx="1.5" fill="#93c5fd" /><rect x="26" y="22" width="6" height="5" rx="1.5" fill="#93c5fd" />
+              <rect x="10" y="29" width="6" height="5" rx="1.5" fill="#93c5fd" /><rect x="18" y="29" width="6" height="5" rx="1.5" fill="#93c5fd" /></svg>
+            <span>1-MONTH OPTIONS</span></div></div></div>
+          <div class="s10-pw" id="s10-cnt"><div class="s10-hop" id="s10-cnth"><div class="s10-card s10-t">
+            <div id="s10-cl">simulated paths</div><div id="s10-cn">0</div></div></div></div>
+          <div class="s10-pw" id="s10-cr"><div class="s10-hop" id="s10-crh"><div class="s10-card s10-r s10-t">
+            <div id="s10-crn">8,171</div><div id="s10-crl">with a crash</div></div></div></div>
+          <div class="s10-pw" id="s10-plq"><div class="s10-hop"><div class="s10-card s10-t">
+            <div id="s10-pl1"><b>1,000,000</b> simulated months</div><div id="s10-pl2">where each month ends</div></div></div></div>
+          <div class="s10-pw" id="s10-note"><div class="s10-t" id="s10-notex"><b>1 block = 1,000 months</b> · tall bars capped</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      /*DATA*/ const DUR = 4.86; const W = [0.16, 0.42, 0.86, 1.2, 1.38, 1.62, 1.84, 2.12, 2.32, 2.74, 3.12, 3.24, 3.52, 4.02]; /*END*/
+      // words: 0 Price 1 one-month 2 options 3 at 4 strikes 5 from 6 80 7 to 8 120, 9 on 10 a 11 million 12 simulated 13 paths.
+      const w = (i) => Math.max(0, W.length > i ? W[i] : 0.16 + i * 0.3);
+// ISO KIT v1: isometric toy-world drawing on a 2D canvas, matching the Flow dioramas' look.
+// Copy this block verbatim into a scene's <script> (inside its IIFE). World units: x to the right-back, y to the left-back,
+// z up. P(x, y, z) -> frame px. Visible faces of a box: top, the face at y+d (front-left) and the face at x+w (front-right).
+// Draw back to front: sort what you draw by (x + y) ascending, then z ascending (painter's order).
+const ISO = (function () {
+  const C30 = Math.cos(Math.PI / 6), S30 = 0.5;
+  const MAT = {
+    white: { top: "#ffffff", left: "#e3ebfb", right: "#c9d8f5" },
+    blue:  { top: "#7fb0ff", left: "#3b82f6", right: "#2563eb" },
+    navy:  { top: "#4f6fe0", left: "#1e40af", right: "#1e3a8a" },
+    sky:   { top: "#dbeafe", left: "#bfdbfe", right: "#93c5fd" },
+    rose:  { top: "#fda4af", left: "#f43f5e", right: "#e11d48" },
+    gold:  { top: "#fde68a", left: "#f59e0b", right: "#d97706" },
+    grey:  { top: "#f1f5f9", left: "#cbd5e1", right: "#94a3b8" },
+    wood:  { top: "#f3c58f", left: "#d99a5b", right: "#b97a3f" },
+  };
+  function make(g, ox, oy, u) {
+    const P = (x, y, z) => [ox + (x - y) * C30 * u, oy + (x + y) * S30 * u - (z || 0) * u];
+    function poly(pts, fill, stroke, lw) {
+      g.beginPath(); pts.forEach(([a, b], i) => (i ? g.lineTo(a, b) : g.moveTo(a, b))); g.closePath();
+      if (fill) { g.fillStyle = fill; g.fill(); }
+      if (stroke) { g.strokeStyle = stroke; g.lineWidth = lw || 1.5; g.stroke(); }
+    }
+    function box(x, y, z, w, d, h, mat, edge) {
+      if (h <= 0 || w <= 0 || d <= 0) return;
+      edge = edge === undefined ? "rgba(15,35,90,0.14)" : edge;
+      poly([P(x, y + d, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x, y + d, z + h)], mat.left, edge);
+      poly([P(x + w, y, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x + w, y, z + h)], mat.right, edge);
+      poly([P(x, y, z + h), P(x + w, y, z + h), P(x + w, y + d, z + h), P(x, y + d, z + h)], mat.top, edge);
+    }
+    // a soft contact shadow on the floor plane z
+    function shadow(x, y, z, w, d, a) {
+      const c = P(x + w / 2, y + d / 2, z); const rx = (w + d) * C30 * u * 0.55, ry = (w + d) * S30 * u * 0.55;
+      const gr = g.createRadialGradient(c[0], c[1], 0, c[0], c[1], rx);
+      gr.addColorStop(0, `rgba(30,64,175,${a || 0.18})`); gr.addColorStop(1, "rgba(30,64,175,0)");
+      g.save(); g.translate(c[0], c[1]); g.scale(1, ry / rx); g.translate(-c[0], -c[1]);
+      g.fillStyle = gr; g.beginPath(); g.arc(c[0], c[1], rx, 0, 6.2832); g.fill(); g.restore();
+    }
+    // the floating platform: white top slab, blue band, white band, blue base (like the dioramas), its top at z = 0
+    function platform(x, y, w, d) {
+      box(x, y, -1.5, w, d, 0.42, MAT.blue);
+      box(x, y, -1.08, w, d, 0.3, MAT.white);
+      box(x, y, -0.78, w, d, 0.28, MAT.blue);
+      box(x, y, -0.5, w, d, 0.5, MAT.white);
+    }
+    // a 2D affine matrix that maps a flat w x h DOM element onto a face given three projected corners (TL, TR, BL)
+    function faceMatrix(tl, tr, bl, w, h) {
+      const a = (tr[0] - tl[0]) / w, b = (tr[1] - tl[1]) / w, c = (bl[0] - tl[0]) / h, d = (bl[1] - tl[1]) / h;
+      return `matrix(${a.toFixed(5)},${b.toFixed(5)},${c.toFixed(5)},${d.toFixed(5)},${tl[0].toFixed(2)},${tl[1].toFixed(2)})`;
+    }
+    return { P, poly, box, shadow, platform, faceMatrix, u };
+  }
+  return { make, MAT };
+})();
+
+      const tl = gsap.timeline({ paused: true });
+      const g = document.getElementById("s10-cv").getContext("2d");
+      // the camera pulls back a little from s1's (u 48 -> 44) so the whole histogram, 70 to 130, fits on a wider platform
+      const U = 44, K = ISO.make(g, 540, 900, U), M = ISO.MAT, P = K.P;
+      const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+      const land = (dt) => (dt < 0 ? 1 : 1 - 0.18 * Math.exp(-dt / 0.08) * Math.cos(dt * 26));
+      const settleF = (dt) => (dt < 0 ? 1 : 1 - 0.07 * Math.sin(dt * 24) * Math.exp(-dt / 0.1));
+      const mild = (p) => { p = clamp(p, 0, 1); return 0.5 * p + 0.5 * (0.5 - 0.5 * Math.cos(Math.PI * p)); };
+      const sine = (p) => { p = clamp(p, 0, 1); return 0.5 - 0.5 * Math.cos(Math.PI * p); };
+
+      // ---- the data: where the 1,000,000 simulated one-month paths end (work/numbers.json ends): month-end price 70 .. 130
+      //      in bins of 2.5 (all), and those of the 8,171 paths that had a crash (crash)
+      const ALL = [106, 465, 1289, 2220, 2055, 1398, 1357, 6161, 27343, 79360, 157911, 218051, 214862, 154982, 83567, 34504, 10944, 2728, 587, 98, 10, 2, 0, 0];
+      const CRS = [106, 465, 1289, 2219, 2050, 1328, 540, 141, 30, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+      const NPATH = 1000000, PER = 1000, CAP = 7;          // 1 block = 1,000 months; bars over 7,000 are capped (with a break mark)
+
+      // ---- the set: strike i (80 .. 120) at world (1 + i, 9 - i) on the screen-horizontal diagonal b = x + y = 10, as in s1.
+      //      Price p sits at a = x - y = (p - 100) / 2.5 along that diagonal, so each 2.5 bin is one step of a and every strike
+      //      lines up with the bin edges. The histogram stands on the parallel diagonal b = HB, just behind the tickets.
+      const Q = (a, b, z) => P((a + b) / 2, (b - a) / 2, z);
+      const HB = 8.6, BS = 0.46;
+      const BINS = ALL.map((n, k) => { const a = -11.5 + k; return { k, n, c: CRS[k], x: (a + HB) / 2 - BS / 2, y: (HB - a) / 2 - BS / 2 }; });
+      const KS = [80, 85, 90, 95, 100, 105, 110, 115, 120];
+      const TK = 0.84, TH = 0.16;
+      const ROW = KS.map((k, i) => ({ k, i, x: 1 + i, y: 9 - i }));
+      const SX = 7.2, SY = 7.2;                            // the ticket stack, on the platform in front of the row
+
+      // ---- beats (scene seconds)
+      const TS = Math.max(0.42, w(2) - 0.2), TSL = TS + 0.24;          // the stack of nine one-month tickets drops on "options"
+      const TSW = w(4) - 0.04;                                         // the nine strike spots light up on "strikes"
+      ROW.forEach((r, i) => { r.T = w(6) + (w(8) - w(6)) * (i / 8); }); // dealt out: 80 lands on "80", 120 on "120"
+      const FL = 0.3;                                                  // each ticket's flight
+      const TR0 = w(9) - 0.02, TR1 = Math.max(TR0 + 0.5, w(12) + 0.04); // a million paths: "on" .. "simulated"
+      const frac = (t) => mild((t - TR0) / (TR1 - TR0));
+      // when each tall bar reaches its cap (for a little bounce)
+      BINS.forEach((b) => {
+        b.hit = null;
+        if (b.n / PER <= CAP) return;
+        let lo = TR0, hi = TR1;
+        for (let it = 0; it < 30; it++) { const m = (lo + hi) / 2; if ((b.n * frac(m)) / PER >= CAP) hi = m; else lo = m; }
+        b.hit = hi;
+      });
+
+      // strike pills
+      const ksEl = document.getElementById("s10-ks");
+      ROW.forEach((r) => {
+        const d = document.createElement("div"); d.className = "s10-k s10-t"; d.innerHTML = "<i>K</i>" + r.k; ksEl.appendChild(d); r.el = d;
+        const p = P(r.x + 0.62, r.y + 0.62, 0); d.style.left = p[0].toFixed(1) + "px"; d.style.top = (p[1] - 6).toFixed(1) + "px";
+      });
+
+      function ticket(cx, cy, z, sq) {
+        const s = 1 + (1 - sq) * 0.4, wd = TK * s, x0 = cx - wd / 2, y0 = cy - wd / 2;
+        K.box(x0, y0, z, wd, wd, TH * sq, M.white, "rgba(15,35,90,0.18)");
+        const zt = z + TH * sq;   // the blue header band along the ticket's back edge, and two printed lines
+        K.poly([P(x0, y0, zt), P(x0 + wd, y0, zt), P(x0 + wd, y0 + 0.24 * s, zt), P(x0, y0 + 0.24 * s, zt)], "#3b82f6");
+        [0.46, 0.66].forEach((f) => K.poly([P(x0 + 0.14, y0 + f * wd, zt), P(x0 + wd - 0.14, y0 + f * wd, zt), P(x0 + wd - 0.14, y0 + (f + 0.08) * wd, zt), P(x0 + 0.14, y0 + (f + 0.08) * wd, zt)], "#c9d8f5"));
+      }
+      function seams(x, y, s, z0, z1) {
+        g.strokeStyle = "rgba(255,255,255,0.62)"; g.lineWidth = 1.6;
+        for (let z = Math.floor(z0) + 1; z < z1 - 0.05; z++) {
+          const a = P(x, y + s, z), b = P(x + s, y + s, z), c = P(x + s, y, z);
+          g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); g.lineTo(c[0], c[1]); g.stroke();
+        }
+      }
+      // a white zigzag across a capped bar's two front faces: the bar goes on far higher (up to 218,051)
+      function breakMark(x, y, s, z) {
+        const pts = [], n = 6;
+        for (let j = 0; j <= n; j++) {
+          const f = j / n, zz = z + (j % 2 ? 0.16 : -0.06);
+          pts.push(f <= 0.5 ? P(x + 2 * f * s, y + s, zz) : P(x + s, y + s - (2 * f - 1) * s, zz));
+        }
+        g.save(); g.strokeStyle = "#ffffff"; g.lineWidth = 7; g.lineJoin = "round"; g.lineCap = "round";
+        g.beginPath(); pts.forEach(([a, b], i) => (i ? g.lineTo(a, b) : g.moveTo(a, b))); g.stroke(); g.restore();
+      }
+
+      const cnEl = document.getElementById("s10-cn");
+      let lastN = "";
+      const fmt = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      const st = { t: 0 }, bob = document.getElementById("s10-bob");
+      function draw() {
+        const t = st.t;
+        g.clearRect(0, 0, 1080, 1920);
+        bob.style.transform = "translateY(" + (-8 * Math.sin((2 * Math.PI * (t + 1.0)) / 3)).toFixed(2) + "px)";
+        K.shadow(-2, -2, -1.6, 12.6, 12.6, 0.2);
+        K.platform(-2, -2, 12.6, 12.6);
+
+        // the histogram's empty sockets along its diagonal, then its bars: crash months (rose) at the foot, the rest (blue) on top
+        const sa = clamp((t - 0.24) / 0.3, 0, 1);
+        const f = t < TR0 ? 0 : frac(t);
+        const settle = settleF(t - TR1);
+        for (const b of BINS) {
+          const s0 = BS + 0.1;
+          K.poly([P(b.x - 0.05, b.y - 0.05, 0), P(b.x - 0.05 + s0, b.y - 0.05, 0), P(b.x - 0.05 + s0, b.y - 0.05 + s0, 0), P(b.x - 0.05, b.y - 0.05 + s0, 0)],
+            `rgba(219,234,254,${(0.9 * sa).toFixed(3)})`, `rgba(37,99,235,${(0.3 * sa).toFixed(3)})`, 2);
+          if (f <= 0) continue;
+          const raw = (b.n * f) / PER, capped = raw > CAP;
+          let h = Math.min(raw, CAP);
+          if (b.hit !== null && t >= b.hit) h = CAP + 0.42 * Math.sin((t - b.hit) * 22) * Math.exp(-(t - b.hit) / 0.09);
+          h *= settle;
+          if (h < 0.004) continue;
+          const hr = Math.min(h, (b.c * f) / PER * settle);
+          if (hr > 0.004) K.box(b.x, b.y, 0, BS, BS, hr, M.rose);
+          if (h - hr > 0.004) K.box(b.x, b.y, hr, BS, BS, h - hr, M.blue);
+          seams(b.x, b.y, BS, 0, h);
+          if (capped) breakMark(b.x, b.y, BS, h - 0.62);
+        }
+
+        // the nine strike spots light up in a sweep on "strikes"
+        ROW.forEach((r, i) => {
+          const k = clamp((t - TSW - 0.03 * i) / 0.2, 0, 1); if (k <= 0) return;
+          const s0 = TK + 0.16, x0 = r.x - s0 / 2, y0 = r.y - s0 / 2;
+          K.poly([P(x0, y0, 0), P(x0 + s0, y0, 0), P(x0 + s0, y0 + s0, 0), P(x0, y0 + s0, 0)], `rgba(191,219,254,${(0.7 * k).toFixed(3)})`, `rgba(37,99,235,${(0.55 * k).toFixed(3)})`, 2.5);
+        });
+        // tickets that have landed on their strikes
+        ROW.forEach((r) => { if (t >= r.T) { K.shadow(r.x - 0.52, r.y - 0.52, 0, 1.04, 1.04, 0.14); ticket(r.x, r.y, 0, land(t - r.T)); } });
+
+        // the stack of nine one-month option tickets (80 on top), dropped on "options", dealt out from the top
+        if (t >= TS) {
+          const p = clamp((t - TS) / (TSL - TS), 0, 1), drop = 3.2 * (1 - p * p), sq = land(t - TSL);
+          const left = ROW.filter((r) => t < r.T - FL);
+          if (left.length) K.shadow(SX - 0.6, SY - 0.6, 0, 1.2, 1.2, 0.18 * clamp(1 - drop / 4, 0.3, 1));
+          left.slice().reverse().forEach((r) => ticket(SX, SY, drop + (8 - r.i) * (TH + 0.02) * sq, sq));
+        }
+        // tickets in flight: an arc from the stack to their strike
+        ROW.forEach((r) => {
+          const p = (t - (r.T - FL)) / FL; if (p < 0 || p >= 1) return;
+          const e = sine(p), x = SX + (r.x - SX) * e, y = SY + (r.y - SY) * e;
+          const z = (8 - r.i) * (TH + 0.02) * (1 - p) + 2.4 * 4 * p * (1 - p);
+          K.shadow(x - 0.45, y - 0.45, 0, 0.9, 0.9, 0.1);
+          ticket(x, y, z, 1);
+        });
+
+        // the path counter rolls with the histogram
+        const n = t < TR0 ? 0 : Math.round(NPATH * f);
+        const s = fmt(n);
+        if (s !== lastN) { cnEl.textContent = s; lastN = s; }
+      }
+
+      // ---- camera: the cube flip in and out, slow push; the bob lives in draw()
+      tl.fromTo("#s10-flip", { rotationY: -90, scale: 0.94 }, { rotationY: 0, scale: 1, duration: 0.36, ease: "power3.out" }, 0);
+      tl.fromTo("#s10-flip", { rotationY: 0 }, { rotationY: 90, duration: 0.26, ease: "power2.in", immediateRender: false }, DUR - 0.26);
+      tl.fromTo("#s10-cam", { scale: 1 }, { scale: 1.04, duration: DUR, ease: "sine.inOut" }, 0);
+
+      // ---- signboards on their words
+      const pop = (sel, t, d) => tl.fromTo(sel, { opacity: 0, scale: 0.3, y: 26 }, { opacity: 1, scale: 1, y: 0, duration: d || 0.4, ease: "back.out(2.8)" }, t);
+      const squash = (sel, t) => {
+        tl.fromTo(sel, { scaleY: 1, scaleX: 1 }, { scaleY: 0.84, scaleX: 1.1, duration: 0.07, ease: "power2.out", immediateRender: false }, t);
+        tl.fromTo(sel, { scaleY: 0.84, scaleX: 1.1 }, { scaleY: 1, scaleX: 1, duration: 0.34, ease: "back.out(3)", immediateRender: false }, t + 0.07);
+      };
+      pop("#s10-opt", w(1) - 0.04);
+      squash("#s10-opth", TSL);
+      ROW.forEach((r) => tl.fromTo(r.el, { opacity: 0, scale: 0.4, y: -10 }, { opacity: 1, scale: 1, y: 0, duration: 0.3, ease: "back.out(3)" }, r.T + 0.02));
+      pop("#s10-cnt", TR0 - 0.12);
+      squash("#s10-cnth", TR1);
+      pop("#s10-plq", w(6) - 0.12);
+      tl.fromTo("#s10-note", { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, w(6) + 0.1);
+      pop("#s10-cr", w(12) - 0.06, 0.36);
+
+      tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: draw }, 0);
+      draw();
+      window.__timelines["s10"] = tl;
+    })();
+  </script>
+</template>

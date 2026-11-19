@@ -1,0 +1,337 @@
+<template>
+  <style>
+    @font-face { font-family: "Fredoka"; font-weight: 400; src: url("assets/fonts/fredoka-400.woff2"); }
+    @font-face { font-family: "Fredoka"; font-weight: 700; src: url("assets/fonts/fredoka-700.woff2"); }
+    @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
+    @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
+    #root { position: absolute; inset: 0; overflow: hidden; perspective: 2400px; perspective-origin: 540px 1150px; }
+    #s5-flip, #s5-cam, #s5-bob { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #s5-flip { transform-origin: 540px 1150px; }
+    #s5-cam { transform-origin: 590px 1010px; }
+    #s5-cv { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    .s5-t { font-family: "Fredoka", "D2QSans", "JetBrains Mono", sans-serif; font-weight: 700; color: #0b1b3a; white-space: nowrap; }
+    .s5-t sup { font-size: 0.6em; line-height: 0; position: relative; top: -0.78em; vertical-align: baseline; margin-left: 2px; }
+    .s5-pw { position: absolute; opacity: 0; transform-origin: 50% 100%; }
+    .s5-hop { position: relative; transform-origin: 50% 100%; }
+    .s5-card { background: #ffffff; border-radius: 26px; box-shadow: 0 10px 0 #2563eb, 0 24px 36px rgba(30,64,175,0.22); }
+    .s5-card.s5-r { box-shadow: 0 10px 0 #e11d48, 0 24px 36px rgba(159,18,57,0.22); }
+    .s5-g { font-family: "D2QSans", "Fredoka", sans-serif; font-weight: 800; }
+    /* axis tick labels on the floor in front of the wall */
+    .s5-tk { position: absolute; top: 1196px; width: 130px; margin-left: -65px; text-align: center; font-size: 30px; line-height: 34px; opacity: 0;
+            text-shadow: 0 0 6px #ffffff, 0 0 3px #ffffff, 0 0 2px #ffffff; }
+    .s5-tk.s5-b { color: #2563eb; }
+    /* right: what the curve is, and who assumes it */
+    #s5-lab { left: 712px; top: 836px; }
+    #s5-lab .s5-card { padding: 8px 22px 12px; }
+    .s5-l1 { display: block; font-size: 34px; line-height: 42px; }
+    .s5-l1 b { color: #2563eb; }
+    #s5-bs { left: 712px; top: 958px; }
+    #s5-bsc { display: block; padding: 8px 18px 10px; border-radius: 24px; background: #1e3a8a; box-shadow: 0 9px 0 #0b1b3a, 0 22px 32px rgba(15,23,42,0.25); text-align: center; }
+    #s5-bs1 { display: block; font-size: 30px; line-height: 38px; letter-spacing: 0.03em; color: #ffffff; }
+    #s5-bs2 { display: block; font-size: 30px; line-height: 34px; color: #bfdbfe; }
+    /* left: the crash day, far off the chart */
+    #s5-oct { left: 72px; top: 856px; }
+    #s5-oct .s5-card { padding: 8px 20px 12px; text-align: center; }
+    #s5-o1 { display: block; font-size: 30px; line-height: 36px; letter-spacing: 0.08em; color: #e11d48; }
+    #s5-o2 { display: block; font-size: 40px; line-height: 48px; }
+    #s5-o2 i { font-style: normal; color: #e11d48; }
+    #s5-o3 { display: block; font-size: 30px; line-height: 36px; color: #334155; }
+    /* top: the chance of such a day on the normal curve */
+    #s5-chw { position: absolute; left: 0; width: 1080px; top: 622px; display: flex; justify-content: center; padding-left: 60px; box-sizing: border-box; }
+    #s5-ch { opacity: 0; transform-origin: 50% 50%; }
+    #s5-chc { display: flex; align-items: baseline; gap: 14px; height: 104px; padding: 0 34px; border-radius: 28px; background: #ffffff;
+              box-shadow: 0 10px 0 #e11d48, 0 24px 36px rgba(159,18,57,0.22); }
+    #s5-chc span { font-size: 42px; line-height: 104px; }
+    #s5-chc b { font-size: 76px; line-height: 104px; color: #e11d48; font-weight: 700; }
+    /* bottom left: since the Big Bang */
+    #s5-bb { left: 78px; top: 1494px; }
+    #s5-bb .s5-card { padding: 10px 26px 14px; }
+    #s5-b1 { display: block; font-size: 30px; line-height: 36px; letter-spacing: 0.06em; color: #2563eb; }
+    #s5-b2 { display: block; font-size: 36px; line-height: 44px; }
+    #s5-b3w { display: block; height: 60px; }
+    #s5-b3 { display: inline-block; font-size: 46px; line-height: 60px; opacity: 0; transform-origin: 0% 70%; }
+    #s5-b3 i { font-style: normal; color: #e11d48; }
+    #s5-nt { position: absolute; left: 84px; top: 1672px; font-size: 30px; line-height: 36px; font-weight: 400; color: #334155; opacity: 0; }
+  </style>
+  <div id="root" data-composition-id="s5" data-width="1080" data-height="1920">
+    <div id="s5-flip">
+      <div id="s5-cam">
+        <div id="s5-bob">
+          <canvas id="s5-cv" width="1080" height="1920"></canvas>
+          <div class="s5-t s5-tk" id="s5-tk0" style="left: 286px;">−5%</div>
+          <div class="s5-t s5-tk s5-b" id="s5-tk1" style="left: 519px;">−1.26%</div>
+          <div class="s5-t s5-tk" id="s5-tk2" style="left: 600px;">0</div>
+          <div class="s5-t s5-tk s5-b" id="s5-tk3" style="left: 681px;">+1.26%</div>
+          <div class="s5-t s5-tk" id="s5-tk4" style="left: 906px;">+5%</div>
+          <div class="s5-pw" id="s5-lab"><div class="s5-hop" id="s5-labh"><div class="s5-card s5-t">
+            <span class="s5-l1">normal curve</span><span class="s5-l1">sd <b>1.26%</b> a day</span></div></div></div>
+          <div class="s5-pw" id="s5-bs"><div class="s5-hop" id="s5-bsh"><div class="s5-t" id="s5-bsc">
+            <span id="s5-bs1">BLACK–SCHOLES</span><span id="s5-bs2">assumes this</span></div></div></div>
+          <div class="s5-pw" id="s5-oct"><div class="s5-hop" id="s5-octh"><div class="s5-card s5-r s5-t">
+            <span id="s5-o1">19 OCT 1987</span><span id="s5-o2"><i>−20.47%</i> = 16.2<span class="s5-g">σ</span></span><span id="s5-o3">way off this chart</span></div></div></div>
+          <div id="s5-chw"><div id="s5-ch"><div class="s5-hop" id="s5-chh"><div class="s5-t" id="s5-chc">
+            <span>chance ≈</span><b>10<sup>−59</sup></b><span>a day</span></div></div></div></div>
+          <div class="s5-pw" id="s5-bb"><div class="s5-hop" id="s5-bbh"><div class="s5-card s5-t">
+            <span id="s5-b1">SINCE THE BIG BANG</span>
+            <span id="s5-b2">13.8 billion years × 252 days</span>
+            <span id="s5-b3w"><span id="s5-b3">→ expected <i>≈ 4 × 10<sup>−47</sup></i> days</span></span></div></div></div>
+          <div class="s5-t" id="s5-nt">x: one day's move · height: how often</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      /*DATA*/ const DUR = 5.54; const W = [0.16, 0.7, 1.02, 1.2, 1.64, 1.76, 2.22, 2.78, 2.88, 3.02, 3.18, 3.34, 3.48, 3.7, 4.26, 4.54, 4.78, 4.96, 5.1, 5.26]; /*END*/
+      // words: 0 If 1 returns 2 were 3 normal, 4 like 5 Black-Scholes 6 assumes, 7 a 8 day 9 like 10 that 11 would 12 never
+      //        13 happen. 14 Not 15 once 16 since 17 the 18 Big 19 Bang.
+      const w = (i) => Math.max(0, W.length > i ? W[i] : 0.16 + i * 0.27);
+// ISO KIT v1: isometric toy-world drawing on a 2D canvas, matching the Flow dioramas' look.
+// Copy this block verbatim into a scene's <script> (inside its IIFE). World units: x to the right-back, y to the left-back,
+// z up. P(x, y, z) -> frame px. Visible faces of a box: top, the face at y+d (front-left) and the face at x+w (front-right).
+// Draw back to front: sort what you draw by (x + y) ascending, then z ascending (painter's order).
+const ISO = (function () {
+  const C30 = Math.cos(Math.PI / 6), S30 = 0.5;
+  const MAT = {
+    white: { top: "#ffffff", left: "#e3ebfb", right: "#c9d8f5" },
+    blue:  { top: "#7fb0ff", left: "#3b82f6", right: "#2563eb" },
+    navy:  { top: "#4f6fe0", left: "#1e40af", right: "#1e3a8a" },
+    sky:   { top: "#dbeafe", left: "#bfdbfe", right: "#93c5fd" },
+    rose:  { top: "#fda4af", left: "#f43f5e", right: "#e11d48" },
+    gold:  { top: "#fde68a", left: "#f59e0b", right: "#d97706" },
+    grey:  { top: "#f1f5f9", left: "#cbd5e1", right: "#94a3b8" },
+    wood:  { top: "#f3c58f", left: "#d99a5b", right: "#b97a3f" },
+  };
+  function make(g, ox, oy, u) {
+    const P = (x, y, z) => [ox + (x - y) * C30 * u, oy + (x + y) * S30 * u - (z || 0) * u];
+    function poly(pts, fill, stroke, lw) {
+      g.beginPath(); pts.forEach(([a, b], i) => (i ? g.lineTo(a, b) : g.moveTo(a, b))); g.closePath();
+      if (fill) { g.fillStyle = fill; g.fill(); }
+      if (stroke) { g.strokeStyle = stroke; g.lineWidth = lw || 1.5; g.stroke(); }
+    }
+    function box(x, y, z, w, d, h, mat, edge) {
+      if (h <= 0 || w <= 0 || d <= 0) return;
+      edge = edge === undefined ? "rgba(15,35,90,0.14)" : edge;
+      poly([P(x, y + d, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x, y + d, z + h)], mat.left, edge);
+      poly([P(x + w, y, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x + w, y, z + h)], mat.right, edge);
+      poly([P(x, y, z + h), P(x + w, y, z + h), P(x + w, y + d, z + h), P(x, y + d, z + h)], mat.top, edge);
+    }
+    // a soft contact shadow on the floor plane z
+    function shadow(x, y, z, w, d, a) {
+      const c = P(x + w / 2, y + d / 2, z); const rx = (w + d) * C30 * u * 0.55, ry = (w + d) * S30 * u * 0.55;
+      const gr = g.createRadialGradient(c[0], c[1], 0, c[0], c[1], rx);
+      gr.addColorStop(0, `rgba(30,64,175,${a || 0.18})`); gr.addColorStop(1, "rgba(30,64,175,0)");
+      g.save(); g.translate(c[0], c[1]); g.scale(1, ry / rx); g.translate(-c[0], -c[1]);
+      g.fillStyle = gr; g.beginPath(); g.arc(c[0], c[1], rx, 0, 6.2832); g.fill(); g.restore();
+    }
+    // the floating platform: white top slab, blue band, white band, blue base (like the dioramas), its top at z = 0
+    function platform(x, y, w, d) {
+      box(x, y, -1.5, w, d, 0.42, MAT.blue);
+      box(x, y, -1.08, w, d, 0.3, MAT.white);
+      box(x, y, -0.78, w, d, 0.28, MAT.blue);
+      box(x, y, -0.5, w, d, 0.5, MAT.white);
+    }
+    // a 2D affine matrix that maps a flat w x h DOM element onto a face given three projected corners (TL, TR, BL)
+    function faceMatrix(tl, tr, bl, w, h) {
+      const a = (tr[0] - tl[0]) / w, b = (tr[1] - tl[1]) / w, c = (bl[0] - tl[0]) / h, d = (bl[1] - tl[1]) / h;
+      return `matrix(${a.toFixed(5)},${b.toFixed(5)},${c.toFixed(5)},${d.toFixed(5)},${tl[0].toFixed(2)},${tl[1].toFixed(2)})`;
+    }
+    return { P, poly, box, shadow, platform, faceMatrix, u };
+  }
+  return { make, MAT };
+})();
+
+      const tl = gsap.timeline({ paused: true });
+      const g = document.getElementById("s5-cv").getContext("2d");
+      // the set (shared with s6): U 44, the platform 10 x 11.5 (its longer side runs to the front-left, leaving room at the left end)
+      const U = 44, OX = 600, OY = 940;
+      const K = ISO.make(g, OX, OY, U), M = ISO.MAT, P = K.P;
+      const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+      const outBack = (p, s) => { if (p <= 0) return 0; if (p >= 1) return 1; p -= 1; return p * p * ((s + 1) * p + s) + 1; };
+      const bounceOut = (p) => {
+        p = clamp(p, 0, 1); const n = 7.5625, d = 2.75;
+        if (p < 1 / d) return n * p * p;
+        if (p < 2 / d) { p -= 1.5 / d; return n * p * p + 0.75; }
+        if (p < 2.5 / d) { p -= 2.25 / d; return n * p * p + 0.9375; }
+        p -= 2.625 / d; return n * p * p + 0.984375;
+      };
+      const land = (dt) => (dt < 0 ? 1 : 1 - 0.2 * Math.exp(-dt / 0.08) * Math.cos(dt * 26));
+      const mix = (a, b, k) => { const A = parseInt(a.slice(1), 16), B = parseInt(b.slice(1), 16);
+        const c = [16, 8, 0].map((sh) => Math.round(((A >> sh) & 255) * (1 - k) + ((B >> sh) & 255) * k));
+        return "rgb(" + c.join(",") + ")"; };
+
+      // ---- the bell curve of daily moves: normal density, sd 1.26% (bell.normal, x = -5% ... +5% step 0.05; symmetric, half stored) ----
+      const NH = [0.00012,0.00014,0.00016,0.00019,0.00022,0.00026,0.0003,0.00035,0.0004,0.00047,0.00054,0.00062,0.00071,0.00082,0.00094,0.00107,0.00122,0.00139,0.00159,0.00181,0.00205,0.00232,0.00263,0.00297,0.00335,0.00377,0.00424,0.00476,0.00534,0.00598,0.00668,0.00745,0.0083,0.00923,0.01025,0.01137,0.01258,0.0139,0.01534,0.0169,0.01859,0.02042,0.02239,0.02451,0.02679,0.02924,0.03186,0.03466,0.03765,0.04083,0.04421,0.0478,0.05159,0.0556,0.05983,0.06427,0.06894,0.07383,0.07894,0.08427,0.08982,0.09558,0.10156,0.10774,0.11411,0.12068,0.12741,0.13432,0.14137,0.14856,0.15587,0.16329,0.17078,0.17834,0.18594,0.19356,0.20118,0.20877,0.2163,0.22375,0.23109,0.2383,0.24534,0.2522,0.25884,0.26523,0.27136,0.27719,0.2827,0.28787,0.29267,0.29708,0.30109,0.30466,0.3078,0.31048,0.31269,0.31441,0.31565,0.3164,0.31665];
+      const dN = (i) => NH[i <= 100 ? i : 200 - i];
+      // the wall stands in the vertical diagonal plane (x + y = const), which faces the camera: 64 px per 1% across,
+      // height = density x HS (normal peak 0.317 = 5 units = 220 px; s6 draws the fat-tailed curve on this same scale)
+      const PXP = 64, DXY = PXP / (0.8660254 * U), HS = 5 / 0.31665;
+      const CB = 9.0, CF = 10.0, CA = 11.3;
+      const at = (s, c, z) => P((c + DXY * s) / 2, (c - DXY * s) / 2, z);
+
+      // ---- beats ----
+      const tAxis = 0.34;                                     // the floor axis and its ticks, as the shot lands
+      const G0 = w(3) - 0.12;                                 // the wall rises from the middle outward on "normal,"
+      const tLab = w(3) + 0.18, tBS = w(5) - 0.04;            // the curve's label; "Black-Scholes" (assumes this)
+      const tLine = w(8) - 0.08, tTile = w(8) - 0.02;         // "day": the dashed line runs off the left end
+      const tPin = w(9) - 0.1, dPin = 0.46;                   // "like that": the marker drops onto its own tile, far off
+      const tOct = w(10) - 0.02;
+      const tNever = w(12) - 0.1;                             // "never": the chance lands
+      const tBB = w(14) - 0.04, tBB3 = w(15) - 0.04;          // "Not once": since the Big Bang ... expected
+
+      const grow = (s, t) => outBack((t - G0 - Math.abs(s) * 0.045) / 0.5, 1.7);
+      const tLay = 0.42;                                      // its floor strip lays in along the axis first
+      function drawWall(t) {
+        const lay = clamp((t - tLay) / 0.36, 0, 1); if (lay <= 0) return;
+        const n = Math.max(1, Math.round(200 * (1 - Math.pow(1 - lay, 2))));
+        const pts = [];
+        for (let i = 0; i <= n; i++) {
+          const s = -5 + i * 0.05, h = HS * dN(i) * grow(s, t);
+          pts.push({ s, h, b: at(s, CB, h), f: at(s, CF, h), f0: at(s, CF, 0) });
+        }
+        K.shadow(1.6, 1.6, 0, 7.2, 7.2, 0.12 * clamp(grow(0, t), 0, 1));
+        // the front face
+        const outline = pts.map((p) => p.f).concat(pts.slice().reverse().map((p) => p.f0));
+        const top = Math.min(...pts.map((p) => p.f[1])), bot = pts[0].f0[1];
+        const gr = g.createLinearGradient(0, top, 0, bot);
+        gr.addColorStop(0, "#4b8df8"); gr.addColorStop(1, "#2563eb");
+        K.poly(outline, gr);
+        // the ribbon along the top, shaded by its slope
+        const L1 = 0.05 * DXY / Math.SQRT2;
+        for (let i = 0; i < pts.length - 1; i++) {
+          const p = pts[i], q = pts[i + 1], slope = (q.h - p.h) / L1, k = clamp(Math.abs(slope) / 2.6, 0, 1) * 0.75;
+          const col = mix(M.blue.top, slope > 0 ? M.blue.left : M.blue.right, k);
+          K.poly([p.b, q.b, q.f, p.f], col, col, 1);
+        }
+        g.lineWidth = 2; g.strokeStyle = "rgba(255,255,255,0.6)";
+        g.beginPath(); pts.forEach((p, i) => (i ? g.lineTo(p.f[0], p.f[1]) : g.moveTo(p.f[0], p.f[1]))); g.stroke();
+        g.lineWidth = 1.5; g.strokeStyle = "rgba(15,35,90,0.16)";
+        g.beginPath(); pts.forEach((p, i) => (i ? g.lineTo(p.b[0], p.b[1]) : g.moveTo(p.b[0], p.b[1]))); g.stroke();
+        // one standard deviation either side: thin white lines on the face at +/-1.26%
+        if (grow(0, t) <= 0) return;
+        [-1.26, 1.26].forEach((s) => {
+          const i = Math.round((s + 5) / 0.05), h = HS * dN(i) * grow(s, t);
+          const a = at(s, CF, h), b = at(s, CF, 0);
+          g.lineWidth = 3; g.strokeStyle = "rgba(255,255,255,0.8)"; g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); g.stroke();
+        });
+      }
+
+      // the floor axis in front of the wall, with ticks at -5%, -1.26%, 0, +1.26%, +5%
+      function drawAxis(t) {
+        const a = clamp((t - tAxis) / 0.25, 0, 1); if (a <= 0) return;
+        g.globalAlpha = a;
+        const l = at(-5, CA, 0), r = at(-5 + 10 * a, CA, 0);
+        g.lineWidth = 3; g.strokeStyle = "#1e3a8a"; g.lineCap = "round"; g.beginPath(); g.moveTo(l[0], l[1]); g.lineTo(r[0], r[1]); g.stroke();
+        [-5, -1.26, 0, 1.26, 5].forEach((s) => {
+          if (s > -5 + 10 * a + 1e-6) return;
+          const p0 = at(s, CA - 0.25, 0), p1 = at(s, CA + 0.25, 0);
+          g.lineWidth = Math.abs(s) === 1.26 ? 4 : 3; g.strokeStyle = Math.abs(s) === 1.26 ? "#2563eb" : "#1e3a8a";
+          g.beginPath(); g.moveTo(p0[0], p0[1]); g.lineTo(p1[0], p1[1]); g.stroke();
+        });
+        g.globalAlpha = 1;
+      }
+
+      // ---- 19 Oct 1987: a rose marker on its own small tile, far off the left end, with a dashed line back to the curve ----
+      const TL = { x: -2.665, y: 10.455, w: 1.3, d: 1.3 }, PIN = [-2.015, 11.105], PH = 1.5;
+      function thinTile(x, y, w, d) {
+        K.box(x, y, -0.5, w, d, 0.14, M.blue);
+        K.box(x, y, -0.36, w, d, 0.1, M.white);
+        K.box(x, y, -0.26, w, d, 0.1, M.blue);
+        K.box(x, y, -0.16, w, d, 0.16, M.white);
+      }
+      function drawLine(t) {
+        const p = clamp((t - tLine) / 0.24, 0, 1); if (p <= 0) return;
+        const A = at(-5, CF, 0), B = P(PIN[0] + 0.2, PIN[1] + 0.2, 0);
+        const e = 1 - Math.pow(1 - p, 2), E = [A[0] + (B[0] - A[0]) * e, A[1] + (B[1] - A[1]) * e];
+        g.save(); g.lineCap = "round"; g.setLineDash([12, 10]); g.lineWidth = 5; g.strokeStyle = "#e11d48";
+        g.beginPath(); g.moveTo(A[0], A[1]); g.lineTo(E[0], E[1]); g.stroke(); g.restore();
+        // the axis break: this is not to scale
+        if (p > 0.55) {
+          const m = [A[0] + (B[0] - A[0]) * 0.42, A[1] + (B[1] - A[1]) * 0.42];
+          g.save(); g.lineCap = "round"; g.lineWidth = 12; g.strokeStyle = "#eef4ff";
+          g.beginPath(); g.moveTo(m[0] - 3, m[1] + 16); g.lineTo(m[0] + 5, m[1] - 16); g.stroke();
+          g.lineWidth = 4; g.strokeStyle = "#1e3a8a";
+          [-6, 6].forEach((o) => { g.beginPath(); g.moveTo(m[0] + o - 4, m[1] + 15); g.lineTo(m[0] + o + 4, m[1] - 15); g.stroke(); });
+          g.restore();
+        }
+      }
+      function drawTile(t) {
+        const k = outBack((t - tTile) / 0.32, 2.4); if (k <= 0) return;
+        const c = P(PIN[0], PIN[1], -0.25);
+        g.save(); g.translate(c[0], c[1]); g.scale(k, k); g.translate(-c[0], -c[1]);
+        K.shadow(TL.x - 0.4, TL.y - 0.4, -1.4, TL.w + 0.8, TL.d + 0.8, 0.16);
+        thinTile(TL.x, TL.y, TL.w, TL.d);
+        g.restore();
+      }
+      function drawPin(t) {
+        const p = (t - tPin) / dPin; if (p <= 0) return;
+        const z = 4.2 * (1 - bounceOut(p)), sq = land(t - tPin - dPin / 2.75);
+        K.shadow(PIN[0] - 0.35, PIN[1] - 0.35, 0, 0.7, 0.7, 0.3 * clamp(1 - z / 4, 0.3, 1));
+        const h = PH * sq;
+        K.box(PIN[0] - 0.1, PIN[1] - 0.1, z, 0.2, 0.2, h, M.rose, "rgba(127,29,29,0.25)");
+        const r = 24, c = P(PIN[0], PIN[1], z + h), cx = c[0], cy = c[1] - r * 0.92;
+        const rx = r * (1 + (1 - sq) * 0.5), ry = r * sq;
+        const gr = g.createRadialGradient(cx - rx * 0.35, cy - ry * 0.4, 2, cx, cy, rx * 1.05);
+        gr.addColorStop(0, "#ffe4e6"); gr.addColorStop(0.35, "#fb7185"); gr.addColorStop(0.8, "#e11d48"); gr.addColorStop(1, "#9f1239");
+        g.fillStyle = gr; g.beginPath(); g.ellipse(cx, cy, rx, ry, 0, 0, 6.2832); g.fill();
+        g.lineWidth = 2; g.strokeStyle = "rgba(127,29,29,0.35)"; g.stroke();
+      }
+
+      function floorShadow() {
+        const cx = OX - 20, cy = OY + 11 * U + 1.5 * U + 40, rx = 470, ry = 120;
+        g.save(); g.translate(cx, cy); g.scale(1, ry / rx);
+        const gr = g.createRadialGradient(0, 0, 0, 0, 0, rx);
+        gr.addColorStop(0, "rgba(37,99,235,0.26)"); gr.addColorStop(0.55, "rgba(37,99,235,0.1)"); gr.addColorStop(1, "rgba(37,99,235,0)");
+        g.fillStyle = gr; g.beginPath(); g.arc(0, 0, rx, 0, 6.2832); g.fill(); g.restore();
+      }
+
+      const st = { t: 0 }, bob = document.getElementById("s5-bob");
+      function draw() {
+        const t = st.t;
+        g.clearRect(0, 0, 1080, 1920);
+        bob.style.transform = "translateY(" + (-8 * Math.sin((2 * Math.PI * (t + 0.4)) / 3)).toFixed(2) + "px)";
+        floorShadow();
+        K.shadow(0, 0, -1.6, 10, 11.5, 0.2);
+        K.platform(0, 0, 10, 11.5);
+        drawWall(t);
+        drawAxis(t);
+        drawTile(t);
+        drawLine(t);
+        drawPin(t);
+      }
+
+      // ---- camera: the cube flip in, a slow push, the cube flip out ----
+      tl.fromTo("#s5-flip", { rotationY: -90, scale: 0.94 }, { rotationY: 0, scale: 1, duration: 0.36, ease: "power3.out" }, 0);
+      tl.fromTo("#s5-cam", { scale: 1 }, { scale: 1.04, duration: DUR, ease: "sine.inOut" }, 0);
+      tl.fromTo("#s5-flip", { rotationY: 0 }, { rotationY: 90, duration: 0.26, ease: "power2.in", immediateRender: false }, DUR - 0.26);
+
+      const pop = (sel, t, d) => tl.fromTo(sel, { opacity: 0, scale: 0.3, y: 26 }, { opacity: 1, scale: 1, y: 0, duration: d || 0.4, ease: "back.out(2.8)" }, t);
+      const hop = (sel, t, h, sq) => {
+        tl.fromTo(sel, { y: 0 }, { y: -h, duration: 0.11, ease: "power2.out", immediateRender: false }, t);
+        tl.fromTo(sel, { y: -h }, { y: 0, duration: 0.12, ease: "power2.in", immediateRender: false }, t + 0.11);
+        tl.fromTo(sel, { scaleY: sq, scaleX: 1 + (1 - sq) * 0.6 }, { scaleY: 1, scaleX: 1, duration: 0.3, ease: "back.out(3)", immediateRender: false }, t + 0.23);
+      };
+      // the axis labels come in with the axis; the note under the stage
+      ["#s5-tk0", "#s5-tk1", "#s5-tk2", "#s5-tk3", "#s5-tk4"].forEach((id, i) => tl.fromTo(id, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.24, ease: "back.out(2.4)" }, tAxis + 0.04 + i * 0.05));
+      tl.fromTo("#s5-nt", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, 0.5);
+      // "normal,": the curve's label; "Black-Scholes assumes,": the navy tag pops and hops
+      pop("#s5-lab", tLab, 0.36);
+      pop("#s5-bs", tBS, 0.36);
+      hop("#s5-bsh", w(6) + 0.02, 12, 0.86);
+      // "a day like that": the marker's label
+      pop("#s5-oct", tOct, 0.38);
+      // "never": the chance slams down with a squash
+      tl.fromTo("#s5-ch", { opacity: 0, scale: 1.3 }, { opacity: 1, scale: 1, duration: 0.14, ease: "power3.in" }, tNever);
+      tl.fromTo("#s5-chh", { scaleX: 1, scaleY: 1 }, { scaleX: 1.08, scaleY: 0.84, duration: 0.06, ease: "power2.out", immediateRender: false }, tNever + 0.14);
+      tl.fromTo("#s5-chh", { scaleX: 1.08, scaleY: 0.84 }, { scaleX: 1, scaleY: 1, duration: 0.32, ease: "back.out(3)", immediateRender: false }, tNever + 0.2);
+      // "Not once since the Big Bang": the board, then the expected count; a hop on "Big"
+      pop("#s5-bb", tBB, 0.38);
+      tl.fromTo("#s5-b3", { opacity: 0, scale: 0.4, y: 14 }, { opacity: 1, scale: 1, y: 0, duration: 0.3, ease: "back.out(2.6)" }, tBB3);
+      hop("#s5-bbh", w(18) - 0.04, 12, 0.88);
+
+      tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: draw }, 0);
+      draw();
+      window.__timelines["s5"] = tl;
+    })();
+  </script>
+</template>

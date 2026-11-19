@@ -1,0 +1,34 @@
+[
+ [
+  "p1",
+  "You know Black-Scholes uses one volatility for every option. Then the interviewer asks: so why does the market quote a different volatility for every strike?"
+ ],
+ [
+  "p2",
+  "On October nineteenth, nineteen eighty-seven, the S and P five hundred fell twenty point four seven percent in one day. At twenty percent volatility, a typical day moves one point two six percent. So that crash was a sixteen-sigma day."
+ ],
+ [
+  "p3",
+  "If returns were normal, like Black-Scholes assumes, a day like that would never happen. Not once since the Big Bang. But it did. Real returns have fat tails: crashes come far more often."
+ ],
+ [
+  "p4",
+  "And what pays in a crash? A low-strike put. So traders pay more for it. Put that higher price into Black-Scholes and solve for the volatility: it comes out higher. That's implied volatility."
+ ],
+ [
+  "p5",
+  "Let's simulate it. A stock with fifteen percent volatility that crashes twenty percent about once every ten years. Price one-month options at strikes from eighty to one twenty, on a million simulated paths."
+ ],
+ [
+  "p6",
+  "At the money, implied vol is fifteen point six percent. At ninety, twenty point seven. At eighty, twenty-nine point seven. One stock, one model, and the flat line bends into a smile."
+ ],
+ [
+  "p7",
+  "So here's the answer: with normal returns and one volatility, implied vol would be flat across strikes. Real returns have fat tails, so low-strike puts cost more, and implied vol rises as the strike falls."
+ ],
+ [
+  "p8",
+  "Comment FORMULA, and we'll DM you the free Quant Formula Sheet. Save this, share it, and follow Desk to Quant for Day twelve."
+ ]
+]

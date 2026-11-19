@@ -1,0 +1,18 @@
+Day 11/30 · Making Quant Easy (the volatility smile): credits
+
+Voice: an English narrator designed from a text description ("a warm, clear adult male narrator, calm and confident,
+  medium pace"), not a real person, spoken by VoxCPM2 (openbmb/VoxCPM2, Apache-2.0, free for commercial use) on CPU.
+  Paragraph 1 is the chosen design take (seed 11); paragraphs 2-8 reuse it as the voice reference. Every take was
+  speech-checked against the script (faster-whisper) before use.
+Look: the Day 10 isometric toy world (d2q-day10 recipe): every object drawn in code (work/iso_kit.js), the trader guide
+  drawn in code (compositions/mc.html). One typeface, Fredoka (SIL OFL 1.1, assets/fonts/Fredoka-OFL.txt); fallbacks Inter
+  (SIL OFL 1.1) for σ and JetBrains Mono (SIL OFL 1.1).
+Music: an original electro-pop bed, F major, 116 BPM, synthesised in numpy (tools/bed_d11.py with bed_synth.py); no samples.
+Sound effects: CC0 1.0 from the uisfx library bundled with Real SFX (assets/sfx/PICKS.json lists each file): rubber/press,
+  rubber/swipe, scifi/swipe, minimal/select, soft/info, mechanical/double-click, dreamy/achievement, studio/typing,
+  soft/complete, studio/drop. No CC BY, NC or ND material.
+Logo: Desk2Quant's own logo, used as supplied. Cover of the Quant Formula Sheet: Desk2Quant's own.
+Data: work/smile.py. S&P 500 closes 282.70 (16 Oct 1987) and 224.84 (19 Oct 1987); the normal-curve odds; an illustrative
+  fat-tailed curve (Student-t, 3 degrees of freedom, same spread); an illustrative crash model (15% volatility plus a fixed
+  -20% crash at 0.1 a year, zero rates) simulated with a fixed seed (11; 1,000,000 paths) and checked against its exact
+  series price. Labelled ILLUSTRATIVE and SIMULATED on screen and in the caption.

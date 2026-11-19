@@ -1,0 +1,280 @@
+<template>
+  <style>
+    @font-face { font-family: "Fredoka"; font-weight: 400; src: url("assets/fonts/fredoka-400.woff2"); }
+    @font-face { font-family: "Fredoka"; font-weight: 700; src: url("assets/fonts/fredoka-700.woff2"); }
+    @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
+    @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("assets/fonts/JetBrainsMono.ttf"); }
+    #root { position: absolute; inset: 0; overflow: hidden; perspective: 2400px; perspective-origin: 540px 1150px; }
+    #s2-flip, #s2-cam, #s2-bob { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #s2-flip { transform-origin: 540px 1150px; }
+    #s2-cam { transform-origin: 540px 1000px; }
+    #s2-cv { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    .s2-t { font-family: "Fredoka", "D2QSans", "JetBrains Mono", sans-serif; font-weight: 700; color: #0b1b3a; white-space: nowrap; }
+    /* "?" tags riding on the column tops: .s2-qa is the projected point (moved every frame), .s2-q pops */
+    .s2-qa { position: absolute; left: 0; top: 0; width: 0; height: 0; }
+    .s2-q { position: absolute; left: -28px; bottom: 22px; width: 56px; height: 56px; border-radius: 28px; background: #ffffff;
+            box-shadow: 0 7px 0 #2563eb, 0 14px 20px rgba(30,64,175,0.22); display: flex; align-items: center; justify-content: center;
+            font-size: 40px; line-height: 1; color: #2563eb; opacity: 0; transform-origin: 50% 100%; }
+    /* the interviewer's speech bubble, its tail pointing down at the interviewer's chair */
+    #s2-bub { position: absolute; left: 130px; top: 618px; width: 820px; height: 184px; background: #ffffff; border-radius: 46px;
+              box-shadow: 0 12px 0 #2563eb, 0 26px 40px rgba(30,64,175,0.22); opacity: 0; transform-origin: 62% 100%; }
+    .s2-ln { position: absolute; left: 0; right: 0; height: 66px; display: flex; justify-content: center; gap: 15px; font-size: 56px; line-height: 66px; }
+    #s2-l1 { top: 24px; }
+    #s2-l2 { top: 92px; }
+    .s2-w { display: block; opacity: 0; transform-origin: 50% 80%; }
+    .s2-w.s2-a { color: #2563eb; }
+    #s2-tail { position: absolute; left: 470px; top: 170px; width: 112px; height: 84px; overflow: visible; }
+    #s2-dots { position: absolute; left: 0; top: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; gap: 22px; opacity: 0; }
+    .s2-dot { width: 26px; height: 26px; border-radius: 13px; background: #3b82f6; }
+    #s2-tag { position: absolute; left: 160px; top: 598px; height: 48px; padding: 0 24px; border-radius: 24px; background: #2563eb; color: #ffffff;
+              font-size: 29px; line-height: 48px; letter-spacing: 0.08em; box-shadow: 0 6px 0 #1e40af, 0 12px 20px rgba(30,64,175,0.22);
+              transform-origin: 0% 100%; opacity: 0; }
+    /* the note under the platform */
+    #s2-notew { position: absolute; left: 70px; top: 1488px; width: 660px; height: 60px; display: flex; justify-content: center; }
+    #s2-note { height: 56px; padding: 0 26px; border-radius: 28px; background: rgba(255,255,255,0.9); font-size: 31px; line-height: 56px;
+               box-shadow: 0 6px 0 #bfdbfe; transform-origin: 50% 0%; opacity: 0; }
+    #s2-note b { color: #2563eb; font-family: "D2QSans", sans-serif; font-weight: 800; }
+    #s2-note i { font-style: normal; font-weight: 400; color: #475569; }
+  </style>
+  <div id="root" data-composition-id="s2" data-width="1080" data-height="1920">
+    <div id="s2-flip">
+      <div id="s2-cam">
+        <div id="s2-bob">
+          <canvas id="s2-cv" width="1080" height="1920"></canvas>
+          <div id="s2-qs" data-layout-ignore></div>
+        </div>
+        <div class="s2-t" id="s2-bub">
+          <div class="s2-ln" id="s2-l1"><span class="s2-w">Why</span><span class="s2-w">a</span><span class="s2-w s2-a">different</span><span class="s2-w">volatility</span></div>
+          <div class="s2-ln" id="s2-l2"><span class="s2-w">for</span><span class="s2-w">every</span><span class="s2-w s2-a">strike?</span></div>
+          <svg id="s2-tail" viewBox="0 0 112 84">
+            <path d="M8 0 L104 0 Q66 26 62 84 Q44 30 8 0 Z" transform="translate(0 12)" fill="#2563eb" />
+            <path d="M8 -18 L104 -18 L104 0 Q66 26 62 84 Q44 30 8 0 Z" fill="#ffffff" />
+          </svg>
+          <div id="s2-dots"><div class="s2-dot"></div><div class="s2-dot"></div><div class="s2-dot"></div></div>
+        </div>
+        <div class="s2-t" id="s2-tag">INTERVIEWER</div>
+        <div id="s2-notew"><div class="s2-t" id="s2-note">a different <b>σ</b> for every strike? <i>· illustrative</i></div></div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      /*DATA*/ const DUR = 4.51; const W = [0.16, 0.34, 0.46, 0.88, 1.36, 1.58, 1.76, 1.88, 2.0, 2.26, 2.52, 2.66, 2.84, 3.32, 3.58, 3.84]; /*END*/
+      // words: 0 Then 1 the 2 interviewer 3 asks: 4 so 5 why 6 does 7 the 8 market 9 quote 10 a 11 different 12 volatility 13 for 14 every 15 strike?
+      const w = (i) => Math.max(0, W.length > i ? W[i] : 0.16 + i * 0.25);
+// ISO KIT v1: isometric toy-world drawing on a 2D canvas, matching the Flow dioramas' look.
+// Copy this block verbatim into a scene's <script> (inside its IIFE). World units: x to the right-back, y to the left-back,
+// z up. P(x, y, z) -> frame px. Visible faces of a box: top, the face at y+d (front-left) and the face at x+w (front-right).
+// Draw back to front: sort what you draw by (x + y) ascending, then z ascending (painter's order).
+const ISO = (function () {
+  const C30 = Math.cos(Math.PI / 6), S30 = 0.5;
+  const MAT = {
+    white: { top: "#ffffff", left: "#e3ebfb", right: "#c9d8f5" },
+    blue:  { top: "#7fb0ff", left: "#3b82f6", right: "#2563eb" },
+    navy:  { top: "#4f6fe0", left: "#1e40af", right: "#1e3a8a" },
+    sky:   { top: "#dbeafe", left: "#bfdbfe", right: "#93c5fd" },
+    rose:  { top: "#fda4af", left: "#f43f5e", right: "#e11d48" },
+    gold:  { top: "#fde68a", left: "#f59e0b", right: "#d97706" },
+    grey:  { top: "#f1f5f9", left: "#cbd5e1", right: "#94a3b8" },
+    wood:  { top: "#f3c58f", left: "#d99a5b", right: "#b97a3f" },
+  };
+  function make(g, ox, oy, u) {
+    const P = (x, y, z) => [ox + (x - y) * C30 * u, oy + (x + y) * S30 * u - (z || 0) * u];
+    function poly(pts, fill, stroke, lw) {
+      g.beginPath(); pts.forEach(([a, b], i) => (i ? g.lineTo(a, b) : g.moveTo(a, b))); g.closePath();
+      if (fill) { g.fillStyle = fill; g.fill(); }
+      if (stroke) { g.strokeStyle = stroke; g.lineWidth = lw || 1.5; g.stroke(); }
+    }
+    function box(x, y, z, w, d, h, mat, edge) {
+      if (h <= 0 || w <= 0 || d <= 0) return;
+      edge = edge === undefined ? "rgba(15,35,90,0.14)" : edge;
+      poly([P(x, y + d, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x, y + d, z + h)], mat.left, edge);
+      poly([P(x + w, y, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x + w, y, z + h)], mat.right, edge);
+      poly([P(x, y, z + h), P(x + w, y, z + h), P(x + w, y + d, z + h), P(x, y + d, z + h)], mat.top, edge);
+    }
+    // a soft contact shadow on the floor plane z
+    function shadow(x, y, z, w, d, a) {
+      const c = P(x + w / 2, y + d / 2, z); const rx = (w + d) * C30 * u * 0.55, ry = (w + d) * S30 * u * 0.55;
+      const gr = g.createRadialGradient(c[0], c[1], 0, c[0], c[1], rx);
+      gr.addColorStop(0, `rgba(30,64,175,${a || 0.18})`); gr.addColorStop(1, "rgba(30,64,175,0)");
+      g.save(); g.translate(c[0], c[1]); g.scale(1, ry / rx); g.translate(-c[0], -c[1]);
+      g.fillStyle = gr; g.beginPath(); g.arc(c[0], c[1], rx, 0, 6.2832); g.fill(); g.restore();
+    }
+    // the floating platform: white top slab, blue band, white band, blue base (like the dioramas), its top at z = 0
+    function platform(x, y, w, d) {
+      box(x, y, -1.5, w, d, 0.42, MAT.blue);
+      box(x, y, -1.08, w, d, 0.3, MAT.white);
+      box(x, y, -0.78, w, d, 0.28, MAT.blue);
+      box(x, y, -0.5, w, d, 0.5, MAT.white);
+    }
+    // a 2D affine matrix that maps a flat w x h DOM element onto a face given three projected corners (TL, TR, BL)
+    function faceMatrix(tl, tr, bl, w, h) {
+      const a = (tr[0] - tl[0]) / w, b = (tr[1] - tl[1]) / w, c = (bl[0] - tl[0]) / h, d = (bl[1] - tl[1]) / h;
+      return `matrix(${a.toFixed(5)},${b.toFixed(5)},${c.toFixed(5)},${d.toFixed(5)},${tl[0].toFixed(2)},${tl[1].toFixed(2)})`;
+    }
+    return { P, poly, box, shadow, platform, faceMatrix, u };
+  }
+  return { make, MAT };
+})();
+
+      const tl = gsap.timeline({ paused: true });
+      const g = document.getElementById("s2-cv").getContext("2d");
+      const K = ISO.make(g, 540, 900, 48), M = ISO.MAT, P = K.P;
+      const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+      const land = (dt) => (dt < 0 ? 1 : 1 - 0.18 * Math.exp(-dt / 0.08) * Math.cos(dt * 26));
+      const bounceOut = (p) => {
+        p = clamp(p, 0, 1); const n = 7.5625, d = 2.75;
+        if (p < 1 / d) return n * p * p;
+        if (p < 2 / d) { p -= 1.5 / d; return n * p * p + 0.75; }
+        if (p < 2.5 / d) { p -= 2.25 / d; return n * p * p + 0.9375; }
+        p -= 2.625 / d; return n * p * p + 0.984375;
+      };
+      const hopZ = (t, t0, d, h) => { const p = (t - t0) / d; return p <= 0 || p >= 1 ? 0 : h * Math.sin(Math.PI * p); };
+
+      // ---- the strike row from s1: nine option tickets at world (1 + i, 9 - i), each with its vol column ----
+      // They arrive level (one volatility, as s1 left them); on "different" they spring to unequal heights.
+      // The heights are illustrative, not data: no numbers here.
+      const KS = [80, 85, 90, 95, 100, 105, 110, 115, 120];
+      const ROW = KS.map((k, i) => ({ k, i, x: 1 + i, y: 9 - i }));
+      const TK = 0.84, TH = 0.16, CW = 0.56, CH0 = 2.9;
+      const HT = [3.5, 2.3, 3.9, 2.6, 2.0, 3.3, 2.8, 3.7, 2.2];
+      const TWOB = Math.max(0.6, w(11) - 0.06);
+      ROW.forEach((r, i) => { r.T = TWOB + i * 0.035; r.H = HT[i]; });
+      function colH(r, t) {
+        const dt = t - r.T;
+        if (dt <= 0) return CH0;
+        const spring = r.H + (CH0 - r.H) * Math.exp(-dt * 4.4) * Math.cos(dt * 15);
+        const idle = 0.05 * clamp(dt / 0.9, 0, 1) * Math.sin(2 * Math.PI * (dt * 1.1 + r.i * 0.23));
+        return spring + idle;
+      }
+      function ticket(r) {
+        const wd = TK, x0 = r.x - wd / 2, y0 = r.y - wd / 2, zt = TH;
+        K.shadow(x0 - 0.1, y0 - 0.1, 0, wd + 0.2, wd + 0.2, 0.14);
+        K.box(x0, y0, 0, wd, wd, TH, M.white, "rgba(15,35,90,0.18)");
+        K.poly([P(x0, y0, zt), P(x0 + wd, y0, zt), P(x0 + wd, y0 + 0.24, zt), P(x0, y0 + 0.24, zt)], "#3b82f6");
+        [0.46, 0.66].forEach((f) => K.poly([P(x0 + 0.14, y0 + f * wd, zt), P(x0 + wd - 0.14, y0 + f * wd, zt), P(x0 + wd - 0.14, y0 + (f + 0.08) * wd, zt), P(x0 + 0.14, y0 + (f + 0.08) * wd, zt)], "#c9d8f5"));
+      }
+      function column(r, h) {
+        const x0 = r.x - CW / 2, y0 = r.y - CW / 2;
+        K.box(x0, y0, TH, CW, CW, h, M.blue);
+        // a soft highlight on the top's front edges, like the toy blocks elsewhere in the film
+        g.lineWidth = 2.5; g.strokeStyle = "rgba(255,255,255,0.7)"; g.lineCap = "round";
+        const a = P(x0, y0 + CW, TH + h), c = P(x0 + CW, y0 + CW, TH + h), e = P(x0 + CW, y0, TH + h);
+        g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(c[0], c[1]); g.lineTo(e[0], e[1]); g.stroke();
+      }
+
+      // ---- the interview desk in front of the row: a wood desk, the interviewer's chair behind it, the candidate's in front ----
+      const DESK = { x: 5.8, y: 6.9, w: 4.0, d: 1.6, h: 1.45, T: 0.1 };
+      const CHI = { x: 6.9, y: 5.5, w: 1.8, d: 1.2, back: "lo", T: 0.18, seat: M.blue, frame: M.navy };   // the interviewer's, facing the desk (+y)
+      const CHC = { x: 6.9, y: 8.7, w: 1.8, d: 1.2, back: "hi", T: 0.26, seat: M.sky, frame: M.navy };    // the candidate's, facing back (-y)
+      const DROP = 0.5;
+      const dropZ = (t, T) => (t < T ? null : t < T + DROP ? 3.2 * (1 - bounceOut((t - T) / DROP)) : 0);
+      const tAsk = Math.max(0.7, w(3) - 0.04);
+      function chair(c, t) {
+        let z = dropZ(t, c.T); if (z === null) return;
+        if (c === CHI) z += hopZ(t, tAsk, 0.3, 0.32);
+        const sq = land(t - c.T - DROP / 2.75) * (c === CHI ? land(t - tAsk - 0.3) : 1), s = 1 + (1 - sq) * 0.4;
+        const W2 = c.w * s, D2 = c.d * s, x = c.x + (c.w - W2) / 2, y = c.y + (c.d - D2) / 2;
+        const LEG = 0.17, SEAT = 0.85 * sq, ST = 0.24 * sq, BH = 1.7 * sq, BT = 0.22;
+        K.shadow(c.x - 0.15, c.y - 0.15, 0, c.w + 0.3, c.d + 0.3, 0.2 * clamp(1 - z / 3.2, 0.2, 1));
+        [[0, 0], [1, 0], [0, 1], [1, 1]].forEach(([i, j]) => K.box(x + 0.06 + i * (W2 - 0.12 - LEG), y + 0.06 + j * (D2 - 0.12 - LEG), z, LEG, LEG, SEAT, c.frame));
+        K.box(x, y, z + SEAT, W2, D2, ST, c.seat);
+        const by = c.back === "lo" ? y : y + D2 - BT;
+        K.box(x, by, z + SEAT + ST, W2, BT, BH, c.seat);
+        K.box(x, by, z + SEAT + ST + BH, W2, BT, 0.12, c.frame);
+      }
+      function desk(t) {
+        const z = dropZ(t, DESK.T); if (z === null) return;
+        const sq = land(t - DESK.T - DROP / 2.75), s = 1 + (1 - sq) * 0.3;
+        const { x, y, w: dw, d: dd } = DESK, H = DESK.h * sq, TT = 0.2 * sq;
+        K.shadow(x - 0.2, y - 0.2, 0, dw + 0.4, dd + 0.4, 0.22 * clamp(1 - z / 3.2, 0.2, 1));
+        const xs = x - (dw * s - dw) / 2, ys = y - (dd * s - dd) / 2, ws = dw * s, ds = dd * s;
+        K.box(xs + 0.1, ys + 0.1, z, 0.24, ds - 0.2, H - TT, M.wood);                    // left panel
+        K.box(xs + ws - 0.34, ys + 0.1, z, 0.24, ds - 0.2, H - TT, M.wood);              // right panel
+        K.box(xs, ys, z + H - TT, ws, ds, TT, M.wood, "rgba(120,70,20,0.22)");          // the top
+        const zt = z + H;                                                                 // a CV sheet and a pen on the top
+        K.poly([P(xs + 1.2, ys + 0.35, zt), P(xs + 2.25, ys + 0.35, zt), P(xs + 2.25, ys + 1.2, zt), P(xs + 1.2, ys + 1.2, zt)], "#ffffff", "rgba(15,35,90,0.16)");
+        [0.52, 0.7, 0.88].forEach((f) => K.poly([P(xs + 1.34, ys + f, zt), P(xs + 2.1, ys + f, zt), P(xs + 2.1, ys + f + 0.07, zt), P(xs + 1.34, ys + f + 0.07, zt)], "#c9d8f5"));
+        K.box(xs + 2.6, ys + 0.65, zt, 0.8, 0.1, 0.08, M.navy);
+      }
+
+      // ---- the "?" tags on the column tops ----
+      const qsEl = document.getElementById("s2-qs");
+      ROW.forEach((r) => {
+        const a = document.createElement("div"); a.className = "s2-qa";
+        const q = document.createElement("div"); q.className = "s2-q s2-t"; q.textContent = "?";
+        a.appendChild(q); qsEl.appendChild(a); r.a = a; r.q = q;
+      });
+
+      const st = { t: 0 }, bob = document.getElementById("s2-bob");
+      function draw() {
+        const t = st.t;
+        g.clearRect(0, 0, 1080, 1920);
+        bob.style.transform = "translateY(" + (-8 * Math.sin((2 * Math.PI * (t + 1.1)) / 3)).toFixed(2) + "px)";
+        K.shadow(0, 0, -1.6, 10, 10, 0.22);
+        K.platform(0, 0, 10, 10);
+        ROW.forEach((r) => ticket(r));
+        ROW.forEach((r) => {
+          const h = colH(r, t);
+          column(r, h);
+          const p = P(r.x, r.y, TH + h);
+          r.a.style.left = p[0].toFixed(1) + "px"; r.a.style.top = p[1].toFixed(1) + "px";
+        });
+        chair(CHI, t);
+        desk(t);
+        chair(CHC, t);
+      }
+
+      // ---- camera: cube flip in, slow push, cube flip out ----
+      tl.fromTo("#s2-flip", { rotationY: -90, scale: 0.94 }, { rotationY: 0, scale: 1, duration: 0.36, ease: "power3.out" }, 0);
+      tl.fromTo("#s2-cam", { scale: 1 }, { scale: 1.04, duration: DUR, ease: "sine.inOut" }, 0);
+      tl.fromTo("#s2-flip", { rotationY: 0 }, { rotationY: 90, duration: 0.26, ease: "power2.in", immediateRender: false }, DUR - 0.26);
+      // the cube turn swings the left of the frame toward the camera: the bubble and its tag fade before that lifts them above y 560
+      tl.fromTo("#s2-bub", { opacity: 1 }, { opacity: 0, duration: 0.09, ease: "power1.in", immediateRender: false }, DUR - 0.26);
+      tl.fromTo("#s2-tag", { opacity: 1 }, { opacity: 0, duration: 0.08, ease: "power1.in", immediateRender: false }, DUR - 0.26);
+
+      // ---- "interviewer": the bubble pops with typing dots; "asks:": the INTERVIEWER tag lands ----
+      const B0 = Math.max(0.38, w(2) - 0.06);
+      tl.fromTo("#s2-bub", { opacity: 0, scale: 0.3, y: 50 }, { opacity: 1, scale: 1, y: 0, duration: 0.42, ease: "back.out(2.2)" }, B0);
+      tl.fromTo("#s2-bub", { scaleX: 1, scaleY: 1 }, { scaleX: 1.03, scaleY: 0.92, duration: 0.07, ease: "power2.out", immediateRender: false }, B0 + 0.42);
+      tl.fromTo("#s2-bub", { scaleX: 1.03, scaleY: 0.92 }, { scaleX: 1, scaleY: 1, duration: 0.34, ease: "back.out(3)", immediateRender: false }, B0 + 0.49);
+      const D0 = B0 + 0.16, D1 = Math.max(D0 + 0.3, w(5) - 0.1);
+      tl.fromTo("#s2-dots", { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.2, ease: "back.out(2.6)" }, D0);
+      tl.fromTo("#s2-dots", { opacity: 1, scale: 1 }, { opacity: 0, scale: 0.4, duration: 0.1, ease: "power2.in", immediateRender: false }, D1);
+      tl.fromTo("#s2-tag", { opacity: 0, scale: 0.2, rotation: -16 }, { opacity: 1, scale: 1, rotation: -2, duration: 0.34, ease: "back.out(2.8)" }, tAsk);
+
+      // ---- the question reveals with the voice ("so", "does the market quote" are not on the card) ----
+      const words = Array.from(document.querySelectorAll("#s2-bub .s2-w"));
+      const onset = [5, 10, 11, 12, 13, 14, 15];
+      words.forEach((el, k) => tl.fromTo(el, { opacity: 0, scale: 0.4, y: 22 }, { opacity: 1, scale: 1, y: 0, duration: 0.3, ease: "back.out(3)" }, Math.max(D1, w(onset[k]) - 0.04)));
+      // "different" and "strike?" hop when they land
+      [[words[2], w(11) + 0.28], [words[6], w(15) + 0.26]].forEach(([el, t]) => {
+        tl.fromTo(el, { y: 0 }, { y: -16, duration: 0.1, ease: "power2.out", immediateRender: false }, t);
+        tl.fromTo(el, { y: -16 }, { y: 0, duration: 0.26, ease: "bounce.out", immediateRender: false }, t + 0.1);
+      });
+
+      // ---- "different": the "?" tags pop on the springing columns; "every strike?": they hop in a wave along the row ----
+      ROW.forEach((r, i) => {
+        tl.fromTo(r.q, { opacity: 0, scale: 0.2, y: 16 }, { opacity: 1, scale: 1, y: 0, duration: 0.34, ease: "back.out(3)" }, r.T + 0.12);
+        const th = Math.max(r.T + 0.5, w(14) + i * 0.045);
+        tl.fromTo(r.q, { y: 0 }, { y: -18, duration: 0.11, ease: "power2.out", immediateRender: false }, th);
+        tl.fromTo(r.q, { y: -18 }, { y: 0, duration: 0.2, ease: "bounce.out", immediateRender: false }, th + 0.11);
+      });
+      tl.fromTo("#s2-note", { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, Math.max(0.6, w(4) - 0.04));
+
+      // ---- the continuous layer: canvas, bob and the typing dots, a pure function of time ----
+      const dots = Array.from(document.querySelectorAll(".s2-dot"));
+      tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: () => {
+        draw();
+        const t = st.t;
+        dots.forEach((d, i) => {
+          const ph = (t - D0 - i * 0.12) / 0.5;
+          const y = t > D0 && t < D1 + 0.12 ? -12 * Math.max(0, Math.sin(Math.PI * 2 * ph)) : 0;
+          d.style.transform = "translateY(" + y.toFixed(2) + "px)";
+        });
+      } }, 0);
+      draw();
+      window.__timelines["s2"] = tl;
+    })();
+  </script>
+</template>

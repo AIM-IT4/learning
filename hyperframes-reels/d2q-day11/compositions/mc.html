@@ -1,0 +1,499 @@
+<template>
+  <style>
+    @font-face { font-family: "Fredoka"; font-weight: 700; src: url("assets/fonts/fredoka-700.woff2"); }
+    @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
+    #root { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+    #mc-cv { position: absolute; left: 600px; top: 1300px; width: 480px; height: 620px; }
+  </style>
+  <div id="root" data-composition-id="mc" data-width="1080" data-height="1920" data-layout-allow-overlap>
+    <canvas id="mc-cv" width="480" height="620"></canvas>
+  </div>
+  <script>
+    (function () {
+      /*DATA*/ const DUR = 77.94; const CUES = [[0.21, "wave", 1.0, 0], [1.15, "sigma", 1.2, 14], [3.31, "look", 1.1, 0], [4.73, "think", 1.4, 0], [6.69, "ask", 1.1, 16], [8.577, "point", 1.2, 0], [11.08, "down", 1.3, 18], [15.78, "think", 1.0, 0], [18.16, "wow", 1.0, 30], [23.08, "shrug", 1.0, 0], [24.7, "meh", 1.0, 0], [25.68, "wow", 0.8, 24], [26.78, "worried", 1.0, 0], [30.2, "think", 1.0, 0], [31.1, "point", 1.0, 0], [32.28, "happy", 0.8, 12], [34.76, "point", 1.2, 0], [36.4, "wow", 0.8, 16], [37.02, "sigma", 1.2, 18], [39.01, "point", 1.2, 0], [41.59, "worried", 1.0, 0], [45.83, "leanL", 0.9, 0], [46.31, "leanR", 0.9, 0], [47.23, "wow", 0.8, 0], [50.35, "happy", 0.8, 12], [53.926, "wow", 0.9, 30], [57.91, "cheer", 1.1, 26], [59.46, "point", 1.4, 0], [62.52, "meh", 0.9, 0], [64.36, "worried", 0.8, 0], [67.18, "iv", 1.2, 18], [69.4, "point", 1.6, 0], [72.44, "happy", 0.9, 12], [74.16, "bye", 9.0, 0]]; const LIPS_HZ = 60; const LIPS_T0 = 0.085; const LIPS = "500b0mg0ci00j60m70r00w04x01x0dw03wb0v90w60x30x00u0hq0zn0zj0zg00h00l03p00v00x80yi0yr0xs0vu0ts0pd0j90dl0bz0cz0cz0bz0bz0az0hy0p00t00v03w07w08v05t50pz0mz0jz0hz0fz0ji0p10t00t00rj0nz0jz0gz0hz0ln0nj0mz0kz0fz0cz09p080690wc0zf0zj0zp0qu05x00w30v00u0ku0vu0zt0zr0zn06n00t00x10y60xc0wf0v50u60t70ta0s50p00k0re07az08z08z07z0eg0l00p00p10p00o00o00p00o00m0rl00l30m20m00l08jb0fz09z06z04z0200b00h00j00h10f00a408i0bc0ib0oc0s90v00u04q0il07h50g00i0ak05m00m10n60n90ne0o90rb0uh0wn0wo0wl0vg0r50m00e609z06z05z05z06z05z06j085080060050d40x30z20010010000000000000050z80zb0qh00p40u90we0wa0x08y0zy0zy0sx70vg0tb0of0ll0km0ni0qe0s50s0zq0zkz0ez0gz0m00o0em0ui0lf90fa0l00r00u00v05u0ct0fs09s00r20p70nd0pp0rr0tz0uz0tz0tz0rz0ow0jf0fk0cz0az0az09z07z04z04z05z06z07z07z07z06z04z03002001001000000000000002004z07z09z0az0iz0q00u00v05v0qu0zs0zr0xt0dx10yb0yn0xq0um0rn0nd0l00n60pb0rh0qz0nz0jz0dz0az0i00n00q02q0pq0lq0ms0iw00y00z30z50w50q00j40c408z08z0g00m40m30i00c009007d06o04n0200200d0ln0ts0cu01u00s0ao0zm0bn00n00l0bj0zh0ze0zb0x720bz0kn0ra0s50q00kz0fz0az0h00l00m00k0lh0xf0zd0za0ma70j00r00v60wb0vi0tc0s80r60rb0p10n0ii0od00bz0az09z0e70k0cn00o00o00n00m30l00j0rk00l30m00l0aj70ez09z05z03z08q0g00l10j40c007706z0hy0qh0wb0w20u03p0fk50g60g09j05l01l00j00hz0fz0ez0dz0cz0az08z07z08z0h10q00w30x80wj0uj0rk0lm0g60b907c04h0300200100100000000000000000000000000000000000000000000000000000000000000000000000100b80j70q70va0wa0v00u0vu0mu00v40yd0yj0yg0va0q00i00c50a50bz0bz0az0k03s06w00y00y0bw0nq0ul0wm0es06u00u10s00r0nr0ts00ug0vo0vp0uq0ru0pw0og0o0go0zk0ye0ebz09z08z08z0dz0k02q30t20t60tc0t40r0en0zi0bci07z05z040080zf0zk0zo05rd0ui0vl0uw0us0uh0t00s0zo0ugh0cz0az08z0f70k00n70p20q0sq0zq06qe0qr0qu0qp0sm0si0q00n0cn70n80m00jz0gz0ez0dz0cz0cz0bz0gg0n60th0wp0xe0va0r00l04i09h00g80f70d50b0ua0z90z80z60z40z200100100100000100530f10p30v30w70v10q00kl0iz0nz0tz0xr0yl0ya0v30qz0lz0iz0ez0fz0j00n09p0sr0zr0zn0zi0rez0az0dz0h00ls0kz0lx0m80l00iz0dz08z05z0dz0q00w70yh0xq0vq0tm0re0n00hc0bz09z0bt0j0gp0as00t30t00t0vs0zp00o00r07u0bu0dr0el0zgg0dz0cz0bz08z05z0ds0m00t60xg0yi0xk0uj0r70n00h0jb027005205z05z05z04u03006q0f0zn0os02u00t00s03rf0ra0qb0p02m0zg0yc0j9107o05z05y0h0zp0ju00t00r80p60m0aj0zgh0cz07z05z05z08z0e0zk0zq0yt0mu06u00t0eq07lz0hz0fz0ez0dz0bz0fz0m20ua0xb0yf0x80r0bn00n00o0mp0zp0zm0zj0zg0zem0f00h0lj0pj0bhz0fz0dz0cz09z0dt0i60li0lq0ki0h0he00c60c50e40g00i0zj0zk0zk0zk0zk0zk0zk0zl0zn0eq10s50r80p00o0zo0zp0zo0zn0zl0zm00p70qf0ro0sr0st0qz0nz0j90gd0d00a0ia00b00b609d06n04z04z04z02001005u0dz0jl0ls0ko0g00c009707f06z06z07z06t05u0810j0ur06v10u70t06s00sd0sm0q00n0ti02e01dt0j0bo0hp00mz0jz0iz0gz0hz0m10rn0rv0pz0nh0k0fh0je0vd0ze0cp00v10y80ye0xh0ve0sb0qb0pi0oa0m0ai0lb089z09z09z0h00o07t40v50v40u50t40t60u60s00o00oa0ol0nl0ma0mb0m06k0wh0yd0u80a5003e02001001002008a0ip0m40l01g0hc029g09z0az0jz0s08u00r0dj00f20i40o00q06o0ol0pj10hf0l00p00t00u00t0lp0zl0zh0egz0n80sc0ti0sy0su0sv0rq0qo0pe0o0bn0zo0zn0zn0zo0zp0zs0xu0yv0zw0wv0xu0zq0zl0zio0gz0fz0dz0bz0a00b0sc0ze0zh0zk0zq0jw00y50x50u00t0zt0zs0zq0zl0zf0vak06h04t0b0zl0vr0ds00r40mp0i03c0ub0za00az0az0bz0bz0dz0l0ws0mv0sv0zt00oz0kz0iz0fz0dz0dz0i70mg0mb0h10cq0az09z08z05z03z02002007b0d0kh0zhv0gz0ez0dz0dz0cz0h70mb0ov0oz0nt0mo0jt0f20a706o04z03y02001001001003z07z09z0bz0cz0hz0p0au02u02t04p0pl0zn10u90xi0yt0yz0vx0ru0lh0eh08k06s06z08v09t09s0h01q01w40y90yk0wx0tz0rz0px0nj0j20fz0dz0bz0az08z06z0803f0zm0zp0hp0bol0mz0kz0kz0k20k00js0iz0iz0iz0jz0jz0iz0hz0gz0kh0pj0qf0o10h60cz0bz0ez0fz0dz08z05z08z09z0ho0o0br70s70s80r30q0lp0zo0zm0hkz0jz0jz0iz0iz0hz0n00r50tb0s60o0hj0qg0vj0zm0zn0zn00m60k80i08f0ze0zdz0gl0lm0nk0oq0nr0lj0h80df08l05z05v06y05r03l0200100100000000000000000000000000000000000000000000000000000000000000000000000000000000000200100100000100200200100100000000100100000000000000000000000000000000000000808jc0q20r0gnq0hz0bz07z0b50j04q04q0ln0sh0kdl0cz0cz0az0hd0q06v00x00w00v30u00t08t0ns0wrs0oz0mz0k60j03m0lq0cs02s0br0zr0zq0zr0ht06v0dx0fy07z00z00y00v0mt0pq0io0gn02l02k00h0gg0zd0za0l7065003j030060pi80pc0sd0rb0o0gh01b407404z06x0f03o00uf0wr0vz0uz0rr0m80fg0bz0bz0cz0bz0bz0az0jc0p00u00v00w00v00tq0pz0kz0iz0jq0k70kz0iz0hz0fz0fz0fz0ez0dz0iy0o30s50t00t0at0er0aq0fo0mm0tk0rk0zj0ziu0gz0ez0cz0az09z09z08z06z03z06z0ba0i30l40k0rj0zg0ze03hz0on0ua0vg0vk0um0th0r40r00u50xl0yp0yj0wg0s00m00f009907z0gb0qc0we0yp0zp0yl0we0s00o0jk0mj0wm0kp00p00n0sm0zn0zo0zp0zq0zq0qqf0sg0vc0v20s01m10m00q00t00s00q00n80lg0kg0m80pd0sv0tt0uz0ss0pn0k00d708b06s062073073070060t50x30u30q20010010000000010010010000000000030070ze0zk0zp0zt30xc0yo0yw0xq0um0rd0ma0h00e0gf0tj0yp0tu0hx00y50x70v00u0ws0zp00kz0hz0gz0gz0ez0dz0i50n0ar0xr0zp0qlz0gz0dz0az07z04z0b00g07j0ri0zg0ze0za0zh20n30pc0pg0oh0m00j0zh0zg0zd0zb0z830d10jf0ll0ls0ks0jb0gc0e70bg08c078050650o40z300200100100000200200100100100100100100000000100100300i00t00x40x50u04r30sb0t80r40l0dg0ha007706p09z0jz0p90ri0os0kq0hj0dr094070050930020010010000000000000000010010000040zc0zm0vu0ox09y00z50z60y90w70v00t05r0cq0et01w00v03s0qm0zgi0dz0dz0bz0i00o08s00t00s00s00s05s0zr00mz0hz0fz0k10p50r60q80m00jz0hz0ez0az08z09z0k90ud0xk0yu0xz0tz0od0ic0c008b05j05z06z07z0az0d00f40e70dr0b809u06x05205206z06z06z06z05z05z04z02001001001000000001003003z04z0dl0o00v40xk0xs0xz0wz0tp0o00jz0fz0dz0cz0ez0h10i00iz0hz0gz0ez09z07z08z0az0gz0p0eu02v00t00s0kq0to0zj80ez0az06z04z0az0n08v00y00y30y60x50v00r0ho0mn0nm0rl0lk0ik0ll09n01p00r00u00v40wd0wl0uf0r50m00gv0cz0bz09z06z05s070690087060x50n5015804l02001001001000000000000000000000000000000000000000000000000000000000000000000000000000000000000009o0fz0jz0lf0pc0t00x0wy0zz0zz0zy0zx0zx0dy00yd0u80m00g00d00c20a20ai0az0dz0lz0r90w50yg0zj0zn0vz0tz0so0sj0qz0nz0lz0nz0r90t00s0pr30rd0s30q0ek0df10df0dr0dp0bx0h00p20vc0xf0xk0ww0vz0sz0ng0ic0eb0cj09z08z09z09z08z07z06z05z05i05z03z0200cb0lh0q20r00s0kt0xu0zv0zx03y00y30x20y00y0dv0dqz0lz0iz0fz0cz0az0az0k00r00v80wd0vh0th0r00n09i00d008407i07u06z05z08s0m0ht00v20vd0ug0rm0m30i80ed0aj06l04w03z02001001000000000000002005z07z07z0gz0o00s00s08r0co0nk0wf00bz0az09z08z09z0j00q10ta0uj0wh0v90t00r00s00u00u05s00pz0jz0ez0az07z04z06z0gm0o40t00ug0vd0wa0w00v0ru0zs0zs0zs0zt0ov0lw0cx00y00z00z00x0jq80jz0ez09z06z06z0b0qe0xd0xd0xd0fe00c008006005005504f02001003005z08z07z0eb0p0tw00x00v0do0zk08kz0qf0wp0yt0zz0yz0wr0ra0k60ho0fz0ez0dz0jn0qe0uq0uu0tx0rs0qh0pf0p90q40s00r0cn0ti05el0bz08s0h00s00w30xe0wk0vi0u10t50pz0lz0iz0fz0fz0j00o0ks0zs0zs0zr00q02n0tl0zi0zgi0g03k00q70wh0yn0xz0wz0uv0qc0k00e70az09z09z09z09z08z0cz0i06o00r00q00p00o00n00n00m00l04jz0gz0dz0bz07z04z03003z04z03z0200100100100100100100810f90l00o0zp0zn00kz0iz0hz0fz0ez0hz0q30vb0yh0yk0yk0xa0v00r0dm00hn0dz09z0e00l08p03o0wo09p00p00o0fl0qk0eo00t80wj0wn0uk0sh0qc0p80pb0p80o00k0mf0lbz0bz0az0gv0n0or00s30t00t00t00t30s00o0zn30n70m50m40j10h0se0xa0n6a04z04z05z05z03z0200100100100440e80kd0l00f0td05dz0dz0iz0q00w00y00x08w0xw0zu00qz0oz0s20wb0yd0ye0xc0t70p00m00jv0gz0fz0gz0oa0tm0uz0tz0rs0pm0mf0i30e00c00b00b008606g06l06v04u02002004t06z0e00pf0vw0yx0xm0v01p04iw0hz0hz0lz0o00t0pv0zv0zs0zm0zhz0fz0cz07z0h00r30wh0xs0wu0uz0rz0nk0jj0g08f0se0ed00e00l10s90vk0ul0sg0n90ke0j70j00h0jf0zc018z07z0az0g0lj00k60j00j00i10hd0ea0a80810750500306200100100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000bj0kj0pz0qy0pb0m60gj0fz0iz0lz0lz0jz0gz0bz08z09l0f05l07r07v00y80ye0zf0y80t00mh0gz0fz0gz0hz0hz0gz0fz0fz0ez0gz0lw0rs0to0u70v0kw0kx00y10yb0y80x00w00u20s70rh0qm0pm0or0le0h00fd0ej0ds0br07l04z03002003003002001001001006e0i80qc0u50ts0pz0mz0jz0iz0gz0cz07z0hq0sc0xf0yz0yz0xz0uk0p70he0da0dg0fg0h0dm0oq03p00n0hkw0hz0ez0az06z04z04z04z03z0db0lj0qr0qf0o80hz0bz07z04z06z09z0hz0o00sm0rs0qd0q0aq0zo0zi0zda0dh0l0fq09q02pz0mz0kz0iz0gz0jz0oh0ql0ps0mo0ja0h0pg0ze0zc20h10s00w50yc0yl0xm0vi0td0sg0rf0p00k0qg0eaz08z06z0az0k0dr00td0td0tb0tb0ue0tg0s20p06p50sg0tb0tf0re0q00m0tk02nj0pz0pz0lo0g90cm08q05z06s09s0bq0bt0h00p00v90xk0yp0xp0vj0s30nz0iz0fz0dz0fz0l00p05o00lz0iz0fz0dz0dz0dz0cz0az0az0aw0az0d0ul0it00v30u00s00sb0u40u0is0zm0zg0pah0g06m0ho0omt0jz0iz0gz0fz0dz0ez0kd0pr0rv0sz0sz0rl0r09r50p30n0xk0zq00w30ye0ze0xf0vb0p30j00g0de0td0zi0zp0wu08x20y50x09x0zv0zpz0lz0iz0fz0dy0dl0hk0ni0r70r00o0pl08m0fo0jq01q00p00n0li0ze0mbz0az09z06z04z0ck0l05qb0rh0ro0qh0p00p0zp0zo0zo0xp07q00r40t80v70x50yc0x60v60t50p00l00h03d0090f6z06z08z09z0az0az0az08z05z03z03z02001001001000000000001003z05z0fk0s00w30xh0uq0rz0qf0pz0mz0kz0iz0ez0bz0cm0g0ui0zk0zo0zv0nx03y50z50w20u0ns0ws0zu0zw0zy0bz00zb0zg0xa0w03t0zo0si00gp0p03v30yk0xz0wz0wz0wz0wq0t70m00gk0dz0bz0bz0cz0ez0k00o02p0js0zu0zsz0oz0mz0n40oe0me0j00ff0dz0cz0dz0ez0dz0az06z05z0fc0q00w00y40yf0vr0tm0r60o01ie0dz0cz0bz0az08z05z0d90l0cp08o0on0zl0zg0zb007305708u0hh0qn0vo0yn0ya0z00z00w0zt10s60s60s90s20u00t0hp0zj0sfz0cz09z0i02p0ys0zr0zo0zm0zk0zn0rt00w20v70t60s0zr0zp0zm0zjo0fz0cz09z07p06r080dg0zp0ov00x40x70v00t0vr60pf0n60m50j00h0sd0e9006504j02001001001000005d0ih0rf0ve0vc0u00t0zt02s00r00q0zr0zs0zt0zu0zv0zw0ewb0xd0x70wd0vg0uf0vc0w50x70w20v70te0r70p0co0zo0zn0nlz0jz0hz0gz0fz0ez0is0n40r00r0zs0zr0zq00q30q60p30o00o07o20ni0ni0ml0nc0l00j00ia0i60h01e0zb0w7004k03f0ar0j00r30we0xt0xs0wz0uz0rz0oq0ia0ga0en0cz09z09z0az0bz0bz0bz0bz0bz09z07z05z03z02001001000000000000000000000000000000000000000000000000000000000000000000001009p0gz0me0sk0we0w00t0iq0pn0gk04gm0g80n03r02s0zs0zs0zs0zt0zu0zx0jy00z80xd0v80t06s0qsb0tp0vg0vc0wg0vj0uc0s00r0mp0zn0zi0iej0az06z04z0d08m00t50xg0ym0xn0wn0tj0rh0p90n00l0zj07i00h40dz0bz0j00r09w00y00z30z70y90y40x10w00w00u00t00s00r20q50p80nd0kz0hz0dz0az07z05z03z0ea0n00r00r00n00gz0dz0bu0a809z07z06z08z0h0gn00p00p05p0zo0zm0zj0ze00ak06z05z0d0ri0kl03l00k50j02h0zf00bz0az0cz0dz0dz0cz0hz0m60p70o00i00bw0az0az0az08z05z03z03z0a04f0bg0hf10cz0bz0bz0cz0ez0dz0ez0ja0oz0rz0tz0tz0tr0sh0r00p0zl0yg0ad00az07z04z03z04z08t0gk0ns0qs0pl0mg0f01a0061090ze0zi0zm09q70ti0wh0wp0wr0vm0uo0ug0v0gv0zt0ys80u70w70x50w00t09m0zgz0cz0az06z04z06d0h0vo0cq00p00n0ln90oc0o00o0nk0ze0ea0aaz0cz0cz0c0lh0pl02m00l70j80h0ve0zbz09z09z0az0bz0bz09z08z0ge0oi0uu0xu0yr0xk0t00p0bm08m40ob0pe0p30o0zn0zl0zj0zg0xc0b7z05z06z0az0bz09z06z03z04z06z09d0dg0kh0pn0qf0o30j00dk09509g0at0ff0mi0tk0xe0y60z30z30w0ir0rr60va0x90w70ul0q00l0yhw0ez0dz09z07z05r05c0d0yl0jp00p00p0zp00pc0pc0oa0o00o0zo0zn0zn06p90sp0wp0xt0xw0wz0uz0tz0sx0rs0r70r0zr0zp0zk0tg00fo0ds0bv0f0zm0xr0gr00q40n60m00j0zf09cz0bz0cz0dz0ez0dz0cz0cz0f10kd0oi0qr0rk0pa0l00h05e00e10f50g01g0zg0zg0zf0ze0zd0ia707z06z09z0az09t06r04w030030020010040z70zd0zk0zs0tx04y00z80x70t00r0vq0zp00mz0lz0lz0lz0jz0gz0cz07z0bz0l70u80xb0yh0zn0yl0xn0vk0rd0m00i10g10ef0ck0bi0c0zd0ze0ze0zg0zh0zg0zi0xp0hw00y60yb0x90v00u0zv0zw0zx0zx0zw0zw0nx00yb0ze0zo0zq0ym0xh0v90q20p00q00r20r00q20o20n00l50i60gc0gd0j00m0zn0zn0zm00l00k00iz0ez09z05z04z03z02005z0f0jq10wg0yq0xz0xz0vy0rf0ml0h90d00e04h0ek0cq00t90ve0vi0wk0wp0vq0tm0ss0qm0p00o0zo0zm0zl0zj0zf0za50e80j90nh0oo0op0nh0m00l0vl0zl0zl0qjz0hz0fz0ez0g00i00j0gj0zj0zh0zez0bz09z07z0900c0zf0zi0ji05h0gfz0ez0dz0cz0cz0bz0az09z07z0b00h0zn0xr00u90wj0wn0wr0up0rt0ow0mj0ji0i90g20d0bb0090l70b5003e0200100100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ch0mo0rz0sw0rz0nz0lz0pz0vz0x07y0kw0gu00w06ye0xg0w80v70v50vz0sz0pz0mz0lz0nf0pc0rz0sz0uz0uz0uz0uz0tz0tz0tt0ta0s0sqb0mz0iz0hz0jr0m00l00j00h07j05m0zo0sn05k00f60gq0j0zn0zs0hw00x07u0rn0qk60l0zp0zs0zs0zs0zt0av09w0dw00y00y00x00v0jt0qt0mv02w00x00w08v0jt0qu0gv00x10v00t0to0dkz0gz0ez0iz0p0ku02v00u00t10r10q00p00p0rp0zn0dkz0iz0hz0cz09z0bz0hw0ml0p00q0zq0zo0zo0zn0zl0zk0zl0zn0zs0iw00y30x30u06t0tt0zs0zp0zk50n30u00xb0yk0yn0wm0tk0r80q60r80sf0s90r0fo0zi05dz0bz0az0j00p00s00s00s00r00r60ra0p50l0xl00n50ob0mb0j50hk0f00fx0ic0o03r0zq0zl0zg0yca0az08z05z0az0l20tj0xp0xu0wu0uz0tz0sz0sa0u0lv0zu0ws0wp0wo0cr0gu09x00y00y00w02v0cv0pu0tu0ou0ps0zp0zl0zj0qo00s00s08od0iz0ez0fz0hz0gz0dz0bz0h0dpa0vr0wz0wz0wz0vz0sn0p70mg0la0k00g00d80ap08x07y0ap0l02u00x30ya0xb0u00ni0iz0gz0gz0gz0fz0ez0dz0cz0az0az0i00r00w40wh0sl0on0kd0h50f40dd0bq09z0az0dz0ez0dz0bz09z09z0az0az08z07z0az0cz0cz09z07e090zd0zj0zp0vu0hv00u50uh0wf0xa0w00v01t0hr0ct02x00y00x08s0zl20hz0gz0fz0m0bq00r20r50r30s00t0xt0zqz0mz0hz0hz0k02l00i00ef0az08z07z05z03z0200i90tk0xr0xz0wz0tz0qz0kz0fp0bv08z06z09z0dz0k0cp06r80qq0qp0qt0qw0qk0p90o50m00jz0gz0ez0dz0bz07z05z04z04z02002005z0az0cz0dz0cz0hz0n00s30t40u10v01w0ow0ru0rt0uu0nv30w50w20x00y04y0nvy0qz0oz0mz0jz0hz0gz0fz0l00p70ro0sz0rk0q00n0ri00d308c08x0az0h90o0ms07s0gq0zoo0kz0jz0jz0gz0dz0az08z0fz0q40wb0xy0xz0xq0ud0oz0jz0hz0gz0fz0ez0cz0i0zn0zp0yo0un0ul0ll0am00m10l00i07f06a007j07z08z07z05z05z07z09z08z06z0az0eo0gz0gr0kp0oi0s0cu0ou20t40s0rs0zq0zl0zh00fz0ez0ez0l00ua0xx0xz0vz0sz0qu0pg0p0rp0zo0um07il0j30p0jt09u00u07v0hv0st0yp0zk0zj0zm0jt00x70yj0xv0vz0tz0rt0ra0r09qt0nz0lz0jz0jr0md0oc0mz0jz0gz0dz0d90gc0j10k01kz0iz0gz0cz0ay0900c0je00hz0gz0gz0hz0iz0hz0cz08z08z0fo0p00u60vj0un0tl0r00n0kg00co09z05z03z03z04z0d60n03u00we0vq0tn0pg0k80f40b10b00cv0dz0cz0az0az0bz0bz08z05z03z02001001000000000000000000000000000000000000000000000000000000000000000000000000000000000000002005z0dz0p30w70xh0wp0vn0t80p00l00k20kd0jj0ij0ga0e0hc0q9006z04z0200100100100000d0ao0rv0hy02y00z30y20w00t0jr0sr0nu10w10x00w00v00t00s70s70ta0tb0tb0td0qd0m50ia0dc08506h04r06x0gr0pn0un0wj0w00w0ww0zu0xr0yp0zq0ps0et00w00y40y00x0st0zr0zn0zh0zcz0cz0jk0o00q30oc0md0kg0nh0rr0sy0sy0sx0sy0tf0u04v0zx0zx0zw02v00v00y00z03z0ez0hx0pt0zo0zm00m00m00k00gk0bz08z05z03z02001001000004v0d0am06r00t30tf0ul0tp0sz0rm0ug0w30w70t00o0gi0ke00cs09r07j06q05y05z0g0tr0jw01y00y60xe0ui0ob0i03e0g9306z04z0300200100100a0oj0qo0dp01q00p0gn0zn0zn0am30l00l00l03m00l20l00k0diz0fz0cz0az08z08z0bz0fd0jh0ji0ia0g70da0a306104n02002001001001000000000000000000000000002003z05z06z07z0ez0p60vm0wx0vz0wz0yu0zi0z10y0rt0xp0ll03j0bh0zg0zm00t40xp0wy0vz0tz0to0sr0qb0mz0iz0fz0ez0dz0bz0az08z06z04z03z02001001001001001000000002005z06z05z05z06z08z09z0az0az0dz0jg0pk0ts0vz0vt0vo0we0w40w30v30u50tf0rh0pg0mf0i00c507n06z06z04z02002004z04z0300200100100100000000200cr0kc0q20u0zu0zs0gnp0gz0az06z04z0200h60t10xb0yo0zs0zl0xh0ui0se0th0ug0v50v01v0gu0zs0zo0zi0zd0zaz0fz0n60u90xh0yt0zs0yz0wx0se0mz0hz0ez0bz09z05z03z02001001002004z08z0i40o0on0zi0sd0mb90ak09l06u04z0e0oq0dw00y40zd0zh0yk0wh0p05i00b707l05z05z04z0ay0k0dr0is0kq0zm0zh0zgz0l60ob0po0ov0oo0oh0n80k0lg0yc00az08z05z03z0200e0vn0it00w80wd0vk0tk0qa0mb0j10g00c009046044s0300200200100"; /*END*/
+      // The guide: a young trader in a blue hoodie with round glasses, a small glossy 3D toy figure on his own floating tile
+      // in the lower right. He stays put through every cut (above the scenes, below the captions) and reacts to the voice:
+      // he holds up a flashcard with σ, ↓ or σ↑ when they are named, a "?" pops over his head when he is puzzled, thumbs
+      // up on "up", a cheer on "win", a wave goodbye. Everything is a pure function of t.
+// ISO KIT v1: isometric toy-world drawing on a 2D canvas, matching the Flow dioramas' look.
+// Copy this block verbatim into a scene's <script> (inside its IIFE). World units: x to the right-back, y to the left-back,
+// z up. P(x, y, z) -> frame px. Visible faces of a box: top, the face at y+d (front-left) and the face at x+w (front-right).
+// Draw back to front: sort what you draw by (x + y) ascending, then z ascending (painter's order).
+const ISO = (function () {
+  const C30 = Math.cos(Math.PI / 6), S30 = 0.5;
+  const MAT = {
+    white: { top: "#ffffff", left: "#e3ebfb", right: "#c9d8f5" },
+    blue:  { top: "#7fb0ff", left: "#3b82f6", right: "#2563eb" },
+    navy:  { top: "#4f6fe0", left: "#1e40af", right: "#1e3a8a" },
+    sky:   { top: "#dbeafe", left: "#bfdbfe", right: "#93c5fd" },
+    rose:  { top: "#fda4af", left: "#f43f5e", right: "#e11d48" },
+    gold:  { top: "#fde68a", left: "#f59e0b", right: "#d97706" },
+    grey:  { top: "#f1f5f9", left: "#cbd5e1", right: "#94a3b8" },
+    wood:  { top: "#f3c58f", left: "#d99a5b", right: "#b97a3f" },
+  };
+  function make(g, ox, oy, u) {
+    const P = (x, y, z) => [ox + (x - y) * C30 * u, oy + (x + y) * S30 * u - (z || 0) * u];
+    function poly(pts, fill, stroke, lw) {
+      g.beginPath(); pts.forEach(([a, b], i) => (i ? g.lineTo(a, b) : g.moveTo(a, b))); g.closePath();
+      if (fill) { g.fillStyle = fill; g.fill(); }
+      if (stroke) { g.strokeStyle = stroke; g.lineWidth = lw || 1.5; g.stroke(); }
+    }
+    function box(x, y, z, w, d, h, mat, edge) {
+      if (h <= 0 || w <= 0 || d <= 0) return;
+      edge = edge === undefined ? "rgba(15,35,90,0.14)" : edge;
+      poly([P(x, y + d, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x, y + d, z + h)], mat.left, edge);
+      poly([P(x + w, y, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x + w, y, z + h)], mat.right, edge);
+      poly([P(x, y, z + h), P(x + w, y, z + h), P(x + w, y + d, z + h), P(x, y + d, z + h)], mat.top, edge);
+    }
+    // a soft contact shadow on the floor plane z
+    function shadow(x, y, z, w, d, a) {
+      const c = P(x + w / 2, y + d / 2, z); const rx = (w + d) * C30 * u * 0.55, ry = (w + d) * S30 * u * 0.55;
+      const gr = g.createRadialGradient(c[0], c[1], 0, c[0], c[1], rx);
+      gr.addColorStop(0, `rgba(30,64,175,${a || 0.18})`); gr.addColorStop(1, "rgba(30,64,175,0)");
+      g.save(); g.translate(c[0], c[1]); g.scale(1, ry / rx); g.translate(-c[0], -c[1]);
+      g.fillStyle = gr; g.beginPath(); g.arc(c[0], c[1], rx, 0, 6.2832); g.fill(); g.restore();
+    }
+    // the floating platform: white top slab, blue band, white band, blue base (like the dioramas), its top at z = 0
+    function platform(x, y, w, d) {
+      box(x, y, -1.5, w, d, 0.42, MAT.blue);
+      box(x, y, -1.08, w, d, 0.3, MAT.white);
+      box(x, y, -0.78, w, d, 0.28, MAT.blue);
+      box(x, y, -0.5, w, d, 0.5, MAT.white);
+    }
+    // a 2D affine matrix that maps a flat w x h DOM element onto a face given three projected corners (TL, TR, BL)
+    function faceMatrix(tl, tr, bl, w, h) {
+      const a = (tr[0] - tl[0]) / w, b = (tr[1] - tl[1]) / w, c = (bl[0] - tl[0]) / h, d = (bl[1] - tl[1]) / h;
+      return `matrix(${a.toFixed(5)},${b.toFixed(5)},${c.toFixed(5)},${d.toFixed(5)},${tl[0].toFixed(2)},${tl[1].toFixed(2)})`;
+    }
+    return { P, poly, box, shadow, platform, faceMatrix, u };
+  }
+  return { make, MAT };
+})();
+
+      const cv = document.getElementById("mc-cv"), g = cv.getContext("2d");
+      try { document.fonts.load('700 48px "Fredoka"'); document.fonts.load('700 48px "D2QSans"', "ΔΓθ₹?"); } catch (e) { /* the canvas falls back */ }
+      const OX = 600, OY = 1300;                    // the canvas's corner in the frame
+      const FX = 874 - OX, FY = 1800 - OY;          // his feet: the centre of his tile's top (frame 874, 1800)
+      const SC = 0.95;                              // design units -> px
+      const U = 13;                                 // the tile: a 5 x 5 kit platform at 13 px a unit
+      const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+      const lerp = (a, b, k) => a + (b - a) * k;
+      const easeOut = (p) => 1 - Math.pow(1 - clamp(p, 0, 1), 3);
+      const backOut = (p) => { p = clamp(p, 0, 1); const q = p - 1, s = 1.5; return 1 + (s + 1) * q * q * q + s * q * q; };
+
+      // ---- lip sync: three base-36 digits per 1/60 s from the voice (open, wide, round), see tools/timing_iso.py lips()
+      const LV = [], LW = [], LR = [];
+      for (let i = 0; i + 2 < LIPS.length; i += 3) { LV.push(parseInt(LIPS[i], 36) / 35); LW.push(parseInt(LIPS[i + 1], 36) / 35); LR.push(parseInt(LIPS[i + 2], 36) / 35); }
+      function talk(t) {
+        const f = (t - LIPS_T0) * LIPS_HZ;
+        if (f < 0 || f >= LV.length - 1) return { open: 0, wide: 0, round: 0 };
+        const i = Math.floor(f), k = f - i;
+        return { open: lerp(LV[i], LV[i + 1], k), wide: lerp(LW[i], LW[i + 1], k), round: lerp(LR[i], LR[i + 1], k) };
+      }
+
+      // ---- poses: numeric channels blend (back.out, toy-like); the face, hands and props switch behind a blink
+      const REST = { aL: 0.22, aR: 0.22, tilt: 0, lx: 0, ly: 0, eyes: "neutral", brows: "neutral", mouth: "smile", hL: "fist", hR: "fist",
+                     card: "", q: 0, wave: 0, sweat: 0, fx: "" };
+      const POSES = {
+        wave:    { aR: 2.15, hR: "open", wave: 1, eyes: "happy", brows: "up", mouth: "grin" },
+        look:    { lx: -4, ly: -4, tilt: -0.05 },
+        think:   { aL: -1.95, lx: -3, ly: -4, tilt: -0.07, brows: "think", mouth: "hmm" },
+        ask:     { aL: -1.95, lx: -3, ly: -4, tilt: 0.06, brows: "think", mouth: "hmm", q: 1 },
+        point:   { aL: 2.25, hL: "point", lx: -4, ly: -3, tilt: -0.05 },
+        thumbs:  { aR: 2.0, hR: "thumb", eyes: "happy", brows: "up", mouth: "grin" },
+        happy:   { aL: 0.45, aR: 0.45, eyes: "happy", brows: "up", mouth: "grin" },
+        wow:     { aL: 0.6, aR: 0.6, eyes: "wow", brows: "wow", mouth: "o" },
+        worried: { aL: 0.12, aR: 0.12, tilt: 0.05, brows: "worried", mouth: "wavy", sweat: 1 },
+        sad:     { aL: 0.08, aR: 0.08, tilt: 0.09, ly: 2, eyes: "sad", brows: "worried", mouth: "frown" },
+        meh:     { eyes: "meh", brows: "flat", mouth: "flat" },
+        cheer:   { aL: 2.3, aR: 2.3, hL: "open", hR: "open", eyes: "star", brows: "up", mouth: "grin", fx: "sparkle" },
+        shrug:   { aL: 1.18, aR: 1.18, hL: "open", hR: "open", tilt: 0.1, brows: "wow", mouth: "flat", q: 1 },
+        leanR:   { lx: 4, ly: -2, tilt: 0.07 },
+        leanL:   { lx: -4, ly: 1, tilt: -0.07 },
+        delta:   { aL: 1.95, hL: "card", card: "Δ", eyes: "happy", brows: "up", mouth: "grin" },
+        gamma:   { aL: 1.95, hL: "card", card: "Γ", eyes: "wow", brows: "wow", mouth: "smile" },
+        theta:   { aL: 1.95, hL: "card", card: "θ", brows: "worried", mouth: "flat" },
+        rupee:   { aL: 1.95, hL: "card", card: "₹", brows: "worried", mouth: "wavy", sweat: 1 },
+        sigma:   { aL: 1.95, hL: "card", card: "σ", eyes: "happy", brows: "up", mouth: "grin" },
+        down:    { aL: 1.95, hL: "card", card: "↓", eyes: "wow", brows: "worried", mouth: "o", sweat: 1 },
+        iv:      { aL: 1.95, hL: "card", card: "σ↑", eyes: "happy", brows: "up", mouth: "grin" },
+        bye:     { aR: 2.15, hR: "open", wave: 1, eyes: "heart", brows: "up", mouth: "grin", fx: "hearts" },
+      };
+      const NUM = ["aL", "aR", "tilt", "lx", "ly"];
+      const pose = (name) => Object.assign({}, REST, POSES[name] || {});
+      // switches: a cue's pose at its start, back to REST at its end (unless the next cue comes first)
+      const SW = [{ t: -1, p: Object.assign({}, REST) }];
+      CUES.forEach(([t0, name, dur], i) => {
+        const next = i + 1 < CUES.length ? CUES[i + 1][0] : 1e9;
+        SW.push({ t: t0, p: pose(name) });
+        if (t0 + dur < next - 0.05) SW.push({ t: t0 + dur, p: Object.assign({}, REST) });
+      });
+      // the value of every numeric channel at each switch, resolved once (so any t is a pure lookup)
+      const RIN = 0.24;
+      SW[0].v = {}; NUM.forEach((k) => { SW[0].v[k] = REST[k]; });
+      for (let i = 1; i < SW.length; i++) {
+        const a = SW[i - 1], p = clamp((SW[i].t - a.t) / RIN, 0, 1);
+        SW[i].v = {}; NUM.forEach((k) => { SW[i].v[k] = lerp(a.v[k], a.p[k], backOut(p)); });
+      }
+      function state(t) {
+        let i = 0; while (i + 1 < SW.length && SW[i + 1].t <= t) i++;
+        const s = SW[i], p = clamp((t - s.t) / RIN, 0, 1), o = {};
+        NUM.forEach((k) => { o[k] = lerp(s.v[k], s.p[k], backOut(p)); });
+        ["eyes", "brows", "mouth", "hL", "hR", "card", "q", "fx", "wave", "sweat"].forEach((k) => { o[k] = s.p[k]; });
+        o.since = t - s.t;
+        o.prevCard = i > 0 ? SW[i - 1].p.card : "";
+        if (o.wave) o.aR += 0.3 * Math.sin(2 * Math.PI * 3.1 * o.since) * clamp(o.since / 0.15, 0, 1);
+        return o;
+      }
+
+      // ---- hops (cue hop heights in design px), the entrance drop and its landing squash
+      const T_TILE = 0.08, T_DROP = 0.3, T_LAND = 0.62;
+      const HOPS = CUES.filter((c) => c[3] > 0).map((c) => [c[0] - 0.04, c[3]]);
+      function hopY(t) {
+        let y = 0;
+        for (const [th, H] of HOPS) { const p = (t - th) / 0.32; if (p > 0 && p < 1) y -= H * 4 * p * (1 - p); }
+        if (t < T_LAND) { const p = clamp((t - T_DROP) / (T_LAND - T_DROP), 0, 1); y -= 340 * (1 - p * p); }
+        return y;
+      }
+      function squash(t) {
+        let s = 0;
+        const lands = HOPS.map(([th]) => th + 0.32).concat([T_LAND]);
+        for (const tl0 of lands) { const q = (t - tl0) / 0.22; if (q > 0 && q < 1) s += 0.12 * Math.sin(Math.PI * q) * (1 - q * 0.4); }
+        for (const [th] of HOPS) { const q = (t - th + 0.07) / 0.07; if (q > 0 && q < 1) s += 0.06 * Math.sin(Math.PI * q); }
+        return s;
+      }
+      // a damped spring kicked by every landing and every pose change (the hair tuft and the hoodie strings swing on it)
+      const KICKS = HOPS.map(([th]) => th + 0.32).concat([T_LAND], SW.slice(1).map((s) => s.t));
+      function spring(t) {
+        let a = 0.05 * Math.sin((2 * Math.PI * t) / 2.4);
+        for (const k of KICKS) { const d = t - k; if (d > 0 && d < 1.2) a += 0.3 * Math.exp(-5.5 * d) * Math.sin(17 * d); }
+        return a;
+      }
+      // blinks: seeded idle blinks, plus one at every face change so the swap happens behind closed eyes
+      function mulberry32(a) { return function () { a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+      const rnd = mulberry32(1010);
+      const BLINKS = [];
+      for (let tb = 1.6; tb < DUR; tb += 2.4 + rnd() * 1.8) BLINKS.push(tb);
+      SW.slice(1).forEach((s) => BLINKS.push(s.t - 0.065));
+      function blink(t) {
+        let c = 0;
+        for (const tb of BLINKS) { const q = (t - tb) / 0.13; if (q > 0 && q < 1) c = Math.max(c, Math.sin(Math.PI * q)); }
+        return c;
+      }
+
+      // ---- drawing helpers
+      function rr(x, y, w, h, r) {
+        r = Math.min(r, w / 2, h / 2);
+        g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r);
+        g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath();
+      }
+      // a rounded slab seen at three-quarters: the depth swept back-right in slices (lit from the top), then the glossy front
+      function slab(x, y, w, h, r, dx, dy, M) {
+        const n = 8;
+        for (let i = n; i >= 1; i--) {
+          const k = i / n, gr = g.createLinearGradient(0, y + dy * k, 0, y + dy * k + h);
+          gr.addColorStop(0, M.top); gr.addColorStop(0.3, M.side); gr.addColorStop(1, M.side2);
+          rr(x + dx * k, y + dy * k, w, h, r); g.fillStyle = gr; g.fill();
+        }
+        const fr = g.createLinearGradient(x, y, x + w * 0.7, y + h);
+        fr.addColorStop(0, M.f0); fr.addColorStop(0.55, M.f1); fr.addColorStop(1, M.f2);
+        rr(x, y, w, h, r); g.fillStyle = fr; g.fill();
+        g.strokeStyle = "rgba(15,35,90,0.16)"; g.lineWidth = 1.6; g.stroke();
+        const sx = x + w * 0.28, sy = y + h * 0.22, sp = g.createRadialGradient(sx, sy, 0, sx, sy, w * 0.36);
+        sp.addColorStop(0, "rgba(255,255,255,0.42)"); sp.addColorStop(1, "rgba(255,255,255,0)");
+        g.save(); rr(x, y, w, h, r); g.clip(); g.fillStyle = sp; g.fillRect(x, y, w, h); g.restore();
+      }
+      const HOODIE = { top: "#9cc2ff", side: "#2a63d6", side2: "#1e40af", f0: "#8ab8ff", f1: "#3b82f6", f2: "#2563eb" };
+      function ball(x, y, r, c0, c1, c2, c3) {
+        const gr = g.createRadialGradient(x - r * 0.38, y - r * 0.42, r * 0.08, x, y, r);
+        gr.addColorStop(0, c0); gr.addColorStop(0.35, c1); gr.addColorStop(0.8, c2); gr.addColorStop(1, c3);
+        g.fillStyle = gr; g.beginPath(); g.arc(x, y, r, 0, 6.2832); g.fill();
+      }
+      const skinBall = (x, y, r) => ball(x, y, r, "#fbe1cb", "#eab894", "#d9a079", "#b97b55");
+      function capsule(x0, y0, x1, y1, r, fill, edge) {
+        const a = Math.atan2(y1 - y0, x1 - x0);
+        g.beginPath(); g.arc(x1, y1, r, a - Math.PI / 2, a + Math.PI / 2); g.arc(x0, y0, r, a + Math.PI / 2, a + 1.5 * Math.PI); g.closePath();
+        g.fillStyle = fill; g.fill(); if (edge) { g.strokeStyle = edge; g.lineWidth = 1.3; g.stroke(); }
+      }
+      function star(x, y, r, n, inner) {
+        g.beginPath();
+        for (let i = 0; i < n * 2; i++) { const a = -Math.PI / 2 + (i * Math.PI) / n, r0 = i % 2 ? r * inner : r; g[i ? "lineTo" : "moveTo"](x + Math.cos(a) * r0, y + Math.sin(a) * r0); }
+        g.closePath();
+      }
+      function heart(x, y, s) {
+        g.beginPath(); g.moveTo(x, y + s * 0.9);
+        g.bezierCurveTo(x - s * 1.4, y - s * 0.1, x - s * 0.7, y - s * 1.2, x, y - s * 0.45);
+        g.bezierCurveTo(x + s * 0.7, y - s * 1.2, x + s * 1.4, y - s * 0.1, x, y + s * 0.9); g.closePath();
+      }
+
+      // the flashcard he holds up (a white card with the blue extruded edge, like the scenes' signboards)
+      function card(x, y, glyph, s, side) {
+        if (s <= 0.01) return;
+        g.save(); g.translate(x, y); g.rotate(-0.09 * side); g.scale(s, s);
+        g.fillStyle = "rgba(30,64,175,0.22)"; rr(-31, -24, 62, 60, 13); g.fill();
+        g.fillStyle = "#2563eb"; rr(-30, -26, 60, 60, 13); g.fill();
+        g.fillStyle = "#ffffff"; rr(-30, -32, 60, 60, 13); g.fill(); g.strokeStyle = "rgba(15,35,90,0.14)"; g.lineWidth = 1.4; g.stroke();
+        g.fillStyle = "#1e3a8a"; g.font = (glyph.length > 1 ? '700 28px' : '700 40px') + ' "Fredoka", "D2QSans", sans-serif'; g.textAlign = "center"; g.textBaseline = "middle";
+        g.fillText(glyph, 0, 0);
+        g.restore();
+      }
+      // one arm: the shoulder at (sx, sy), angle a from straight down (positive = outward / up), side -1 left, +1 right
+      function arm(sx, sy, a, side, hand, o) {
+        const dx = side * Math.sin(a), dy = Math.cos(a);
+        const rz = clamp((a - 1.3) / 0.8, 0, 1), L = 32 + 18 * rz * rz * (3 - 2 * rz);   // raised arms stretch past the big head
+        const ex = sx + dx * L, ey = sy + dy * L;
+        const sg = g.createLinearGradient(sx - 9, sy - 9, sx + 9, sy + 9);
+        sg.addColorStop(0, "#7fb0ff"); sg.addColorStop(0.5, "#3b82f6"); sg.addColorStop(1, "#2563eb");
+        capsule(sx, sy, ex, ey, 9.5, sg, "rgba(15,35,90,0.18)");
+        capsule(sx + dx * (L - 5), sy + dy * (L - 5), ex, ey, 9.8, "#2a63d6");                       // the cuff
+        const hx = sx + dx * (L + 7), hy = sy + dy * (L + 7);
+        if (hand === "card" || (o.prevCard && o.since < 0.16 && side < 0)) {
+          const glyph = hand === "card" ? o.card : o.prevCard;
+          const s = hand === "card" ? 0.35 + 0.65 * backOut(o.since / 0.26) : 1 - o.since / 0.16;
+          card(hx + side * 2, hy - 34, glyph, s, side);
+        }
+        if (hand === "point") capsule(hx, hy, hx + dx * 15, hy + dy * 15, 3.9, "#e2ac86", "rgba(120,60,30,0.3)");
+        skinBall(hx, hy, hand === "open" ? 11 : 10.5);
+        if (hand === "open") {
+          for (const k of [-0.55, 0, 0.55]) {
+            const fa = Math.atan2(dy, dx) + k, fx = hx + Math.cos(fa) * 10, fy = hy + Math.sin(fa) * 10;
+            g.fillStyle = "#e3ad87"; g.beginPath(); g.arc(fx, fy, 3.6, 0, 6.2832); g.fill();
+          }
+        }
+        if (hand === "thumb") capsule(hx + side * 1.5, hy - 5, hx + side * 1.5, hy - 19, 4.6, "#e7b28c", "rgba(120,60,30,0.3)");
+      }
+
+      // ---- the face, in head coordinates (head centre (0, -54), radius ~52)
+      const INK = "#2b1a12", LIP = "#6b2f22";
+      function eye(x, y, o, bl, sd) {
+        g.save(); g.translate(x, y); g.scale(1, 1 - 0.9 * bl);
+        const e = o.eyes;
+        if (e === "happy") { g.strokeStyle = INK; g.lineWidth = 3.8; g.lineCap = "round"; g.beginPath(); g.arc(0, 4, 7, Math.PI + 0.25, 2 * Math.PI - 0.25); g.stroke(); }
+        else if (e === "star") { g.fillStyle = "#fbbf24"; g.strokeStyle = "#d97706"; g.lineWidth = 1.5; star(0, 0, 9.5, 5, 0.45); g.fill(); g.stroke(); }
+        else if (e === "heart") { g.fillStyle = "#f43f5e"; heart(0, 1, 7.5); g.fill(); }
+        else {
+          const big = e === "wow", rx = big ? 8.2 : 7, ry = big ? 10 : 8.6, px = o.lx, py = o.ly;
+          g.fillStyle = "#ffffff"; g.beginPath(); g.ellipse(0, 0, rx + 2.6, ry + 2.4, 0, 0, 6.2832); g.fill();
+          g.fillStyle = INK; g.beginPath(); g.ellipse(px * 0.6, py * 0.6, rx, ry, 0, 0, 6.2832); g.fill();
+          g.fillStyle = "#ffffff"; g.beginPath(); g.arc(px * 0.6 - 2.6, py * 0.6 - 3.4, big ? 3.2 : 2.6, 0, 6.2832); g.fill();
+          g.beginPath(); g.arc(px * 0.6 + 2.6, py * 0.6 + 2.8, 1.2, 0, 6.2832); g.fill();
+          if (e === "sad" || e === "meh") {                                       // the upper lid comes down (sad: drooping at the outer corner)
+            const k = e === "meh" ? 0.5 : 0.36, yl = -ry - 2 + (2 * ry + 4) * k, dr = e === "sad" ? 3 : 0;
+            const xi = -sd * (rx + 3), xo = sd * (rx + 3), yi = yl - dr, yo = yl + dr;
+            g.fillStyle = "#e6b28c"; g.beginPath(); g.moveTo(xi, yi); g.lineTo(xo, yo); g.lineTo(xo, -ry - 6); g.lineTo(xi, -ry - 6); g.closePath(); g.fill();
+            g.strokeStyle = INK; g.lineWidth = 2.4; g.beginPath(); g.moveTo(xi * 0.92, yi); g.lineTo(xo * 0.92, yo); g.stroke();
+          }
+        }
+        g.restore();
+      }
+      function brow(sd, kind) {
+        // inner end at x = sd * 9, outer end at x = sd * 29; y up is negative
+        let yi = -77, yo = -74;
+        if (kind === "up") { yi -= 3; yo -= 3; }
+        if (kind === "wow") { yi -= 7; yo -= 6; }
+        if (kind === "worried") { yi -= 6; yo += 1; }
+        if (kind === "flat") { yi = -73; yo = -73; }
+        if (kind === "think") { if (sd > 0) { yi -= 6; yo -= 7; } else { yi += 1; yo += 0; } }
+        g.strokeStyle = "#2b211c"; g.lineWidth = 4.4; g.lineCap = "round";
+        g.beginPath(); g.moveTo(sd * 9, yi); g.quadraticCurveTo(sd * 19, Math.min(yi, yo) - 3, sd * 29, yo); g.stroke();
+      }
+      function mouth(kind) {
+        g.lineCap = "round"; g.lineJoin = "round";
+        if (kind === "grin") {
+          g.save(); g.beginPath(); g.moveTo(-12, -32); g.quadraticCurveTo(0, -34, 12, -32); g.quadraticCurveTo(11, -16, 0, -15); g.quadraticCurveTo(-11, -16, -12, -32); g.closePath();
+          g.fillStyle = "#5b1a1a"; g.fill(); g.clip();
+          g.fillStyle = "#ffffff"; g.fillRect(-13, -34, 26, 6);
+          g.fillStyle = "#f27a7a"; g.beginPath(); g.ellipse(0, -16, 7, 4.5, 0, 0, 6.2832); g.fill(); g.restore();
+        } else if (kind === "o") { g.fillStyle = "#5b1a1a"; g.beginPath(); g.ellipse(0, -26, 5.2, 6.8, 0, 0, 6.2832); g.fill(); }
+        else {
+          g.strokeStyle = LIP; g.lineWidth = 3.4; g.beginPath();
+          if (kind === "flat") { g.moveTo(-8, -27); g.lineTo(8, -27); }
+          else if (kind === "hmm") { g.moveTo(-7, -26); g.lineTo(8, -29); }
+          else if (kind === "wavy") { g.moveTo(-10, -27); g.quadraticCurveTo(-5, -31, 0, -27); g.quadraticCurveTo(5, -23, 10, -27); }
+          else if (kind === "frown") { g.arc(0, -18, 9, Math.PI + 0.6, 2 * Math.PI - 0.6); }
+          else { g.arc(0, -37, 11, 0.62, Math.PI - 0.62); }
+          g.stroke();
+        }
+      }
+      function talkMouth(tk, kind) {
+        const op = tk.open, wd = tk.wide, rd = tk.round;
+        const c = kind === "grin" || kind === "smile" ? -3 : kind === "frown" ? 3 : 0;     // the corners carry the mood
+        const hw = 10 + 3 * wd - 4 * rd + (kind === "grin" ? 2 : 0);
+        const top = -28 - 1.5 * op, bot = -27 + 15 * op * (1 - 0.25 * wd);
+        g.save();
+        g.beginPath(); g.moveTo(-hw, -27 + c);
+        g.quadraticCurveTo(0, top - 2 * op, hw, -27 + c);
+        g.quadraticCurveTo(0, bot + 3 * op, -hw, -27 + c); g.closePath();
+        g.fillStyle = "#5b1a1a"; g.fill();
+        g.strokeStyle = "#6b2f22"; g.lineWidth = 2.2; g.lineJoin = "round"; g.stroke();
+        g.clip();
+        if (op > 0.18) { g.fillStyle = "#ffffff"; g.fillRect(-hw, top - 7, 2 * hw, 5 + 3 * wd + 3 * op); }        // upper teeth
+        if (op > 0.4) { g.fillStyle = "#f27a7a"; g.beginPath(); g.ellipse(0, bot + 2, hw * 0.55, 3 + 3 * op, 0, 0, 6.2832); g.fill(); }  // tongue
+        g.restore();
+      }
+      function head(o, t) {
+        const bl = blink(t), sp = spring(t);
+        // ears, behind the head
+        for (const sd of [-1, 1]) {
+          ball(sd * 49, -52, 11, "#fbe1cb", "#e6b28c", "#d39a73", "#b57650");
+          g.fillStyle = "rgba(150,80,50,0.35)"; g.beginPath(); g.ellipse(sd * 50, -52, 4.2, 6.5, 0, 0, 6.2832); g.fill();
+        }
+        // the head: a big round toy head, lit from the top left
+        const hg = g.createRadialGradient(-18, -78, 6, 0, -54, 62);
+        hg.addColorStop(0, "#fde6d2"); hg.addColorStop(0.45, "#eab894"); hg.addColorStop(0.85, "#d69c75"); hg.addColorStop(1, "#b97b55");
+        g.fillStyle = hg; g.beginPath(); g.ellipse(0, -54, 51, 53, 0, 0, 6.2832); g.fill();
+        g.strokeStyle = "rgba(120,60,30,0.18)"; g.lineWidth = 1.4; g.stroke();
+        // blush and nose
+        g.fillStyle = "rgba(240,120,110,0.22)";
+        for (const sd of [-1, 1]) { g.beginPath(); g.ellipse(sd * 31, -36, 8, 5, 0, 0, 6.2832); g.fill(); }
+        g.strokeStyle = "rgba(150,80,50,0.45)"; g.lineWidth = 2.6; g.lineCap = "round";
+        g.beginPath(); g.moveTo(-3, -41); g.quadraticCurveTo(0, -38, 3, -41); g.stroke();
+        // eyes, then the round glasses over them, then the brows
+        eye(-19, -55, o, bl, -1); eye(19, -55, o, bl, 1);
+        g.strokeStyle = "#1e293b"; g.lineWidth = 3.3;
+        for (const sd of [-1, 1]) {
+          g.beginPath(); g.arc(sd * 19, -55, 15.5, 0, 6.2832); g.stroke();
+          g.save(); g.strokeStyle = "rgba(255,255,255,0.55)"; g.lineWidth = 2.4; g.beginPath(); g.arc(sd * 19, -55, 11, Math.PI * 1.08, Math.PI * 1.38); g.stroke(); g.restore();
+          g.beginPath(); g.moveTo(sd * 34.5, -57); g.lineTo(sd * 47, -55); g.stroke();
+        }
+        g.beginPath(); g.moveTo(-3.6, -57); g.quadraticCurveTo(0, -60, 3.6, -57); g.stroke();
+        brow(-1, o.brows); brow(1, o.brows);
+        const tk = talk(t);
+        if (tk.open > 0.05) talkMouth(tk, o.mouth); else mouth(o.mouth);
+        // hair: a short textured crop with a side-swept fringe, glossy
+        const hr = g.createLinearGradient(-36, -112, 40, -48);
+        hr.addColorStop(0, "#6b5446"); hr.addColorStop(0.38, "#2b211c"); hr.addColorStop(1, "#120e0b");
+        g.fillStyle = hr; g.beginPath();
+        g.moveTo(-51, -48);
+        g.bezierCurveTo(-58, -82, -42, -110, -10, -113);
+        g.bezierCurveTo(18, -116 + sp * 4, 46, -104, 53, -78);
+        g.bezierCurveTo(56, -66, 54, -56, 51, -48);
+        g.bezierCurveTo(48, -66, 40, -80, 26, -87);           // the right hairline rises, so both brows show
+        g.bezierCurveTo(12, -92, -2, -87, -14, -93);          // a side-swept fringe with a small dip
+        g.bezierCurveTo(-28, -98, -42, -87, -46, -64);
+        g.bezierCurveTo(-47, -56, -48, -52, -51, -48);
+        g.closePath(); g.fill();
+        g.strokeStyle = "rgba(255,255,255,0.16)"; g.lineWidth = 5; g.lineCap = "round";
+        g.beginPath(); g.moveTo(-30, -100); g.quadraticCurveTo(-12, -110, 10, -108); g.stroke();
+        // the tuft on top, springing with every move
+        g.fillStyle = "#2b211c"; g.beginPath();
+        g.moveTo(-4, -110); g.quadraticCurveTo(4 + sp * 16, -128, 12 + sp * 22, -122); g.quadraticCurveTo(8 + sp * 8, -114, 8, -110); g.closePath(); g.fill();
+        // a sweat drop slides down the temple when he is worried
+        if (o.sweat) {
+          const p = clamp(o.since / 0.7, 0, 1), y = -86 + 24 * easeOut(p), a = Math.min(1, o.since / 0.12) * (1 - Math.max(0, (o.since - 1.6) / 0.3));
+          if (a > 0) {
+            g.globalAlpha = clamp(a, 0, 1); g.fillStyle = "#bfdbfe"; g.strokeStyle = "#60a5fa"; g.lineWidth = 2;
+            g.beginPath(); g.moveTo(44, y - 12); g.bezierCurveTo(51, y - 2, 51, y + 6, 44, y + 6); g.bezierCurveTo(37, y + 6, 37, y - 2, 44, y - 12); g.closePath(); g.fill(); g.stroke();
+            g.fillStyle = "#ffffff"; g.beginPath(); g.arc(41.8, y + 1, 2, 0, 6.2832); g.fill(); g.globalAlpha = 1;
+          }
+        }
+      }
+
+      function drawGuy(t) {
+        const o = state(t);
+        const bob = 3 * Math.sin((2 * Math.PI * t) / 3.2);
+        const hy = hopY(t), sq = squash(t), br = 0.012 * Math.sin((2 * Math.PI * t) / 1.7), sp = spring(t);
+        // contact shadow on the tile (shrinks while he is in the air)
+        const air = clamp(-hy / 120, 0, 1);
+        g.save(); g.translate(FX, FY + bob); g.scale(1, 0.32);
+        const sh = g.createRadialGradient(0, 0, 0, 0, 0, 52 * SC * (1 - 0.45 * air));
+        sh.addColorStop(0, `rgba(30,64,175,${0.32 * (1 - 0.6 * air)})`); sh.addColorStop(1, "rgba(30,64,175,0)");
+        g.fillStyle = sh; g.beginPath(); g.arc(0, 0, 60 * SC, 0, 6.2832); g.fill(); g.restore();
+
+        g.save();
+        g.translate(FX, FY + bob + hy * SC);
+        g.scale(SC * (1 + sq * 0.6), SC * (1 - sq));
+        g.rotate(o.tilt * 0.3);
+        // legs (navy trousers) and white sneakers
+        for (const sd of [-1, 1]) {
+          const lg = g.createLinearGradient(sd * 14 - 8, 0, sd * 14 + 8, 0); lg.addColorStop(0, "#2c4a9e"); lg.addColorStop(1, "#172554");
+          g.fillStyle = lg; rr(sd * 14 - 8, -40, 16, 32, 6); g.fill();
+          const sg = g.createLinearGradient(0, -15, 0, 0); sg.addColorStop(0, "#ffffff"); sg.addColorStop(1, "#cfd9ea");
+          g.fillStyle = sg; g.beginPath(); g.ellipse(sd * 15 + 2, -7.5, 17, 8.5, 0, 0, 6.2832); g.fill();
+          g.strokeStyle = "#1e40af"; g.lineWidth = 2.6; g.beginPath(); g.ellipse(sd * 15 + 2, -7.5, 17, 8.5, 0, 0.15 * Math.PI, 0.85 * Math.PI); g.stroke();
+          g.strokeStyle = "#3b82f6"; g.lineWidth = 2.4; g.beginPath(); g.moveTo(sd * 15 - 6, -9); g.quadraticCurveTo(sd * 15 + 2, -12, sd * 15 + 10, -8); g.stroke();
+        }
+        // the hood bunched behind the neck, the neck, then the hoodie
+        const hd = g.createLinearGradient(0, -122, 0, -98); hd.addColorStop(0, "#3b82f6"); hd.addColorStop(1, "#1e40af");
+        g.fillStyle = hd; g.beginPath(); g.ellipse(0, -104, 39, 14, 0, 0, 6.2832); g.fill();
+        g.fillStyle = "#c98a63"; rr(-11, -118, 22, 22, 6); g.fill();
+        g.save(); g.scale(1, 1 + br);
+        slab(-43, -104, 86, 74, 26, 7, -4, HOODIE);
+        // the neckline, the kangaroo pocket and the drawstrings
+        g.fillStyle = "#c98a63"; g.beginPath(); g.ellipse(0, -104, 13, 8.5, 0, 0, Math.PI); g.fill();
+        g.strokeStyle = "#1e40af"; g.lineWidth = 4; g.beginPath(); g.ellipse(0, -104, 15, 10, 0, 0.05, Math.PI - 0.05); g.stroke();
+        g.fillStyle = "rgba(30,64,175,0.32)"; rr(-27, -62, 54, 24, 9); g.fill();
+        g.strokeStyle = "rgba(255,255,255,0.32)"; g.lineWidth = 2; g.beginPath(); g.moveTo(-22, -61); g.lineTo(22, -61); g.stroke();
+        g.strokeStyle = "#ffffff"; g.lineWidth = 2.8; g.lineCap = "round";
+        for (const sd of [-1, 1]) {
+          const ex = sd * 9 + sp * 10, ey = -80 + sd * 2;
+          g.beginPath(); g.moveTo(sd * 8, -98); g.quadraticCurveTo(sd * 9, -90, ex, ey); g.stroke();
+          g.fillStyle = "#dbe5f5"; g.beginPath(); g.arc(ex, ey + 2, 2.6, 0, 6.2832); g.fill();
+        }
+        g.restore();
+        // arms (an arm crossing in front, the thinking hand on the chin, is drawn after the head)
+        if (o.aL > -0.6) arm(-41, -92, o.aL, -1, o.hL, o);
+        if (o.aR > -0.6) arm(41, -92, o.aR, 1, o.hR, o);
+        // the head tilts about the neck
+        const tk = talk(t);
+        g.save(); g.translate(0, -104 + 1.6 * tk.open); g.rotate(o.tilt + 0.035 * (tk.open - 0.35) * (tk.open > 0.05 ? 1 : 0)); head(o, t); g.restore();
+        if (o.aL <= -0.6) arm(-41, -92, o.aL, -1, o.hL, o);
+        if (o.aR <= -0.6) arm(41, -92, o.aR, 1, o.hR, o);
+        g.restore();
+
+        // above the head (unsquashed): a "?" when puzzled, sparkles on a cheer, hearts on the goodbye
+        const topY = FY + bob + hy * SC - 226 * SC;
+        if (o.q) {
+          const p = backOut(o.since / 0.28), y = topY - 8 + 3 * Math.sin(o.since * 7);
+          g.save(); g.translate(FX + 20 * SC, y); g.rotate(0.12); g.scale(0.4 + 0.6 * p, 0.4 + 0.6 * p);
+          g.font = '700 50px "Fredoka", "D2QSans", sans-serif'; g.textAlign = "center"; g.textBaseline = "middle";
+          g.lineWidth = 8; g.strokeStyle = "#ffffff"; g.lineJoin = "round"; g.strokeText("?", 0, 0);
+          g.fillStyle = "#2563eb"; g.fillText("?", 0, 0); g.restore();
+        }
+        if (o.fx === "sparkle") {
+          for (let i = 0; i < 5; i++) {
+            const d = o.since - i * 0.07, p = clamp(d / 0.5, 0, 1);
+            if (d <= 0 || p >= 1) continue;
+            const a = -Math.PI / 2 + (i - 2) * 0.62, R = (70 + 34 * easeOut(p)) * SC;
+            const x = FX + Math.cos(a) * R * 1.25, y = FY + bob + hy * SC - 160 * SC + Math.sin(a) * R;
+            g.save(); g.globalAlpha = Math.sin(Math.PI * p); g.fillStyle = i % 2 ? "#fde68a" : "#ffffff";
+            g.shadowColor = "rgba(245,158,11,0.8)"; g.shadowBlur = 10; star(x, y, 10 * (0.6 + 0.4 * Math.sin(Math.PI * p)), 4, 0.36); g.fill(); g.restore();
+          }
+        }
+        if (o.fx === "hearts") {
+          for (let i = 0; i < 6; i++) {
+            const d = (o.since - i * 0.55) % 3.3;
+            if (o.since - i * 0.55 < 0 || d > 1.6) continue;
+            const p = d / 1.6, x = FX + (i % 2 ? 46 : -40) * SC + Math.sin(d * 5 + i) * 7, y = topY + 10 - 90 * p;
+            g.save(); g.globalAlpha = Math.sin(Math.PI * p) * 0.95; g.fillStyle = "#fb7185"; heart(x, y, 9 + 3 * p); g.fill(); g.restore();
+          }
+        }
+      }
+
+      function drawTile(t) {
+        // the tile pops up under him at the very start, then floats with him
+        const p = backOut((t - T_TILE) / 0.36);
+        if (p <= 0) return false;
+        const bob = 3 * Math.sin((2 * Math.PI * t) / 3.2);
+        g.save(); g.translate(FX, FY + bob); g.scale(p, p); g.translate(-FX, -(FY + bob));
+        const K = ISO.make(g, FX, FY + bob - 2.5 * U, U);   // top vertex 32.5 px above the tile's centre
+        K.platform(0, 0, 5, 5);
+        g.restore();
+        return true;
+      }
+
+      const st = { t: 0 };
+      function draw() {
+        const t = st.t;
+        g.clearRect(0, 0, cv.width, cv.height);
+        if (!drawTile(t)) return;
+        if (t >= T_DROP) drawGuy(t);
+      }
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: draw }, 0);
+      draw();
+      window.__timelines["mc"] = tl;
+    })();
+  </script>
+</template>
