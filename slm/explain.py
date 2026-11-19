@@ -686,36 +686,59 @@ TOPICS = {
 HEADS = {"instrument": "How to price it:", "measure": "How to calculate it:", "model": "How it works:"}
 VERB = {"instrument": "price", "measure": "calculate", "model": "use"}
 
+# Questions are built from parts so that the product name, not the exact phrasing, decides the answer.
 ASK = {
     "instrument": {
-        "train": ["How can I price {a}?", "How do I price {a}?", "How do you price {a}?", "How to price {a}?", "How we can price {a}?",
-                  "How can we price {a}?", "How should I price {a}?", "How is {a} priced?", "How are {p} priced?",
-                  "How do banks price {p}?", "How can I value {a}?", "How do I value {a}?", "How to value {a}?",
-                  "How do I calculate the value of {a}?", "How do I work out the fair value of {a}?", "How do I find the MTM of {a}?",
-                  "Explain how to price {a}.", "Explain the pricing of {p}.", "Explain {n} pricing.", "Explain {n} valuation.",
-                  "Can you explain how to price {a}?", "Please explain how to value {a}.", "Walk me through pricing {a}.",
-                  "Teach me how to price {a}.", "What is the method to price {a}?", "What is the formula for pricing {a}?",
-                  "What is {a} and how is it priced?", "What is {a}?", "{N} pricing", "{N} valuation", "price {a}", "pricing {p}",
-                  "how to price {n}", "I need to price {a}. How do I do it?", "I have {a}. How do I value it?",
-                  "Steps to price {a}?", "Give me the steps to value {a}.", "How is the price of {a} calculated?",
-                  "Pricing method for {p}?", "How do I do the valuation of {a}?"],
-        "heldout": ["What's the right way to value {a}?", "Could you show me how {p} are valued?", "I'd like to understand {n} pricing.",
-                    "{N}: how is it valued?", "Tell me how {p} get priced.", "Show me the valuation of {a}."]},
+        "q": ["How can I price {a}?", "How do I price {a}?", "How do you price {a}?", "How to price {a}?", "How we can price {a}?",
+              "How can we price {a}?", "How should I price {a}?", "How is {a} priced?", "How are {p} priced?",
+              "How do banks price {p}?", "How can I value {a}?", "How do I value {a}?", "How to value {a}?",
+              "How do I calculate the value of {a}?", "How do I work out the fair value of {a}?", "How do I find the MTM of {a}?",
+              "What is the method to price {a}?", "What is the formula for pricing {a}?", "What is {a} and how is it priced?",
+              "What is {a}?", "How is the price of {a} calculated?", "What's the right way to value {a}?",
+              "I need to price {a}. How do I do it?", "I have {a}. How do I value it?", "Steps to price {a}?",
+              "How do I do the valuation of {a}?", "What is the fair value of {a}?", "How is {a} valued?", "How are {p} valued?",
+              "How does pricing {a} work?", "How do traders value {p}?", "Where do I start with pricing {a}?"],
+        "v": ["explain how to price {a}", "explain the pricing of {p}", "explain {n} valuation", "explain {n} pricing",
+              "show me how {p} are priced", "show me how to value {a}", "tell me how to price {a}", "tell me how {p} get priced",
+              "walk me through pricing {a}", "help me price {a}", "help me value {a}", "teach me how to price {a}",
+              "explain {a} and how it is priced", "show me the valuation of {a}", "describe how to price {a}",
+              "give me the steps to value {a}", "explain how {p} are valued", "show me how {p} are valued"],
+        "n": ["{n} pricing", "{n} valuation", "the pricing of {p}", "the valuation of {a}", "pricing {p}", "valuing {p}",
+              "how {p} are valued", "how {p} get priced", "how to value {a}", "how to price {a}", "the right way to value {a}",
+              "the method for pricing {p}", "the formula behind {n} pricing", "{n} pricing method", "{a}"],
+        "t": ["{N}: how is it priced?", "{N}: how is it valued?", "{N} - how do I value it?", "{N}? How to price it",
+              "{N}, how do I price it?", "{N} valuation method?", "{N} pricing formula?", "{N} price calculation",
+              "{N}. How is it valued?", "{N} - pricing steps", "{N} pricing", "{N} valuation"],
+        "heldout": ["Any idea how {p} are valued?", "What goes into pricing {a}?", "Need the valuation approach for {p}.",
+                    "{N} - what's the pricing approach?", "How would a quant value {a}?", "Break down {n} pricing for me."]},
     "measure": {
-        "train": ["How do I calculate {m}?", "How can I calculate {m}?", "How to calculate {m}?", "How we can calculate {m}?",
-                  "How do you compute {m}?", "How to compute {m}?", "How do I find {m}?", "How do I work out {m}?",
-                  "How is {m} calculated?", "What is {m} and how do I calculate it?", "What is {m}?", "Explain {m}.",
-                  "Explain how to calculate {m}.", "Can you explain {m}?", "Please explain how to compute {m}.", "Teach me {m}.",
-                  "What is the formula for {m}?", "Formula for {m}?", "{M} calculation", "{M} formula", "calculate {m}",
-                  "how to find {m}", "Steps to calculate {m}?", "Walk me through calculating {m}.", "How do I get {m}?"],
-        "heldout": ["What's the right way to get {m}?", "Could you show me how {m} is computed?", "I'd like to understand {m}.",
-                    "{M}: how is it computed?", "Tell me how to work out {m}.", "Show me the calculation of {m}."]},
+        "q": ["How do I calculate {m}?", "How can I calculate {m}?", "How to calculate {m}?", "How we can calculate {m}?",
+              "How do you compute {m}?", "How to compute {m}?", "How do I find {m}?", "How do I work out {m}?",
+              "How is {m} calculated?", "How is {m} computed?", "What is {m} and how do I calculate it?", "What is {m}?",
+              "What is the formula for {m}?", "Formula for {m}?", "How do I get {m}?", "What's the right way to get {m}?",
+              "Steps to calculate {m}?", "How does {m} work?", "How do traders calculate {m}?", "Where do I start with {m}?"],
+        "v": ["explain {m}", "explain how to calculate {m}", "show me how to compute {m}", "tell me how to work out {m}",
+              "walk me through calculating {m}", "help me calculate {m}", "teach me {m}", "show me the calculation of {m}",
+              "describe how to calculate {m}", "show me how {m} is computed", "tell me how {m} is calculated"],
+        "n": ["{m}", "the formula for {m}", "the calculation of {m}", "how {m} is computed", "how to find {m}",
+              "how to calculate {m}", "{m} calculation", "{m} formula", "calculating {m}"],
+        "t": ["{M}: how is it computed?", "{M}: how is it calculated?", "{M} - how do I calculate it?", "{M}? formula",
+              "{M} calculation method?", "{M} formula please", "{M}, how to calculate?", "{M} calculation", "{M} formula"],
+        "heldout": ["Any idea how {m} is computed?", "What goes into {m}?", "Need the approach for {m}.",
+                    "{M} - what's the approach?", "How would a quant get {m}?", "Break down {m} for me."]},
     "model": {
-        "train": ["How does {m} work?", "Explain {m}.", "What is {m}?", "How do I price a bond with {m}?", "How to use {m} to price bonds?",
-                  "How do I calculate a bond price under {m}?", "Can you explain {m}?", "Teach me {m}.", "{M} explained",
-                  "{M} bond pricing", "How do I use {m}?"],
-        "heldout": ["What's the idea behind {m}?", "Could you show me how {m} prices a bond?", "I'd like to understand {m}."]},
+        "q": ["How does {m} work?", "What is {m}?", "How do I price a bond with {m}?", "How to use {m} to price bonds?",
+              "How do I calculate a bond price under {m}?", "How do I use {m}?", "What's the idea behind {m}?"],
+        "v": ["explain {m}", "teach me {m}", "show me how {m} prices a bond", "walk me through {m}", "describe {m}"],
+        "n": ["{m}", "{m} bond pricing", "bond pricing with {m}", "how {m} works"],
+        "t": ["{M}: how does it work?", "{M} explained", "{M} - how do I use it?", "{M}? bond price"],
+        "heldout": ["Any idea how {m} prices bonds?", "What goes into {m}?", "Break down {m} for me."]},
 }
+OPEN = {"q": ["", "", "", "", "", "Hi, ", "Hello, ", "Quick question: ", "Ganit, ", "Hey, "],
+        "v": ["", "", "Please ", "Can you ", "Could you ", "Kindly ", "Pls ", "Would you "],
+        "n": ["", "", "I want to know ", "I'd like to understand ", "Tell me about ", "Explain ", "Info on ", "Need help with ",
+              "Question about ", "Help with ", "Doubt: "]}
+CLOSE = ["", "", "", "", " please", " step by step", " with an example", " in simple words", " for a beginner", " briefly"]
 
 
 def styled(R, q):
@@ -735,12 +758,29 @@ def cap(s):
 
 
 def ask(R, kind, name, wording):
-    t = R.choice(ASK[kind][wording])
     if kind == "instrument":
         a, n, p = name
-        q = t.format(a=a, n=n, p=p, N=cap(n))
+        fmt = dict(a=a, n=n, p=p, N=cap(n))
     else:
-        q = t.format(m=name, M=cap(name))
+        fmt = dict(m=name, M=cap(name))
+    lists = ASK[kind]
+    if wording == "heldout":
+        return styled(R, R.choice(lists["heldout"]).format(**fmt))
+    fam = R.choices(["q", "v", "n", "t"], weights=[5, 3, 2, 1])[0]
+    core, close = R.choice(lists[fam]).format(**fmt), R.choice(CLOSE)
+    if fam == "q":
+        opener = R.choice(OPEN["q"])
+        body, end = (core[:-1], core[-1]) if core[-1] in "?." else (core, "")
+        q = (opener + body[:1].lower() + body[1:] if opener else body) + close + end
+    elif fam == "v":
+        opener = R.choice(OPEN["v"])
+        end = "?" if opener in ("Can you ", "Could you ", "Would you ") else R.choice(["", ".", "."])
+        q = (opener + core if opener else cap(core)) + close + end
+    elif fam == "n":
+        opener = R.choice(OPEN["n"])
+        q = (opener + core if opener else cap(core)) + close + R.choice(["", ".", "?"])
+    else:
+        q = core
     return styled(R, q)
 
 
@@ -1019,7 +1059,13 @@ UNKNOWN = {
                   "a|warrant|warrants", "an|employee stock option|employee stock options", "a|chooser option|chooser options",
                   "a|cliquet option|cliquet options", "a|rainbow option|rainbow options", "an|inflation-linked bond|inflation-linked bonds",
                   "a|catastrophe bond|catastrophe bonds", "a|credit-linked note|credit-linked notes", "a|CVA charge|CVA charges",
-                  "a|Heston model price|Heston model prices", "a|SABR volatility|SABR volatilities"),
+                  "a|Heston model price|Heston model prices", "a|SABR volatility|SABR volatilities",
+                  "an|asset swap|asset swaps", "a|constant maturity swap|constant maturity swaps", "a|weather swap|weather swaps",
+                  "a|freight swap|freight swaps", "a|basket default swap|basket default swaps", "a|gap option|gap options",
+                  "an|exchange option|exchange options", "a|shout option|shout options", "a|ladder option|ladder options",
+                  "a|forward start option|forward start options", "a|Bermudan option|Bermudan options",
+                  "a|reverse convertible note|reverse convertible notes", "a|bonus certificate|bonus certificates",
+                  "a|perpetual bond|perpetual bonds", "a|floating rate note|floating rate notes", "a|step-up bond|step-up bonds"),
     "heldout": inst("a|volatility swap|volatility swaps", "a|power option|power options", "a|compound option|compound options",
                     "a|Parisian option|Parisian options", "a|range accrual note|range accrual notes", "a|CMS swap|CMS swaps",
                     "a|dividend swap|dividend swaps", "a|correlation swap|correlation swaps"),
@@ -1032,6 +1078,18 @@ HELLO = ["hi", "hello", "hey", "hi Ganit", "hello Ganit", "good morning", "who a
          "what are you?", "how can you help me?", "what is Ganit?", "what do you know?", "hey there", "namaste"]
 
 
+SYL = ["zor", "ket", "vex", "lum", "tra", "bix", "quo", "nim", "fal", "dra", "pel", "gor", "sin", "mar", "tev", "ul", "ax", "ron"]
+MADE_UP_HEADS = [("swap", "swaps"), ("option", "options"), ("note", "notes"), ("bond", "bonds"), ("certificate", "certificates"),
+                 ("warrant", "warrants"), ("spread", "spreads"), ("future", "futures"), ("forward", "forwards")]
+
+
+def made_up(R):
+    """A product name that does not exist, so the reply must copy the name from the question."""
+    word = "".join(R.choice(SYL) for _ in range(R.choice([2, 2, 3]))).capitalize()
+    head, plural = R.choice(MADE_UP_HEADS)
+    return (f"{'an' if word[0] in 'AEIOU' else 'a'} {word} {head}", f"{word} {head}", f"{word} {plural}")
+
+
 def unknown(R, wording):
     if wording == "train" and R.random() < 0.15:
         q = R.choice(OFF_TOPIC)
@@ -1040,7 +1098,7 @@ def unknown(R, wording):
         return dict(kind="unknown", topic="off_topic", question=styled(R, q), answer=None, check={"contains": "I only know quant finance"},
                     solution=think("answer a question outside quant finance", "the question is not about pricing or risk",
                                    ["say what I can help with"]) + text)
-    a, n, p = R.choice(UNKNOWN[wording])
+    a, n, p = made_up(R) if wording == "train" and R.random() < 0.4 else R.choice(UNKNOWN[wording])
     if R.random() < 0.25:                       # with numbers: still not something Ganit has learned
         N = R.choice([1, 5, 10, 25, 100])
         q = R.choice([f"Price {a} on a notional of ₹{N} crore with a maturity of {R.randint(1, 10)} years.",
@@ -1061,7 +1119,7 @@ def hello(R):
     return dict(kind="hello", topic="hello", question=q, answer=None, check={"contains": "I'm Ganit"}, solution=text)
 
 
-KINDS = {"method": 45, "assume": 25, "full": 15, "unknown": 12, "hello": 3}
+KINDS = {"method": 50, "assume": 22, "full": 13, "unknown": 12, "hello": 3}
 
 
 def problem(R, split="train", kind=None):

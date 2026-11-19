@@ -27,6 +27,7 @@ JOBS = {
                   internet=False, gpu=True),
     "stage1": dict(template="stage1.py", title="SLM Stage 1", slug="slm-stage-1", files=FULL, internet=True, gpu=True),
     "ganit15_v2": dict(template="stage1.py", title="SLM Ganit 15M v2", slug="slm-ganit-15m-v2", files=FULL, internet=True, gpu=True),
+    "ganit15_v3": dict(template="stage1.py", title="SLM Ganit 15M v3", slug="slm-ganit-15m-v3", files=FULL, internet=True, gpu=True),
     "stage2_data": dict(template="stage2_data.py", title="SLM Stage 2 Data", slug="slm-stage-2-data", files=FULL,
                         internet=True, gpu=False),
     "stage1_rl": dict(template="rl_kernel.py", title="SLM Stage 1 RL", slug="slm-stage-1-rl", files=FULL + ["rl.py"],

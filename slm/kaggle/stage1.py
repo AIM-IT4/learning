@@ -15,9 +15,9 @@ import sys
 CODE = {}
 WORK = os.environ.get("SLM_WORK", "/kaggle/working")
 PROBLEMS = os.environ.get("SLM_PROBLEMS", "600000")
-TOKENS = os.environ.get("SLM_TOKENS", "4e8")
+TOKENS = os.environ.get("SLM_TOKENS", "5e8")
 SEQ = os.environ.get("SLM_SEQ", "1024")
-MINUTES = os.environ.get("SLM_MINUTES", "80")
+MINUTES = os.environ.get("SLM_MINUTES", "90")
 
 os.makedirs(f"{WORK}/slm", exist_ok=True)
 for name, b64 in CODE.items():
