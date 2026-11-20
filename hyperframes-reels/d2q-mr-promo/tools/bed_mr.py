@@ -3,7 +3,7 @@ copied from d2q-day11-hud: its "pop" style, C major, 112 BPM: C Am F G with pads
 plucked arpeggio; no samples). The voice ducks it with a held envelope (no pumping between words), and a ceiling keeps it
 at least 10 dB under the voice wherever the voice speaks, as the two meet in the film (bed at data-volume 0.75, voice at 1
 from t = 0.12): duck() and ceiling() as in d2q-day11-hud/tools/bed_hud.py.
-usage: ~/.local/share/earshot/.venv/bin/python tools/bed_mr.py 46.75 assets/bgm.wav [assets/vo.wav]"""
+usage: ~/.local/share/earshot/.venv/bin/python tools/bed_mr.py 40.25 assets/bgm.wav [assets/vo.wav]"""
 import importlib.util, os, sys
 import numpy as np
 
@@ -103,7 +103,7 @@ if __name__ == "__main__":
     v, _ = sf.read(vo, always_2d=True)
     gap = loud(v.mean(1)) - loud(y.mean(1) * 0.75)
     y = y * 10 ** ((gap - 14.0) / 20)
-    y, worst, share = ceiling(y, vo)
+    y, worst, share = ceiling(y, vo, margin=10.6)          # a little over 10 dB, so the check below never dips under 10
     lo, p5, med = check(y, vo)
     sf.write(out, y.astype(np.float32), SR)
     print(f"{out}: {sec} s, pop (C major, 112 BPM); ceiling: deepest cut {worst:.1f} dB, active {100 * share:.0f}%; "

@@ -17,7 +17,7 @@
       function init() { K.load({ p4: "assets/img/page-4.jpg" }, "c3-images", () => draw()); }
       const DAYS = FACTS.p1_days, TESTS = FACTS.p1_tests;
       // beats
-      const tA = 0.12, tVaR = w(32) - 0.05, tES = w(34) - 0.05, tRates = w(38) - 0.04, tFX = w(40) - 0.04, tDesk = w(41) - 0.04;
+      const tA = 0.04, tVaR = w(32) - 0.05, tES = w(34) - 0.05, tRates = w(38) - 0.04, tFX = w(40) - 0.04, tDesk = w(41) - 0.04;
       const tB = w(42) - 0.22, tN0 = w(44) - 0.02, tN1 = WE[44] - T0 - 0.05, tDays = w(45) - 0.04, tReal = w(47) - 0.03;
       const tC = w(49) - 0.36, tT = [w(49) - 0.03, w(50) - 0.03, w(51) - 0.03], tRing = w(51) + 0.1;
       const X = 40, W = 1000, Y = 300, H = 1040;
@@ -191,10 +191,11 @@
       function draw() {
         const t = st.t;
         g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, 1080, 1920);
-        const out = t > NEXT ? K.leave(t - NEXT, { dy: -150, dur: 0.24 }) : K.still;
+        const out = t > NEXT ? K.leave(t - NEXT, { dy: -60, dur: 0.2, sc: 0.95 }) : K.still;
         const bob = { dx: 0, dy: K.bob(t, 0.4, 3), rot: 0, sc: 1, yaw: 0, pitch: 0, a: 1 };
         if (t < tB + 0.4) projectCard(t, K.combine(K.combine(K.enter(t - tA, { dy: 150, pitch: 0.4, yaw: 0, rot: 0.02, sc: 0.92 }), bob),
           t > tB ? K.leave(t - tB, { dy: -200, dur: 0.32 }) : K.still));
         if (t > tB) dash(t, K.combine(K.combine(K.enter(t - tB, { dy: 160, pitch: 0.45, yaw: 0, rot: 0.03, sc: 0.92 }), bob), out));
         proof(t, out);
+        K.floor(g);
       }

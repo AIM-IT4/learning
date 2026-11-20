@@ -1,7 +1,7 @@
       // ---- c2, the pack: "This is the Market Risk Quant Notes and Lab. 141 pages, 19 modules, 64 interview answers."
       // The reveal: c2 carries c1's picture on (K.hook) for half a second: the lock opens, the blur clears and the answer
       // reads (the real cover thumbnail, "Market Risk Quant Notes & Lab · 141 pages"); then the cover springs out of the
-      // answer bubble into the hero, big, with a soft shadow, while the chat and the histogram drop away. Three counter
+      // answer bubble into the hero, big, with a soft shadow, while the chat and the histogram lift away and fade. Three counter
       // chips wait under it and roll on their numbers (141 PAGES, 19 MODULES, 64 INTERVIEW Q&As); on "modules" the real
       // contents page (page-2) slides in behind the cover as proof, and on "answers" a red frame rings its "Interview
       // drill: 64 questions" row.
@@ -12,9 +12,9 @@
       const st = { t: 0 };
       const w = (i) => WA[i] - T0;
       function init() { K.load({ cover: "assets/img/cover.jpg", p2: "assets/img/page-2.jpg" }, "c2-images", () => draw()); }
-      const HB = { tVar: WA[6] - 0.04, tTail: WA[6] + 0.16, tES: WA[7] - 0.05, tDots: WA[9] - 0.1, tAns: WA[13] - 0.04, tPill: WA[13] + 0.26 };
+      const HB = K.hookBeats(WA);
       // beats
-      const tOpen = 0.02, tClear = 0.12, tOut = 0.56, tFly = 0.6, FLY = 0.55, tGlint = w(22) - 0.1, tChips = 1.0;
+      const tOpen = 0.02, tClear = 0.12, tOut = 0.56, tFly = 0.6, FLY = 0.55, tGlint = w(22) - 0.1, tChips = 0.66;
       const tPage = w(26) - 0.06, tRing = w(29) - 0.04;
       const CNT = [
         { v: FACTS.pages, lab: "PAGES", t0: w(23) - 0.02, t1: WE[23] - T0 - 0.06, tl: w(24) - 0.03, icon: "page" },
@@ -29,7 +29,7 @@
         const u = t - tFly; if (u <= 0) return null;
         const p = K.spring(u, 0.55, 11), q = eio(clamp((t - tPage) / 0.5));
         const to = { x: lerp(CA.x, CB.x, q), y: lerp(CA.y, CB.y, q) + K.bob(T0 + t, 2.2, 4), s: lerp(CA.s, CB.s, q) };
-        const arc = -120 * Math.sin(Math.PI * clamp(u / FLY));
+        const arc = -40 * Math.sin(Math.PI * clamp(u / FLY));
         return { x: lerp(from.x, to.x, p), y: lerp(from.y, to.y, p) + arc, s: lerp(from.s, to.s, p),
           rot: lerp(0.0, -0.028, clamp(p)) + 0.05 * Math.sin(Math.PI * clamp(u / FLY)) + 0.012 * Math.sin((T0 + t) * 1.7) * clamp(u - 0.6),
           sh: clamp(u / 0.4) };
@@ -95,17 +95,20 @@
       function draw() {
         const t = st.t, T = T0 + t;
         g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, 1080, 1920);
-        const out = t > NEXT ? K.leave(t - NEXT, { dy: -150, dur: 0.24 }) : K.still;
+        const out = t > NEXT ? K.leave(t - NEXT, { dy: -60, dur: 0.2, sc: 0.95 }) : K.still;
         // the hook, carried over from c1: the lock opens, the blur clears, then the cards drop away
         if (t < tOut + 0.5) {
           const bob = (ph) => ({ dx: 0, dy: K.bob(T, ph, 3), rot: 0, sc: 1, yaw: 0, pitch: 0, a: 1 });
-          const drop = (d) => (t > tOut + d ? K.leave(t - tOut - d, { dy: 300, dur: 0.42, pitch: -0.25, sc: 0.9, rot: 0.03 }) : K.still);
-          K.hook(g, T, Object.assign({}, HB, { P: K.combine(bob(0.2), drop(0.06)), PH: K.combine(bob(1.2), drop(0)),
+          // they lift away and fade (upward, so they never pass over the subtitle)
+          const lift = (d, dy) => (t > tOut + d ? K.leave(t - tOut - d, { dy, dur: 0.3, pitch: 0.2, sc: 0.92, rot: -0.02 }) : K.still);
+          K.hook(g, T, Object.assign({}, HB, { P: K.combine(bob(0.2), lift(0.04, -70)), PH: K.combine(bob(1.2), lift(-0.04, -50)),
+            PP: K.combine(bob(0.2), lift(-0.1, -40)),
             blur: 11 * (1 - eio(clamp((t - tClear) / 0.32))), lockOpen: eo(clamp((t - tOpen) / 0.26)),
-            lockA: 1 - clamp((t - 0.22) / 0.14), thumbA: t < tFly ? 1 : 0, pillA: 1 - clamp(t / 0.22) }));
+            lockA: 1 - clamp((t - 0.22) / 0.14), thumbA: t < tFly ? 1 : 0, pillA: 1 - clamp((t - 0.3) / 0.16) }));
         }
         page(t, out);
         chips(t, out);
         const R = coverRect(t);
         if (R) drawCover(t, R, out);
+        K.floor(g);
       }

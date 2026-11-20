@@ -2,7 +2,7 @@
       // chapter tag right-aligned ("● BACKTEST · 03/07") with desk2quant.com on the left, and a thin full-width progress
       // line in seven segments that fills chapter by chapter; then the chapter title (bold 66 px, one keyword in the accent
       // red), which stays for its chapter and changes with it. On the brand-blue block the ink turns white and the title's
-      // keyword sits in a red pill.
+      // keyword sits in a red pill. Each chapter's tag and title land on its first word (the chapter starts 0.16 s before it).
       const g = document.getElementById("hud-cv").getContext("2d");
       const { C, clamp, lerp, eo, eio, back, mix, rgba } = K;
       const st = { t: 0 };
@@ -26,7 +26,7 @@
       // the chapter tag: a white chip at the right; its text slides up to the next chapter's
       function tag(t, k, bl) {
         const lab = (j) => CH[j].tag + " · " + String(j + 1).padStart(2, "0") + "/" + String(N).padStart(2, "0");
-        const u = k > 0 ? clamp((t - B[k]) / 0.32) : 1, q = eio(u);
+        const u = k > 0 ? clamp((t - B[k]) / 0.22) : 1, q = eio(u);
         const wOf = (j) => K.tw(g, lab(j), 25, true, 2) + 72;
         const w = k > 0 ? lerp(wOf(k - 1), wOf(k), q) : wOf(k), h = 46, x = 1040 - w;
         K.card(g, x, TY - h / 2, w, h, { r: h / 2, shadow: bl > 0.5 ? "rgba(8,22,90,0.35)" : "rgba(52,40,14,0.14)", blur: 16, dy: 5 });
@@ -64,13 +64,13 @@
       function title(t, k, bl) {
         const ink = mix(C.ink, C.white, bl);
         // the outgoing title lifts away
-        if (k > 0 && t - B[k] < 0.26) {
-          const q = eio(clamp((t - B[k]) / 0.24));
+        if (k > 0 && t - B[k] < 0.13) {
+          const q = eio(clamp((t - B[k]) / 0.12));
           titleLayout(k - 1).forEach((c) => K.text(g, c.s, c.x, TB - 34 * q, { size: TFS, ls: -1, c: c.key && THEME[k - 1] !== "B" ? C.red : mix(C.ink, C.white, THEME[k - 1] === "B" ? 1 : 0), a: 1 - q }));
         }
-        const t0 = k === 0 ? -9 : B[k] + 0.14;
+        const t0 = k === 0 ? -9 : B[k] + 0.06;
         titleLayout(k).forEach((c, i) => {
-          const u = t - (t0 + 0.07 * i); if (u <= 0) return;
+          const u = t - (t0 + 0.05 * i); if (u <= 0) return;
           const p = K.spring(u, 0.55, 15), dy = 40 * (1 - p), a = clamp(u / 0.12);
           const sc = c.key ? 1 + 0.16 * Math.exp(-u * 7) * Math.sin(Math.min(u, 0.6) * 11) * (u > 0 ? 1 : 0) : 1;
           g.save(); g.globalAlpha *= a; g.translate(c.x + c.w / 2, TB - TFS * 0.36 + dy); g.scale(sc, sc); g.translate(-(c.x + c.w / 2), -(TB - TFS * 0.36));

@@ -1,5 +1,5 @@
 """Market Risk promo ("Comment RISK"): one source of truth for timing (the d2q-day11-rip pattern). Reads the caption words
-(voice/out/words.json: 126 words with their on-screen spellings and start/end in vo.wav) and writes the DATA blocks of
+(voice/out/words.json: 127 words with their on-screen spellings and start/end in vo.wav) and writes the DATA blocks of
 every composition (bg, hud, ov, c1-c7) and the root index.html (scene hosts, the persistent layers, the voice, the music
 and the sound effects), plus a readable work/timing.md.
 
@@ -9,7 +9,7 @@ import json, os, re
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 VO_START = 0.12            # the voice starts at film t = 0.12
-DUR = 46.75                # the film: the voice ends at 45.26; the end card holds ~1.5 s
+DUR = 40.25                # the film: the voice (one continuous take) ends at 38.74; the end card holds ~1.5 s
 LEAD = 0.16                # a chapter starts this long before its first word
 XO = 0.36                  # a scene stays this long into the next chapter, for its exit
 
@@ -17,8 +17,9 @@ WJ = json.load(open(os.path.join(HERE, "voice/out/words.json"), encoding="utf-8"
 WORDS = [w["w"] for w in WJ["words"]]
 WA = [round(VO_START + w["s"], 3) for w in WJ["words"]]          # film time of every spoken word's onset
 WE = [round(VO_START + w["e"], 3) for w in WJ["words"]]          # ... and its end
-assert len(WA) == 126, len(WA)
-VO_SECONDS = WJ["dur"]
+assert len(WA) == 127, len(WA)
+VO_SECONDS = 38.88         # the length of voice/out/vo.wav (= assets/vo.wav)
+assert VO_START + WJ["end"] + 1.4 < DUR
 
 # the 7 chapters: (scene id, first word, theme L light paper / B brand-blue colour block, tag, title tokens [text, key])
 CH = [("c1", 0, "L", "VAR", [["The", 0], ["VaR", 1], ["question", 0]]),
@@ -53,9 +54,9 @@ PAGES = [
     (84, 90, [89]),                   # all the way to the capital number.
     (91, 96, [94, 96]),               # You get the notes, executed notebooks,
     (97, 104, [98, 102]),             # a Python risk library and 14 regression tests.
-    (105, 112, [106, (111, "y"), (112, "y")], [107]),   # Comment RISK, / and we'll DM you 50% off.
-    (113, 118, [117, 118]),           # The code works for 7 days.
-    (119, 125, [119, 120]),           # Save this for your next risk interview.
+    (105, 113, [106, (112, "y"), (113, "y")], [107]),   # Comment RISK, / and we will DM you 50% off.
+    (114, 119, [118, 119]),           # The code works for 7 days.
+    (120, 126, [120, 121]),           # Save this for your next risk interview.
 ]
 
 
@@ -73,7 +74,7 @@ def pages():
         # the hook's first phrase is on screen from frame 1, faint, each word lighting up as it is spoken ("pre")
         out.append({"start": 0.0 if a == 0 else round(WA[a] - 0.05, 3), "pre": 1 if a == 0 else 0, "tok": tok, "br": [i - a for i in br]})
     seen = [t["w"] for p in out for t in p["tok"]]
-    assert seen == list(range(126)), "every spoken word is on some page, once, in order"
+    assert seen == list(range(127)), "every spoken word is on some page, once, in order"
     return out
 
 
@@ -112,10 +113,11 @@ def sfx_list():
     add = lambda n, t, v: S.append((n, t, D[n], v))
     # c1: the VaR line drops; typing dots; the locked answer
     add("type", W[6] - 0.14, 0.06)
-    add("type", W[9] - 0.1, 0.05); add("type", W[9] + 0.04, 0.045)
-    add("lock", W[13] + 0.56, 0.08)
-    # c2: the lock opens; the cover flies out; 141 lands; the contents page slides in; the red frame on "answers"
-    add("chip", B[1] + 0.02, 0.07)
+    add("type", W[7] - 0.02, 0.05); add("type", W[7] + 0.12, 0.045)
+    add("lock", W[11] + 0.12, 0.08)
+    # c2: the lock opens (the click waits for "built?" to end); the cover flies out; 141 lands; the contents page slides
+    # in; the red frame on "answers"
+    add("chip", W[14], 0.07)
     add("send", B[1] + 0.56, 0.09)
     add("chip", WE[23] - 0.04, 0.07)
     add("send", W[26], 0.07)
@@ -123,7 +125,7 @@ def sfx_list():
     # c3: the project card; the tiles and the desk light (each just before its word); the dashboard; the count lands;
     # DAYS; REAL DATA; the proof; the traffic light's three dots
     add("send", B[2] + 0.1, 0.08)
-    add("type", W[32] - 0.14, 0.06); add("type", W[34] - 0.16, 0.06)
+    add("type", W[32] - 0.14, 0.06)            # (ES lights between two stressed words, "VaR" and "expected": no cue)
     add("type", W[38] - 0.16, 0.06); add("type", W[40] - 0.16, 0.06)
     add("send", W[42] - 0.22, 0.08)
     add("type", WE[44] - 0.32, 0.05); add("type", WE[44] - 0.19, 0.05)
@@ -133,9 +135,9 @@ def sfx_list():
     for j in range(3): add("type", W[51] + 0.03 + 0.14 * j, 0.06)
     # c4: the pricer; the two clicks; STRESSED; the scenario cards
     add("send", B[3] + 0.12, 0.08)
-    add("type", W[59] + 0.04, 0.07)
-    add("type", W[61] + 0.3, 0.07)
-    add("lock", W[64] - 0.02, 0.11)
+    add("type", W[59] - 0.06, 0.07)
+    add("type", W[61] + 0.1, 0.07)
+    add("lock", W[64], 0.11)
     add("type", W[66] - 0.04, 0.06); add("type", W[68] - 0.16, 0.06); add("type", W[70] - 0.04, 0.06)
     # c5: the cards; SA; IMA; the five desks; CAPITAL
     add("send", B[4] + 0.12, 0.08)
@@ -148,13 +150,13 @@ def sfx_list():
     for j in range(3): add("type", WE[102] + 0.02 + 0.14 * j, 0.05)
     add("lock", W[104] + 0.02, 0.09)
     # c7: the blue block; posted; the DM; the code chip; valid 7 days; the send row; the close
-    add("send", B[6] + 0.04, 0.10)
+    add("send", B[6] - 0.08, 0.07)            # (before "Comment" starts: a louder whoosh masked its soft onset)
     add("send", W[107] + 0.02, 0.08)
-    add("chip", W[109] + 0.06, 0.08)
-    add("lock", W[114] - 0.02, 0.09)
-    add("type", W[117] - 0.16, 0.06)
-    add("chip", W[123] - 0.02, 0.07)
-    add("end", WE[125] + 0.34, 0.10)
+    add("chip", W[110] + 0.06, 0.08)
+    add("lock", W[115] - 0.02, 0.09)
+    add("type", W[118] - 0.16, 0.06)
+    add("chip", W[124] - 0.02, 0.07)
+    add("end", WE[126] + 0.34, 0.10)
     out = sorted([(n, round(max(0.0, t), 2), d, v) for n, t, d, v in S], key=lambda x: x[1])
     for n, t, d, v in out:
         for i in STRESSED:

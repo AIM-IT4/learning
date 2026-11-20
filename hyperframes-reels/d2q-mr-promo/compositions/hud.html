@@ -12,7 +12,7 @@
   </div>
   <script>
     (function () {
-      /*DATA*/ const DUR = 46.75; const B = [0.0, 4.06, 10.31, 19.51, 28.58, 34.56, 39.36]; const THEME = ["L", "L", "L", "L", "L", "L", "B"]; const CH = [{"tag": "VAR", "title": [["The", 0], ["VaR", 1], ["question", 0]]}, {"tag": "THE PACK", "title": [["Notes", 0], ["+ Lab", 1]]}, {"tag": "BACKTEST", "title": [["Project 1:", 0], ["VaR & ES", 1]]}, {"tag": "STRESS", "title": [["Project 2:", 0], ["FX options", 1]]}, {"tag": "FRTB", "title": [["Project 3:", 0], ["FRTB", 1]]}, {"tag": "INSIDE", "title": [["What you", 0], ["get", 1]]}, {"tag": "50% OFF", "title": [["Comment", 0], ["RISK", 1]]}]; /*END*/
+      /*DATA*/ const DUR = 40.25; const B = [0.0, 3.38, 8.44, 17.0, 24.68, 29.48, 33.5]; const THEME = ["L", "L", "L", "L", "L", "L", "B"]; const CH = [{"tag": "VAR", "title": [["The", 0], ["VaR", 1], ["question", 0]]}, {"tag": "THE PACK", "title": [["Notes", 0], ["+ Lab", 1]]}, {"tag": "BACKTEST", "title": [["Project 1:", 0], ["VaR & ES", 1]]}, {"tag": "STRESS", "title": [["Project 2:", 0], ["FX options", 1]]}, {"tag": "FRTB", "title": [["Project 3:", 0], ["FRTB", 1]]}, {"tag": "INSIDE", "title": [["What you", 0], ["get", 1]]}, {"tag": "50% OFF", "title": [["Comment", 0], ["RISK", 1]]}]; /*END*/
       /*FACTS*/ const FACTS = {"product":"Market Risk Quant Notes & Lab","topics":"VaR · ES · Backtesting · FRTB","pages":141,"modules":19,"qa":64,"projects":3,"p1_desk":"Rates & FX desk","p1_days":4919,"p1_tests":["Kupiec","Christoffersen","Traffic light"],"p2_desk":"FX options desk","p2_methods":["Full revaluation","Delta-gamma-vega"],"p2_stress":[["GFC","2008"],["COVID","2020"],["","2022"],["YEN UNWIND","2024"]],"p3_desks":5,"p3_parts":["SBM","DRC","RRAO","PLA","IMCC","SES"],"library":["market","curves","instruments","risk","backtest","frtb"],"tests":14,"offer_pct":50,"offer_days":7,"handle":"@desk2quant","site":"desk2quant.com","pdf_name":"market-risk-quant-notes.pdf","page_contents":"4 / 141","page_backtest":"67 / 141","page_frtb":"86 / 141"}; /*ENDFACTS*/
       // ===== K: the Desk2Quant "Ripping" kit, from d2q-day11-rip/work/kit.js (inlined by tools/compose.py) =====
       // The look: warm paper with a faint grid, ink-navy type (D2QSans = Inter Bold), Share Tech Mono for small data (with
@@ -175,13 +175,13 @@
         // ---- counters and labels
         function odometer(g, V, n, x, base, size, col, a) {
           font(g, size, false, 0);
-          const dw = g.measureText("0").width * 1.02, top = base - size * 0.78, hh = size * 1.06;
+          const dw = g.measureText("0").width * 1.02, top = base - size * 0.78, hh = size * 1.06, ga = g.globalAlpha;
           g.save(); g.beginPath(); g.rect(x - 4, top - size * 0.12, dw * n + 8, hh + size * 0.1); g.clip();
           for (let p = 0; p < n; p++) {
             const pw = Math.pow(10, p), lower = V % pw, carry = p === 0 ? V - Math.floor(V) : clamp(lower - (pw - 1));
             const d = Math.floor(V / pw) % 10, frac = carry;
             const cx = x + (n - 1 - p) * dw + dw / 2, lead = V < pw && p > 0;
-            g.fillStyle = col; g.globalAlpha = a * (lead ? 0.22 : 1); g.textAlign = "center";
+            g.fillStyle = col; g.globalAlpha = ga * a * (lead ? 0.22 : 1); g.textAlign = "center";
             g.fillText(String(d), cx, base - frac * hh);
             g.fillText(String((d + 1) % 10), cx, base + (1 - frac) * hh);
           }
@@ -793,18 +793,31 @@
           }
         }
 
+        // ---- the floor: a scene's pixels fade out between y 1352 and 1392 and are cleared below, so no hero card (resting,
+        // entering or leaving) ever sits over the subtitle zone or Instagram's caption zone. Call last in draw().
+        function floor(g, y0 = 1352, y1 = 1392) {
+          g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = "destination-out";
+          const gr = g.createLinearGradient(0, y0, 0, y1); gr.addColorStop(0, "rgba(0,0,0,0)"); gr.addColorStop(1, "rgba(0,0,0,1)");
+          g.fillStyle = gr; g.fillRect(0, y0, 1080, y1 - y0); g.fillStyle = "#000"; g.fillRect(0, y1, 1080, 1920 - y1);
+          g.restore();
+        }
+        // the hook's beats in film time (c1 and c2 share them): the VaR line on "VaR", the tail, the ES marker on "Can",
+        // typing dots on "Can", the blurred answer on "you've", the pill on "built?" (all in place before 02 starts)
+        const hookBeats = (WA) => ({ tVar: WA[6] - 0.04, tTail: WA[6] + 0.16, tES: WA[7] - 0.05, tDots: WA[7] - 0.04,
+          tAns: WA[11] - 0.04, tPill: WA[13] - 0.06 });
+
         return { C, F, clamp, lerp, eo, ei, eio, back, spring, rnd, mix, rgba, MINUS, fmt, comma, blueAt, beatAt, shake,
           IMG, load, ok, pic, texLoad, tex, texSize, rr, card, font, tw, text, enter, leave, still, combine, life, apply, bob,
           odometer, count, chip, prov, stamp, cursor, cursorAt, check, bookmark, heart, plane, avatar, pathLen, subPath, poly, pipe,
           collar, flapCell, flapState, flapRow, frame, axes, line, area, candles, hline, dot, smooth,
-          field, button, slider, toggle, ball, highlight, lock, typingDots, photo, pdfView, T4, pnlHist, tickBadge, bubble, HK, hook };
+          field, button, slider, toggle, ball, highlight, lock, typingDots, photo, pdfView, T4, pnlHist, tickBadge, bubble, HK, hook, floor, hookBeats };
       })();
 
       // ---- hud: the brand pill top-centre (the real logo + "Desk2Quant · MARKET RISK · MAKING QUANT EASY"); under it, the
       // chapter tag right-aligned ("● BACKTEST · 03/07") with desk2quant.com on the left, and a thin full-width progress
       // line in seven segments that fills chapter by chapter; then the chapter title (bold 66 px, one keyword in the accent
       // red), which stays for its chapter and changes with it. On the brand-blue block the ink turns white and the title's
-      // keyword sits in a red pill.
+      // keyword sits in a red pill. Each chapter's tag and title land on its first word (the chapter starts 0.16 s before it).
       const g = document.getElementById("hud-cv").getContext("2d");
       const { C, clamp, lerp, eo, eio, back, mix, rgba } = K;
       const st = { t: 0 };
@@ -828,7 +841,7 @@
       // the chapter tag: a white chip at the right; its text slides up to the next chapter's
       function tag(t, k, bl) {
         const lab = (j) => CH[j].tag + " · " + String(j + 1).padStart(2, "0") + "/" + String(N).padStart(2, "0");
-        const u = k > 0 ? clamp((t - B[k]) / 0.32) : 1, q = eio(u);
+        const u = k > 0 ? clamp((t - B[k]) / 0.22) : 1, q = eio(u);
         const wOf = (j) => K.tw(g, lab(j), 25, true, 2) + 72;
         const w = k > 0 ? lerp(wOf(k - 1), wOf(k), q) : wOf(k), h = 46, x = 1040 - w;
         K.card(g, x, TY - h / 2, w, h, { r: h / 2, shadow: bl > 0.5 ? "rgba(8,22,90,0.35)" : "rgba(52,40,14,0.14)", blur: 16, dy: 5 });
@@ -866,13 +879,13 @@
       function title(t, k, bl) {
         const ink = mix(C.ink, C.white, bl);
         // the outgoing title lifts away
-        if (k > 0 && t - B[k] < 0.26) {
-          const q = eio(clamp((t - B[k]) / 0.24));
+        if (k > 0 && t - B[k] < 0.13) {
+          const q = eio(clamp((t - B[k]) / 0.12));
           titleLayout(k - 1).forEach((c) => K.text(g, c.s, c.x, TB - 34 * q, { size: TFS, ls: -1, c: c.key && THEME[k - 1] !== "B" ? C.red : mix(C.ink, C.white, THEME[k - 1] === "B" ? 1 : 0), a: 1 - q }));
         }
-        const t0 = k === 0 ? -9 : B[k] + 0.14;
+        const t0 = k === 0 ? -9 : B[k] + 0.06;
         titleLayout(k).forEach((c, i) => {
-          const u = t - (t0 + 0.07 * i); if (u <= 0) return;
+          const u = t - (t0 + 0.05 * i); if (u <= 0) return;
           const p = K.spring(u, 0.55, 15), dy = 40 * (1 - p), a = clamp(u / 0.12);
           const sc = c.key ? 1 + 0.16 * Math.exp(-u * 7) * Math.sin(Math.min(u, 0.6) * 11) * (u > 0 ? 1 : 0) : 1;
           g.save(); g.globalAlpha *= a; g.translate(c.x + c.w / 2, TB - TFS * 0.36 + dy); g.scale(sc, sc); g.translate(-(c.x + c.w / 2), -(TB - TFS * 0.36));

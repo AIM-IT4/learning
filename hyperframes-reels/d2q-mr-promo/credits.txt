@@ -1,8 +1,8 @@
-"Comment RISK": Market Risk Quant Notes & Lab promo (Desk2Quant reel, 46.75 s, 1080 x 1920, 24 fps): credits
+"Comment RISK": Market Risk Quant Notes & Lab promo (Desk2Quant reel, 40.25 s, 1080 x 1920, 24 fps): credits
 
-Voice: assets/vo.wav (= voice/out/vo.wav), placed at t = 0.12 s. An English narrator designed from a text description
-  (not a real person) and spoken by VoxCPM2 (openbmb/VoxCPM2, Apache-2.0) on CPU, in the timbre of the Day 11 narrator
-  take (voice/vox_jobs.json); the picked takes are in voice/pick.json. Word timings: voice/out/words.json.
+Voice: assets/vo.wav (= voice/out/vo.wav), one continuous take placed at t = 0.12 s. An English narrator designed from
+  a text description (not a real person) and spoken by VoxCPM2 (openbmb/VoxCPM2, Apache-2.0) on CPU, in the timbre of
+  the Day 11 narrator take. Word timings: voice/out/words.json.
 Product facts: every fact on screen comes from the desk2quant.com product page for the Market Risk Quant Notes & Lab, as
   quoted in BRIEF.md (work/facts.json): 141 pages, 19 modules, 64 interview Q&As, 3 real-data projects, the 4,919-day
   walk-forward backtest (Kupiec, Christoffersen, traffic lights), the FX options desk (full revaluation vs

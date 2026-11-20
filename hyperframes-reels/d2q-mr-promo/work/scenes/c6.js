@@ -13,8 +13,8 @@
       function init() { K.load({ cover: "assets/img/cover.jpg" }, "c6-images", () => draw()); }
       const LIB = FACTS.library, NT = FACTS.tests;
       // beats
-      const tNotes = w(94) - 0.05, tExec = w(95) - 0.05, tNb = w(96) - 0.04, tPy = w(98) - 0.04, tT0 = w(102) - 0.02, tTests = w(104) - 0.04;
-      const tick = (i) => tT0 + 0.055 * i;
+      const tNotes = w(94) - 0.05, tExec = w(95) - 0.05, tNb = w(96) - 0.04, tPy = w(98) - 0.04, tT0 = w(102) - 0.1, tTests = w(104) - 0.04;
+      const tick = (i) => tT0 + 0.04 * i;
       const X = 40, W = 1000, R1 = 300, H1 = 310, R2 = 634, H2 = 300, R3 = 958, H3 = 382;
       const dealt = (t, t0, ph) => K.combine(K.enter(t - t0, { dy: 120, pitch: 0.4, yaw: 0, rot: 0.02, sc: 0.92 }), { dx: 0, dy: K.bob(T0 + t, ph, 2.5), rot: 0, sc: 1, yaw: 0, pitch: 0, a: 1 });
       const popOf = (t, t0) => 1 + 0.06 * Math.sin(Math.PI * clamp((t - t0) / 0.3)) * (t > t0 && t < t0 + 0.3 ? 1 : 0);
@@ -89,7 +89,7 @@
         K.card(g, x, y, W, H3, { r: 30, blur: 40, dy: 20, stroke: lit > 0.5 ? rgba(C.green, 0.6) : undefined });
         g.save(); K.rr(g, x, y, W, H3, 30); g.clip(); g.fillStyle = mix("#e3e8ef", C.green, lit); g.fillRect(x, y, W, 10); g.restore();
         K.text(g, "REGRESSION SUITE", x + 40, y + 66, { size: 27, mono: true, ls: 3, c: rgba(C.ink, 0.6) });
-        const n = Math.max(0, Math.min(NT, Math.floor((t - tT0) / 0.055) + 1));
+        const n = Math.max(0, Math.min(NT, Math.floor((t - tT0) / 0.04) + 1));
         const nn = t < tT0 ? 0 : n;
         K.text(g, nn + " / " + NT, x + W - 40, y + 82, { size: 66, align: "right", c: nn === NT ? C.greenD : C.ink });
         K.text(g, "TESTS", x + W - 42, y + 116, { size: 22, mono: true, ls: 3, align: "right", c: rgba(C.ink, 0.5) });
@@ -110,9 +110,10 @@
       function draw() {
         const t = st.t;
         g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, 1080, 1920);
-        const out = t > NEXT ? K.leave(t - NEXT, { dy: -150, dur: 0.24 }) : K.still;
-        suite(t, K.combine(dealt(t, 0.34, 2.6), out));
-        library(t, K.combine(dealt(t, 0.26, 1.7), out));
-        notebooks(t, K.combine(dealt(t, 0.18, 0.9), out));
-        notes(t, K.combine(dealt(t, 0.12, 0.2), out));
+        const out = t > NEXT ? K.leave(t - NEXT, { dy: -60, dur: 0.2, sc: 0.95 }) : K.still;
+        suite(t, K.combine(dealt(t, 0.16, 2.6), out));
+        library(t, K.combine(dealt(t, 0.12, 1.7), out));
+        notebooks(t, K.combine(dealt(t, 0.08, 0.9), out));
+        notes(t, K.combine(dealt(t, 0.04, 0.2), out));
+        K.floor(g);
       }

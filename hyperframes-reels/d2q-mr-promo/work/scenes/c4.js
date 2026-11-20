@@ -1,7 +1,7 @@
       // ---- c4, project 2: "Project two: an FX options desk. Full revaluation against delta-gamma-vega, stressed through the
       // financial crisis, COVID and the 2024 yen unwind."
       // A pricer card for the FX options desk: a two-way toggle "Full revaluation ⟷ Delta-gamma-vega" that a cursor
-      // clicks on "Full" and late in "against" (cues stay off the stressed words), over an illustrative chart (labelled): a long straddle's P&L against
+      // clicks just before "Full" and in "against" (cues stay off the stressed words), over an illustrative chart (labelled): a long straddle's P&L against
       // a spot shock, revalued in full (blue, solid) and by its delta-gamma Taylor expansion (red, dashed; Black-Scholes,
       // 10% vol, 3 months, at the money); the selected one is drawn bold and the gap between them shades in the tails.
       // Right after "stressed" a red STRESSED stamp slams on the pricer (it shakes). Under it, the historical stress library: four
@@ -16,8 +16,8 @@
       function init() { }
       const SC = FACTS.p2_stress, M = FACTS.p2_methods;
       // beats
-      const tCard = 0.12, tLib = 0.3, tDesk = w(56) - 0.05, tCur0 = w(58) - 0.1, tClick1 = w(59) + 0.04, tClick2 = w(61) + 0.3;
-      const tStamp = w(64) - 0.02, tSlot = [w(66) - 0.04, w(68) - 0.04, w(70) - 0.06, w(71) - 0.04], tRun = w(73) + 0.1;
+      const tCard = 0.04, tLib = 0.12, tDesk = w(56) - 0.05, tCur0 = w(58) - 0.1, tClick1 = w(59) - 0.06, tClick2 = w(61) + 0.1;
+      const tStamp = w(64), tSlot = [w(66) - 0.04, w(68) - 0.04, w(70) - 0.06, w(71) - 0.04], tRun = w(73) + 0.1;
       const X = 40, W = 1000, Y = 300, H = 540, YL = 866, HL = 474;
       // ---- the illustrative chart: a long at-the-money straddle (Black-Scholes, S0 = K = 100, 10% vol, 3 months, r = 0):
       // its P&L for a spot shock x, revalued in full and by delta-gamma (spot only, so the vega term is zero)
@@ -118,7 +118,7 @@
       function draw() {
         const t = st.t;
         g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, 1080, 1920);
-        const out = t > NEXT ? K.leave(t - NEXT, { dy: -150, dur: 0.24 }) : K.still;
+        const out = t > NEXT ? K.leave(t - NEXT, { dy: -60, dur: 0.2, sc: 0.95 }) : K.still;
         const bob = (ph) => ({ dx: 0, dy: K.bob(T0 + t, ph, 3), rot: 0, sc: 1, yaw: 0, pitch: 0, a: 1 });
         const sh = K.shake(t - tStamp - 0.12, 12, 3);
         library(t, K.combine(K.combine(K.enter(t - tLib, { dy: 130, pitch: 0.4, yaw: 0, rot: 0.02, sc: 0.92 }), bob(1.6)), out));
@@ -130,4 +130,5 @@
           const c = K.cursorAt(t, [[tCur0, 1120, 1180], [tClick1 - 0.05, 300, Y + 210], [tClick2 - 0.4, 300, Y + 210], [tClick2 - 0.05, 790, Y + 210], [tStamp + 0.45, 1150, Y + 120]], [tClick1, tClick2]);
           K.cursor(g, c.x, c.y, { p: c.p, r: c.r, s: 1.3 });
         }
+        K.floor(g);
       }

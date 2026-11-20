@@ -14,7 +14,7 @@
       function init() { K.load({ pla: "assets/img/c_pla_plane.png" }, "c5-images", () => draw()); }
       const PARTS = FACTS.p3_parts, ND = FACTS.p3_desks;
       // beats
-      const tCard = 0.12, tStrip = 0.22, tRow = 0.34, tFRTB = w(76) - 0.05, tSA = w(77) - 0.04, tIMA = w(79) - 0.04;
+      const tCard = 0.04, tStrip = 0.1, tRow = 0.16, tFRTB = w(76) - 0.05, tSA = w(77) - 0.04, tIMA = w(79) - 0.04;
       const tN0 = w(82) - 0.04, tN1 = w(83) + 0.1, tDesks = w(83) - 0.04, tCap = w(89) - 0.05, tNum = w(90) - 0.02;
       const X = 40, W = 1000, Y = 300, H = 560, YS = 880, HS = 150, YB = 1050, HB = 290;
       function column(t, x, y, cw, ch, on, big, sub, parts, t0) {
@@ -105,9 +105,10 @@
       function draw() {
         const t = st.t;
         g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, 1080, 1920);
-        const out = t > NEXT ? K.leave(t - NEXT, { dy: -150, dur: 0.24 }) : K.still;
+        const out = t > NEXT ? K.leave(t - NEXT, { dy: -60, dur: 0.2, sc: 0.95 }) : K.still;
         const bob = (ph) => ({ dx: 0, dy: K.bob(T0 + t, ph, 3), rot: 0, sc: 1, yaw: 0, pitch: 0, a: 1 });
         bottom(t, K.combine(K.combine(K.enter(t - tRow, { dy: 110, pitch: 0.35, yaw: 0, rot: 0.02, sc: 0.92 }), bob(2.4)), out));
         strip(t, K.combine(K.combine(K.enter(t - tStrip, { dy: 120, pitch: 0.4, yaw: 0, rot: 0.02, sc: 0.92 }), bob(1.3)), out));
         card(t, K.combine(K.combine(K.enter(t - tCard, { dy: 150, pitch: 0.45, yaw: 0, rot: 0.02, sc: 0.92 }), bob(0.3)), out));
+        K.floor(g);
       }

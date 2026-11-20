@@ -159,13 +159,13 @@
         // ---- counters and labels
         function odometer(g, V, n, x, base, size, col, a) {
           font(g, size, false, 0);
-          const dw = g.measureText("0").width * 1.02, top = base - size * 0.78, hh = size * 1.06;
+          const dw = g.measureText("0").width * 1.02, top = base - size * 0.78, hh = size * 1.06, ga = g.globalAlpha;
           g.save(); g.beginPath(); g.rect(x - 4, top - size * 0.12, dw * n + 8, hh + size * 0.1); g.clip();
           for (let p = 0; p < n; p++) {
             const pw = Math.pow(10, p), lower = V % pw, carry = p === 0 ? V - Math.floor(V) : clamp(lower - (pw - 1));
             const d = Math.floor(V / pw) % 10, frac = carry;
             const cx = x + (n - 1 - p) * dw + dw / 2, lead = V < pw && p > 0;
-            g.fillStyle = col; g.globalAlpha = a * (lead ? 0.22 : 1); g.textAlign = "center";
+            g.fillStyle = col; g.globalAlpha = ga * a * (lead ? 0.22 : 1); g.textAlign = "center";
             g.fillText(String(d), cx, base - frac * hh);
             g.fillText(String((d + 1) % 10), cx, base + (1 - frac) * hh);
           }
@@ -777,9 +777,22 @@
           }
         }
 
+        // ---- the floor: a scene's pixels fade out between y 1352 and 1392 and are cleared below, so no hero card (resting,
+        // entering or leaving) ever sits over the subtitle zone or Instagram's caption zone. Call last in draw().
+        function floor(g, y0 = 1352, y1 = 1392) {
+          g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = "destination-out";
+          const gr = g.createLinearGradient(0, y0, 0, y1); gr.addColorStop(0, "rgba(0,0,0,0)"); gr.addColorStop(1, "rgba(0,0,0,1)");
+          g.fillStyle = gr; g.fillRect(0, y0, 1080, y1 - y0); g.fillStyle = "#000"; g.fillRect(0, y1, 1080, 1920 - y1);
+          g.restore();
+        }
+        // the hook's beats in film time (c1 and c2 share them): the VaR line on "VaR", the tail, the ES marker on "Can",
+        // typing dots on "Can", the blurred answer on "you've", the pill on "built?" (all in place before 02 starts)
+        const hookBeats = (WA) => ({ tVar: WA[6] - 0.04, tTail: WA[6] + 0.16, tES: WA[7] - 0.05, tDots: WA[7] - 0.04,
+          tAns: WA[11] - 0.04, tPill: WA[13] - 0.06 });
+
         return { C, F, clamp, lerp, eo, ei, eio, back, spring, rnd, mix, rgba, MINUS, fmt, comma, blueAt, beatAt, shake,
           IMG, load, ok, pic, texLoad, tex, texSize, rr, card, font, tw, text, enter, leave, still, combine, life, apply, bob,
           odometer, count, chip, prov, stamp, cursor, cursorAt, check, bookmark, heart, plane, avatar, pathLen, subPath, poly, pipe,
           collar, flapCell, flapState, flapRow, frame, axes, line, area, candles, hline, dot, smooth,
-          field, button, slider, toggle, ball, highlight, lock, typingDots, photo, pdfView, T4, pnlHist, tickBadge, bubble, HK, hook };
+          field, button, slider, toggle, ball, highlight, lock, typingDots, photo, pdfView, T4, pnlHist, tickBadge, bubble, HK, hook, floor, hookBeats };
       })();

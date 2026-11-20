@@ -1,4 +1,4 @@
-      // ---- c7, the call to action (brand-blue block): "Comment RISK, and we'll DM you fifty percent off. The code works for
+      // ---- c7, the call to action (brand-blue block): "Comment RISK, and we will DM you fifty percent off. The code works for
       // seven days. Save this for your next risk interview."
       // Four white cards deal in at once (so the block is never empty): a comment card where RISK types in on "RISK" and
       // posts on "and"; a direct message from desk2quant (typing dots until "DM", then the real cover thumbnail and the
@@ -6,22 +6,22 @@
       // the code itself never appears; "valid 7 days" on "seven days"); a row "Send to a friend preparing for risk
       // interviews" + SAVE (SAVE lights on "Save this", the send row on "next risk interview"); and the DESK2QUANT plate (the
       // real logo, @desk2quant, desk2quant.com). The last frame holds.
-      // words (global): 105 Comment 106 RISK, 107 and 108 we'll 109 DM 110 you 111 50% 112 off. 113 The 114 code 115 works
-      //   116 for 117 7 118 days. 119 Save 120 this 121 for 122 your 123 next 124 risk 125 interview.
+      // words (global): 105 Comment 106 RISK, 107 and 108 we 109 will 110 DM 111 you 112 50% 113 off. 114 The 115 code
+      //   116 works 117 for 118 7 119 days. 120 Save 121 this 122 for 123 your 124 next 125 risk 126 interview.
       const g = document.getElementById("c7-cv").getContext("2d");
       const { C, clamp, lerp, eo, eio, back, mix, rgba } = K;
       const st = { t: 0 };
       const w = (i) => WA[i] - T0;
       function init() { K.load({ logo: "assets/logo.png", cover: "assets/img/cover.jpg" }, "c7-images", () => draw()); }
       const WORD = "RISK";
-      const tType = w(106) - 0.02, tPost = w(107) + 0.02, tDM = w(109) - 0.08, tOff = w(111) - 0.04, tCode = w(114) - 0.04,
-        tValid = w(117) - 0.04, tSave = w(119) - 0.03, tSend = w(123) - 0.03;
+      const tType = w(106) - 0.02, tPost = w(107) + 0.02, tDM = w(110) - 0.08, tOff = w(112) - 0.04, tCode = w(115) - 0.04,
+        tValid = w(118) - 0.04, tSave = w(120) - 0.03, tSend = w(124) - 0.03;
       const X = 40, W = 1000, SH = "rgba(8,22,90,0.42)";
       const dealt = (t, t0, P0) => K.combine(K.enter(t - t0, Object.assign({ dy: 230, pitch: 0.4, yaw: 0, rot: 0.02, sc: 0.92 }, P0 || {})),
         { dx: 0, dy: K.bob(t, t0 * 7, 2.5), rot: 0, sc: 1, yaw: 0, pitch: 0, a: 1 });
       function commentCard(t) {
         const Y = 300, H = 282;
-        g.save(); K.apply(g, 540, Y + H / 2, dealt(t, 0.12));
+        g.save(); K.apply(g, 540, Y + H / 2, dealt(t, 0.04));
         K.card(g, X, Y, W, H, { r: 30, blur: 44, dy: 22, shadow: SH });
         K.text(g, "COMMENTS", X + 40, Y + 54, { size: 26, mono: true, ls: 3, c: rgba(C.ink, 0.55) });
         g.fillStyle = rgba(C.ink, 0.08); g.fillRect(X + 30, Y + 80, W - 60, 2);
@@ -50,7 +50,7 @@
       }
       function dmCard(t) {
         const Y = 606, H = 384;
-        g.save(); K.apply(g, 540, Y + H / 2, dealt(t, 0.2, { dx: 260, dy: 40, yaw: -0.3, pitch: 0.1 }));
+        g.save(); K.apply(g, 540, Y + H / 2, dealt(t, 0.08, { dx: 260, dy: 40, yaw: -0.3, pitch: 0.1 }));
         K.card(g, X, Y, W, H, { r: 30, blur: 44, dy: 22, shadow: SH });
         const lg = K.pic("logo", 60); if (lg) g.drawImage(lg, X + 34, Y + 26, 60, 60);
         K.text(g, "desk2quant", X + 112, Y + 60, { size: 34 });
@@ -115,7 +115,7 @@
       }
       function actions(t) {
         const Y = 1014, H = 120;
-        g.save(); K.apply(g, 540, Y + H / 2, dealt(t, 0.28, { dy: 110, pitch: 0.3 }));
+        g.save(); K.apply(g, 540, Y + H / 2, dealt(t, 0.12, { dy: 60, pitch: 0.3 }));
         // send to a friend
         const ks = clamp((t - tSend) / 0.22), sw = 708;
         const ps = 1 + 0.06 * Math.sin(Math.PI * ks) * (ks < 1 ? 1 : 0);
@@ -139,7 +139,7 @@
       }
       function plate(t) {
         const Y = 1158, H = 190;
-        g.save(); K.apply(g, 540, Y + H / 2, dealt(t, 0.38, { dy: 90, pitch: 0.3 }));
+        g.save(); K.apply(g, 540, Y + H / 2, dealt(t, 0.16, { dy: 40, pitch: 0.3 }));
         K.card(g, X, Y, W, H, { r: 30, blur: 40, dy: 20, shadow: SH });
         const L = 134, lg = K.pic("logo", L);
         if (lg) g.drawImage(lg, X + 30, Y + 28, L, L);
@@ -157,4 +157,5 @@
         actions(t);
         dmCard(t);
         commentCard(t);
+        K.floor(g);
       }

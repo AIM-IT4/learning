@@ -12,7 +12,7 @@
   </div>
   <script>
     (function () {
-      /*DATA*/ const DUR = 6.61; const T0 = 4.06; const NEXT = 6.25; const KB = 1; const B = [0.0, 4.06, 10.31, 19.51, 28.58, 34.56, 39.36]; const THEME = ["L", "L", "L", "L", "L", "L", "B"]; const WA = [0.12, 0.32, 0.58, 0.8, 1.1, 1.46, 1.84, 2.44, 2.56, 2.66, 2.84, 3.0, 3.22, 3.44, 4.22, 4.36, 4.5, 4.6, 4.84, 5.1, 5.36, 5.64, 5.76, 6.24, 7.06, 7.62, 7.88, 8.68, 9.04, 9.4, 10.47, 10.76, 11.26, 11.54, 11.68, 11.98, 12.48, 12.66, 12.78, 13.04, 13.18, 13.52, 14.02, 14.54, 14.74, 16.14, 16.42, 16.6, 16.76, 17.22, 17.687, 18.62, 18.84, 19.67, 20.0, 20.5, 20.58, 20.94, 21.34, 22.02, 22.22, 22.82, 23.26, 24.247, 24.74, 24.94, 25.06, 25.36, 26.06, 26.56, 26.62, 26.72, 27.16, 27.66, 28.74, 29.26, 29.637, 30.121, 30.82, 31.2, 31.58, 31.9, 32.08, 32.34, 32.74, 33.04, 33.18, 33.26, 33.4, 33.5, 33.78, 34.72, 34.92, 35.04, 35.16, 35.62, 36.02, 36.62, 36.64, 36.94, 37.18, 37.7, 37.76, 38.1, 38.5, 39.52, 39.82, 40.5, 40.66, 40.8, 41.04, 41.18, 41.74, 42.34, 42.48, 42.68, 42.94, 43.1, 43.4, 43.9, 44.1, 44.26, 44.42, 44.52, 44.74, 45.0]; const WE = [0.32, 0.58, 0.8, 1.1, 1.46, 1.84, 2.44, 2.56, 2.66, 2.84, 3.0, 3.22, 3.44, 4.22, 4.36, 4.5, 4.6, 4.84, 5.1, 5.36, 5.64, 5.76, 6.24, 7.06, 7.62, 7.88, 8.68, 9.04, 9.4, 10.3, 10.76, 11.26, 11.54, 11.68, 11.98, 12.48, 12.66, 12.78, 13.04, 13.18, 13.52, 14.02, 14.54, 14.74, 15.64, 16.42, 16.6, 16.76, 17.22, 17.687, 18.587, 18.84, 19.67, 20.0, 20.5, 20.58, 20.94, 21.34, 22.02, 22.22, 22.82, 23.26, 24.16, 24.74, 24.94, 25.06, 25.36, 26.06, 26.56, 26.62, 26.72, 27.16, 27.66, 28.56, 29.26, 29.637, 30.121, 30.82, 31.2, 31.58, 31.9, 32.08, 32.34, 32.74, 33.04, 33.18, 33.26, 33.4, 33.5, 33.78, 34.68, 34.92, 35.04, 35.16, 35.62, 36.02, 36.62, 36.64, 36.94, 37.18, 37.7, 37.76, 38.1, 38.5, 39.4, 39.82, 40.5, 40.66, 40.8, 41.04, 41.18, 41.74, 42.34, 42.48, 42.68, 42.94, 43.1, 43.4, 43.9, 44.1, 44.26, 44.42, 44.52, 44.74, 45.0, 45.26]; /*END*/
+      /*DATA*/ const DUR = 5.42; const T0 = 3.38; const NEXT = 5.06; const KB = 1; const B = [0.0, 3.38, 8.44, 17.0, 24.68, 29.48, 33.5]; const THEME = ["L", "L", "L", "L", "L", "L", "B"]; const WA = [0.12, 0.3, 0.54, 0.76, 1.06, 1.42, 1.68, 2.08, 2.16, 2.28, 2.5, 2.68, 2.9, 3.14, 3.54, 3.66, 3.76, 3.86, 4.08, 4.3, 4.52, 4.8, 4.92, 5.24, 5.94, 6.48, 6.66, 7.4, 7.76, 8.08, 8.6, 8.82, 9.4, 9.96, 10.04, 10.36, 10.82, 11.0, 11.1, 11.34, 11.53, 11.72, 12.16, 12.62, 12.82, 14.22, 14.5, 14.7, 14.9, 15.28, 15.662, 16.34, 16.64, 17.16, 17.42, 18.06, 18.18, 18.42, 18.7, 19.2, 19.3, 19.9, 20.28, 21.093, 21.5, 21.68, 21.8, 22.14, 22.68, 22.88, 23.02, 23.1, 23.62, 24.0, 24.84, 25.14, 25.64, 26.025, 26.58, 26.96, 27.36, 27.66, 27.88, 28.12, 28.54, 28.62, 28.74, 28.84, 28.96, 29.06, 29.34, 29.64, 29.78, 29.9, 30.02, 30.26, 30.74, 31.22, 31.44, 31.68, 31.92, 32.32, 32.5, 32.82, 33.2, 33.66, 34.32, 34.58, 34.8, 34.92, 35.04, 35.36, 35.48, 35.76, 36.22, 36.38, 36.54, 36.74, 36.88, 37.12, 37.34, 37.6, 37.74, 37.9, 38.0, 38.2, 38.44]; const WE = [0.3, 0.54, 0.76, 1.06, 1.42, 1.68, 2.08, 2.16, 2.28, 2.5, 2.68, 2.9, 3.14, 3.54, 3.66, 3.76, 3.86, 4.08, 4.3, 4.52, 4.8, 4.92, 5.24, 5.94, 6.48, 6.66, 7.4, 7.76, 8.08, 8.6, 8.82, 9.4, 9.96, 10.04, 10.36, 10.82, 11.0, 11.1, 11.34, 11.53, 11.72, 12.16, 12.62, 12.82, 13.72, 14.5, 14.7, 14.9, 15.28, 15.662, 16.34, 16.64, 17.16, 17.42, 18.06, 18.18, 18.42, 18.7, 19.2, 19.3, 19.9, 20.28, 21.093, 21.5, 21.68, 21.8, 22.14, 22.68, 22.88, 23.02, 23.1, 23.62, 24.0, 24.84, 25.14, 25.64, 26.025, 26.58, 26.96, 27.36, 27.66, 27.88, 28.12, 28.54, 28.62, 28.74, 28.84, 28.96, 29.06, 29.34, 29.64, 29.78, 29.9, 30.02, 30.26, 30.74, 31.22, 31.44, 31.68, 31.92, 32.32, 32.5, 32.82, 33.2, 33.66, 34.32, 34.58, 34.8, 34.92, 35.04, 35.36, 35.48, 35.76, 36.22, 36.38, 36.54, 36.74, 36.88, 37.12, 37.34, 37.6, 37.74, 37.9, 38.0, 38.2, 38.44, 38.74]; /*END*/
       /*FACTS*/ const FACTS = {"product":"Market Risk Quant Notes & Lab","topics":"VaR · ES · Backtesting · FRTB","pages":141,"modules":19,"qa":64,"projects":3,"p1_desk":"Rates & FX desk","p1_days":4919,"p1_tests":["Kupiec","Christoffersen","Traffic light"],"p2_desk":"FX options desk","p2_methods":["Full revaluation","Delta-gamma-vega"],"p2_stress":[["GFC","2008"],["COVID","2020"],["","2022"],["YEN UNWIND","2024"]],"p3_desks":5,"p3_parts":["SBM","DRC","RRAO","PLA","IMCC","SES"],"library":["market","curves","instruments","risk","backtest","frtb"],"tests":14,"offer_pct":50,"offer_days":7,"handle":"@desk2quant","site":"desk2quant.com","pdf_name":"market-risk-quant-notes.pdf","page_contents":"4 / 141","page_backtest":"67 / 141","page_frtb":"86 / 141"}; /*ENDFACTS*/
       // ===== K: the Desk2Quant "Ripping" kit, from d2q-day11-rip/work/kit.js (inlined by tools/compose.py) =====
       // The look: warm paper with a faint grid, ink-navy type (D2QSans = Inter Bold), Share Tech Mono for small data (with
@@ -175,13 +175,13 @@
         // ---- counters and labels
         function odometer(g, V, n, x, base, size, col, a) {
           font(g, size, false, 0);
-          const dw = g.measureText("0").width * 1.02, top = base - size * 0.78, hh = size * 1.06;
+          const dw = g.measureText("0").width * 1.02, top = base - size * 0.78, hh = size * 1.06, ga = g.globalAlpha;
           g.save(); g.beginPath(); g.rect(x - 4, top - size * 0.12, dw * n + 8, hh + size * 0.1); g.clip();
           for (let p = 0; p < n; p++) {
             const pw = Math.pow(10, p), lower = V % pw, carry = p === 0 ? V - Math.floor(V) : clamp(lower - (pw - 1));
             const d = Math.floor(V / pw) % 10, frac = carry;
             const cx = x + (n - 1 - p) * dw + dw / 2, lead = V < pw && p > 0;
-            g.fillStyle = col; g.globalAlpha = a * (lead ? 0.22 : 1); g.textAlign = "center";
+            g.fillStyle = col; g.globalAlpha = ga * a * (lead ? 0.22 : 1); g.textAlign = "center";
             g.fillText(String(d), cx, base - frac * hh);
             g.fillText(String((d + 1) % 10), cx, base + (1 - frac) * hh);
           }
@@ -793,17 +793,30 @@
           }
         }
 
+        // ---- the floor: a scene's pixels fade out between y 1352 and 1392 and are cleared below, so no hero card (resting,
+        // entering or leaving) ever sits over the subtitle zone or Instagram's caption zone. Call last in draw().
+        function floor(g, y0 = 1352, y1 = 1392) {
+          g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = "destination-out";
+          const gr = g.createLinearGradient(0, y0, 0, y1); gr.addColorStop(0, "rgba(0,0,0,0)"); gr.addColorStop(1, "rgba(0,0,0,1)");
+          g.fillStyle = gr; g.fillRect(0, y0, 1080, y1 - y0); g.fillStyle = "#000"; g.fillRect(0, y1, 1080, 1920 - y1);
+          g.restore();
+        }
+        // the hook's beats in film time (c1 and c2 share them): the VaR line on "VaR", the tail, the ES marker on "Can",
+        // typing dots on "Can", the blurred answer on "you've", the pill on "built?" (all in place before 02 starts)
+        const hookBeats = (WA) => ({ tVar: WA[6] - 0.04, tTail: WA[6] + 0.16, tES: WA[7] - 0.05, tDots: WA[7] - 0.04,
+          tAns: WA[11] - 0.04, tPill: WA[13] - 0.06 });
+
         return { C, F, clamp, lerp, eo, ei, eio, back, spring, rnd, mix, rgba, MINUS, fmt, comma, blueAt, beatAt, shake,
           IMG, load, ok, pic, texLoad, tex, texSize, rr, card, font, tw, text, enter, leave, still, combine, life, apply, bob,
           odometer, count, chip, prov, stamp, cursor, cursorAt, check, bookmark, heart, plane, avatar, pathLen, subPath, poly, pipe,
           collar, flapCell, flapState, flapRow, frame, axes, line, area, candles, hline, dot, smooth,
-          field, button, slider, toggle, ball, highlight, lock, typingDots, photo, pdfView, T4, pnlHist, tickBadge, bubble, HK, hook };
+          field, button, slider, toggle, ball, highlight, lock, typingDots, photo, pdfView, T4, pnlHist, tickBadge, bubble, HK, hook, floor, hookBeats };
       })();
 
       // ---- c2, the pack: "This is the Market Risk Quant Notes and Lab. 141 pages, 19 modules, 64 interview answers."
       // The reveal: c2 carries c1's picture on (K.hook) for half a second: the lock opens, the blur clears and the answer
       // reads (the real cover thumbnail, "Market Risk Quant Notes & Lab · 141 pages"); then the cover springs out of the
-      // answer bubble into the hero, big, with a soft shadow, while the chat and the histogram drop away. Three counter
+      // answer bubble into the hero, big, with a soft shadow, while the chat and the histogram lift away and fade. Three counter
       // chips wait under it and roll on their numbers (141 PAGES, 19 MODULES, 64 INTERVIEW Q&As); on "modules" the real
       // contents page (page-2) slides in behind the cover as proof, and on "answers" a red frame rings its "Interview
       // drill: 64 questions" row.
@@ -814,9 +827,9 @@
       const st = { t: 0 };
       const w = (i) => WA[i] - T0;
       function init() { K.load({ cover: "assets/img/cover.jpg", p2: "assets/img/page-2.jpg" }, "c2-images", () => draw()); }
-      const HB = { tVar: WA[6] - 0.04, tTail: WA[6] + 0.16, tES: WA[7] - 0.05, tDots: WA[9] - 0.1, tAns: WA[13] - 0.04, tPill: WA[13] + 0.26 };
+      const HB = K.hookBeats(WA);
       // beats
-      const tOpen = 0.02, tClear = 0.12, tOut = 0.56, tFly = 0.6, FLY = 0.55, tGlint = w(22) - 0.1, tChips = 1.0;
+      const tOpen = 0.02, tClear = 0.12, tOut = 0.56, tFly = 0.6, FLY = 0.55, tGlint = w(22) - 0.1, tChips = 0.66;
       const tPage = w(26) - 0.06, tRing = w(29) - 0.04;
       const CNT = [
         { v: FACTS.pages, lab: "PAGES", t0: w(23) - 0.02, t1: WE[23] - T0 - 0.06, tl: w(24) - 0.03, icon: "page" },
@@ -831,7 +844,7 @@
         const u = t - tFly; if (u <= 0) return null;
         const p = K.spring(u, 0.55, 11), q = eio(clamp((t - tPage) / 0.5));
         const to = { x: lerp(CA.x, CB.x, q), y: lerp(CA.y, CB.y, q) + K.bob(T0 + t, 2.2, 4), s: lerp(CA.s, CB.s, q) };
-        const arc = -120 * Math.sin(Math.PI * clamp(u / FLY));
+        const arc = -40 * Math.sin(Math.PI * clamp(u / FLY));
         return { x: lerp(from.x, to.x, p), y: lerp(from.y, to.y, p) + arc, s: lerp(from.s, to.s, p),
           rot: lerp(0.0, -0.028, clamp(p)) + 0.05 * Math.sin(Math.PI * clamp(u / FLY)) + 0.012 * Math.sin((T0 + t) * 1.7) * clamp(u - 0.6),
           sh: clamp(u / 0.4) };
@@ -897,19 +910,22 @@
       function draw() {
         const t = st.t, T = T0 + t;
         g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, 1080, 1920);
-        const out = t > NEXT ? K.leave(t - NEXT, { dy: -150, dur: 0.24 }) : K.still;
+        const out = t > NEXT ? K.leave(t - NEXT, { dy: -60, dur: 0.2, sc: 0.95 }) : K.still;
         // the hook, carried over from c1: the lock opens, the blur clears, then the cards drop away
         if (t < tOut + 0.5) {
           const bob = (ph) => ({ dx: 0, dy: K.bob(T, ph, 3), rot: 0, sc: 1, yaw: 0, pitch: 0, a: 1 });
-          const drop = (d) => (t > tOut + d ? K.leave(t - tOut - d, { dy: 300, dur: 0.42, pitch: -0.25, sc: 0.9, rot: 0.03 }) : K.still);
-          K.hook(g, T, Object.assign({}, HB, { P: K.combine(bob(0.2), drop(0.06)), PH: K.combine(bob(1.2), drop(0)),
+          // they lift away and fade (upward, so they never pass over the subtitle)
+          const lift = (d, dy) => (t > tOut + d ? K.leave(t - tOut - d, { dy, dur: 0.3, pitch: 0.2, sc: 0.92, rot: -0.02 }) : K.still);
+          K.hook(g, T, Object.assign({}, HB, { P: K.combine(bob(0.2), lift(0.04, -70)), PH: K.combine(bob(1.2), lift(-0.04, -50)),
+            PP: K.combine(bob(0.2), lift(-0.1, -40)),
             blur: 11 * (1 - eio(clamp((t - tClear) / 0.32))), lockOpen: eo(clamp((t - tOpen) / 0.26)),
-            lockA: 1 - clamp((t - 0.22) / 0.14), thumbA: t < tFly ? 1 : 0, pillA: 1 - clamp(t / 0.22) }));
+            lockA: 1 - clamp((t - 0.22) / 0.14), thumbA: t < tFly ? 1 : 0, pillA: 1 - clamp((t - 0.3) / 0.16) }));
         }
         page(t, out);
         chips(t, out);
         const R = coverRect(t);
         if (R) drawCover(t, R, out);
+        K.floor(g);
       }
       if (typeof init === "function") init();     // before the tween: fromTo renders (and draws) at once
       const tl = gsap.timeline({ paused: true });
