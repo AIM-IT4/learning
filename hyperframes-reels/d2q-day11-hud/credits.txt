@@ -7,7 +7,9 @@ Look: a light-mode variant of the Sci-fi Hologram HUD style of the Lemo-Opuscar 
   wireframe and HUD engine (holo.js, hud.js, mkmodel.mjs; MIT, Copyright (c) 2026 Lemomo (LemoLab),
   https://github.com/lemomo-ai/lemo-opuscar), bundled with a light mode added (work/holohud.js); its plates, target
   locks, rolling values and chips frame our own charts (work/qchart.js: candles, curves, histograms, paths, tables).
-  Our own scenes, story and data; no LemoLab credit is needed on screen. The trader guide is Desk2Quant's own.
+  Our own scenes, story and data; no LemoLab credit is needed on screen.
+Guide: D, the desk quant of Desk2Quant's own character kit (characters/ in the learning repo: SVG puppet, gestures and
+  lip-sync), lip-synced to the narrator; no logos or employer branding.
 Formulas: typeset from TeX to SVG at build time with MathJax 3 (mathjax-full 3.2.2, Apache-2.0; tools/tex2svg.mjs),
   every number in them generated from work/numbers.json (tools/formulas.py).
 Type: Fredoka for captions, labels and numbers (the series font; SIL OFL 1.1, assets/fonts/Fredoka-OFL.txt), Share Tech

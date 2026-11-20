@@ -1038,7 +1038,7 @@ const HOLOHUD = (function () {
         const end = clamp((t - END) / 0.4);
         HUD.chrome(g, W, H, T, { px, alpha: 1,
           bl: "HOLO." + String(1100 + f).padStart(4, "0") + " \u00b7 T " + t.toFixed(2) + " S",
-          br: "YAW " + (35.5 + 6 * Math.sin(t * 0.21)).toFixed(1) + "\u00b0 \u00b7 PITCH " + (17.2 + 2 * Math.sin(t * 0.13)).toFixed(1) + "\u00b0" });
+          br: "" });   // (no camera readout: the charts are flat, and the guide stands in that corner)
         // brand plate: logo (DOM image) + DESK2QUANT // DAY 11/30, and the series name in micro type
         g.save(); g.globalCompositeOperation = HOLOHUD.ADD; g.textBaseline = "alphabetic"; g.textAlign = "left";
         g.letterSpacing = "4px"; g.font = "600 31px " + HUD.FONT.ui; g.fillStyle = T.hi(0.95);

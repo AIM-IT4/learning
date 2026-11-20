@@ -60,22 +60,26 @@ SCRIPT = [
 ]
 
 
-# the guide in the lower right, a young trader (compositions/mc.html): (caption line, token index, pose, seconds held, hop px)
+# the guide in the lower right, D the desk quant (compositions/mc.html): (caption line, token index, beat, seconds held,
+# hop px: always 0, he does not hop). The beats are defined in mc.html (BEAT): point = the index finger on the chart element
+# the voice names; show = an open palm toward it; talk = the talking hand; watch = eyes on the chart; wave = the sign-off
 MASCOT = [
-    ("L1", 1, "wave", 1.0, 0), ("L1", 4, "sigma", 1.2, 14),
-    ("L2a", 2, "look", 1.1, 0), ("L2b", 3, "think", 1.4, 0), ("L2b", 11, "ask", 1.1, 16),
-    ("L3", 3, "point", 1.2, 0), ("L3", 8, "down", 1.3, 18),
-    ("L4a", 7, "think", 1.0, 0), ("L4b", 5, "wow", 1.0, 30),
-    ("L5a", 12, "shrug", 1.0, 0), ("L5b", 4, "meh", 1.0, 0),
-    ("L6a", 2, "wow", 0.8, 24), ("L6b", 3, "worried", 1.0, 0),
-    ("L7a", 5, "think", 1.0, 0), ("L7b", 2, "point", 1.0, 0), ("L7c", 3, "happy", 0.8, 12),
-    ("L8a", 7, "point", 1.2, 0), ("L8b", 3, "wow", 0.8, 16), ("L8c", 1, "sigma", 1.2, 18),
-    ("L9a", 1, "point", 1.2, 0), ("L9b", 6, "worried", 1.0, 0),
-    ("L10", 6, "leanL", 0.9, 0), ("L10", 8, "leanR", 0.9, 0), ("L10", 11, "wow", 0.8, 0),
-    ("L11a", 6, "happy", 0.8, 12), ("L11b", 5, "wow", 0.9, 30), ("L11c", 11, "cheer", 1.1, 26),
-    ("L12a", 3, "point", 1.4, 0), ("L12b", 10, "meh", 0.9, 0),
-    ("L13", 3, "worried", 0.8, 0), ("L13", 12, "iv", 1.2, 18),
-    ("L14a", 1, "point", 1.6, 0), ("L14b", 0, "happy", 0.9, 12), ("L14b", 5, "bye", 9.0, 0),
+    ("L1", 0, "hello", 1.3, 0), ("L1", 4, "showOneVol", 1.6, 0),
+    ("L2a", 2, "talk", 1.2, 0), ("L2b", 4, "showQuotes", 1.5, 0), ("L2b", 11, "askYou", 1.0, 0),
+    ("L3", 2, "watchChart", 2.4, 0), ("L3", 7, "pointCrash", 1.7, 0),
+    ("L4a", 1, "talk", 1.2, 0), ("L4a", 4, "showBell", 1.4, 0), ("L4b", 5, "pointSigma", 1.3, 0),
+    ("L5a", 3, "showNormal", 1.4, 0), ("L5a", 12, "never", 0.9, 0), ("L5b", 0, "talk", 1.5, 0),
+    ("L6a", 0, "pointDid", 1.1, 0), ("L6b", 3, "showFat", 1.3, 0), ("L6b", 5, "talk", 1.4, 0),
+    ("L7a", 1, "askWhat", 0.9, 0), ("L7b", 2, "pointPayoff", 1.2, 0), ("L7c", 3, "showPrice", 0.9, 0),
+    ("L8a", 2, "talk", 1.2, 0), ("L8a", 7, "showSolve", 1.5, 0), ("L8c", 1, "pointRoot", 1.3, 0),
+    ("L9a", 1, "pointPaths", 2.0, 0), ("L9b", 6, "pointCrashes", 1.0, 0), ("L9b", 9, "talk", 2.8, 0),
+    ("L10", 6, "sweepStrikes", 1.0, 0), ("L10", 11, "showMillion", 1.1, 0),
+    ("L11a", 0, "watchSmile", 1.2, 0), ("L11a", 6, "pointAtm", 1.0, 0), ("L11b", 1, "point90", 1.0, 0),
+    ("L11b", 4, "point80", 1.3, 0), ("L11c", 0, "talk", 1.3, 0), ("L11c", 7, "showSmile", 0.9, 0), ("L11c", 11, "smile", 1.5, 0),
+    ("L12a", 3, "pointAnswer", 1.85, 0), ("L12b", 10, "flatAcross", 1.0, 0),
+    ("L13", 3, "pointTail", 1.0, 0), ("L13", 6, "pointLowK", 1.1, 0), ("L13", 12, "traceRise", 1.2, 0),
+    ("L14a", 0, "pointComment", 1.2, 0), ("L14a", 4, "showSheet", 1.6, 0), ("L14b", 0, "showRows", 1.6, 0),
+    ("L14b", 5, "wave", 1.9, 0),
 ]
 
 

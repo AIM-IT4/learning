@@ -22,7 +22,9 @@ numbers policy.
   - `bg.html`: the light stage.
   - `hud.html`: chrome, status line, chip rail.
   - `ov.html`: HUD subtitles driven by the voice.
-  - `mc.html`: the trader.
+  - `mc.html`: the guide, D the desk quant from the Desk2Quant character kit (`characters/` in this repo), lip-synced to
+    the narrator and pointing at each chart element as it is named. Built by `work/guide/build_mc.py` from
+    `work/guide/guide_src.js`; `work/guide/make_test.py` writes a test page for the kit's motion audit.
 - **Chart kit:** `work/qchart.js` (global `QC`) provides the pieces. `work/holohud.js` bundles the Lemo-Opuscar
   hologram-HUD engine (MIT), with a light mode added, for its plates, locks and rolling values.
   - Charts: panels, axes, curves with a scan head, areas, bars, candles, reference lines, markers, tags.
