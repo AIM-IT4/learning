@@ -15,7 +15,7 @@ script = re.search(r"<script>(.*)</script>", mc, flags=re.S).group(1)
 # test hook (this page only): expose the built gesture keys for work/guide/qa_aim.mjs
 hook = 'window.__timelines["mc"] = tl;'
 assert script.count(hook) == 1
-script = script.replace(hook, hook + " window.__mcKeys = keys;")
+script = script.replace(hook, hook + " window.__mcKeys = keys; window.__mcPose = poseAt; window.__mcHead = headK;")
 dur = float(re.search(r"const DUR = ([0-9.]+);", mc).group(1))
 bgs = []
 for f in sorted(glob.glob(os.path.join(HERE, "out/guide_bg/frame-*-at-*s.png"))):

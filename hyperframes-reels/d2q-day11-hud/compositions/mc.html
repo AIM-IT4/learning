@@ -2084,20 +2084,24 @@ Gest.G.presentSide = (z, p, a, sd, m, o) => { const T = typeof o.target === 'fun
 
     (function () {
       /*DATA*/ const DUR = 77.94; const CUES = [[0.03, "hello", 1.3, 0], [1.15, "showOneVol", 1.6, 0], [3.31, "talk", 1.2, 0], [4.85, "showQuotes", 1.5, 0], [6.69, "askYou", 1.0, 0], [7.96, "watchChart", 2.4, 0], [10.76, "pointCrash", 1.7, 0], [13.44, "talk", 1.2, 0], [14.9, "showBell", 1.4, 0], [18.16, "pointSigma", 1.3, 0], [20.8, "showNormal", 1.4, 0], [23.08, "never", 0.9, 0], [23.86, "talk", 1.5, 0], [25.3, "pointDid", 1.1, 0], [26.78, "showFat", 1.3, 0], [27.84, "talk", 1.4, 0], [29.52, "askWhat", 0.9, 0], [31.1, "pointPayoff", 1.2, 0], [32.28, "showPrice", 0.9, 0], [33.16, "talk", 1.2, 0], [34.76, "showSolve", 1.5, 0], [37.02, "pointRoot", 1.3, 0], [39.01, "pointPaths", 2.0, 0], [41.59, "pointCrashes", 1.0, 0], [42.81, "talk", 2.8, 0], [45.83, "sweepStrikes", 1.0, 0], [47.23, "showMillion", 1.1, 0], [49.01, "watchSmile", 1.2, 0], [50.35, "pointAtm", 1.0, 0], [51.89, "point90", 1.0, 0], [53.49, "point80", 1.3, 0], [55.29, "talk", 1.3, 0], [56.97, "showSmile", 0.9, 0], [57.91, "smile", 1.5, 0], [59.46, "pointAnswer", 1.85, 0], [62.52, "flatAcross", 1.0, 0], [64.36, "pointTail", 1.0, 0], [65.62, "pointLowK", 1.1, 0], [67.18, "traceRise", 1.2, 0], [69.1, "pointComment", 1.2, 0], [70.32, "showSheet", 1.6, 0], [72.44, "showRows", 1.6, 0], [74.16, "wave", 1.9, 0]]; const LIPS_HZ = 60; const LIPS_T0 = 0.085; const LIPS = "500b0mg0ci00j60m70r00w04x01x0dw03wb0v90w60x30x00u0hq0zn0zj0zg00h00l03p00v00x80yi0yr0xs0vu0ts0pd0j90dl0bz0cz0cz0bz0bz0az0hy0p00t00v03w07w08v05t50pz0mz0jz0hz0fz0ji0p10t00t00rj0nz0jz0gz0hz0ln0nj0mz0kz0fz0cz09p080690wc0zf0zj0zp0qu05x00w30v00u0ku0vu0zt0zr0zn06n00t00x10y60xc0wf0v50u60t70ta0s50p00k0re07az08z08z07z0eg0l00p00p10p00o00o00p00o00m0rl00l30m20m00l08jb0fz09z06z04z0200b00h00j00h10f00a408i0bc0ib0oc0s90v00u04q0il07h50g00i0ak05m00m10n60n90ne0o90rb0uh0wn0wo0wl0vg0r50m00e609z06z05z05z06z05z06j085080060050d40x30z20010010000000000000050z80zb0qh00p40u90we0wa0x08y0zy0zy0sx70vg0tb0of0ll0km0ni0qe0s50s0zq0zkz0ez0gz0m00o0em0ui0lf90fa0l00r00u00v05u0ct0fs09s00r20p70nd0pp0rr0tz0uz0tz0tz0rz0ow0jf0fk0cz0az0az09z07z04z04z05z06z07z07z07z06z04z03002001001000000000000002004z07z09z0az0iz0q00u00v05v0qu0zs0zr0xt0dx10yb0yn0xq0um0rn0nd0l00n60pb0rh0qz0nz0jz0dz0az0i00n00q02q0pq0lq0ms0iw00y00z30z50w50q00j40c408z08z0g00m40m30i00c009007d06o04n0200200d0ln0ts0cu01u00s0ao0zm0bn00n00l0bj0zh0ze0zb0x720bz0kn0ra0s50q00kz0fz0az0h00l00m00k0lh0xf0zd0za0ma70j00r00v60wb0vi0tc0s80r60rb0p10n0ii0od00bz0az09z0e70k0cn00o00o00n00m30l00j0rk00l30m00l0aj70ez09z05z03z08q0g00l10j40c007706z0hy0qh0wb0w20u03p0fk50g60g09j05l01l00j00hz0fz0ez0dz0cz0az08z07z08z0h10q00w30x80wj0uj0rk0lm0g60b907c04h0300200100100000000000000000000000000000000000000000000000000000000000000000000000100b80j70q70va0wa0v00u0vu0mu00v40yd0yj0yg0va0q00i00c50a50bz0bz0az0k03s06w00y00y0bw0nq0ul0wm0es06u00u10s00r0nr0ts00ug0vo0vp0uq0ru0pw0og0o0go0zk0ye0ebz09z08z08z0dz0k02q30t20t60tc0t40r0en0zi0bci07z05z040080zf0zk0zo05rd0ui0vl0uw0us0uh0t00s0zo0ugh0cz0az08z0f70k00n70p20q0sq0zq06qe0qr0qu0qp0sm0si0q00n0cn70n80m00jz0gz0ez0dz0cz0cz0bz0gg0n60th0wp0xe0va0r00l04i09h00g80f70d50b0ua0z90z80z60z40z200100100100000100530f10p30v30w70v10q00kl0iz0nz0tz0xr0yl0ya0v30qz0lz0iz0ez0fz0j00n09p0sr0zr0zn0zi0rez0az0dz0h00ls0kz0lx0m80l00iz0dz08z05z0dz0q00w70yh0xq0vq0tm0re0n00hc0bz09z0bt0j0gp0as00t30t00t0vs0zp00o00r07u0bu0dr0el0zgg0dz0cz0bz08z05z0ds0m00t60xg0yi0xk0uj0r70n00h0jb027005205z05z05z04u03006q0f0zn0os02u00t00s03rf0ra0qb0p02m0zg0yc0j9107o05z05y0h0zp0ju00t00r80p60m0aj0zgh0cz07z05z05z08z0e0zk0zq0yt0mu06u00t0eq07lz0hz0fz0ez0dz0bz0fz0m20ua0xb0yf0x80r0bn00n00o0mp0zp0zm0zj0zg0zem0f00h0lj0pj0bhz0fz0dz0cz09z0dt0i60li0lq0ki0h0he00c60c50e40g00i0zj0zk0zk0zk0zk0zk0zk0zl0zn0eq10s50r80p00o0zo0zp0zo0zn0zl0zm00p70qf0ro0sr0st0qz0nz0j90gd0d00a0ia00b00b609d06n04z04z04z02001005u0dz0jl0ls0ko0g00c009707f06z06z07z06t05u0810j0ur06v10u70t06s00sd0sm0q00n0ti02e01dt0j0bo0hp00mz0jz0iz0gz0hz0m10rn0rv0pz0nh0k0fh0je0vd0ze0cp00v10y80ye0xh0ve0sb0qb0pi0oa0m0ai0lb089z09z09z0h00o07t40v50v40u50t40t60u60s00o00oa0ol0nl0ma0mb0m06k0wh0yd0u80a5003e02001001002008a0ip0m40l01g0hc029g09z0az0jz0s08u00r0dj00f20i40o00q06o0ol0pj10hf0l00p00t00u00t0lp0zl0zh0egz0n80sc0ti0sy0su0sv0rq0qo0pe0o0bn0zo0zn0zn0zo0zp0zs0xu0yv0zw0wv0xu0zq0zl0zio0gz0fz0dz0bz0a00b0sc0ze0zh0zk0zq0jw00y50x50u00t0zt0zs0zq0zl0zf0vak06h04t0b0zl0vr0ds00r40mp0i03c0ub0za00az0az0bz0bz0dz0l0ws0mv0sv0zt00oz0kz0iz0fz0dz0dz0i70mg0mb0h10cq0az09z08z05z03z02002007b0d0kh0zhv0gz0ez0dz0dz0cz0h70mb0ov0oz0nt0mo0jt0f20a706o04z03y02001001001003z07z09z0bz0cz0hz0p0au02u02t04p0pl0zn10u90xi0yt0yz0vx0ru0lh0eh08k06s06z08v09t09s0h01q01w40y90yk0wx0tz0rz0px0nj0j20fz0dz0bz0az08z06z0803f0zm0zp0hp0bol0mz0kz0kz0k20k00js0iz0iz0iz0jz0jz0iz0hz0gz0kh0pj0qf0o10h60cz0bz0ez0fz0dz08z05z08z09z0ho0o0br70s70s80r30q0lp0zo0zm0hkz0jz0jz0iz0iz0hz0n00r50tb0s60o0hj0qg0vj0zm0zn0zn00m60k80i08f0ze0zdz0gl0lm0nk0oq0nr0lj0h80df08l05z05v06y05r03l0200100100000000000000000000000000000000000000000000000000000000000000000000000000000000000200100100000100200200100100000000100100000000000000000000000000000000000000808jc0q20r0gnq0hz0bz07z0b50j04q04q0ln0sh0kdl0cz0cz0az0hd0q06v00x00w00v30u00t08t0ns0wrs0oz0mz0k60j03m0lq0cs02s0br0zr0zq0zr0ht06v0dx0fy07z00z00y00v0mt0pq0io0gn02l02k00h0gg0zd0za0l7065003j030060pi80pc0sd0rb0o0gh01b407404z06x0f03o00uf0wr0vz0uz0rr0m80fg0bz0bz0cz0bz0bz0az0jc0p00u00v00w00v00tq0pz0kz0iz0jq0k70kz0iz0hz0fz0fz0fz0ez0dz0iy0o30s50t00t0at0er0aq0fo0mm0tk0rk0zj0ziu0gz0ez0cz0az09z09z08z06z03z06z0ba0i30l40k0rj0zg0ze03hz0on0ua0vg0vk0um0th0r40r00u50xl0yp0yj0wg0s00m00f009907z0gb0qc0we0yp0zp0yl0we0s00o0jk0mj0wm0kp00p00n0sm0zn0zo0zp0zq0zq0qqf0sg0vc0v20s01m10m00q00t00s00q00n80lg0kg0m80pd0sv0tt0uz0ss0pn0k00d708b06s062073073070060t50x30u30q20010010000000010010010000000000030070ze0zk0zp0zt30xc0yo0yw0xq0um0rd0ma0h00e0gf0tj0yp0tu0hx00y50x70v00u0ws0zp00kz0hz0gz0gz0ez0dz0i50n0ar0xr0zp0qlz0gz0dz0az07z04z0b00g07j0ri0zg0ze0za0zh20n30pc0pg0oh0m00j0zh0zg0zd0zb0z830d10jf0ll0ls0ks0jb0gc0e70bg08c078050650o40z300200100100000200200100100100100100100000000100100300i00t00x40x50u04r30sb0t80r40l0dg0ha007706p09z0jz0p90ri0os0kq0hj0dr094070050930020010010000000000000000010010000040zc0zm0vu0ox09y00z50z60y90w70v00t05r0cq0et01w00v03s0qm0zgi0dz0dz0bz0i00o08s00t00s00s00s05s0zr00mz0hz0fz0k10p50r60q80m00jz0hz0ez0az08z09z0k90ud0xk0yu0xz0tz0od0ic0c008b05j05z06z07z0az0d00f40e70dr0b809u06x05205206z06z06z06z05z05z04z02001001001000000001003003z04z0dl0o00v40xk0xs0xz0wz0tp0o00jz0fz0dz0cz0ez0h10i00iz0hz0gz0ez09z07z08z0az0gz0p0eu02v00t00s0kq0to0zj80ez0az06z04z0az0n08v00y00y30y60x50v00r0ho0mn0nm0rl0lk0ik0ll09n01p00r00u00v40wd0wl0uf0r50m00gv0cz0bz09z06z05s070690087060x50n5015804l02001001001000000000000000000000000000000000000000000000000000000000000000000000000000000000000009o0fz0jz0lf0pc0t00x0wy0zz0zz0zy0zx0zx0dy00yd0u80m00g00d00c20a20ai0az0dz0lz0r90w50yg0zj0zn0vz0tz0so0sj0qz0nz0lz0nz0r90t00s0pr30rd0s30q0ek0df10df0dr0dp0bx0h00p20vc0xf0xk0ww0vz0sz0ng0ic0eb0cj09z08z09z09z08z07z06z05z05i05z03z0200cb0lh0q20r00s0kt0xu0zv0zx03y00y30x20y00y0dv0dqz0lz0iz0fz0cz0az0az0k00r00v80wd0vh0th0r00n09i00d008407i07u06z05z08s0m0ht00v20vd0ug0rm0m30i80ed0aj06l04w03z02001001000000000000002005z07z07z0gz0o00s00s08r0co0nk0wf00bz0az09z08z09z0j00q10ta0uj0wh0v90t00r00s00u00u05s00pz0jz0ez0az07z04z06z0gm0o40t00ug0vd0wa0w00v0ru0zs0zs0zs0zt0ov0lw0cx00y00z00z00x0jq80jz0ez09z06z06z0b0qe0xd0xd0xd0fe00c008006005005504f02001003005z08z07z0eb0p0tw00x00v0do0zk08kz0qf0wp0yt0zz0yz0wr0ra0k60ho0fz0ez0dz0jn0qe0uq0uu0tx0rs0qh0pf0p90q40s00r0cn0ti05el0bz08s0h00s00w30xe0wk0vi0u10t50pz0lz0iz0fz0fz0j00o0ks0zs0zs0zr00q02n0tl0zi0zgi0g03k00q70wh0yn0xz0wz0uv0qc0k00e70az09z09z09z09z08z0cz0i06o00r00q00p00o00n00n00m00l04jz0gz0dz0bz07z04z03003z04z03z0200100100100100100100810f90l00o0zp0zn00kz0iz0hz0fz0ez0hz0q30vb0yh0yk0yk0xa0v00r0dm00hn0dz09z0e00l08p03o0wo09p00p00o0fl0qk0eo00t80wj0wn0uk0sh0qc0p80pb0p80o00k0mf0lbz0bz0az0gv0n0or00s30t00t00t00t30s00o0zn30n70m50m40j10h0se0xa0n6a04z04z05z05z03z0200100100100440e80kd0l00f0td05dz0dz0iz0q00w00y00x08w0xw0zu00qz0oz0s20wb0yd0ye0xc0t70p00m00jv0gz0fz0gz0oa0tm0uz0tz0rs0pm0mf0i30e00c00b00b008606g06l06v04u02002004t06z0e00pf0vw0yx0xm0v01p04iw0hz0hz0lz0o00t0pv0zv0zs0zm0zhz0fz0cz07z0h00r30wh0xs0wu0uz0rz0nk0jj0g08f0se0ed00e00l10s90vk0ul0sg0n90ke0j70j00h0jf0zc018z07z0az0g0lj00k60j00j00i10hd0ea0a80810750500306200100100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000bj0kj0pz0qy0pb0m60gj0fz0iz0lz0lz0jz0gz0bz08z09l0f05l07r07v00y80ye0zf0y80t00mh0gz0fz0gz0hz0hz0gz0fz0fz0ez0gz0lw0rs0to0u70v0kw0kx00y10yb0y80x00w00u20s70rh0qm0pm0or0le0h00fd0ej0ds0br07l04z03002003003002001001001006e0i80qc0u50ts0pz0mz0jz0iz0gz0cz07z0hq0sc0xf0yz0yz0xz0uk0p70he0da0dg0fg0h0dm0oq03p00n0hkw0hz0ez0az06z04z04z04z03z0db0lj0qr0qf0o80hz0bz07z04z06z09z0hz0o00sm0rs0qd0q0aq0zo0zi0zda0dh0l0fq09q02pz0mz0kz0iz0gz0jz0oh0ql0ps0mo0ja0h0pg0ze0zc20h10s00w50yc0yl0xm0vi0td0sg0rf0p00k0qg0eaz08z06z0az0k0dr00td0td0tb0tb0ue0tg0s20p06p50sg0tb0tf0re0q00m0tk02nj0pz0pz0lo0g90cm08q05z06s09s0bq0bt0h00p00v90xk0yp0xp0vj0s30nz0iz0fz0dz0fz0l00p05o00lz0iz0fz0dz0dz0dz0cz0az0az0aw0az0d0ul0it00v30u00s00sb0u40u0is0zm0zg0pah0g06m0ho0omt0jz0iz0gz0fz0dz0ez0kd0pr0rv0sz0sz0rl0r09r50p30n0xk0zq00w30ye0ze0xf0vb0p30j00g0de0td0zi0zp0wu08x20y50x09x0zv0zpz0lz0iz0fz0dy0dl0hk0ni0r70r00o0pl08m0fo0jq01q00p00n0li0ze0mbz0az09z06z04z0ck0l05qb0rh0ro0qh0p00p0zp0zo0zo0xp07q00r40t80v70x50yc0x60v60t50p00l00h03d0090f6z06z08z09z0az0az0az08z05z03z03z02001001001000000000001003z05z0fk0s00w30xh0uq0rz0qf0pz0mz0kz0iz0ez0bz0cm0g0ui0zk0zo0zv0nx03y50z50w20u0ns0ws0zu0zw0zy0bz00zb0zg0xa0w03t0zo0si00gp0p03v30yk0xz0wz0wz0wz0wq0t70m00gk0dz0bz0bz0cz0ez0k00o02p0js0zu0zsz0oz0mz0n40oe0me0j00ff0dz0cz0dz0ez0dz0az06z05z0fc0q00w00y40yf0vr0tm0r60o01ie0dz0cz0bz0az08z05z0d90l0cp08o0on0zl0zg0zb007305708u0hh0qn0vo0yn0ya0z00z00w0zt10s60s60s90s20u00t0hp0zj0sfz0cz09z0i02p0ys0zr0zo0zm0zk0zn0rt00w20v70t60s0zr0zp0zm0zjo0fz0cz09z07p06r080dg0zp0ov00x40x70v00t0vr60pf0n60m50j00h0sd0e9006504j02001001001000005d0ih0rf0ve0vc0u00t0zt02s00r00q0zr0zs0zt0zu0zv0zw0ewb0xd0x70wd0vg0uf0vc0w50x70w20v70te0r70p0co0zo0zn0nlz0jz0hz0gz0fz0ez0is0n40r00r0zs0zr0zq00q30q60p30o00o07o20ni0ni0ml0nc0l00j00ia0i60h01e0zb0w7004k03f0ar0j00r30we0xt0xs0wz0uz0rz0oq0ia0ga0en0cz09z09z0az0bz0bz0bz0bz0bz09z07z05z03z02001001000000000000000000000000000000000000000000000000000000000000000000001009p0gz0me0sk0we0w00t0iq0pn0gk04gm0g80n03r02s0zs0zs0zs0zt0zu0zx0jy00z80xd0v80t06s0qsb0tp0vg0vc0wg0vj0uc0s00r0mp0zn0zi0iej0az06z04z0d08m00t50xg0ym0xn0wn0tj0rh0p90n00l0zj07i00h40dz0bz0j00r09w00y00z30z70y90y40x10w00w00u00t00s00r20q50p80nd0kz0hz0dz0az07z05z03z0ea0n00r00r00n00gz0dz0bu0a809z07z06z08z0h0gn00p00p05p0zo0zm0zj0ze00ak06z05z0d0ri0kl03l00k50j02h0zf00bz0az0cz0dz0dz0cz0hz0m60p70o00i00bw0az0az0az08z05z03z03z0a04f0bg0hf10cz0bz0bz0cz0ez0dz0ez0ja0oz0rz0tz0tz0tr0sh0r00p0zl0yg0ad00az07z04z03z04z08t0gk0ns0qs0pl0mg0f01a0061090ze0zi0zm09q70ti0wh0wp0wr0vm0uo0ug0v0gv0zt0ys80u70w70x50w00t09m0zgz0cz0az06z04z06d0h0vo0cq00p00n0ln90oc0o00o0nk0ze0ea0aaz0cz0cz0c0lh0pl02m00l70j80h0ve0zbz09z09z0az0bz0bz09z08z0ge0oi0uu0xu0yr0xk0t00p0bm08m40ob0pe0p30o0zn0zl0zj0zg0xc0b7z05z06z0az0bz09z06z03z04z06z09d0dg0kh0pn0qf0o30j00dk09509g0at0ff0mi0tk0xe0y60z30z30w0ir0rr60va0x90w70ul0q00l0yhw0ez0dz09z07z05r05c0d0yl0jp00p00p0zp00pc0pc0oa0o00o0zo0zn0zn06p90sp0wp0xt0xw0wz0uz0tz0sx0rs0r70r0zr0zp0zk0tg00fo0ds0bv0f0zm0xr0gr00q40n60m00j0zf09cz0bz0cz0dz0ez0dz0cz0cz0f10kd0oi0qr0rk0pa0l00h05e00e10f50g01g0zg0zg0zf0ze0zd0ia707z06z09z0az09t06r04w030030020010040z70zd0zk0zs0tx04y00z80x70t00r0vq0zp00mz0lz0lz0lz0jz0gz0cz07z0bz0l70u80xb0yh0zn0yl0xn0vk0rd0m00i10g10ef0ck0bi0c0zd0ze0ze0zg0zh0zg0zi0xp0hw00y60yb0x90v00u0zv0zw0zx0zx0zw0zw0nx00yb0ze0zo0zq0ym0xh0v90q20p00q00r20r00q20o20n00l50i60gc0gd0j00m0zn0zn0zm00l00k00iz0ez09z05z04z03z02005z0f0jq10wg0yq0xz0xz0vy0rf0ml0h90d00e04h0ek0cq00t90ve0vi0wk0wp0vq0tm0ss0qm0p00o0zo0zm0zl0zj0zf0za50e80j90nh0oo0op0nh0m00l0vl0zl0zl0qjz0hz0fz0ez0g00i00j0gj0zj0zh0zez0bz09z07z0900c0zf0zi0ji05h0gfz0ez0dz0cz0cz0bz0az09z07z0b00h0zn0xr00u90wj0wn0wr0up0rt0ow0mj0ji0i90g20d0bb0090l70b5003e0200100100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ch0mo0rz0sw0rz0nz0lz0pz0vz0x07y0kw0gu00w06ye0xg0w80v70v50vz0sz0pz0mz0lz0nf0pc0rz0sz0uz0uz0uz0uz0tz0tz0tt0ta0s0sqb0mz0iz0hz0jr0m00l00j00h07j05m0zo0sn05k00f60gq0j0zn0zs0hw00x07u0rn0qk60l0zp0zs0zs0zs0zt0av09w0dw00y00y00x00v0jt0qt0mv02w00x00w08v0jt0qu0gv00x10v00t0to0dkz0gz0ez0iz0p0ku02v00u00t10r10q00p00p0rp0zn0dkz0iz0hz0cz09z0bz0hw0ml0p00q0zq0zo0zo0zn0zl0zk0zl0zn0zs0iw00y30x30u06t0tt0zs0zp0zk50n30u00xb0yk0yn0wm0tk0r80q60r80sf0s90r0fo0zi05dz0bz0az0j00p00s00s00s00r00r60ra0p50l0xl00n50ob0mb0j50hk0f00fx0ic0o03r0zq0zl0zg0yca0az08z05z0az0l20tj0xp0xu0wu0uz0tz0sz0sa0u0lv0zu0ws0wp0wo0cr0gu09x00y00y00w02v0cv0pu0tu0ou0ps0zp0zl0zj0qo00s00s08od0iz0ez0fz0hz0gz0dz0bz0h0dpa0vr0wz0wz0wz0vz0sn0p70mg0la0k00g00d80ap08x07y0ap0l02u00x30ya0xb0u00ni0iz0gz0gz0gz0fz0ez0dz0cz0az0az0i00r00w40wh0sl0on0kd0h50f40dd0bq09z0az0dz0ez0dz0bz09z09z0az0az08z07z0az0cz0cz09z07e090zd0zj0zp0vu0hv00u50uh0wf0xa0w00v01t0hr0ct02x00y00x08s0zl20hz0gz0fz0m0bq00r20r50r30s00t0xt0zqz0mz0hz0hz0k02l00i00ef0az08z07z05z03z0200i90tk0xr0xz0wz0tz0qz0kz0fp0bv08z06z09z0dz0k0cp06r80qq0qp0qt0qw0qk0p90o50m00jz0gz0ez0dz0bz07z05z04z04z02002005z0az0cz0dz0cz0hz0n00s30t40u10v01w0ow0ru0rt0uu0nv30w50w20x00y04y0nvy0qz0oz0mz0jz0hz0gz0fz0l00p70ro0sz0rk0q00n0ri00d308c08x0az0h90o0ms07s0gq0zoo0kz0jz0jz0gz0dz0az08z0fz0q40wb0xy0xz0xq0ud0oz0jz0hz0gz0fz0ez0cz0i0zn0zp0yo0un0ul0ll0am00m10l00i07f06a007j07z08z07z05z05z07z09z08z06z0az0eo0gz0gr0kp0oi0s0cu0ou20t40s0rs0zq0zl0zh00fz0ez0ez0l00ua0xx0xz0vz0sz0qu0pg0p0rp0zo0um07il0j30p0jt09u00u07v0hv0st0yp0zk0zj0zm0jt00x70yj0xv0vz0tz0rt0ra0r09qt0nz0lz0jz0jr0md0oc0mz0jz0gz0dz0d90gc0j10k01kz0iz0gz0cz0ay0900c0je00hz0gz0gz0hz0iz0hz0cz08z08z0fo0p00u60vj0un0tl0r00n0kg00co09z05z03z03z04z0d60n03u00we0vq0tn0pg0k80f40b10b00cv0dz0cz0az0az0bz0bz08z05z03z02001001000000000000000000000000000000000000000000000000000000000000000000000000000000000000002005z0dz0p30w70xh0wp0vn0t80p00l00k20kd0jj0ij0ga0e0hc0q9006z04z0200100100100000d0ao0rv0hy02y00z30y20w00t0jr0sr0nu10w10x00w00v00t00s70s70ta0tb0tb0td0qd0m50ia0dc08506h04r06x0gr0pn0un0wj0w00w0ww0zu0xr0yp0zq0ps0et00w00y40y00x0st0zr0zn0zh0zcz0cz0jk0o00q30oc0md0kg0nh0rr0sy0sy0sx0sy0tf0u04v0zx0zx0zw02v00v00y00z03z0ez0hx0pt0zo0zm00m00m00k00gk0bz08z05z03z02001001000004v0d0am06r00t30tf0ul0tp0sz0rm0ug0w30w70t00o0gi0ke00cs09r07j06q05y05z0g0tr0jw01y00y60xe0ui0ob0i03e0g9306z04z0300200100100a0oj0qo0dp01q00p0gn0zn0zn0am30l00l00l03m00l20l00k0diz0fz0cz0az08z08z0bz0fd0jh0ji0ia0g70da0a306104n02002001001001000000000000000000000000002003z05z06z07z0ez0p60vm0wx0vz0wz0yu0zi0z10y0rt0xp0ll03j0bh0zg0zm00t40xp0wy0vz0tz0to0sr0qb0mz0iz0fz0ez0dz0bz0az08z06z04z03z02001001001001001000000002005z06z05z05z06z08z09z0az0az0dz0jg0pk0ts0vz0vt0vo0we0w40w30v30u50tf0rh0pg0mf0i00c507n06z06z04z02002004z04z0300200100100100000000200cr0kc0q20u0zu0zs0gnp0gz0az06z04z0200h60t10xb0yo0zs0zl0xh0ui0se0th0ug0v50v01v0gu0zs0zo0zi0zd0zaz0fz0n60u90xh0yt0zs0yz0wx0se0mz0hz0ez0bz09z05z03z02001001002004z08z0i40o0on0zi0sd0mb90ak09l06u04z0e0oq0dw00y40zd0zh0yk0wh0p05i00b707l05z05z04z0ay0k0dr0is0kq0zm0zh0zgz0l60ob0po0ov0oo0oh0n80k0lg0yc00az08z05z03z0200e0vn0it00w80wd0vk0tk0qa0mb0j10g00c009046044s0300200200100"; /*END*/
-      // ===== The guide: D, the desk quant from the Desk2Quant character kit =====
-      // Light-blue Oxford with rolled sleeves, navy quilted gilet, lanyard with a plain badge, chinos, glasses. He stands
-      // in the lower right (x 760-1060, y 1478-1920), framed from about mid-thigh up, above the scenes and below the HUD
-      // chrome and subtitles. He talks with the narrator's voice (LIPS), breathes, blinks, shifts his weight, and acts each
-      // beat in CUES: he points at the exact chart element the voice names (the arm nearest it, the index finger aimed at
-      // it, the hand kept inside his own zone so it never covers the chart or the chip rail), presents with an open palm on
-      // explanatory phrases, keeps one talking hand, and waves only to sign off. Everything is a pure function of t.
+      // ===== The guide: D, the desk quant from the Desk2Quant character kit, framed as a bust =====
+      // Light-blue Oxford with rolled sleeves, navy quilted gilet, lanyard with a plain badge, glasses. He sits in the lower
+      // right, head and shoulders, the frame's bottom edge cutting him at the chest (above the scenes, below the HUD chrome
+      // and subtitles). He talks with the narrator's voice (LIPS), breathes, blinks and nods on the stressed syllables. When
+      // the voice names a chart element he turns his head to it and looks at it, then back to the viewer; on the key beats he
+      // brings his near hand up beside the shoulder and points at the exact element (the hand kept below the chart, clear of
+      // the chip rail and never in front of his face). He waves only to sign off. Everything is a pure function of t.
       const SVG = document.getElementById("mc-sv");
-      const { V, mk, clamp, lerp, sstep, E, castIn, stand, breathe, lookTrack, facing } = Kit;
+      const { V, mk, clamp, lerp, sstep, E, castIn, stand, breathe, facing } = Kit;
       const G = Gest.G;
 
-      // ---- placement: hair top at y 1550, scale 1.55 (about 600 px hair to sole; the legs run off the frame bottom)
-      const S = 1.55, X0 = 958, HEAD_TOP = 1550, GROUND = HEAD_TOP + 385.8 * S;
-      const ZONE = { x0: 765, x1: 1055, y0: 1491 };             // where his hands may go (the chart ends at y 1478, the chip rail at x 760)
+      // ---- placement: a bust. Kit scale 3.5 (his hair top at y 1500, his face about 80 px wide), centred at x 935; the
+      // frame's bottom edge cuts him at the chest (the badge), his far shoulder runs off the right edge
+      const S = 3.5, X0 = 935, HEAD_TOP = 1500, GROUND = HEAD_TOP + 385.8 * S;
+      // where a raised hand may go: below the chart (it ends at y 1478), clear of the chip rail (x 54-760, y 1484-1690; below
+      // it, only empty background down to the HUD's corner text), inside the frame, and never in front of his face (faceBox)
+      const STAGE_Y = 1500, RAIL_Y = 1716, RAIL_X = 778, LEFT_X = 640, RIGHT_X = 1076;
+      const allowed = (q) => q.y >= STAGE_Y && q.x <= RIGHT_X && (q.y >= RAIL_Y ? q.x >= LEFT_X : q.x >= RAIL_X);
       let NOW = 0;                                             // film time of the frame being drawn (moving targets read it)
 
       // ---- lip sync: three base-36 digits per 1/60 s from the voice (open, wide, round); the mouth opens with the first
@@ -2106,7 +2110,7 @@ Gest.G.presentSide = (z, p, a, sd, m, o) => { const T = typeof o.target === 'fun
       const lipAt = (A, t) => { const f = (t - LIPS_T0) * LIPS_HZ; if (f < 0 || f >= A.length - 1) return 0; const i = Math.floor(f); return lerp(A[i], A[i + 1], f - i); };
 
       // syllables from the same track: each rise out of a dip is a stressed onset; the ones after a pause start a phrase.
-      // They drive the small head nods and the beats of the talking hand, so both stay locked to the voice.
+      // They drive the head nods, so the nods stay locked to the voice.
       const SYL = [], NODS = [];
       {
         const n = LV.length, at = (i) => LV[clamp(i, 0, n - 1)];
@@ -2126,64 +2130,81 @@ Gest.G.presentSide = (z, p, a, sd, m, o) => { const T = typeof o.target === 'fun
       }
       const pulses = (L, t, a, w, d, span) => { let s = 0; for (const [t0, k] of L) { const u = t - t0 + a; if (u <= 0) break; if (u < span) s += k * Math.exp(-u * w) * Math.sin(u * d); } return s; };
       const nodAt = (t) => pulses(NODS, t, 0.04, 8, 22, 0.55);
-      const accentAt = (t) => pulses(SYL, t, 0.05, 7, 16, 0.6);
 
-      // ---- gestures kept inside the zone (composition-local additions to the kit's gesture set)
+      // ---- the raised hand at bust scale (composition-local additions to the kit's gesture set)
       const tgtOf = (o) => (typeof o.target === "function" ? o.target() : o.target);
-      // the rig's arm IK (cast.js ik()), to know where the elbow will be for a wrist position
-      const elbowOf = (A, Tw, l1, l2, bend) => {
-        const dx = Tw.x - A.x, dy = Tw.y - A.y, d = Math.hypot(dx, dy), mx = l1 + l2, soft = 0.08 * mx;
-        const ds = d > mx - soft ? mx - soft * Math.exp(-(d - (mx - soft)) / soft) : d, dd = Math.min(Math.max(ds, Math.abs(l1 - l2) + 0.5), mx - 0.01);
-        const th = Math.atan2(dy, dx), a = Math.acos(Math.min(1, Math.max(-1, (l1 * l1 + dd * dd - l2 * l2) / (2 * l1 * dd))));
-        const c = Math.cos(th), s = Math.sin(th), h = l1 * Math.sin(a) * bend, f = l1 * Math.cos(a);
-        return V(A.x + f * c + h * s, A.y + f * s - h * c);
-      };
-      // a hand with its wrist at W, aimed at angle th, fingers L long, half as wide as hw, and its elbow (sleeve radius er):
-      // inside the zone?
-      const inZ = (q, r) => q.x - r >= ZONE.x0 && q.x + r <= ZONE.x1 && q.y - r >= ZONE.y0;
-      const fits = (W, th, L, hw, El, er) => {
+      // his face, from the pose: a hand must stay left of it (x < x0) unless it is below his chin (y > y1)
+      const faceBox = (z, p) => { const H = Gest.headPt(z, p, 0, 0), u = Cast.K * S * Cast.HS; return { x0: H.x - 33 * u, y1: H.y + 40 * u }; };
+      // how far a hand (wrist at W, aimed at angle th, L long and 2 hw wide) reaches outside the allowed region, in px summed
+      // over sampled points (0 = it fits): onto the chart, past the frame edge, onto the chip rail, or in front of his face
+      const intrusion = (W, th, L, hw, fb) => {
         const c = Math.cos(th), s = Math.sin(th);
-        return [W, V(W.x + c * L, W.y + s * L), V(W.x + c * L * 0.55 - s * hw, W.y + s * L * 0.55 + c * hw), V(W.x + c * L * 0.55 + s * hw, W.y + s * L * 0.55 - c * hw)]
-          .every((q) => inZ(q, 0)) && (!El || inZ(El, er));
+        let v = 0;
+        for (const [f, w] of [[0, 0], [1, 0], [0.8, 0.45], [0.8, -0.45], [0.55, 1], [0.55, -1], [0.25, 1], [0.25, -1]]) {
+          const x = W.x + c * L * f - s * hw * w, y = W.y + s * L * f + c * hw * w;
+          v += Math.max(0, STAGE_Y - y) + Math.max(0, x - RIGHT_X);
+          if (y < RAIL_Y && x < RAIL_X) v += Math.min(RAIL_X - x, RAIL_Y - y + Math.max(0, LEFT_X - x)); else if (y >= RAIL_Y) v += Math.max(0, LEFT_X - x);
+          if (x > fb.x0 && y < fb.y1) v += Math.min(x - fb.x0, fb.y1 - y);
+        }
+        return v;
       };
-      // the longest reach r in [lo, hi] at which the hand (and the elbow) still fit: the reach shrinks toward the shoulder
-      const fitReach = (at, aim, L, hw, lo, hi, elb, er) => {
-        const ok = (r) => { const W = at(r); return fits(W, aim(W), L, hw, elb ? elb(W) : null, er); };
-        if (ok(hi)) return hi;
-        for (let k = 0; k < 16; k++) { const r = (lo + hi) / 2; if (ok(r)) lo = r; else hi = r; }
-        return lo;
+      // pointB: the near hand up beside the shoulder, the index finger aimed at the target. The wrist sits on an arc round
+      // the outer side of the shoulder (clear of the joint), from beside it (out and a little up) to down and out; it
+      // takes the first spot on that arc where the whole hand fits for every position the element takes during the beat
+      // (o.place), so a target far up and to the left brings the hand lower and further in, and a moving element (a dot
+      // rising, a sweep along the strikes) is followed by the finger alone. If no spot fits, the one that intrudes least.
+      const ARC = [-20 * Math.PI / 180, 70 * Math.PI / 180], ARC_R = [15, 24];
+      G.pointB = (z, p, a, sd, m, o) => {
+        const T = tgtOf(o), Sh = m.sh[a], fb = faceBox(z, p), L = 38 * m.s, hw = 8 * m.s;
+        const at = (u) => { const q = lerp(ARC[0], ARC[1], u), r = lerp(ARC_R[0], ARC_R[1], u) * m.s; return V(Sh.x + sd * Math.cos(q) * r, Sh.y + Math.sin(q) * r); };
+        const aim = (W) => Math.atan2(T.y - W.y, T.x - W.x);
+        const PL = o.place || [T], vio = (u) => { const W = at(u); let v = 0; for (const P of PL) v = Math.max(v, intrusion(W, Math.atan2(P.y - W.y, P.x - W.x), L, hw, fb)); return v; };
+        const N = 40, vs = []; for (let k = 0; k <= N; k++) vs.push(vio(k / N));
+        let u, k0 = vs.findIndex((v) => v <= 0);
+        if (k0 >= 0) {
+          u = k0 / N;
+          if (k0 > 0) { let lo = (k0 - 1) / N, hi = u; for (let j = 0; j < 14; j++) { const mid = (lo + hi) / 2; if (vio(mid) <= 0) hi = mid; else lo = mid; } u = hi; }
+        } else {
+          let kb = 0; vs.forEach((v, k) => { if (v < vs[kb]) kb = k; });
+          let lo = Math.max(0, (kb - 1) / N), hi = Math.min(1, (kb + 1) / N);
+          for (let j = 0; j < 24; j++) { const m1 = lo + (hi - lo) / 3, m2 = hi - (hi - lo) / 3; if (vio(m1) <= vio(m2)) hi = m2; else lo = m1; }
+          u = (lo + hi) / 2;
+        }
+        const W = at(u);
+        return { hand: W, hb: sd, pose: "point", aim: aim(W), aimW: 1, face: [0, 1, 0.3], faceW: 1 };
       };
-      // pointZ: the index finger aimed exactly at the target. The arm rises along the line to it, capped at maxEl (so a high
-      // target never turns into a raised hand) and only as far as the zone allows; the finger is then re-aimed at the target.
-      G.pointZ = (z, p, a, sd, m, o) => {
-        const T = tgtOf(o), Sh = m.sh[a], dx = T.x - Sh.x, dy = T.y - Sh.y, el = Math.atan2(-dy, Math.abs(dx));
-        const sx = Math.abs(dx) < 0.18 * Math.abs(dy) ? sd : Math.sign(dx), elA = Math.min(el, o.maxEl ?? 0.88);
-        const u = V(sx * Math.cos(elA), -Math.sin(elA)), drop = (o.drop || 0) * m.s;
-        const at = (r) => V(Sh.x + u.x * r, Sh.y + u.y * r + drop), aim = (W) => Math.atan2(T.y - W.y, T.x - W.x), hb = o.hb ?? -sd * 0.3;
-        const elb = (W) => elbowOf(Sh, W, z.L.U * m.s, z.L.F * m.s, hb);
-        const W = at(fitReach(at, aim, 42 * m.s, 9 * m.s, 20 * m.s, 120 * m.s * (o.reach ?? 0.84), elb, 11 * m.s));
-        return { hand: W, hb, pose: "point", aim: aim(W), aimW: 1, face: [0, 1, 0.3], faceW: 1 };
+      // waveB: the open hand up beside his cheek, palm to the viewer (the sign-off); the fingers a little closer and the thumb
+      // in, so the hand stays clear of his face
+      Hand.POSES.waveB = { c: [0.02, 0, 0.02, 0.06], s: 0.38, ta: 0.42, to: 0.24, tc: 0.08, fx: -0.14 };
+      G.waveB = (z, p, a, sd, m, o) => {
+        const Sh = m.sh[a];
+        return { hand: V(Sh.x - sd * (o.dx ?? 2) * m.s, Sh.y - (o.up ?? 12) * m.s), hb: sd, pose: "waveB", aim: -Math.PI / 2 + sd * 0.05, aimW: 1, face: [0, 0, 1], faceW: 1 };
       };
-      // presentZ: an open palm out to the side at chest height, turned toward the target, pulled in until it fits the zone
-      G.presentZ = (z, p, a, sd, m, o) => {
-        const T = tgtOf(o), Sh = m.sh[a], dx = T.x - Sh.x, dy = T.y - Sh.y, dir = Math.sign(dx) || sd;
-        const el = Math.atan2(-dy, Math.abs(dx)), k = Math.max(-0.5, Math.min(1, el / 0.6)), e = Math.max(-0.35, Math.min(0.42, el));
-        const th = Math.atan2(-Math.sin(e), dir * Math.cos(e));
-        const at = (r) => V(Sh.x + dir * 72 * r * m.s, Sh.y + (44 - 24 * k) * m.s + (o.drop || 0) * m.s), hb = o.hb ?? -sd;
-        const elb = (W) => elbowOf(Sh, W, z.L.U * m.s, z.L.F * m.s, hb);
-        const W = at(fitReach(at, () => th, 40 * m.s, 12 * m.s, 0.05, o.reach ?? 1, elb, 11 * m.s));
-        return { hand: W, hb, pose: "offer", aim: th, aimW: 1, face: [dir * 0.45, -1, 0.5], faceW: 1 };
-      };
-
-      // flatZ: a flat hand, palm down, marking a level at his side ("flat", "never"); o.dy: how far below the shoulder;
-      // o.glide() (0..1) slides it outward, a slow horizontal sweep
-      G.flatZ = (z, p, a, sd, m, o) => {
-        const Sh = m.sh[a], k = o.glide ? o.glide() : 0, th = sd > 0 ? -0.06 : Math.PI + 0.06, hb = -sd;
-        const at = (r) => V(Sh.x + sd * (30 + 30 * k) * r * m.s, Sh.y + (o.dy ?? 66) * m.s);
-        const elb = (W) => elbowOf(Sh, W, z.L.U * m.s, z.L.F * m.s, hb);
-        const W = at(fitReach(at, () => th, 40 * m.s, 10 * m.s, 0.2, 1, elb, 11 * m.s));
-        return { hand: W, hb, pose: "blade", aim: th, aimW: 1, face: [0, 1, 0.3], faceW: 1 };
-      };
+      // waveLow: the same open hand lower, in front of the chest: the hand passes through it on the way up and down, so it
+      // rises and falls straight, clear of the chip rail
+      G.waveLow = (z, p, a, sd, m) => Object.assign(G.waveB(z, p, a, sd, m, { dx: 6, up: -30 }), { pose: "waveB" });
+      // idleB: the near arm hangs relaxed, the hand a little out from his side (below the frame). Every spot the hand takes
+      // (idle, pointing, waving) keeps the elbow on the same side of the shoulder-to-hand line, so the arm never has to
+      // flip its bend on the way between them
+      G.idleB = (z, p, a, sd, m) => ({ hand: V(m.sh[a].x + sd * 26 * m.s, m.sh[a].y + 92 * m.s), hb: sd, pose: "rest", face: [-sd, 0.1, 0.35], faceW: 1 });
+      // the near arm at bust scale: the elbow stays down, under the shoulder (below the frame unless the hand is up by his
+      // cheek), and the forearm rises from it to the hand. The rig's two-bone IK swings the elbow out sideways when the hand
+      // comes up beside the shoulder, so it is given the segment lengths that put the elbow here instead (a segment reaching
+      // toward the camera draws a little shorter) and the bend that keeps it on this side.
+      // (ww: how far into the wave the arm is. For the wave the elbow drops straight down a little in front of the chest, so
+      // the forearm rises in front of the body to the hand beside the face and the arm never lines up through the shoulder)
+      function elbowDown(p, a, z, ww) {
+        const Sh = Gest.marks(z, p).sh[a], W = p.hand[a], sd = a === 0 ? -1 : 1, UP = z.L.U * S, FP = z.L.F * S;
+        const smin = (u, v, k) => (u + v - Math.sqrt((u - v) * (u - v) + k * k)) / 2;      // a smooth min: the elbow starts to rise gently
+        const E0 = V(lerp(lerp(Sh.x, W.x, 0.3) + sd * 6 * S, Sh.x - sd * 8 * S, ww), smin(W.y + 0.96 * FP, Sh.y + 0.98 * UP, 70));
+        const d = Math.hypot(W.x - Sh.x, W.y - Sh.y) || 1, c = (W.x - Sh.x) / d, s = (W.y - Sh.y) / d;
+        const side = (E0.x - Sh.x) * s - (E0.y - Sh.y) * c;
+        ["fu", "ff", "hb"].forEach((k) => { p[k] = (p[k] || [1, 1]).slice(); });
+        // the bend's sign puts the IK's elbow exactly here. Folded, that is seamless where the elbow crosses the shoulder-wrist
+        // line; nearly straight, the rig softens the reach and the two sides differ, so there the bend fades through zero
+        const l1 = Math.hypot(E0.x - Sh.x, E0.y - Sh.y), l2 = Math.hypot(W.x - E0.x, W.y - E0.y), ext = sstep(0.84, 0.92, d / (l1 + l2));
+        p.fu[a] = l1 / UP; p.ff[a] = l2 / FP; p.hb[a] = clamp(side / Math.max(1e-3, 0.1 * UP * ext), -1, 1);
+      }
 
       // ---- what he points at: chart elements in frame px, from the scene code (work/scenes/sN.js); some move with the scene
       // (t: film time, c: the beat's cue time; the scene's own timings, relative to the cue)
@@ -2226,96 +2247,107 @@ Gest.G.presentSide = (z, p, a, sd, m, o) => { const T = typeof o.target === 'fun
         s14rows: V(640, 760),                                     // s14: save / share / follow
       };
 
-      // ---- the beats (CUES names): arm 0 works the chart (screen-left, nearest it), arm 1 rests across the belt.
-      // a0/a1: [gesture, move seconds, options]; at: the target; lead: the move starts this long before the cue so it lands
-      // on the word; face: [expression, weight] (blended from neutral), fd: its delay; look: "cam" | "tgt" | a target key;
-      // turn: "cam" (toward the viewer) | "chart"; beats: the talking hand rides the stressed syllables; shake: a small
-      // head shake ("never"); wave: the sign-off wave
+      // ---- the beats (CUES names). hand: "point" (the near hand, arm 0) | "wave"; at: the target; lead: the head (and the
+      // hand) start this long before the cue so they land on the word; face: [expression, weight] (blended from neutral),
+      // fd: its delay; look: he turns his head to the target (lookMax: how long, at most, before he turns back to the
+      // viewer); ask: a questioning tilt of the head; shake: a small head shake ("never")
       const BEAT = {
-        hello:        { a1: ["homeOpen", 0.5, { hb: 0.55 }], lead: 0, face: ["smile", 0.3], look: "cam", turn: "cam" },
-        showOneVol:   { a0: ["presentZ", 0.5], at: "s1line", lead: 0.3, face: ["focus", 0.2], look: "tgt", turn: "chart" },
-        talk:         { a0: ["explain", 0.45], lead: 0.2, face: ["smile", 0.12], look: "cam", turn: "cam", beats: 1 },
-        showQuotes:   { a0: ["presentZ", 0.5], at: "s2quotes", lead: 0.3, face: ["focus", 0.25], look: "tgt", turn: "chart" },
-        askYou:       { a0: ["you", 0.45], lead: 0.25, face: ["stuck", 0.35], look: "cam", turn: "cam" },
-        watchChart:   { at: "s3chart", lead: 0.1, face: ["focus", 0.25], look: "tgt", turn: "chart" },
-        pointCrash:   { a0: ["pointZ", 0.5], at: "s3crash", lead: 0.36, face: ["focus", 0.45], look: "tgt", turn: "chart" },
-        showBell:     { a0: ["presentZ", 0.5], at: "s4band", lead: 0.3, face: ["smile", 0.12], look: "tgt", turn: "chart" },
-        watchRuler:   { at: "s4ruler", lead: 0.1, face: ["focus", 0.3], look: "tgt", turn: "chart" },
-        pointSigma:   { a0: ["pointZ", 0.5], at: "s4pin", lead: 0.45, face: ["wow", 0.58], look: "tgt", turn: "chart" },
-        showNormal:   { a0: ["presentZ", 0.5], at: "s5bell", lead: 0.3, face: ["smile", 0.12], look: "tgt", turn: "chart" },
-        never:        { a0: ["flatZ", 0.42, { dy: 92 }], glide: [0.05, 0.5], lead: 0.18, face: ["focus", 0.3], look: "cam", turn: "cam", shake: 1 },
-        pointDid:     { a0: ["pointZ", 0.5], at: "s6dot", lead: 0.08, face: ["wow", 0.6], fd: 0.38, look: "tgt", turn: "chart" },
-        showFat:      { a0: ["presentZ", 0.5], at: "s6fat", lead: 0.3, face: ["focus", 0.25], look: "tgt", turn: "chart" },
-        askWhat:      { a0: ["explainHi", 0.45], lead: 0.2, face: ["stuck", 0.3], look: "cam", turn: "cam" },
-        pointPayoff:  { a0: ["pointZ", 0.5], at: "s7payoff", lead: 0.3, face: ["focus", 0.35], look: "tgt", turn: "chart" },
-        showPrice:    { a0: ["presentZ", 0.5], at: "s7price", lead: 0.28, face: ["smile", 0.15], look: "tgt", turn: "chart" },
-        showSolve:    { a0: ["presentZ", 0.5], at: "s8newton", lead: 0.3, face: ["focus", 0.3], look: "tgt", turn: "chart" },
-        pointRoot:    { a0: ["pointZ", 0.5], at: "s8root", lead: 0.36, face: ["focus", 0.25], look: "tgt", turn: "chart" },
-        pointPaths:   { a0: ["pointZ", 0.5], at: "s9fan", lead: 0.3, face: ["focus", 0.2], look: "tgt", turn: "chart" },
-        pointCrashes: { a0: ["pointZ", 0.5], at: "s9crash", lead: 0.32, face: ["focus", 0.35], look: "tgt", turn: "chart" },
-        sweepStrikes: { a0: ["pointZ", 0.45], at: "s10strikes", lead: 0.3, face: ["focus", 0.35], look: "tgt", turn: "chart" },
-        showMillion:  { a0: ["presentZ", 0.5], at: "s10million", lead: 0.3, face: ["smile", 0.15], look: "tgt", turn: "chart" },
-        watchSmile:   { at: "s11chart", lead: 0.1, face: ["focus", 0.2], look: "tgt", turn: "chart" },
-        pointAtm:     { a0: ["pointZ", 0.5], at: "s11atm", lead: 0.38, face: ["focus", 0.3], look: "tgt", turn: "chart" },
-        point90:      { a0: ["pointZ", 0.5], at: "s11k90", lead: 0.32, face: ["focus", 0.3], look: "tgt", turn: "chart" },
-        point80:      { a0: ["pointZ", 0.5], at: "s11k80", lead: 0.32, face: ["focus", 0.35], look: "tgt", turn: "chart" },
-        showSmile:    { a0: ["presentZ", 0.5], at: "s11smile", lead: 0.3, face: ["smile", 0.15], look: "tgt", turn: "chart" },
-        smile:        { lead: 0.05, face: ["smile", 0.8], look: "cam", turn: "cam" },
-        pointAnswer:  { a0: ["pointZ", 0.5], at: "s12answer", lead: 0.12, face: ["smile", 0.12], look: "tgt", turn: "chart" },
-        flatAcross:   { a0: ["flatZ", 0.45, { dy: 64 }], glide: [0.1, 0.7], at: "s12flat", lead: 0.3, face: ["smile", 0.12], look: "tgt", turn: "chart" },
-        pointTail:    { a0: ["pointZ", 0.5], at: "s13tail", lead: 0.34, face: ["focus", 0.3], look: "tgt", turn: "chart" },
-        pointLowK:    { a0: ["pointZ", 0.5], at: "s13low", lead: 0.3, face: ["focus", 0.3], look: "tgt", turn: "chart" },
-        traceRise:    { a0: ["pointZ", 0.5], at: "s13rise", lead: 0.3, face: ["smile", 0.15], look: "tgt", turn: "chart" },
-        pointComment: { a0: ["pointZ", 0.5], at: "s14comment", lead: 0.25, face: ["smile", 0.2], look: "tgt", turn: "chart" },
-        you:          { a0: ["you", 0.45], lead: 0.22, face: ["smile", 0.35], look: "cam", turn: "cam" },
-        showSheet:    { a0: ["presentZ", 0.5], at: "s14sheet", lead: 0.28, face: ["smile", 0.25], look: "tgt", turn: "chart" },
-        showRows:     { a0: ["presentZ", 0.5], at: "s14rows", lead: 0.28, face: ["smile", 0.2], look: "tgt", turn: "chart" },
-        wave:         { a0: ["wave", 0.5], lead: 0.18, face: ["smile", 0.6], look: "cam", turn: "cam", wave: 1 },
+        hello:        { face: ["smile", 0.32] },
+        showOneVol:   { at: "s1line", lead: 0.25, face: ["focus", 0.2], look: 1 },
+        talk:         { face: ["smile", 0.14] },
+        showQuotes:   { at: "s2quotes", lead: 0.25, face: ["focus", 0.25], look: 1 },
+        askYou:       { face: ["stuck", 0.35], ask: 1 },
+        watchChart:   { at: "s3chart", lead: 0.15, face: ["focus", 0.25], look: 1 },
+        pointCrash:   { hand: "point", at: "s3crash", lead: 0.36, face: ["focus", 0.45], look: 1 },
+        showBell:     { at: "s4band", lead: 0.25, face: ["smile", 0.12], look: 1 },
+        pointSigma:   { hand: "point", at: "s4pin", lead: 0.45, face: ["wow", 0.58], look: 1 },
+        showNormal:   { at: "s5bell", lead: 0.25, face: ["smile", 0.12], look: 1 },
+        never:        { face: ["focus", 0.3], shake: 1 },
+        pointDid:     { hand: "point", at: "s6dot", lead: 0.08, face: ["wow", 0.6], fd: 0.38, look: 1 },
+        showFat:      { at: "s6fat", lead: 0.25, face: ["focus", 0.25], look: 1 },
+        askWhat:      { face: ["stuck", 0.3], ask: 1 },
+        pointPayoff:  { hand: "point", at: "s7payoff", lead: 0.3, face: ["focus", 0.35], look: 1 },
+        showPrice:    { at: "s7price", lead: 0.25, face: ["smile", 0.15], look: 1 },
+        showSolve:    { at: "s8newton", lead: 0.25, face: ["focus", 0.3], look: 1 },
+        pointRoot:    { hand: "point", at: "s8root", lead: 0.36, face: ["focus", 0.25], look: 1 },
+        pointPaths:   { hand: "point", at: "s9fan", lead: 0.3, face: ["focus", 0.2], look: 1 },
+        pointCrashes: { hand: "point", at: "s9crash", lead: 0.32, face: ["focus", 0.35], look: 1 },
+        sweepStrikes: { hand: "point", at: "s10strikes", lead: 0.3, face: ["focus", 0.35], look: 1 },
+        showMillion:  { at: "s10million", lead: 0.25, face: ["smile", 0.15], look: 1 },
+        watchSmile:   { at: "s11chart", lead: 0.15, face: ["focus", 0.2], look: 1 },
+        pointAtm:     { hand: "point", at: "s11atm", lead: 0.38, face: ["focus", 0.3], look: 1 },
+        point90:      { hand: "point", at: "s11k90", lead: 0.32, face: ["focus", 0.3], look: 1 },
+        point80:      { hand: "point", at: "s11k80", lead: 0.32, face: ["focus", 0.35], look: 1 },
+        showSmile:    { at: "s11smile", lead: 0.25, face: ["smile", 0.15], look: 1 },
+        smile:        { face: ["smile", 0.8] },
+        pointAnswer:  { hand: "point", at: "s12answer", lead: 0.12, face: ["smile", 0.12], look: 1 },
+        flatAcross:   { at: "s12flat", lead: 0.2, face: ["smile", 0.12], look: 1 },
+        pointTail:    { hand: "point", at: "s13tail", lead: 0.34, face: ["focus", 0.3], look: 1 },
+        pointLowK:    { hand: "point", at: "s13low", lead: 0.3, face: ["focus", 0.3], look: 1 },
+        traceRise:    { hand: "point", at: "s13rise", lead: 0.3, face: ["smile", 0.15], look: 1 },
+        pointComment: { hand: "point", at: "s14comment", lead: 0.25, face: ["smile", 0.2], look: 1, lookMax: 1.0 },
+        showSheet:    { at: "s14sheet", lead: 0.2, face: ["smile", 0.25], look: 1, lookMax: 0.8 },
+        showRows:     { face: ["smile", 0.25] },
+        wave:         { hand: "wave", lead: 0.3, face: ["smile", 0.6] },
       };
       const BASE_FACE = ["smile", 0.12];                          // between beats: neutral, a little warmth
-      const IDLE = ["rest", "home"];                              // arm 0 hangs, arm 1 rests across the belt
-      const FACE_TURN = { cam: -0.06, chart: -0.2 };              // body facing (front view; negative turns him toward the chart)
+      const POINT = "pointB", HAND_UP = 0.5, HAND_DOWN = 0.6;      // raise and lower times (s)
+      const F_BODY = -0.1, HF_CAM = -0.08, HF_CHART = -0.5, HT = 0.45;   // facing: body, head to the viewer / to the chart (3/4), turn time
 
       // ---- build the tracks from CUES: [time, beat, seconds held, hop (unused: he does not hop)]
       const cues = CUES.map(([t, name, hold]) => ({ t, name, hold, b: BEAT[name] || {} })).sort((a, b) => a.t - b.t);
       const startOf = (c) => Math.max(0, c.t - (c.b.lead || 0));
-      const keys = [[[0, IDLE[0], 0.5, {}]], [[0, IDLE[1], 0.5, {}]]];
-      const faceK = [[0, BASE_FACE[0], BASE_FACE[1]]], lookK = [[0, V(0, 1)]], turnK = [[0, FACE_TURN.cam]];
-      const acc = [], waves = [], shakes = [];
+      const nextStart = (i) => (i + 1 < cues.length ? startOf(cues[i + 1]) : 1e9);
+      const IDLE = "idleB";                                       // the near arm idles hanging, the hand below the frame
+      const keys = [[[0, IDLE, 0.5, {}]], [[0, "rest", 0.5, {}]]];
+      const faceK = [[0, BASE_FACE[0], BASE_FACE[1]]], waves = [], shakes = [], asks = [];
       const lookAt = (P, from) => { const dx = P.x - from.x, dy = P.y - from.y, l = Math.hypot(dx, dy) || 1; return V(7 * dx / l, 7 * dy / l); };
-      const HEAD = V(X0 - 6, HEAD_TOP + 50);
+      const HEAD = V(X0, HEAD_TOP + 90);
+      const tfOf = (c) => { const tg = c.b.at ? TG[c.b.at] : null; return typeof tg === "function" ? ((f, tc) => () => f(NOW, tc))(tg, c.t) : tg; };
+      const looks = [];
       cues.forEach((c, i) => {
-        const b = c.b, t0 = startOf(c), next = i + 1 < cues.length ? startOf(cues[i + 1]) : 1e9, end = Math.min(c.t + c.hold, next - 0.05);
-        const target = b.at ? TG[b.at] : null;
-        const tf = typeof target === "function" ? ((f, tc) => () => f(NOW, tc))(target, c.t) : target;
-        [0, 1].forEach((a) => {
-          const K = keys[a], g = b["a" + a], last = K[K.length - 1];
-          if (g) {
-            const gl = b.glide ? ((tc, g0, gd) => () => E.s(clamp((NOW - tc - g0) / gd, 0, 1)))(c.t, b.glide[0], b.glide[1]) : null;
-            K.push([t0, g[0], g[1], Object.assign({ target: tf, glide: gl }, g[2] || {})]);
-            if (end < next - 0.6) K.push([end, IDLE[a], 0.55, {}]);
-            if (b.beats) acc.push([a, t0 + g[1], end]);
-          } else if (last[1] !== IDLE[a]) K.push([t0, IDLE[a], 0.5, {}]);
-        });
+        const b = c.b, t0 = startOf(c), next = nextStart(i), end = Math.min(c.t + c.hold, next - 0.05), tf = tfOf(c), K = keys[0];
+        if (b.hand === "point") {
+          // where the element is over the beat (a moving one is sampled), for the hand's spot
+          const raw = TG[b.at], place = typeof raw === "function" ? Array.from({ length: 13 }, (_, k) => raw(lerp(t0, end, k / 12), c.t)) : [raw];
+          // from one point to the next the hand travels round the shoulder (a bowed path), not across the joint; up from
+          // and down to the belt it travels straight
+          K.push([t0, POINT, HAND_UP, { target: tf, place, bow: K[K.length - 1][1] === POINT ? 0.3 : 0 }]);
+          if (end < next - 0.6) K.push([end, IDLE, HAND_DOWN, { bow: 0 }]);
+        } else if (b.hand === "wave") {
+          K.push([t0, "waveLow", 0.32, { bow: 0 }], [t0 + 0.32, "waveB", 0.3, { bow: 0 }]); waves.push([t0 + 0.62, end]);
+          K.push([end, "waveLow", 0.3, { bow: 0 }], [end + 0.3, IDLE, 0.45, { bow: 0 }]);
+        } else if (K[K.length - 1][1] !== IDLE) K.push([t0, IDLE, HAND_DOWN, { bow: 0 }]);
         const tf0 = c.t + (b.fd || 0), fk = b.face || BASE_FACE;
         if (tf0 - faceK[faceK.length - 1][0] < 0.3) faceK.pop();
         faceK.push([tf0, fk[0], fk[1]]);
         if (end < next - 0.4) faceK.push([end + 0.1, BASE_FACE[0], BASE_FACE[1]]);
-        const lk = b.look === "tgt" && tf ? (typeof tf === "function" ? "fn" : lookAt(tf, HEAD)) : V(0, 1);
-        lookK.push([b.look === "tgt" ? t0 : c.t, lk === "fn" ? tf : lk]);
-        if (b.look === "tgt" && end < next - 0.4) lookK.push([end + 0.15, V(0, 1)]);
-        turnK.push([t0, FACE_TURN[b.turn || "cam"], 0.6]);
-        if (b.wave) waves.push([t0 + b.a0[1], end]);
+        if (b.look && tf) looks.push([t0, Math.min(c.t + clamp(c.hold, 0.8, b.lookMax || 1.5), next - 0.05), tf]);
         if (b.shake) shakes.push(c.t);
-        // the ending: after the wave the hands come home and he holds a warm smile to the camera
+        if (b.ask) asks.push([c.t - 0.1, end]);
+        // the ending: after the wave the hand comes down and he holds a warm smile to the viewer
         if (i === cues.length - 1) { faceK.pop(); faceK.push([end + 0.1, "smile", 0.35]); }
       });
-      [keys[0], keys[1], faceK, lookK, turnK].forEach((K) => K.sort((p, q) => p[0] - q[0]));
-      // body turns need room to finish: drop a turn that repeats the last one or comes too soon after it
-      for (let k = turnK.length - 1; k > 0; k--) if (turnK[k][1] === turnK[k - 1][1]) turnK.splice(k, 1);
-      for (let k = 1; k < turnK.length; k++) if (turnK[k][0] - turnK[k - 1][0] < 0.7) { turnK.splice(k, 1); k--; }
-      for (let k = turnK.length - 1; k > 0; k--) if (turnK[k][1] === turnK[k - 1][1]) turnK.splice(k, 1);
+      [keys[0], faceK].forEach((K) => K.sort((p, q) => p[0] - q[0]));
 
+      // ---- where he looks: chart looks merged when the gap between them is short; the head turns to 3/4 for each run of
+      // them and back to the viewer after; the eyes follow each beat's element (a moving element is followed)
+      const runs = [];
+      for (const L of looks) { const r = runs[runs.length - 1]; if (r && L[0] - r.t1 < 0.9) { r.t1 = Math.max(r.t1, L[1]); r.items.push(L); } else runs.push({ t0: L[0], t1: L[1], items: [L] }); }
+      runs.forEach((r) => { r.t1 = Math.max(r.t1, r.t0 + HT + 0.3); });
+      const headK = [[0, HF_CAM]], lookK = [[0, V(0, 1)]];
+      runs.forEach((r) => {
+        headK.push([r.t0, HF_CHART, HT]); headK.push([r.t1, HF_CAM, HT]);
+        r.items.forEach((L) => lookK.push([L[0], typeof L[2] === "function" ? L[2] : lookAt(L[2], HEAD)]));
+        lookK.push([r.t1, V(0, 1)]);
+      });
+      const headTurn = facing(headK);
+      function look(t) {
+        let i = 0; while (i < lookK.length - 1 && t >= lookK[i + 1][0]) i++;
+        const val = (k) => (typeof lookK[k][1] === "function" ? lookAt(lookK[k][1](), HEAD) : lookK[k][1]);
+        if (i === 0) return val(0);
+        return Kit.mixV(val(i - 1), val(i), E.io(clamp((t - lookK[i][0]) / 0.12, 0, 1)));
+      }
       // ---- expressions: [t, name, weight] blended from neutral; a change of expression passes through neutral
       const FD = 0.28;
       function face(t) {
@@ -2326,70 +2358,72 @@ Gest.G.presentSide = (z, p, a, sd, m, o) => { const T = typeof o.target === 'fun
         if (n0 === n1) return { expr: "neutral", expr2: n1, exprU: lerp(w0, w1, e) };
         return e < 0.5 ? { expr: "neutral", expr2: n0, exprU: w0 * (1 - 2 * e) } : { expr: "neutral", expr2: n1, exprU: w1 * (2 * e - 1) };
       }
-      // ---- eyes: saccades between the viewer and the target (a moving target is followed)
-      function look(t) {
-        let i = 0; while (i < lookK.length - 1 && t >= lookK[i + 1][0]) i++;
-        const val = (k) => (typeof lookK[k][1] === "function" ? lookAt(lookK[k][1](), HEAD) : lookK[k][1]);
-        if (i === 0) return val(0);
-        return Kit.mixV(val(i - 1), val(i), E.io(clamp((t - lookK[i][0]) / 0.12, 0, 1)));
-      }
-      const turn = facing(turnK);
-      // blinks: a natural track, plus one now and then as the eyes jump between the viewer and the chart
-      const BL = Motion.blinkTrack(11, 0.3, DUR);
-      lookK.forEach(([t], k) => { if (k > 0 && k % 3 === 0 && BL.every((b) => Math.abs(b - t) > 1.2)) BL.push(t + 0.02); });
-      BL.sort((a, b) => a - b);
+      // ---- blinks: a natural track, minus any blink close to the one he makes as his head turns (Motion.turn blinks as
+      // the head drawing swaps)
+      const SWAP = headK.slice(1).map((k, i) => Motion.turn(k[0], k[0], HT, headK[i][1], k[1]).blinkT).filter((x) => x != null);
+      const BL = Motion.blinkTrack(11, 0.3, DUR).filter((b) => SWAP.every((w) => Math.abs(b - w) > 0.9));
       const blinkAt = (t) => { let b = 1; for (const c of BL) { if (c > t + 0.1) break; if (c > t - 0.25) b = Math.min(b, Motion.blink(t, [c])); } return b; };
+      // ---- nods: a small dip of the head on each stressed phrase onset (a pitch, drawn as the head moving down and
+      // foreshortening a little), plus the kit's gentle roll accent
+      const nodBump = (t) => { let s = 0; for (const [t0, k] of NODS) { const u = t - t0 + 0.02; if (u <= 0) break; if (u < 0.7) s += k * (u / 0.12) * Math.exp(1 - u / 0.12); } return Math.min(1.2, s); };
+
+      // how far into the wave the near arm is (0..1), from its keys, blended over each move as Gest.track blends it
+      const isWave = (n) => n === "waveB" || n === "waveLow";
+      function waveW(t) {
+        const K = keys[0]; let i = 0; while (i < K.length - 1 && t >= K[i + 1][0]) i++;
+        const [t1, n1, d1] = K[i], c = isWave(n1) ? 1 : 0;
+        if (i === 0 || t >= t1 + d1) return c;
+        return lerp(isWave(K[i - 1][1]) ? 1 : 0, c, sstep(0, 1, (t - t1) / d1));
+      }
 
       // ---- the figure
       const DQ = castIn(mk("g", {}, SVG), "D");
       const gest = [0, 1].map((a) => Gest.track(DQ, keys[a], a));
       function poseAt(t) {
         NOW = t;
-        const T = turn(t), xp = face(t), br = breathe(t, 0.4) * 2.4 * S / 1.75;
+        const H = headTurn(t), xp = face(t), br = breathe(t, 0.4) * 1.2 * S / 1.75;
         const sway = 2.0 * Math.sin((2 * Math.PI * t) / 6.7) + 0.9 * Math.sin((2 * Math.PI * t) / 3.9 + 1.3);
-        // "never": a small, slow shake of the head (a roll: the front-view head is one drawing)
-        let shake = 0;
-        for (const c of shakes) { const u = t - c; if (u > 0 && u < 0.9) shake += 0.03 * Math.sin(2 * Math.PI * 2.2 * u) * Math.sin(Math.PI * u / 0.9); }
-        const p = stand(DQ, X0 + sway, GROUND, S, { f: T.f, hf: T.hf, smear: T.smear, headSmear: T.headSmear,
-          tilt: (T.tilt || 0) + 0.035 * nodAt(t) + 0.012 * Math.sin((2 * Math.PI * t) / 5.3) + shake, ...xp });
+        // "never": a small, slow shake of the head (a roll, with the eyes); a questioning tilt on the asks
+        let shake = 0, ask = 0;
+        for (const c of shakes) { const u = t - c; if (u > 0 && u < 0.9) shake += Math.sin(2 * Math.PI * 2.2 * u) * Math.sin(Math.PI * u / 0.9); }
+        for (const [a0, a1] of asks) ask += sstep(a0, a0 + 0.3, t) * (1 - sstep(a1, a1 + 0.35, t));
+        const toChart = clamp((HF_CAM - H.hf) / (HF_CAM - HF_CHART), 0, 1);
+        const p = stand(DQ, X0 + sway, GROUND, S, { f: F_BODY + (H.f - HF_CAM) * 0.25, hf: H.hf, smear: 0, headSmear: H.headSmear,
+          tilt: (H.tilt || 0) + 0.03 * nodAt(t) + 0.012 * Math.sin((2 * Math.PI * t) / 5.3) + 0.025 * shake + 0.045 * ask - 0.02 * toChart, ...xp });
         p.y += br; p.hand = p.hand.map((h) => V(h.x, h.y + br));
         [0, 1].forEach((a) => Gest.put(p, a, gest[a](t, p)));
-        // the talking hand rides the stressed syllables
-        for (const [ai, a0, a1] of acc) if (t > a0 - 0.1 && t < a1 + 0.15) {
-          const k = sstep(a0 - 0.1, a0 + 0.15, t) * (1 - sstep(a1 - 0.1, a1 + 0.15, t));
-          p.hand[ai] = V(p.hand[ai].x, p.hand[ai].y + 5 * S * k * accentAt(t));
-        }
+        elbowDown(p, 0, DQ, waveW(t));
         // the wave: a relaxed side-to-side of the open hand at the wrist
         for (const [w0, w1] of waves) if (t > w0 - 0.1 && t < w1 + 0.2) {
           const k = sstep(w0 - 0.1, w0 + 0.2, t) * (1 - sstep(w1 - 0.2, w1 + 0.2, t));
-          p.handRot = p.handRot.slice(); p.handRot[0] = (p.handRot[0] || 0) + 0.3 * k * Math.sin(2 * Math.PI * 1.9 * (t - w0));
+          p.handRot = p.handRot.slice(); p.handRot[0] = (p.handRot[0] || 0) + 0.14 * k * Math.sin(2 * Math.PI * 1.8 * (t - w0));
         }
-        const lk = look(t); p.look = V(lk.x + (T.look ? T.look.x : 0), lk.y);
+        const lk = look(t); p.look = V(lk.x + (H.look ? H.look.x : 0) + 2 * shake, lk.y);
         p.talkV = clamp(lipAt(LV, t) * 1.05, 0, 1);
         p.talkW = 1 + 0.14 * lipAt(LW, t) - 0.22 * lipAt(LR, t);
         const smiling = xp.expr2 === "smile" && xp.exprU > 0.45;
-        p.blink = smiling ? 1 : Math.min(T.blink ?? 1, blinkAt(t));
+        p.blink = smiling ? 1 : Math.min(H.blink ?? 1, blinkAt(t));
         p.shadow = 0;
         return p;
       }
 
-      // ---- aim: the 3D hand turns the index finger a few degrees off its commanded aim (more the further sideways he
-      // points), so after posing, measure the drawn finger (knuckle -> tip) and turn it onto the target: two passes
+      // ---- aim: the 3D hand turns the index finger off its commanded aim (more the further the wrist has to bend), so
+      // after posing, measure the drawn finger (knuckle -> tip) and turn it onto the target: three passes
       const K0 = keys[0];
       // the target the finger should be on at t, blended the way Gest.track blends the aim between two keys
       function pointTarget(t) {
         let i = 0; while (i < K0.length - 1 && t >= K0[i + 1][0]) i++;
         const [t1, n1, d1, o1] = K0[i], prev = i > 0 ? K0[i - 1] : null, u = clamp((t - t1) / d1, 0, 1);
-        if (n1 === "pointZ" && prev && prev[1] === "pointZ" && u < 1) return Kit.mixV(tgtOf(prev[3]), tgtOf(o1), sstep(0.08, 0.92, u));
-        if (n1 === "pointZ") return tgtOf(o1);
-        return prev && prev[1] === "pointZ" && u < 1 ? tgtOf(prev[3]) : null;
+        if (n1 === POINT && prev && prev[1] === POINT && u < 1) return Kit.mixV(tgtOf(prev[3]), tgtOf(o1), sstep(0.08, 0.92, u));
+        if (n1 === POINT) return tgtOf(o1);
+        return prev && prev[1] === POINT && u < 1 ? tgtOf(prev[3]) : null;
       }
       function fingerErr(T) {
         const a = DQ.arms[0], W = a.W, f = a.hand.fingers[0].m, kw = Cast.K * S;
         const kx = W.x + +f[1].getAttribute("x1") * kw, ky = W.y + +f[1].getAttribute("y1") * kw;
         const tx = W.x + +f[3].getAttribute("x2") * kw, ty = W.y + +f[3].getAttribute("y2") * kw;
         const d = Math.atan2(ty - ky, tx - kx) - Math.atan2(T.y - ty, T.x - tx);
-        return clamp(Math.atan2(Math.sin(d), Math.cos(d)), -0.25, 0.25);
+        return clamp(Math.atan2(Math.sin(d), Math.cos(d)), -0.4, 0.4);
       }
       const st = { t: 0 };
       function draw() {
@@ -2400,8 +2434,11 @@ Gest.G.presentSide = (z, p, a, sd, m, o) => { const T = typeof o.target === 'fun
         const w = T ? sstep(0.55, 1, ext) : 0;
         if (w > 0.001 && p.handAim[0] != null) {
           p.handAim = p.handAim.slice();
-          for (let k = 0; k < 2; k++) { p.handAim[0] -= fingerErr(T) * w; DQ.pose(p); }
+          for (let k = 0; k < 3; k++) { p.handAim[0] -= fingerErr(T) * w; DQ.pose(p); }
         }
+        // the nod, on top of the posed head (head units: down and a little foreshortened)
+        const n = nodBump(t);
+        if (n > 0.001) DQ.headG.setAttribute("transform", DQ.headG.getAttribute("transform") + ` translate(0,${(2.2 * n).toFixed(3)}) scale(1,${(1 - 0.025 * n).toFixed(4)})`);
       }
       const tl = gsap.timeline({ paused: true });
       tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: draw }, 0);

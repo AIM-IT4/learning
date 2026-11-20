@@ -15,7 +15,7 @@ const rows = await p.evaluate(() => {
   const keys = window.__mcKeys ? window.__mcKeys[0] : null;
   if (!keys) return null;
   keys.forEach((k, i) => {
-    if (k[1] !== 'pointZ') return;
+    if (k[1] !== 'pointZ' && k[1] !== 'pointB') return;
     const t0 = k[0] + 0.45, t1 = i + 1 < keys.length ? keys[i + 1][0] : t0 + 1;
     let worst = 0, sum = 0, n = 0;
     for (let t = t0; t <= t1 + 1e-6; t += 1 / 30) {

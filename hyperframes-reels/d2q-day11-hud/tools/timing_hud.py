@@ -60,9 +60,10 @@ SCRIPT = [
 ]
 
 
-# the guide in the lower right, D the desk quant (compositions/mc.html): (caption line, token index, beat, seconds held,
-# hop px: always 0, he does not hop). The beats are defined in mc.html (BEAT): point = the index finger on the chart element
-# the voice names; show = an open palm toward it; talk = the talking hand; watch = eyes on the chart; wave = the sign-off
+# the guide in the lower right, D the desk quant as a bust (compositions/mc.html, built from work/guide/guide_src.js):
+# (caption line, token index, beat, seconds held, hop px: always 0, he does not hop). The beats are defined there (BEAT):
+# point = he turns to the chart element the voice names and his near hand comes up beside the shoulder, the index finger
+# on it; show / watch = he turns his head to it and looks; talk = to the viewer; wave = the sign-off
 MASCOT = [
     ("L1", 0, "hello", 1.3, 0), ("L1", 4, "showOneVol", 1.6, 0),
     ("L2a", 2, "talk", 1.2, 0), ("L2b", 4, "showQuotes", 1.5, 0), ("L2b", 11, "askYou", 1.0, 0),

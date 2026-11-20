@@ -1,17 +1,21 @@
-      // ===== The guide: D, the desk quant from the Desk2Quant character kit =====
-      // Light-blue Oxford with rolled sleeves, navy quilted gilet, lanyard with a plain badge, chinos, glasses. He stands
-      // in the lower right (x 760-1060, y 1478-1920), framed from about mid-thigh up, above the scenes and below the HUD
-      // chrome and subtitles. He talks with the narrator's voice (LIPS), breathes, blinks, shifts his weight, and acts each
-      // beat in CUES: he points at the exact chart element the voice names (the arm nearest it, the index finger aimed at
-      // it, the hand kept inside his own zone so it never covers the chart or the chip rail), presents with an open palm on
-      // explanatory phrases, keeps one talking hand, and waves only to sign off. Everything is a pure function of t.
+      // ===== The guide: D, the desk quant from the Desk2Quant character kit, framed as a bust =====
+      // Light-blue Oxford with rolled sleeves, navy quilted gilet, lanyard with a plain badge, glasses. He sits in the lower
+      // right, head and shoulders, the frame's bottom edge cutting him at the chest (above the scenes, below the HUD chrome
+      // and subtitles). He talks with the narrator's voice (LIPS), breathes, blinks and nods on the stressed syllables. When
+      // the voice names a chart element he turns his head to it and looks at it, then back to the viewer; on the key beats he
+      // brings his near hand up beside the shoulder and points at the exact element (the hand kept below the chart, clear of
+      // the chip rail and never in front of his face). He waves only to sign off. Everything is a pure function of t.
       const SVG = document.getElementById("mc-sv");
-      const { V, mk, clamp, lerp, sstep, E, castIn, stand, breathe, lookTrack, facing } = Kit;
+      const { V, mk, clamp, lerp, sstep, E, castIn, stand, breathe, facing } = Kit;
       const G = Gest.G;
 
-      // ---- placement: hair top at y 1550, scale 1.55 (about 600 px hair to sole; the legs run off the frame bottom)
-      const S = 1.55, X0 = 958, HEAD_TOP = 1550, GROUND = HEAD_TOP + 385.8 * S;
-      const ZONE = { x0: 765, x1: 1055, y0: 1491 };             // where his hands may go (the chart ends at y 1478, the chip rail at x 760)
+      // ---- placement: a bust. Kit scale 3.5 (his hair top at y 1500, his face about 80 px wide), centred at x 935; the
+      // frame's bottom edge cuts him at the chest (the badge), his far shoulder runs off the right edge
+      const S = 3.5, X0 = 935, HEAD_TOP = 1500, GROUND = HEAD_TOP + 385.8 * S;
+      // where a raised hand may go: below the chart (it ends at y 1478), clear of the chip rail (x 54-760, y 1484-1690; below
+      // it, only empty background down to the HUD's corner text), inside the frame, and never in front of his face (faceBox)
+      const STAGE_Y = 1500, RAIL_Y = 1716, RAIL_X = 778, LEFT_X = 640, RIGHT_X = 1076;
+      const allowed = (q) => q.y >= STAGE_Y && q.x <= RIGHT_X && (q.y >= RAIL_Y ? q.x >= LEFT_X : q.x >= RAIL_X);
       let NOW = 0;                                             // film time of the frame being drawn (moving targets read it)
 
       // ---- lip sync: three base-36 digits per 1/60 s from the voice (open, wide, round); the mouth opens with the first
@@ -20,7 +24,7 @@
       const lipAt = (A, t) => { const f = (t - LIPS_T0) * LIPS_HZ; if (f < 0 || f >= A.length - 1) return 0; const i = Math.floor(f); return lerp(A[i], A[i + 1], f - i); };
 
       // syllables from the same track: each rise out of a dip is a stressed onset; the ones after a pause start a phrase.
-      // They drive the small head nods and the beats of the talking hand, so both stay locked to the voice.
+      // They drive the head nods, so the nods stay locked to the voice.
       const SYL = [], NODS = [];
       {
         const n = LV.length, at = (i) => LV[clamp(i, 0, n - 1)];
@@ -40,64 +44,81 @@
       }
       const pulses = (L, t, a, w, d, span) => { let s = 0; for (const [t0, k] of L) { const u = t - t0 + a; if (u <= 0) break; if (u < span) s += k * Math.exp(-u * w) * Math.sin(u * d); } return s; };
       const nodAt = (t) => pulses(NODS, t, 0.04, 8, 22, 0.55);
-      const accentAt = (t) => pulses(SYL, t, 0.05, 7, 16, 0.6);
 
-      // ---- gestures kept inside the zone (composition-local additions to the kit's gesture set)
+      // ---- the raised hand at bust scale (composition-local additions to the kit's gesture set)
       const tgtOf = (o) => (typeof o.target === "function" ? o.target() : o.target);
-      // the rig's arm IK (cast.js ik()), to know where the elbow will be for a wrist position
-      const elbowOf = (A, Tw, l1, l2, bend) => {
-        const dx = Tw.x - A.x, dy = Tw.y - A.y, d = Math.hypot(dx, dy), mx = l1 + l2, soft = 0.08 * mx;
-        const ds = d > mx - soft ? mx - soft * Math.exp(-(d - (mx - soft)) / soft) : d, dd = Math.min(Math.max(ds, Math.abs(l1 - l2) + 0.5), mx - 0.01);
-        const th = Math.atan2(dy, dx), a = Math.acos(Math.min(1, Math.max(-1, (l1 * l1 + dd * dd - l2 * l2) / (2 * l1 * dd))));
-        const c = Math.cos(th), s = Math.sin(th), h = l1 * Math.sin(a) * bend, f = l1 * Math.cos(a);
-        return V(A.x + f * c + h * s, A.y + f * s - h * c);
-      };
-      // a hand with its wrist at W, aimed at angle th, fingers L long, half as wide as hw, and its elbow (sleeve radius er):
-      // inside the zone?
-      const inZ = (q, r) => q.x - r >= ZONE.x0 && q.x + r <= ZONE.x1 && q.y - r >= ZONE.y0;
-      const fits = (W, th, L, hw, El, er) => {
+      // his face, from the pose: a hand must stay left of it (x < x0) unless it is below his chin (y > y1)
+      const faceBox = (z, p) => { const H = Gest.headPt(z, p, 0, 0), u = Cast.K * S * Cast.HS; return { x0: H.x - 33 * u, y1: H.y + 40 * u }; };
+      // how far a hand (wrist at W, aimed at angle th, L long and 2 hw wide) reaches outside the allowed region, in px summed
+      // over sampled points (0 = it fits): onto the chart, past the frame edge, onto the chip rail, or in front of his face
+      const intrusion = (W, th, L, hw, fb) => {
         const c = Math.cos(th), s = Math.sin(th);
-        return [W, V(W.x + c * L, W.y + s * L), V(W.x + c * L * 0.55 - s * hw, W.y + s * L * 0.55 + c * hw), V(W.x + c * L * 0.55 + s * hw, W.y + s * L * 0.55 - c * hw)]
-          .every((q) => inZ(q, 0)) && (!El || inZ(El, er));
+        let v = 0;
+        for (const [f, w] of [[0, 0], [1, 0], [0.8, 0.45], [0.8, -0.45], [0.55, 1], [0.55, -1], [0.25, 1], [0.25, -1]]) {
+          const x = W.x + c * L * f - s * hw * w, y = W.y + s * L * f + c * hw * w;
+          v += Math.max(0, STAGE_Y - y) + Math.max(0, x - RIGHT_X);
+          if (y < RAIL_Y && x < RAIL_X) v += Math.min(RAIL_X - x, RAIL_Y - y + Math.max(0, LEFT_X - x)); else if (y >= RAIL_Y) v += Math.max(0, LEFT_X - x);
+          if (x > fb.x0 && y < fb.y1) v += Math.min(x - fb.x0, fb.y1 - y);
+        }
+        return v;
       };
-      // the longest reach r in [lo, hi] at which the hand (and the elbow) still fit: the reach shrinks toward the shoulder
-      const fitReach = (at, aim, L, hw, lo, hi, elb, er) => {
-        const ok = (r) => { const W = at(r); return fits(W, aim(W), L, hw, elb ? elb(W) : null, er); };
-        if (ok(hi)) return hi;
-        for (let k = 0; k < 16; k++) { const r = (lo + hi) / 2; if (ok(r)) lo = r; else hi = r; }
-        return lo;
+      // pointB: the near hand up beside the shoulder, the index finger aimed at the target. The wrist sits on an arc round
+      // the outer side of the shoulder (clear of the joint), from beside it (out and a little up) to down and out; it
+      // takes the first spot on that arc where the whole hand fits for every position the element takes during the beat
+      // (o.place), so a target far up and to the left brings the hand lower and further in, and a moving element (a dot
+      // rising, a sweep along the strikes) is followed by the finger alone. If no spot fits, the one that intrudes least.
+      const ARC = [-20 * Math.PI / 180, 70 * Math.PI / 180], ARC_R = [15, 24];
+      G.pointB = (z, p, a, sd, m, o) => {
+        const T = tgtOf(o), Sh = m.sh[a], fb = faceBox(z, p), L = 38 * m.s, hw = 8 * m.s;
+        const at = (u) => { const q = lerp(ARC[0], ARC[1], u), r = lerp(ARC_R[0], ARC_R[1], u) * m.s; return V(Sh.x + sd * Math.cos(q) * r, Sh.y + Math.sin(q) * r); };
+        const aim = (W) => Math.atan2(T.y - W.y, T.x - W.x);
+        const PL = o.place || [T], vio = (u) => { const W = at(u); let v = 0; for (const P of PL) v = Math.max(v, intrusion(W, Math.atan2(P.y - W.y, P.x - W.x), L, hw, fb)); return v; };
+        const N = 40, vs = []; for (let k = 0; k <= N; k++) vs.push(vio(k / N));
+        let u, k0 = vs.findIndex((v) => v <= 0);
+        if (k0 >= 0) {
+          u = k0 / N;
+          if (k0 > 0) { let lo = (k0 - 1) / N, hi = u; for (let j = 0; j < 14; j++) { const mid = (lo + hi) / 2; if (vio(mid) <= 0) hi = mid; else lo = mid; } u = hi; }
+        } else {
+          let kb = 0; vs.forEach((v, k) => { if (v < vs[kb]) kb = k; });
+          let lo = Math.max(0, (kb - 1) / N), hi = Math.min(1, (kb + 1) / N);
+          for (let j = 0; j < 24; j++) { const m1 = lo + (hi - lo) / 3, m2 = hi - (hi - lo) / 3; if (vio(m1) <= vio(m2)) hi = m2; else lo = m1; }
+          u = (lo + hi) / 2;
+        }
+        const W = at(u);
+        return { hand: W, hb: sd, pose: "point", aim: aim(W), aimW: 1, face: [0, 1, 0.3], faceW: 1 };
       };
-      // pointZ: the index finger aimed exactly at the target. The arm rises along the line to it, capped at maxEl (so a high
-      // target never turns into a raised hand) and only as far as the zone allows; the finger is then re-aimed at the target.
-      G.pointZ = (z, p, a, sd, m, o) => {
-        const T = tgtOf(o), Sh = m.sh[a], dx = T.x - Sh.x, dy = T.y - Sh.y, el = Math.atan2(-dy, Math.abs(dx));
-        const sx = Math.abs(dx) < 0.18 * Math.abs(dy) ? sd : Math.sign(dx), elA = Math.min(el, o.maxEl ?? 0.88);
-        const u = V(sx * Math.cos(elA), -Math.sin(elA)), drop = (o.drop || 0) * m.s;
-        const at = (r) => V(Sh.x + u.x * r, Sh.y + u.y * r + drop), aim = (W) => Math.atan2(T.y - W.y, T.x - W.x), hb = o.hb ?? -sd * 0.3;
-        const elb = (W) => elbowOf(Sh, W, z.L.U * m.s, z.L.F * m.s, hb);
-        const W = at(fitReach(at, aim, 42 * m.s, 9 * m.s, 20 * m.s, 120 * m.s * (o.reach ?? 0.84), elb, 11 * m.s));
-        return { hand: W, hb, pose: "point", aim: aim(W), aimW: 1, face: [0, 1, 0.3], faceW: 1 };
+      // waveB: the open hand up beside his cheek, palm to the viewer (the sign-off); the fingers a little closer and the thumb
+      // in, so the hand stays clear of his face
+      Hand.POSES.waveB = { c: [0.02, 0, 0.02, 0.06], s: 0.38, ta: 0.42, to: 0.24, tc: 0.08, fx: -0.14 };
+      G.waveB = (z, p, a, sd, m, o) => {
+        const Sh = m.sh[a];
+        return { hand: V(Sh.x - sd * (o.dx ?? 2) * m.s, Sh.y - (o.up ?? 12) * m.s), hb: sd, pose: "waveB", aim: -Math.PI / 2 + sd * 0.05, aimW: 1, face: [0, 0, 1], faceW: 1 };
       };
-      // presentZ: an open palm out to the side at chest height, turned toward the target, pulled in until it fits the zone
-      G.presentZ = (z, p, a, sd, m, o) => {
-        const T = tgtOf(o), Sh = m.sh[a], dx = T.x - Sh.x, dy = T.y - Sh.y, dir = Math.sign(dx) || sd;
-        const el = Math.atan2(-dy, Math.abs(dx)), k = Math.max(-0.5, Math.min(1, el / 0.6)), e = Math.max(-0.35, Math.min(0.42, el));
-        const th = Math.atan2(-Math.sin(e), dir * Math.cos(e));
-        const at = (r) => V(Sh.x + dir * 72 * r * m.s, Sh.y + (44 - 24 * k) * m.s + (o.drop || 0) * m.s), hb = o.hb ?? -sd;
-        const elb = (W) => elbowOf(Sh, W, z.L.U * m.s, z.L.F * m.s, hb);
-        const W = at(fitReach(at, () => th, 40 * m.s, 12 * m.s, 0.05, o.reach ?? 1, elb, 11 * m.s));
-        return { hand: W, hb, pose: "offer", aim: th, aimW: 1, face: [dir * 0.45, -1, 0.5], faceW: 1 };
-      };
-
-      // flatZ: a flat hand, palm down, marking a level at his side ("flat", "never"); o.dy: how far below the shoulder;
-      // o.glide() (0..1) slides it outward, a slow horizontal sweep
-      G.flatZ = (z, p, a, sd, m, o) => {
-        const Sh = m.sh[a], k = o.glide ? o.glide() : 0, th = sd > 0 ? -0.06 : Math.PI + 0.06, hb = -sd;
-        const at = (r) => V(Sh.x + sd * (30 + 30 * k) * r * m.s, Sh.y + (o.dy ?? 66) * m.s);
-        const elb = (W) => elbowOf(Sh, W, z.L.U * m.s, z.L.F * m.s, hb);
-        const W = at(fitReach(at, () => th, 40 * m.s, 10 * m.s, 0.2, 1, elb, 11 * m.s));
-        return { hand: W, hb, pose: "blade", aim: th, aimW: 1, face: [0, 1, 0.3], faceW: 1 };
-      };
+      // waveLow: the same open hand lower, in front of the chest: the hand passes through it on the way up and down, so it
+      // rises and falls straight, clear of the chip rail
+      G.waveLow = (z, p, a, sd, m) => Object.assign(G.waveB(z, p, a, sd, m, { dx: 6, up: -30 }), { pose: "waveB" });
+      // idleB: the near arm hangs relaxed, the hand a little out from his side (below the frame). Every spot the hand takes
+      // (idle, pointing, waving) keeps the elbow on the same side of the shoulder-to-hand line, so the arm never has to
+      // flip its bend on the way between them
+      G.idleB = (z, p, a, sd, m) => ({ hand: V(m.sh[a].x + sd * 26 * m.s, m.sh[a].y + 92 * m.s), hb: sd, pose: "rest", face: [-sd, 0.1, 0.35], faceW: 1 });
+      // the near arm at bust scale: the elbow stays down, under the shoulder (below the frame unless the hand is up by his
+      // cheek), and the forearm rises from it to the hand. The rig's two-bone IK swings the elbow out sideways when the hand
+      // comes up beside the shoulder, so it is given the segment lengths that put the elbow here instead (a segment reaching
+      // toward the camera draws a little shorter) and the bend that keeps it on this side.
+      // (ww: how far into the wave the arm is. For the wave the elbow drops straight down a little in front of the chest, so
+      // the forearm rises in front of the body to the hand beside the face and the arm never lines up through the shoulder)
+      function elbowDown(p, a, z, ww) {
+        const Sh = Gest.marks(z, p).sh[a], W = p.hand[a], sd = a === 0 ? -1 : 1, UP = z.L.U * S, FP = z.L.F * S;
+        const smin = (u, v, k) => (u + v - Math.sqrt((u - v) * (u - v) + k * k)) / 2;      // a smooth min: the elbow starts to rise gently
+        const E0 = V(lerp(lerp(Sh.x, W.x, 0.3) + sd * 6 * S, Sh.x - sd * 8 * S, ww), smin(W.y + 0.96 * FP, Sh.y + 0.98 * UP, 70));
+        const d = Math.hypot(W.x - Sh.x, W.y - Sh.y) || 1, c = (W.x - Sh.x) / d, s = (W.y - Sh.y) / d;
+        const side = (E0.x - Sh.x) * s - (E0.y - Sh.y) * c;
+        ["fu", "ff", "hb"].forEach((k) => { p[k] = (p[k] || [1, 1]).slice(); });
+        // the bend's sign puts the IK's elbow exactly here. Folded, that is seamless where the elbow crosses the shoulder-wrist
+        // line; nearly straight, the rig softens the reach and the two sides differ, so there the bend fades through zero
+        const l1 = Math.hypot(E0.x - Sh.x, E0.y - Sh.y), l2 = Math.hypot(W.x - E0.x, W.y - E0.y), ext = sstep(0.84, 0.92, d / (l1 + l2));
+        p.fu[a] = l1 / UP; p.ff[a] = l2 / FP; p.hb[a] = clamp(side / Math.max(1e-3, 0.1 * UP * ext), -1, 1);
+      }
 
       // ---- what he points at: chart elements in frame px, from the scene code (work/scenes/sN.js); some move with the scene
       // (t: film time, c: the beat's cue time; the scene's own timings, relative to the cue)
@@ -140,96 +161,107 @@
         s14rows: V(640, 760),                                     // s14: save / share / follow
       };
 
-      // ---- the beats (CUES names): arm 0 works the chart (screen-left, nearest it), arm 1 rests across the belt.
-      // a0/a1: [gesture, move seconds, options]; at: the target; lead: the move starts this long before the cue so it lands
-      // on the word; face: [expression, weight] (blended from neutral), fd: its delay; look: "cam" | "tgt" | a target key;
-      // turn: "cam" (toward the viewer) | "chart"; beats: the talking hand rides the stressed syllables; shake: a small
-      // head shake ("never"); wave: the sign-off wave
+      // ---- the beats (CUES names). hand: "point" (the near hand, arm 0) | "wave"; at: the target; lead: the head (and the
+      // hand) start this long before the cue so they land on the word; face: [expression, weight] (blended from neutral),
+      // fd: its delay; look: he turns his head to the target (lookMax: how long, at most, before he turns back to the
+      // viewer); ask: a questioning tilt of the head; shake: a small head shake ("never")
       const BEAT = {
-        hello:        { a1: ["homeOpen", 0.5, { hb: 0.55 }], lead: 0, face: ["smile", 0.3], look: "cam", turn: "cam" },
-        showOneVol:   { a0: ["presentZ", 0.5], at: "s1line", lead: 0.3, face: ["focus", 0.2], look: "tgt", turn: "chart" },
-        talk:         { a0: ["explain", 0.45], lead: 0.2, face: ["smile", 0.12], look: "cam", turn: "cam", beats: 1 },
-        showQuotes:   { a0: ["presentZ", 0.5], at: "s2quotes", lead: 0.3, face: ["focus", 0.25], look: "tgt", turn: "chart" },
-        askYou:       { a0: ["you", 0.45], lead: 0.25, face: ["stuck", 0.35], look: "cam", turn: "cam" },
-        watchChart:   { at: "s3chart", lead: 0.1, face: ["focus", 0.25], look: "tgt", turn: "chart" },
-        pointCrash:   { a0: ["pointZ", 0.5], at: "s3crash", lead: 0.36, face: ["focus", 0.45], look: "tgt", turn: "chart" },
-        showBell:     { a0: ["presentZ", 0.5], at: "s4band", lead: 0.3, face: ["smile", 0.12], look: "tgt", turn: "chart" },
-        watchRuler:   { at: "s4ruler", lead: 0.1, face: ["focus", 0.3], look: "tgt", turn: "chart" },
-        pointSigma:   { a0: ["pointZ", 0.5], at: "s4pin", lead: 0.45, face: ["wow", 0.58], look: "tgt", turn: "chart" },
-        showNormal:   { a0: ["presentZ", 0.5], at: "s5bell", lead: 0.3, face: ["smile", 0.12], look: "tgt", turn: "chart" },
-        never:        { a0: ["flatZ", 0.42, { dy: 92 }], glide: [0.05, 0.5], lead: 0.18, face: ["focus", 0.3], look: "cam", turn: "cam", shake: 1 },
-        pointDid:     { a0: ["pointZ", 0.5], at: "s6dot", lead: 0.08, face: ["wow", 0.6], fd: 0.38, look: "tgt", turn: "chart" },
-        showFat:      { a0: ["presentZ", 0.5], at: "s6fat", lead: 0.3, face: ["focus", 0.25], look: "tgt", turn: "chart" },
-        askWhat:      { a0: ["explainHi", 0.45], lead: 0.2, face: ["stuck", 0.3], look: "cam", turn: "cam" },
-        pointPayoff:  { a0: ["pointZ", 0.5], at: "s7payoff", lead: 0.3, face: ["focus", 0.35], look: "tgt", turn: "chart" },
-        showPrice:    { a0: ["presentZ", 0.5], at: "s7price", lead: 0.28, face: ["smile", 0.15], look: "tgt", turn: "chart" },
-        showSolve:    { a0: ["presentZ", 0.5], at: "s8newton", lead: 0.3, face: ["focus", 0.3], look: "tgt", turn: "chart" },
-        pointRoot:    { a0: ["pointZ", 0.5], at: "s8root", lead: 0.36, face: ["focus", 0.25], look: "tgt", turn: "chart" },
-        pointPaths:   { a0: ["pointZ", 0.5], at: "s9fan", lead: 0.3, face: ["focus", 0.2], look: "tgt", turn: "chart" },
-        pointCrashes: { a0: ["pointZ", 0.5], at: "s9crash", lead: 0.32, face: ["focus", 0.35], look: "tgt", turn: "chart" },
-        sweepStrikes: { a0: ["pointZ", 0.45], at: "s10strikes", lead: 0.3, face: ["focus", 0.35], look: "tgt", turn: "chart" },
-        showMillion:  { a0: ["presentZ", 0.5], at: "s10million", lead: 0.3, face: ["smile", 0.15], look: "tgt", turn: "chart" },
-        watchSmile:   { at: "s11chart", lead: 0.1, face: ["focus", 0.2], look: "tgt", turn: "chart" },
-        pointAtm:     { a0: ["pointZ", 0.5], at: "s11atm", lead: 0.38, face: ["focus", 0.3], look: "tgt", turn: "chart" },
-        point90:      { a0: ["pointZ", 0.5], at: "s11k90", lead: 0.32, face: ["focus", 0.3], look: "tgt", turn: "chart" },
-        point80:      { a0: ["pointZ", 0.5], at: "s11k80", lead: 0.32, face: ["focus", 0.35], look: "tgt", turn: "chart" },
-        showSmile:    { a0: ["presentZ", 0.5], at: "s11smile", lead: 0.3, face: ["smile", 0.15], look: "tgt", turn: "chart" },
-        smile:        { lead: 0.05, face: ["smile", 0.8], look: "cam", turn: "cam" },
-        pointAnswer:  { a0: ["pointZ", 0.5], at: "s12answer", lead: 0.12, face: ["smile", 0.12], look: "tgt", turn: "chart" },
-        flatAcross:   { a0: ["flatZ", 0.45, { dy: 64 }], glide: [0.1, 0.7], at: "s12flat", lead: 0.3, face: ["smile", 0.12], look: "tgt", turn: "chart" },
-        pointTail:    { a0: ["pointZ", 0.5], at: "s13tail", lead: 0.34, face: ["focus", 0.3], look: "tgt", turn: "chart" },
-        pointLowK:    { a0: ["pointZ", 0.5], at: "s13low", lead: 0.3, face: ["focus", 0.3], look: "tgt", turn: "chart" },
-        traceRise:    { a0: ["pointZ", 0.5], at: "s13rise", lead: 0.3, face: ["smile", 0.15], look: "tgt", turn: "chart" },
-        pointComment: { a0: ["pointZ", 0.5], at: "s14comment", lead: 0.25, face: ["smile", 0.2], look: "tgt", turn: "chart" },
-        you:          { a0: ["you", 0.45], lead: 0.22, face: ["smile", 0.35], look: "cam", turn: "cam" },
-        showSheet:    { a0: ["presentZ", 0.5], at: "s14sheet", lead: 0.28, face: ["smile", 0.25], look: "tgt", turn: "chart" },
-        showRows:     { a0: ["presentZ", 0.5], at: "s14rows", lead: 0.28, face: ["smile", 0.2], look: "tgt", turn: "chart" },
-        wave:         { a0: ["wave", 0.5], lead: 0.18, face: ["smile", 0.6], look: "cam", turn: "cam", wave: 1 },
+        hello:        { face: ["smile", 0.32] },
+        showOneVol:   { at: "s1line", lead: 0.25, face: ["focus", 0.2], look: 1 },
+        talk:         { face: ["smile", 0.14] },
+        showQuotes:   { at: "s2quotes", lead: 0.25, face: ["focus", 0.25], look: 1 },
+        askYou:       { face: ["stuck", 0.35], ask: 1 },
+        watchChart:   { at: "s3chart", lead: 0.15, face: ["focus", 0.25], look: 1 },
+        pointCrash:   { hand: "point", at: "s3crash", lead: 0.36, face: ["focus", 0.45], look: 1 },
+        showBell:     { at: "s4band", lead: 0.25, face: ["smile", 0.12], look: 1 },
+        pointSigma:   { hand: "point", at: "s4pin", lead: 0.45, face: ["wow", 0.58], look: 1 },
+        showNormal:   { at: "s5bell", lead: 0.25, face: ["smile", 0.12], look: 1 },
+        never:        { face: ["focus", 0.3], shake: 1 },
+        pointDid:     { hand: "point", at: "s6dot", lead: 0.08, face: ["wow", 0.6], fd: 0.38, look: 1 },
+        showFat:      { at: "s6fat", lead: 0.25, face: ["focus", 0.25], look: 1 },
+        askWhat:      { face: ["stuck", 0.3], ask: 1 },
+        pointPayoff:  { hand: "point", at: "s7payoff", lead: 0.3, face: ["focus", 0.35], look: 1 },
+        showPrice:    { at: "s7price", lead: 0.25, face: ["smile", 0.15], look: 1 },
+        showSolve:    { at: "s8newton", lead: 0.25, face: ["focus", 0.3], look: 1 },
+        pointRoot:    { hand: "point", at: "s8root", lead: 0.36, face: ["focus", 0.25], look: 1 },
+        pointPaths:   { hand: "point", at: "s9fan", lead: 0.3, face: ["focus", 0.2], look: 1 },
+        pointCrashes: { hand: "point", at: "s9crash", lead: 0.32, face: ["focus", 0.35], look: 1 },
+        sweepStrikes: { hand: "point", at: "s10strikes", lead: 0.3, face: ["focus", 0.35], look: 1 },
+        showMillion:  { at: "s10million", lead: 0.25, face: ["smile", 0.15], look: 1 },
+        watchSmile:   { at: "s11chart", lead: 0.15, face: ["focus", 0.2], look: 1 },
+        pointAtm:     { hand: "point", at: "s11atm", lead: 0.38, face: ["focus", 0.3], look: 1 },
+        point90:      { hand: "point", at: "s11k90", lead: 0.32, face: ["focus", 0.3], look: 1 },
+        point80:      { hand: "point", at: "s11k80", lead: 0.32, face: ["focus", 0.35], look: 1 },
+        showSmile:    { at: "s11smile", lead: 0.25, face: ["smile", 0.15], look: 1 },
+        smile:        { face: ["smile", 0.8] },
+        pointAnswer:  { hand: "point", at: "s12answer", lead: 0.12, face: ["smile", 0.12], look: 1 },
+        flatAcross:   { at: "s12flat", lead: 0.2, face: ["smile", 0.12], look: 1 },
+        pointTail:    { hand: "point", at: "s13tail", lead: 0.34, face: ["focus", 0.3], look: 1 },
+        pointLowK:    { hand: "point", at: "s13low", lead: 0.3, face: ["focus", 0.3], look: 1 },
+        traceRise:    { hand: "point", at: "s13rise", lead: 0.3, face: ["smile", 0.15], look: 1 },
+        pointComment: { hand: "point", at: "s14comment", lead: 0.25, face: ["smile", 0.2], look: 1, lookMax: 1.0 },
+        showSheet:    { at: "s14sheet", lead: 0.2, face: ["smile", 0.25], look: 1, lookMax: 0.8 },
+        showRows:     { face: ["smile", 0.25] },
+        wave:         { hand: "wave", lead: 0.3, face: ["smile", 0.6] },
       };
       const BASE_FACE = ["smile", 0.12];                          // between beats: neutral, a little warmth
-      const IDLE = ["rest", "home"];                              // arm 0 hangs, arm 1 rests across the belt
-      const FACE_TURN = { cam: -0.06, chart: -0.2 };              // body facing (front view; negative turns him toward the chart)
+      const POINT = "pointB", HAND_UP = 0.5, HAND_DOWN = 0.6;      // raise and lower times (s)
+      const F_BODY = -0.1, HF_CAM = -0.08, HF_CHART = -0.5, HT = 0.45;   // facing: body, head to the viewer / to the chart (3/4), turn time
 
       // ---- build the tracks from CUES: [time, beat, seconds held, hop (unused: he does not hop)]
       const cues = CUES.map(([t, name, hold]) => ({ t, name, hold, b: BEAT[name] || {} })).sort((a, b) => a.t - b.t);
       const startOf = (c) => Math.max(0, c.t - (c.b.lead || 0));
-      const keys = [[[0, IDLE[0], 0.5, {}]], [[0, IDLE[1], 0.5, {}]]];
-      const faceK = [[0, BASE_FACE[0], BASE_FACE[1]]], lookK = [[0, V(0, 1)]], turnK = [[0, FACE_TURN.cam]];
-      const acc = [], waves = [], shakes = [];
+      const nextStart = (i) => (i + 1 < cues.length ? startOf(cues[i + 1]) : 1e9);
+      const IDLE = "idleB";                                       // the near arm idles hanging, the hand below the frame
+      const keys = [[[0, IDLE, 0.5, {}]], [[0, "rest", 0.5, {}]]];
+      const faceK = [[0, BASE_FACE[0], BASE_FACE[1]]], waves = [], shakes = [], asks = [];
       const lookAt = (P, from) => { const dx = P.x - from.x, dy = P.y - from.y, l = Math.hypot(dx, dy) || 1; return V(7 * dx / l, 7 * dy / l); };
-      const HEAD = V(X0 - 6, HEAD_TOP + 50);
+      const HEAD = V(X0, HEAD_TOP + 90);
+      const tfOf = (c) => { const tg = c.b.at ? TG[c.b.at] : null; return typeof tg === "function" ? ((f, tc) => () => f(NOW, tc))(tg, c.t) : tg; };
+      const looks = [];
       cues.forEach((c, i) => {
-        const b = c.b, t0 = startOf(c), next = i + 1 < cues.length ? startOf(cues[i + 1]) : 1e9, end = Math.min(c.t + c.hold, next - 0.05);
-        const target = b.at ? TG[b.at] : null;
-        const tf = typeof target === "function" ? ((f, tc) => () => f(NOW, tc))(target, c.t) : target;
-        [0, 1].forEach((a) => {
-          const K = keys[a], g = b["a" + a], last = K[K.length - 1];
-          if (g) {
-            const gl = b.glide ? ((tc, g0, gd) => () => E.s(clamp((NOW - tc - g0) / gd, 0, 1)))(c.t, b.glide[0], b.glide[1]) : null;
-            K.push([t0, g[0], g[1], Object.assign({ target: tf, glide: gl }, g[2] || {})]);
-            if (end < next - 0.6) K.push([end, IDLE[a], 0.55, {}]);
-            if (b.beats) acc.push([a, t0 + g[1], end]);
-          } else if (last[1] !== IDLE[a]) K.push([t0, IDLE[a], 0.5, {}]);
-        });
+        const b = c.b, t0 = startOf(c), next = nextStart(i), end = Math.min(c.t + c.hold, next - 0.05), tf = tfOf(c), K = keys[0];
+        if (b.hand === "point") {
+          // where the element is over the beat (a moving one is sampled), for the hand's spot
+          const raw = TG[b.at], place = typeof raw === "function" ? Array.from({ length: 13 }, (_, k) => raw(lerp(t0, end, k / 12), c.t)) : [raw];
+          // from one point to the next the hand travels round the shoulder (a bowed path), not across the joint; up from
+          // and down to the belt it travels straight
+          K.push([t0, POINT, HAND_UP, { target: tf, place, bow: K[K.length - 1][1] === POINT ? 0.3 : 0 }]);
+          if (end < next - 0.6) K.push([end, IDLE, HAND_DOWN, { bow: 0 }]);
+        } else if (b.hand === "wave") {
+          K.push([t0, "waveLow", 0.32, { bow: 0 }], [t0 + 0.32, "waveB", 0.3, { bow: 0 }]); waves.push([t0 + 0.62, end]);
+          K.push([end, "waveLow", 0.3, { bow: 0 }], [end + 0.3, IDLE, 0.45, { bow: 0 }]);
+        } else if (K[K.length - 1][1] !== IDLE) K.push([t0, IDLE, HAND_DOWN, { bow: 0 }]);
         const tf0 = c.t + (b.fd || 0), fk = b.face || BASE_FACE;
         if (tf0 - faceK[faceK.length - 1][0] < 0.3) faceK.pop();
         faceK.push([tf0, fk[0], fk[1]]);
         if (end < next - 0.4) faceK.push([end + 0.1, BASE_FACE[0], BASE_FACE[1]]);
-        const lk = b.look === "tgt" && tf ? (typeof tf === "function" ? "fn" : lookAt(tf, HEAD)) : V(0, 1);
-        lookK.push([b.look === "tgt" ? t0 : c.t, lk === "fn" ? tf : lk]);
-        if (b.look === "tgt" && end < next - 0.4) lookK.push([end + 0.15, V(0, 1)]);
-        turnK.push([t0, FACE_TURN[b.turn || "cam"], 0.6]);
-        if (b.wave) waves.push([t0 + b.a0[1], end]);
+        if (b.look && tf) looks.push([t0, Math.min(c.t + clamp(c.hold, 0.8, b.lookMax || 1.5), next - 0.05), tf]);
         if (b.shake) shakes.push(c.t);
-        // the ending: after the wave the hands come home and he holds a warm smile to the camera
+        if (b.ask) asks.push([c.t - 0.1, end]);
+        // the ending: after the wave the hand comes down and he holds a warm smile to the viewer
         if (i === cues.length - 1) { faceK.pop(); faceK.push([end + 0.1, "smile", 0.35]); }
       });
-      [keys[0], keys[1], faceK, lookK, turnK].forEach((K) => K.sort((p, q) => p[0] - q[0]));
-      // body turns need room to finish: drop a turn that repeats the last one or comes too soon after it
-      for (let k = turnK.length - 1; k > 0; k--) if (turnK[k][1] === turnK[k - 1][1]) turnK.splice(k, 1);
-      for (let k = 1; k < turnK.length; k++) if (turnK[k][0] - turnK[k - 1][0] < 0.7) { turnK.splice(k, 1); k--; }
-      for (let k = turnK.length - 1; k > 0; k--) if (turnK[k][1] === turnK[k - 1][1]) turnK.splice(k, 1);
+      [keys[0], faceK].forEach((K) => K.sort((p, q) => p[0] - q[0]));
 
+      // ---- where he looks: chart looks merged when the gap between them is short; the head turns to 3/4 for each run of
+      // them and back to the viewer after; the eyes follow each beat's element (a moving element is followed)
+      const runs = [];
+      for (const L of looks) { const r = runs[runs.length - 1]; if (r && L[0] - r.t1 < 0.9) { r.t1 = Math.max(r.t1, L[1]); r.items.push(L); } else runs.push({ t0: L[0], t1: L[1], items: [L] }); }
+      runs.forEach((r) => { r.t1 = Math.max(r.t1, r.t0 + HT + 0.3); });
+      const headK = [[0, HF_CAM]], lookK = [[0, V(0, 1)]];
+      runs.forEach((r) => {
+        headK.push([r.t0, HF_CHART, HT]); headK.push([r.t1, HF_CAM, HT]);
+        r.items.forEach((L) => lookK.push([L[0], typeof L[2] === "function" ? L[2] : lookAt(L[2], HEAD)]));
+        lookK.push([r.t1, V(0, 1)]);
+      });
+      const headTurn = facing(headK);
+      function look(t) {
+        let i = 0; while (i < lookK.length - 1 && t >= lookK[i + 1][0]) i++;
+        const val = (k) => (typeof lookK[k][1] === "function" ? lookAt(lookK[k][1](), HEAD) : lookK[k][1]);
+        if (i === 0) return val(0);
+        return Kit.mixV(val(i - 1), val(i), E.io(clamp((t - lookK[i][0]) / 0.12, 0, 1)));
+      }
       // ---- expressions: [t, name, weight] blended from neutral; a change of expression passes through neutral
       const FD = 0.28;
       function face(t) {
@@ -240,70 +272,72 @@
         if (n0 === n1) return { expr: "neutral", expr2: n1, exprU: lerp(w0, w1, e) };
         return e < 0.5 ? { expr: "neutral", expr2: n0, exprU: w0 * (1 - 2 * e) } : { expr: "neutral", expr2: n1, exprU: w1 * (2 * e - 1) };
       }
-      // ---- eyes: saccades between the viewer and the target (a moving target is followed)
-      function look(t) {
-        let i = 0; while (i < lookK.length - 1 && t >= lookK[i + 1][0]) i++;
-        const val = (k) => (typeof lookK[k][1] === "function" ? lookAt(lookK[k][1](), HEAD) : lookK[k][1]);
-        if (i === 0) return val(0);
-        return Kit.mixV(val(i - 1), val(i), E.io(clamp((t - lookK[i][0]) / 0.12, 0, 1)));
-      }
-      const turn = facing(turnK);
-      // blinks: a natural track, plus one now and then as the eyes jump between the viewer and the chart
-      const BL = Motion.blinkTrack(11, 0.3, DUR);
-      lookK.forEach(([t], k) => { if (k > 0 && k % 3 === 0 && BL.every((b) => Math.abs(b - t) > 1.2)) BL.push(t + 0.02); });
-      BL.sort((a, b) => a - b);
+      // ---- blinks: a natural track, minus any blink close to the one he makes as his head turns (Motion.turn blinks as
+      // the head drawing swaps)
+      const SWAP = headK.slice(1).map((k, i) => Motion.turn(k[0], k[0], HT, headK[i][1], k[1]).blinkT).filter((x) => x != null);
+      const BL = Motion.blinkTrack(11, 0.3, DUR).filter((b) => SWAP.every((w) => Math.abs(b - w) > 0.9));
       const blinkAt = (t) => { let b = 1; for (const c of BL) { if (c > t + 0.1) break; if (c > t - 0.25) b = Math.min(b, Motion.blink(t, [c])); } return b; };
+      // ---- nods: a small dip of the head on each stressed phrase onset (a pitch, drawn as the head moving down and
+      // foreshortening a little), plus the kit's gentle roll accent
+      const nodBump = (t) => { let s = 0; for (const [t0, k] of NODS) { const u = t - t0 + 0.02; if (u <= 0) break; if (u < 0.7) s += k * (u / 0.12) * Math.exp(1 - u / 0.12); } return Math.min(1.2, s); };
+
+      // how far into the wave the near arm is (0..1), from its keys, blended over each move as Gest.track blends it
+      const isWave = (n) => n === "waveB" || n === "waveLow";
+      function waveW(t) {
+        const K = keys[0]; let i = 0; while (i < K.length - 1 && t >= K[i + 1][0]) i++;
+        const [t1, n1, d1] = K[i], c = isWave(n1) ? 1 : 0;
+        if (i === 0 || t >= t1 + d1) return c;
+        return lerp(isWave(K[i - 1][1]) ? 1 : 0, c, sstep(0, 1, (t - t1) / d1));
+      }
 
       // ---- the figure
       const DQ = castIn(mk("g", {}, SVG), "D");
       const gest = [0, 1].map((a) => Gest.track(DQ, keys[a], a));
       function poseAt(t) {
         NOW = t;
-        const T = turn(t), xp = face(t), br = breathe(t, 0.4) * 2.4 * S / 1.75;
+        const H = headTurn(t), xp = face(t), br = breathe(t, 0.4) * 1.2 * S / 1.75;
         const sway = 2.0 * Math.sin((2 * Math.PI * t) / 6.7) + 0.9 * Math.sin((2 * Math.PI * t) / 3.9 + 1.3);
-        // "never": a small, slow shake of the head (a roll: the front-view head is one drawing)
-        let shake = 0;
-        for (const c of shakes) { const u = t - c; if (u > 0 && u < 0.9) shake += 0.03 * Math.sin(2 * Math.PI * 2.2 * u) * Math.sin(Math.PI * u / 0.9); }
-        const p = stand(DQ, X0 + sway, GROUND, S, { f: T.f, hf: T.hf, smear: T.smear, headSmear: T.headSmear,
-          tilt: (T.tilt || 0) + 0.035 * nodAt(t) + 0.012 * Math.sin((2 * Math.PI * t) / 5.3) + shake, ...xp });
+        // "never": a small, slow shake of the head (a roll, with the eyes); a questioning tilt on the asks
+        let shake = 0, ask = 0;
+        for (const c of shakes) { const u = t - c; if (u > 0 && u < 0.9) shake += Math.sin(2 * Math.PI * 2.2 * u) * Math.sin(Math.PI * u / 0.9); }
+        for (const [a0, a1] of asks) ask += sstep(a0, a0 + 0.3, t) * (1 - sstep(a1, a1 + 0.35, t));
+        const toChart = clamp((HF_CAM - H.hf) / (HF_CAM - HF_CHART), 0, 1);
+        const p = stand(DQ, X0 + sway, GROUND, S, { f: F_BODY + (H.f - HF_CAM) * 0.25, hf: H.hf, smear: 0, headSmear: H.headSmear,
+          tilt: (H.tilt || 0) + 0.03 * nodAt(t) + 0.012 * Math.sin((2 * Math.PI * t) / 5.3) + 0.025 * shake + 0.045 * ask - 0.02 * toChart, ...xp });
         p.y += br; p.hand = p.hand.map((h) => V(h.x, h.y + br));
         [0, 1].forEach((a) => Gest.put(p, a, gest[a](t, p)));
-        // the talking hand rides the stressed syllables
-        for (const [ai, a0, a1] of acc) if (t > a0 - 0.1 && t < a1 + 0.15) {
-          const k = sstep(a0 - 0.1, a0 + 0.15, t) * (1 - sstep(a1 - 0.1, a1 + 0.15, t));
-          p.hand[ai] = V(p.hand[ai].x, p.hand[ai].y + 5 * S * k * accentAt(t));
-        }
+        elbowDown(p, 0, DQ, waveW(t));
         // the wave: a relaxed side-to-side of the open hand at the wrist
         for (const [w0, w1] of waves) if (t > w0 - 0.1 && t < w1 + 0.2) {
           const k = sstep(w0 - 0.1, w0 + 0.2, t) * (1 - sstep(w1 - 0.2, w1 + 0.2, t));
-          p.handRot = p.handRot.slice(); p.handRot[0] = (p.handRot[0] || 0) + 0.3 * k * Math.sin(2 * Math.PI * 1.9 * (t - w0));
+          p.handRot = p.handRot.slice(); p.handRot[0] = (p.handRot[0] || 0) + 0.14 * k * Math.sin(2 * Math.PI * 1.8 * (t - w0));
         }
-        const lk = look(t); p.look = V(lk.x + (T.look ? T.look.x : 0), lk.y);
+        const lk = look(t); p.look = V(lk.x + (H.look ? H.look.x : 0) + 2 * shake, lk.y);
         p.talkV = clamp(lipAt(LV, t) * 1.05, 0, 1);
         p.talkW = 1 + 0.14 * lipAt(LW, t) - 0.22 * lipAt(LR, t);
         const smiling = xp.expr2 === "smile" && xp.exprU > 0.45;
-        p.blink = smiling ? 1 : Math.min(T.blink ?? 1, blinkAt(t));
+        p.blink = smiling ? 1 : Math.min(H.blink ?? 1, blinkAt(t));
         p.shadow = 0;
         return p;
       }
 
-      // ---- aim: the 3D hand turns the index finger a few degrees off its commanded aim (more the further sideways he
-      // points), so after posing, measure the drawn finger (knuckle -> tip) and turn it onto the target: two passes
+      // ---- aim: the 3D hand turns the index finger off its commanded aim (more the further the wrist has to bend), so
+      // after posing, measure the drawn finger (knuckle -> tip) and turn it onto the target: three passes
       const K0 = keys[0];
       // the target the finger should be on at t, blended the way Gest.track blends the aim between two keys
       function pointTarget(t) {
         let i = 0; while (i < K0.length - 1 && t >= K0[i + 1][0]) i++;
         const [t1, n1, d1, o1] = K0[i], prev = i > 0 ? K0[i - 1] : null, u = clamp((t - t1) / d1, 0, 1);
-        if (n1 === "pointZ" && prev && prev[1] === "pointZ" && u < 1) return Kit.mixV(tgtOf(prev[3]), tgtOf(o1), sstep(0.08, 0.92, u));
-        if (n1 === "pointZ") return tgtOf(o1);
-        return prev && prev[1] === "pointZ" && u < 1 ? tgtOf(prev[3]) : null;
+        if (n1 === POINT && prev && prev[1] === POINT && u < 1) return Kit.mixV(tgtOf(prev[3]), tgtOf(o1), sstep(0.08, 0.92, u));
+        if (n1 === POINT) return tgtOf(o1);
+        return prev && prev[1] === POINT && u < 1 ? tgtOf(prev[3]) : null;
       }
       function fingerErr(T) {
         const a = DQ.arms[0], W = a.W, f = a.hand.fingers[0].m, kw = Cast.K * S;
         const kx = W.x + +f[1].getAttribute("x1") * kw, ky = W.y + +f[1].getAttribute("y1") * kw;
         const tx = W.x + +f[3].getAttribute("x2") * kw, ty = W.y + +f[3].getAttribute("y2") * kw;
         const d = Math.atan2(ty - ky, tx - kx) - Math.atan2(T.y - ty, T.x - tx);
-        return clamp(Math.atan2(Math.sin(d), Math.cos(d)), -0.25, 0.25);
+        return clamp(Math.atan2(Math.sin(d), Math.cos(d)), -0.4, 0.4);
       }
       const st = { t: 0 };
       function draw() {
@@ -314,8 +348,11 @@
         const w = T ? sstep(0.55, 1, ext) : 0;
         if (w > 0.001 && p.handAim[0] != null) {
           p.handAim = p.handAim.slice();
-          for (let k = 0; k < 2; k++) { p.handAim[0] -= fingerErr(T) * w; DQ.pose(p); }
+          for (let k = 0; k < 3; k++) { p.handAim[0] -= fingerErr(T) * w; DQ.pose(p); }
         }
+        // the nod, on top of the posed head (head units: down and a little foreshortened)
+        const n = nodBump(t);
+        if (n > 0.001) DQ.headG.setAttribute("transform", DQ.headG.getAttribute("transform") + ` translate(0,${(2.2 * n).toFixed(3)}) scale(1,${(1 - 0.025 * n).toFixed(4)})`);
       }
       const tl = gsap.timeline({ paused: true });
       tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: draw }, 0);
