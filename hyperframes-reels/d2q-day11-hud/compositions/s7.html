@@ -1,10 +1,6 @@
 <template>
   <style>
     @font-face { font-family: "Fredoka"; font-weight: 300 700; src: url("assets/fonts/fredoka-700.woff2"); }
-    @font-face { font-family: "Rajdhani"; font-weight: 300; src: url("assets/fonts/rajdhani-300.woff2"); }
-    @font-face { font-family: "Rajdhani"; font-weight: 400; src: url("assets/fonts/rajdhani-400.woff2"); }
-    @font-face { font-family: "Rajdhani"; font-weight: 500; src: url("assets/fonts/rajdhani-500.woff2"); }
-    @font-face { font-family: "Rajdhani"; font-weight: 600; src: url("assets/fonts/rajdhani-600.woff2"); }
     @font-face { font-family: "ShareTechMono"; font-weight: 400; src: url("assets/fonts/sharetechmono.woff2"); }
     @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
     #root { position: absolute; inset: 0; overflow: hidden; }
@@ -16,6 +12,10 @@
   <script>
     (function () {
       /*DATA*/ const DUR = 3.5; const W = [0.16, 0.3, 0.44, 0.74, 0.86, 0.98, 1.38, 1.48, 1.88, 2.44, 2.5, 2.82, 3.06, 3.28, 3.46]; /*END*/
+      const TEX_IDS = ["payoff"];
+      const NUM_KEYS = ["model", "put90"];
+      /*TEX*/ const TEX = {"payoff": {"svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" focusable=\"false\" viewBox=\"0 -750 11168.5 1000\"><g stroke=\"currentColor\" fill=\"currentColor\" stroke-width=\"0\" transform=\"scale(1,-1)\"><g data-mml-node=\"math\"><g data-mml-node=\"mtext\"><path data-c=\"70\" d=\"M36 -148H50Q89 -148 97 -134V-126Q97 -119 97 -107T97 -77T98 -38T98 6T98 55T98 106Q98 140 98 177T98 243T98 296T97 335T97 351Q94 370 83 376T38 385H20V408Q20 431 22 431L32 432Q42 433 61 434T98 436Q115 437 135 438T165 441T176 442H179V416L180 390L188 397Q247 441 326 441Q407 441 464 377T522 216Q522 115 457 52T310 -11Q242 -11 190 33L182 40V-45V-101Q182 -128 184 -134T195 -145Q216 -148 244 -148H260V-194H252L228 -193Q205 -192 178 -192T140 -191Q37 -191 28 -194H20V-148H36ZM424 218Q424 292 390 347T305 402Q234 402 182 337V98Q222 26 294 26Q345 26 384 80T424 218Z\"></path><path data-c=\"61\" d=\"M137 305T115 305T78 320T63 359Q63 394 97 421T218 448Q291 448 336 416T396 340Q401 326 401 309T402 194V124Q402 76 407 58T428 40Q443 40 448 56T453 109V145H493V106Q492 66 490 59Q481 29 455 12T400 -6T353 12T329 54V58L327 55Q325 52 322 49T314 40T302 29T287 17T269 6T247 -2T221 -8T190 -11Q130 -11 82 20T34 107Q34 128 41 147T68 188T116 225T194 253T304 268H318V290Q318 324 312 340Q290 411 215 411Q197 411 181 410T156 406T148 403Q170 388 170 359Q170 334 154 320ZM126 106Q126 75 150 51T209 26Q247 26 276 49T315 109Q317 116 318 175Q318 233 317 233Q309 233 296 232T251 223T193 203T147 166T126 106Z\" transform=\"translate(556,0)\"></path><path data-c=\"79\" d=\"M69 -66Q91 -66 104 -80T118 -116Q118 -134 109 -145T91 -160Q84 -163 97 -166Q104 -168 111 -168Q131 -168 148 -159T175 -138T197 -106T213 -75T225 -43L242 0L170 183Q150 233 125 297Q101 358 96 368T80 381Q79 382 78 382Q66 385 34 385H19V431H26L46 430Q65 430 88 429T122 428Q129 428 142 428T171 429T200 430T224 430L233 431H241V385H232Q183 385 185 366L286 112Q286 113 332 227L376 341V350Q376 365 366 373T348 383T334 385H331V431H337H344Q351 431 361 431T382 430T405 429T422 429Q477 429 503 431H508V385H497Q441 380 422 345Q420 343 378 235T289 9T227 -131Q180 -204 113 -204Q69 -204 44 -177T19 -116Q19 -89 35 -78T69 -66Z\" transform=\"translate(1056,0)\"></path><path data-c=\"6F\" d=\"M28 214Q28 309 93 378T250 448Q340 448 405 380T471 215Q471 120 407 55T250 -10Q153 -10 91 57T28 214ZM250 30Q372 30 372 193V225V250Q372 272 371 288T364 326T348 362T317 390T268 410Q263 411 252 411Q222 411 195 399Q152 377 139 338T126 246V226Q126 130 145 91Q177 30 250 30Z\" transform=\"translate(1584,0)\"></path><path data-c=\"66\" d=\"M273 0Q255 3 146 3Q43 3 34 0H26V46H42Q70 46 91 49Q99 52 103 60Q104 62 104 224V385H33V431H104V497L105 564L107 574Q126 639 171 668T266 704Q267 704 275 704T289 705Q330 702 351 679T372 627Q372 604 358 590T321 576T284 590T270 627Q270 647 288 667H284Q280 668 273 668Q245 668 223 647T189 592Q183 572 182 497V431H293V385H185V225Q185 63 186 61T189 57T194 54T199 51T206 49T213 48T222 47T231 47T241 46T251 46H282V0H273Z\" transform=\"translate(2084,0)\"></path><path data-c=\"66\" d=\"M273 0Q255 3 146 3Q43 3 34 0H26V46H42Q70 46 91 49Q99 52 103 60Q104 62 104 224V385H33V431H104V497L105 564L107 574Q126 639 171 668T266 704Q267 704 275 704T289 705Q330 702 351 679T372 627Q372 604 358 590T321 576T284 590T270 627Q270 647 288 667H284Q280 668 273 668Q245 668 223 647T189 592Q183 572 182 497V431H293V385H185V225Q185 63 186 61T189 57T194 54T199 51T206 49T213 48T222 47T231 47T241 46T251 46H282V0H273Z\" transform=\"translate(2390,0)\"></path></g><g data-mml-node=\"mo\" transform=\"translate(2973.8,0)\"><path data-c=\"3D\" d=\"M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z\"></path></g><g data-mml-node=\"mo\" transform=\"translate(4029.6,0)\"><path data-c=\"6D\" d=\"M41 46H55Q94 46 102 60V68Q102 77 102 91T102 122T103 161T103 203Q103 234 103 269T102 328V351Q99 370 88 376T43 385H25V408Q25 431 27 431L37 432Q47 433 65 434T102 436Q119 437 138 438T167 441T178 442H181V402Q181 364 182 364T187 369T199 384T218 402T247 421T285 437Q305 442 336 442Q351 442 364 440T387 434T406 426T421 417T432 406T441 395T448 384T452 374T455 366L457 361L460 365Q463 369 466 373T475 384T488 397T503 410T523 422T546 432T572 439T603 442Q729 442 740 329Q741 322 741 190V104Q741 66 743 59T754 49Q775 46 803 46H819V0H811L788 1Q764 2 737 2T699 3Q596 3 587 0H579V46H595Q656 46 656 62Q657 64 657 200Q656 335 655 343Q649 371 635 385T611 402T585 404Q540 404 506 370Q479 343 472 315T464 232V168V108Q464 78 465 68T468 55T477 49Q498 46 526 46H542V0H534L510 1Q487 2 460 2T422 3Q319 3 310 0H302V46H318Q379 46 379 62Q380 64 380 200Q379 335 378 343Q372 371 358 385T334 402T308 404Q263 404 229 370Q202 343 195 315T187 232V168V108Q187 78 188 68T191 55T200 49Q221 46 249 46H265V0H257L234 1Q210 2 183 2T145 3Q42 3 33 0H25V46H41Z\"></path><path data-c=\"61\" d=\"M137 305T115 305T78 320T63 359Q63 394 97 421T218 448Q291 448 336 416T396 340Q401 326 401 309T402 194V124Q402 76 407 58T428 40Q443 40 448 56T453 109V145H493V106Q492 66 490 59Q481 29 455 12T400 -6T353 12T329 54V58L327 55Q325 52 322 49T314 40T302 29T287 17T269 6T247 -2T221 -8T190 -11Q130 -11 82 20T34 107Q34 128 41 147T68 188T116 225T194 253T304 268H318V290Q318 324 312 340Q290 411 215 411Q197 411 181 410T156 406T148 403Q170 388 170 359Q170 334 154 320ZM126 106Q126 75 150 51T209 26Q247 26 276 49T315 109Q317 116 318 175Q318 233 317 233Q309 233 296 232T251 223T193 203T147 166T126 106Z\" transform=\"translate(833,0)\"></path><path data-c=\"78\" d=\"M201 0Q189 3 102 3Q26 3 17 0H11V46H25Q48 47 67 52T96 61T121 78T139 96T160 122T180 150L226 210L168 288Q159 301 149 315T133 336T122 351T113 363T107 370T100 376T94 379T88 381T80 383Q74 383 44 385H16V431H23Q59 429 126 429Q219 429 229 431H237V385Q201 381 201 369Q201 367 211 353T239 315T268 274L272 270L297 304Q329 345 329 358Q329 364 327 369T322 376T317 380T310 384L307 385H302V431H309Q324 428 408 428Q487 428 493 431H499V385H492Q443 385 411 368Q394 360 377 341T312 257L296 236L358 151Q424 61 429 57T446 50Q464 46 499 46H516V0H510H502Q494 1 482 1T457 2T432 2T414 3Q403 3 377 3T327 1L304 0H295V46H298Q309 46 320 51T331 63Q331 65 291 120L250 175Q249 174 219 133T185 88Q181 83 181 74Q181 63 188 55T206 46Q208 46 208 23V0H201Z\" transform=\"translate(1333,0)\"></path></g><g data-mml-node=\"mo\" transform=\"translate(5890.6,0)\"><path data-c=\"28\" d=\"M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z\"></path></g><g data-mml-node=\"mi\" transform=\"translate(6279.6,0)\"><path data-c=\"1D43E\" d=\"M285 628Q285 635 228 637Q205 637 198 638T191 647Q191 649 193 661Q199 681 203 682Q205 683 214 683H219Q260 681 355 681Q389 681 418 681T463 682T483 682Q500 682 500 674Q500 669 497 660Q496 658 496 654T495 648T493 644T490 641T486 639T479 638T470 637T456 637Q416 636 405 634T387 623L306 305Q307 305 490 449T678 597Q692 611 692 620Q692 635 667 637Q651 637 651 648Q651 650 654 662T659 677Q662 682 676 682Q680 682 711 681T791 680Q814 680 839 681T869 682Q889 682 889 672Q889 650 881 642Q878 637 862 637Q787 632 726 586Q710 576 656 534T556 455L509 418L518 396Q527 374 546 329T581 244Q656 67 661 61Q663 59 666 57Q680 47 717 46H738Q744 38 744 37T741 19Q737 6 731 0H720Q680 3 625 3Q503 3 488 0H478Q472 6 472 9T474 27Q478 40 480 43T491 46H494Q544 46 544 71Q544 75 517 141T485 216L427 354L359 301L291 248L268 155Q245 63 245 58Q245 51 253 49T303 46H334Q340 37 340 35Q340 19 333 5Q328 0 317 0Q314 0 280 1T180 2Q118 2 85 2T49 1Q31 1 31 11Q31 13 34 25Q38 41 42 43T65 46Q92 46 125 49Q139 52 144 61Q147 65 216 339T285 628Z\"></path></g><g data-mml-node=\"mo\" transform=\"translate(7390.8,0)\"><path data-c=\"2212\" d=\"M84 237T84 250T98 270H679Q694 262 694 250T679 230H98Q84 237 84 250Z\"></path></g><g data-mml-node=\"msub\" transform=\"translate(8391,0)\"><g data-mml-node=\"mi\"><path data-c=\"1D446\" d=\"M308 24Q367 24 416 76T466 197Q466 260 414 284Q308 311 278 321T236 341Q176 383 176 462Q176 523 208 573T273 648Q302 673 343 688T407 704H418H425Q521 704 564 640Q565 640 577 653T603 682T623 704Q624 704 627 704T632 705Q645 705 645 698T617 577T585 459T569 456Q549 456 549 465Q549 471 550 475Q550 478 551 494T553 520Q553 554 544 579T526 616T501 641Q465 662 419 662Q362 662 313 616T263 510Q263 480 278 458T319 427Q323 425 389 408T456 390Q490 379 522 342T554 242Q554 216 546 186Q541 164 528 137T492 78T426 18T332 -20Q320 -22 298 -22Q199 -22 144 33L134 44L106 13Q83 -14 78 -18T65 -22Q52 -22 52 -14Q52 -11 110 221Q112 227 130 227H143Q149 221 149 216Q149 214 148 207T144 186T142 153Q144 114 160 87T203 47T255 29T308 24Z\"></path></g><g data-mml-node=\"mi\" transform=\"translate(646,-150) scale(0.707)\"><path data-c=\"1D447\" d=\"M40 437Q21 437 21 445Q21 450 37 501T71 602L88 651Q93 669 101 677H569H659Q691 677 697 676T704 667Q704 661 687 553T668 444Q668 437 649 437Q640 437 637 437T631 442L629 445Q629 451 635 490T641 551Q641 586 628 604T573 629Q568 630 515 631Q469 631 457 630T439 622Q438 621 368 343T298 60Q298 48 386 46Q418 46 427 45T436 36Q436 31 433 22Q429 4 424 1L422 0Q419 0 415 0Q410 0 363 1T228 2Q99 2 64 0H49Q43 6 43 9T45 27Q49 40 55 46H83H94Q174 46 189 55Q190 56 191 56Q196 59 201 76T241 233Q258 301 269 344Q339 619 339 625Q339 630 310 630H279Q212 630 191 624Q146 614 121 583T67 467Q60 445 57 441T43 437H40Z\"></path></g></g><g data-mml-node=\"mo\" transform=\"translate(9584.8,0)\"><path data-c=\"2C\" d=\"M78 35T78 60T94 103T137 121Q165 121 187 96T210 8Q210 -27 201 -60T180 -117T154 -158T130 -185T117 -194Q113 -194 104 -185T95 -172Q95 -168 106 -156T131 -126T157 -76T173 -3V9L172 8Q170 7 167 6T161 3T152 1T140 0Q113 0 96 17Z\"></path></g><g data-mml-node=\"mtext\" transform=\"translate(10029.5,0)\"><path data-c=\"A0\" d=\"\"></path></g><g data-mml-node=\"mn\" transform=\"translate(10279.5,0)\"><path data-c=\"30\" d=\"M96 585Q152 666 249 666Q297 666 345 640T423 548Q460 465 460 320Q460 165 417 83Q397 41 362 16T301 -15T250 -22Q224 -22 198 -16T137 16T82 83Q39 165 39 320Q39 494 96 585ZM321 597Q291 629 250 629Q208 629 178 597Q153 571 145 525T137 333Q137 175 145 125T181 46Q209 16 250 16Q290 16 318 46Q347 76 354 130T362 333Q362 478 354 524T321 597Z\"></path></g><g data-mml-node=\"mo\" transform=\"translate(10779.5,0)\"><path data-c=\"29\" d=\"M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z\"></path></g></g></g></svg>", "w": 11.1685, "h": 1, "a": 0.25, "va": -0.566}}; /*ENDTEX*/
+      /*NUM*/ const NUM = {"model":{"S0":100.0,"T_months":1,"r":0.0,"sigma":0.15,"crash":-0.2,"crash_rate":0.1,"crash_every_years":10.0,"paths":1000000,"seed":11,"paths_with_crash":8171,"strikes":[80,85,90,95,100,105,110,115,120],"rows":[{"K":80,"type":"put","price_mc":0.011170796819100525,"se":0.00022787166802043185,"price_exact":0.011436687340088323,"iv_mc":0.2971392935386652,"iv_exact":0.29789448503711385,"iv_pct":29.7},{"K":85,"type":"put","price_mc":0.04132806321287731,"se":0.0005460852083054605,"price_exact":0.04218832731875371,"iv_mc":0.26383954829524925,"iv_exact":0.2646242088807321,"iv_pct":26.4},{"K":90,"type":"put","price_mc":0.08956271432408816,"se":0.0009590692873856381,"price_exact":0.09138424359041891,"iv_mc":0.20737032529458066,"iv_exact":0.2081507484808209,"iv_pct":20.7},{"K":95,"type":"put","price_mc":0.3451030209296069,"se":0.0015988297801790997,"price_exact":0.3480027603303514,"iv_mc":0.16685960618501114,"iv_exact":0.1673144601786464,"iv_pct":16.7},{"K":100,"type":"call","price_mc":1.7980148763496528,"se":0.002648573688870384,"price_exact":1.7984101093213365,"iv_mc":0.156138714617461,"iv_exact":0.15617304226471088,"iv_pct":15.6},{"K":105,"type":"call","price_mc":0.30936375092849205,"se":0.0010844343914216742,"price_exact":0.30922075562338525,"iv_mc":0.1532664539703412,"iv_exact":0.15324418940092535,"iv_pct":15.3},{"K":110,"type":"call","price_mc":0.02453095169269709,"se":0.0002790418582786498,"price_exact":0.02448231426731061,"iv_mc":0.15217279697582725,"iv_exact":0.1521303785608618,"iv_pct":15.2},{"K":115,"type":"call","price_mc":0.0009501218600889001,"se":4.964552527029973e-05,"price_exact":0.0008885289361257162,"iv_mc":0.15237690309625118,"iv_exact":0.15157960467492973,"iv_pct":15.2},{"K":120,"type":"call","price_mc":1.5744911687713554e-05,"se":6.316785701074801e-06,"price_exact":1.5476242483741354e-05,"iv_mc":0.15138784852358356,"iv_exact":0.15125869899311462,"iv_pct":15.1}],"iv_pct":{"80":29.7,"85":26.4,"90":20.7,"95":16.7,"100":15.6,"105":15.3,"110":15.2,"115":15.2,"120":15.1}},"put90":{"K":90,"price_model":0.08956271432408816,"price_one_vol":0.014015880396880398,"ratio":6.390088370333318,"atm_iv":0.156138714617461,"iv":0.20737032529458066,"iv_pct":20.7}}; /*ENDNUM*/
 // HOLOHUD: the Sci-fi Hologram HUD engine as one classic script, for HyperFrames scenes (copy it verbatim into a
 // scene's IIFE). HOLO = wireframe engine (holo.js), HUD = UI layer (hud.js), MKM = model builder (mkmodel.mjs), unchanged
 // except that ES-module exports became closures and the fetch-based model loader was dropped.
@@ -999,237 +999,469 @@ const HOLOHUD = (function () {
   })();
   return { HOLO, HUD, MKM, LIGHT, ADD };
 })();
+// QCHART: the quant chart kit for the light HUD scenes (panels, axes, curves, candles, bars, markers, rolling values,
+// target locks and typeset LaTeX formulas). Needs HOLOHUD above it. Pure functions of what you pass in: call them from
+// draw() every frame. Colours are theme keys ('line' blue, 'hi' navy, 'dim' pale blue, 'acc' orange) or CSS strings.
+const QC = (function () {
+  const { HUD } = HOLOHUD, FONT = HUD.FONT;
+  const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x)), lerp = (a, b, k) => a + (b - a) * k;
+  const eo = (x) => 1 - Math.pow(1 - clamp(x), 3);
+  const eio = (x) => { x = clamp(x); return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
+  const C = (T, c, a) => (typeof c === 'function' ? c(a) : (T[c] && typeof T[c] === 'function') ? T[c](a) : c);
+  const MINUS = '−';
+  const fmt = (v, d = 2) => (v < 0 ? MINUS : '') + Math.abs(v).toFixed(d);
+  const SUP = { '-': '⁻', '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹' };
+  const pow10 = (e) => '10' + String(e).split('').map((ch) => SUP[ch] || ch).join('');
 
-      // ---- the HUD scene scaffold (shared by every scene; keep it as is) ----
-      const { HOLO, HUD, MKM } = HOLOHUD;
-      const T = HUD.theme(218, 22), WF = 1080, HF = 1920, FPS = 24;
-      const holo = new HOLO.Holo(WF, HF);
-      const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x)), lerp = (a, b, k) => a + (b - a) * k;
-      const eo = (x) => 1 - Math.pow(1 - clamp(x), 3), eio = (x) => { x = clamp(x); return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
-      // HOME: every scene starts and ends on this camera, so the projector pad never jumps at a cut
-      const HOME = { target: [0, 0.5, 0], yaw: 0.35, pitch: 0.32, dist: 7.6, fov: 0.62, cx: 540, cy: 1010 };
-      const camMix = (a, b, k) => ({ target: a.target.map((v, i) => lerp(v, b.target[i], k)), yaw: lerp(a.yaw, b.yaw, k), pitch: lerp(a.pitch, b.pitch, k),
-        dist: lerp(a.dist, b.dist, k), fov: lerp(a.fov, b.fov, k), cx: lerp(a.cx, b.cx, k), cy: lerp(a.cy, b.cy, k) });
-      // build a model from MKM primitives in world units (no normalising: heights stay honest), ready for holo.draw
-      const build = (fn) => { const m = new MKM.Model("m"); fn(m); return HOLO.prepModel(m.toJSON()); };
-      // scan in over the first 0.6 s (the scan plane grows the subject), erase over the last 0.4 s; yTop = the subject's height
-      const scanState = (t, yTop) => {
-        const kin = clamp(t / 0.6), kout = clamp((t - (DUR - 0.42)) / 0.4);
-        if (kout > 0) return { scanDown: { y: lerp(yTop + 0.1, -0.05, eio(kout)) }, plane: lerp(yTop + 0.1, -0.05, eio(kout)), planeA: 1 - 0.3 * kout };
-        if (kin < 1) return { scan: { y: lerp(-0.05, yTop + 0.12, eio(kin)), band: 0.07 }, plane: lerp(-0.05, yTop + 0.12, eio(kin)), planeA: 1 };
-        return {};
-      };
-      const P3 = (cam, x, y, z) => { const c = HOLO.makeCamera(cam, WF, HF), o = new Float32Array(3); c.project(x, y, z, o); return [o[0], o[1], o[2]]; };
+  // ---- a plot frame: data -> px. xr, yr: data ranges; for a log axis pass log10 values and format ticks with pow10 ----
+  function frame(x, y, w, h, xr, yr) {
+    return { x, y, w, h, xr, yr,
+      X: (v) => x + (v - xr[0]) / (xr[1] - xr[0]) * w,
+      Y: (v) => y + h - (v - yr[0]) / (yr[1] - yr[0]) * h,
+      ix: (px) => xr[0] + (px - x) / w * (xr[1] - xr[0]) };
+  }
 
+  // ---- panel: white plate + corner brackets, opening from its centre; title row (index tick, title, sub, tag) ----
+  function panel(g, T, x, y, w, h, o = {}) {
+    const a = o.a ?? 1, k = o.open ?? 1;
+    if (a <= 0 || k <= 0) return;
+    const ow = w * (0.5 + 0.5 * eo(k));
+    HUD.plate(g, T, x + (w - ow) / 2, y, ow, h, clamp(k * 1.5) * a, { op: o.op ?? 0.82 });
+    if (!o.title) return;
+    const ta = a * clamp((k - 0.45) * 2.2);
+    if (ta <= 0) return;
+    g.save(); g.globalAlpha = ta; g.textBaseline = 'alphabetic'; g.textAlign = 'left';
+    g.fillStyle = T.line(1); g.fillRect(x + 24, y + 22, 30 * eo(k), 4);
+    let tx = x + 24;
+    if (o.index) { g.font = `400 19px ${FONT.mono}`; g.fillStyle = T.dim(1); g.fillText(o.index, tx, y + 54); tx += 38; }
+    g.letterSpacing = '2px'; g.font = `600 ${o.ts ?? 26}px ${FONT.ui}`; g.fillStyle = T.hi(1);
+    g.fillText(HUD.rollText(o.title.toUpperCase().replace(/Σ/g, 'σ').replace(/Λ/g, 'λ'), clamp(k * 1.4 - 0.3), o.frame ?? 0, 5), tx, y + 54);
+    if (o.sub) { g.letterSpacing = '1px'; g.font = `400 19px ${FONT.mono}`; g.fillStyle = T.dim(1); g.fillText(o.sub.toUpperCase().replace(/Σ/g, 'σ').replace(/Λ/g, 'λ'), x + 24, y + 82); }
+    if (o.tag) {
+      g.letterSpacing = '1.5px'; g.font = `600 17px ${FONT.ui}`;
+      const tw = g.measureText(o.tag).width + 20, bx = x + w - 24 - tw;
+      g.strokeStyle = C(T, o.tagC || 'line', 0.9); g.lineWidth = 1.2; g.strokeRect(bx, y + 32, tw, 28);
+      g.fillStyle = C(T, o.tagC || 'line', 1); g.fillText(o.tag, bx + 10, y + 52);
+    }
+    g.restore();
+  }
 
-      // words: 0 And 1 what 2 pays 3 in 4 a 5 crash? 6 A 7 low-strike 8 put. 9 So 10 traders 11 pay 12 more 13 for 14 it.
-      const w = (i) => Math.max(0, W.length > i ? W[i] : 0.12 + i * 0.3);
-      // ---- s7: one scale for every price, 1 point = 0.01 units. The stock, a price block 100 points tall banded every 10,
-      // drops 20% to 80 on "crash?" (the lost 20-point slab lifts off and is erased). "A low-strike put": a put contract
-      // card (thin slab, header band) for strike 90, 1 month, and its payoff at expiry as columns for S = 70..100, height
-      // max(90 - S, 0): 20, 15, 10, 5, 0, 0, 0; the S = 80 column (where the crash left the stock) is hot. "pay more": the
-      // put's price with one volatility (15.6%) is 0.014; with crashes (simulated) 0.090, x6.4. ----
-      const KP = 0.01;                                          // world units per price point
-      const SX = -0.72, SZ = 0.1, SW = 0.2;                     // the stock block (front left)
-      const CX = 0.2, CZ = -0.32, CW = 0.66, CH = 0.44;         // the put contract card (standing at the back, facing the camera)
-      const PS = [70, 75, 80, 85, 90, 95, 100], PX = (i) => -0.22 + i * 0.14, PZ = 0.22, PW = 0.1;
-      const pay = (S) => Math.max(90 - S, 0);
-      const tCrash = w(5), tPut = w(7) - 0.12;
-      const stockH = (t) => KP * lerp(100, 80, eio((t - tCrash) / 0.16));
-      function priceBlock(m, h) {
-        m.box([SX, h / 2, SZ], [SW, h, SW]);
-        for (let p = 10; p * KP < h - 0.005; p += 10) {          // a band every 10 points
-          const y = p * KP, a = SW / 2 + 0.006, ids = [[-a, -a], [a, -a], [a, a], [-a, a]].map(([dx, dz]) => m.vtx([SX + dx, y, SZ + dz]));
-          for (let i = 0; i < 4; i++) m.edge(ids[i], ids[(i + 1) % 4]);
-        }
-      }
-      function model(t) {
-        return build((m) => {
-          m.part("stk", { anchor: [SX + SW / 2, stockH(t), SZ + SW / 2] }); m.piece("stk"); priceBlock(m, stockH(t));
-          // the payoff columns rise one after another from S = 70 (hot at S = 80, where the stock now is)
-          PS.forEach((S, i) => {
-            const p = clamp((t - (w(7) + 0.02 + i * 0.05)) / 0.3); if (p <= 0) return;
-            const h = Math.max(0.004, KP * pay(S) * eo(p) * (1 + 0.1 * Math.sin(p * 3.2) * (1 - p)));
-            m.part("c" + i, { anchor: [PX(i), h, PZ] }); m.piece("c" + i); m.box([PX(i), h / 2, PZ], [PW, h, PW]);
-          });
-        });
-      }
-      const SLAB = build((m) => { m.part("slab", { anchor: [SX, 0.9, SZ] }); m.piece("slab"); m.box([SX, 0.9, SZ], [SW, 0.2, SW]); m.box([SX, 0.9, SZ], [SW + 0.012, 0.004, SW + 0.012]); });
-      const CARD = build((m) => {
-        m.part("card", { anchor: [CX, CH / 2, CZ + 0.02] }); m.piece("card");
-        m.box([CX, 0.02 + CH / 2, CZ], [CW, CH, 0.025]);                      // the contract, standing
-        m.box([CX, 0.02 + CH - 0.045, CZ], [CW, 0.09, 0.025]);                // its header band
-        for (const dx of [-CW * 0.32, CW * 0.32]) m.box([CX + dx, 0.01, CZ], [0.09, 0.02, 0.12]);   // two feet on the pad
+  // ---- a tick label; "10⁻⁵⁹"-style labels (QC.pow10) are drawn as the base plus a raised, smaller exponent in the
+  //      same face, so no superscript glyph falls back to another font ----
+  const SUPR = { '\u207b': MINUS, '\u2070': '0', '\u00b9': '1', '\u00b2': '2', '\u00b3': '3', '\u2074': '4', '\u2075': '5', '\u2076': '6', '\u2077': '7', '\u2078': '8', '\u2079': '9' };
+  function tick(g, s, x, y, align, sz) {
+    const m = /^(.*?)([\u207b\u2070\u00b9\u00b2\u00b3\u2074-\u2079]+)$/.exec(s);
+    if (!m) { g.textAlign = align; g.fillText(s, x, y); return; }
+    const base = m[1], ex = m[2].split('').map((c) => SUPR[c]).join('');
+    const f0 = g.font, fe = f0.replace(/(\d+(?:\.\d+)?)px/, (_, n) => Math.round(n * 0.68) + 'px');
+    const wb = g.measureText(base).width; g.font = fe; const we = g.measureText(ex).width; g.font = f0;
+    const tw = wb + 2 + we, x0 = align === 'right' ? x - tw : align === 'center' ? x - tw / 2 : x;
+    g.textAlign = 'left'; g.fillText(base, x0, y);
+    g.font = fe; g.fillText(ex, x0 + wb + 2, y - sz * 0.42); g.font = f0;
+  }
+
+  // ---- axes: o = { xt, yt (tick values), xf, yf (tick formats), xl, yl (axis titles), grid, k (draw-in 0-1), a,
+  //      xAt (data y of the x axis; default yr[0]), yAt (data x of the y axis; default xr[0]), size (tick px) } ----
+  function axes(g, T, F, o = {}) {
+    const a = o.a ?? 1, k = eo(o.k ?? 1);
+    if (a <= 0 || k <= 0) return;
+    const xAt = F.Y(o.xAt ?? F.yr[0]), yAt = F.X(o.yAt ?? F.xr[0]), sz = o.size ?? 21;
+    g.save(); g.textBaseline = 'alphabetic';
+    if (o.grid !== false) {
+      g.strokeStyle = T.dim(0.22 * a); g.lineWidth = 1;
+      g.beginPath();
+      (o.yt || []).forEach((v) => { const py = F.Y(v); g.moveTo(F.x, py); g.lineTo(F.x + F.w * k, py); });
+      (o.xt || []).forEach((v) => { const px = F.X(v); g.moveTo(px, F.y + F.h); g.lineTo(px, F.y + F.h - F.h * k); });
+      g.stroke();
+    }
+    g.strokeStyle = T.hi(0.85 * a); g.lineWidth = 2;
+    g.beginPath(); g.moveTo(F.x, xAt); g.lineTo(F.x + F.w * k, xAt);
+    if (!o.noY) { g.moveTo(yAt, F.y + F.h); g.lineTo(yAt, F.y + F.h - F.h * k); }
+    g.stroke();
+    g.font = `400 ${sz}px ${FONT.mono}`; g.fillStyle = T.hi(0.85 * a);
+    g.textAlign = 'center';
+    (o.xt || []).forEach((v, i) => {
+      const px = F.X(v), ka = clamp((k - i / Math.max(1, o.xt.length) * 0.6) * 3);
+      if (ka <= 0) return;
+      g.globalAlpha = ka; g.beginPath(); g.moveTo(px, xAt); g.lineTo(px, xAt + 8); g.stroke();
+      tick(g, o.xf ? o.xf(v) : String(v), px, xAt + 12 + sz, 'center', sz);
+    });
+    g.globalAlpha = 1;
+    if (!o.noY) {
+      g.textAlign = 'right';
+      (o.yt || []).forEach((v, i) => {
+        const py = F.Y(v), ka = clamp((k - i / Math.max(1, o.yt.length) * 0.6) * 3);
+        if (ka <= 0) return;
+        g.globalAlpha = ka; g.beginPath(); g.moveTo(yAt, py); g.lineTo(yAt - 8, py); g.stroke();
+        tick(g, o.yf ? o.yf(v) : String(v), yAt - 14, py + sz * 0.36, 'right', sz);
       });
+    }
+    g.globalAlpha = a * clamp(k * 2 - 1);
+    g.letterSpacing = '1.5px'; g.font = `500 ${sz - 2}px ${FONT.mono}`; g.fillStyle = T.line(0.95);
+    if (o.xl) { g.textAlign = 'right'; g.fillText(o.xl.toUpperCase().replace(/Σ/g, 'σ').replace(/Λ/g, 'λ'), F.x + F.w, xAt + 2 * sz + 26); }
+    if (o.yl) { g.textAlign = 'left'; g.fillText(o.yl.toUpperCase().replace(/Σ/g, 'σ').replace(/Λ/g, 'λ'), yAt - (o.ylDx ?? 0), F.y - 16); }
+    g.restore();
+  }
 
-      // ---- camera: HOME -> 3/4 over the pad -> a slow drift toward the contract -> HOME ----
-      const S7 = { target: [-0.5, 0.45, 0], yaw: 0.3, pitch: 0.28, dist: 5.4, fov: 0.62, cx: 540, cy: 1120 };
-      const S7p = { target: [-0.05, 0.3, 0], yaw: 0.22, pitch: 0.3, dist: 5.0, fov: 0.62, cx: 600, cy: 1118 };
-      function camPath(t, keys) {
-        for (let i = 1; i < keys.length; i++) keys[i][0] = Math.max(keys[i][0], keys[i - 1][0]);
-        if (t <= keys[0][0]) return keys[0][1];
-        for (let i = 0; i < keys.length - 1; i++) {
-          const [ta, ca] = keys[i], [tb, cb] = keys[i + 1];
-          if (t <= tb) return tb - ta < 1e-6 ? cb : camMix(ca, cb, eio((t - ta) / (tb - ta)));
-        }
-        return keys[keys.length - 1][1];
+  // ---- a curve. o = { c, w, a, k (0-1 of the x range drawn, left to right) or x1 (data x drawn up to), dash, glow,
+  //      head (a dot + short scan line at the drawing front), clipY (keep inside the frame vertically) } ----
+  function line(g, T, F, xs, ys, o = {}) {
+    const a = o.a ?? 1; if (a <= 0) return null;
+    const xEnd = o.x1 ?? lerp(xs[0], xs[xs.length - 1], clamp(o.k ?? 1));
+    g.save();
+    if (o.clipY !== false) { g.beginPath(); g.rect(F.x - 4, F.y - 4, F.w + 8, F.h + 8); g.clip(); }
+    const pts = []; let last = null;
+    for (let i = 0; i < xs.length; i++) {
+      if (xs[i] > xEnd) {
+        if (i > 0) { const f = (xEnd - xs[i - 1]) / (xs[i] - xs[i - 1]); last = [xEnd, lerp(ys[i - 1], ys[i], f)]; pts.push([F.X(last[0]), F.Y(last[1])]); }
+        break;
       }
-      const camAt = (t) => camPath(t, [[0, HOME], [0.15, HOME], [0.95, S7], [w(5) + 0.22, S7], [w(7) + 0.25, S7p], [DUR - 0.75, S7p], [DUR - 0.15, HOME], [DUR, HOME]]);
-      // the pad turns slowly and is back at its rest angle at both ends of the scene (no jump at either cut)
-      const padRot = (t) => 0.05 * DUR / Math.PI * Math.sin(Math.PI * clamp(t / DUR));
+      pts.push([F.X(xs[i]), F.Y(ys[i])]); last = [xs[i], ys[i]];
+    }
+    if (pts.length < 2) { g.restore(); return null; }
+    const path = () => { g.beginPath(); g.moveTo(pts[0][0], pts[0][1]); for (let i = 1; i < pts.length; i++) g.lineTo(pts[i][0], pts[i][1]); };
+    g.lineJoin = 'round'; g.lineCap = 'round';
+    if (o.glow !== false) { path(); g.strokeStyle = C(T, o.c || 'line', 0.16 * a); g.lineWidth = (o.w ?? 3) + 8; g.stroke(); }
+    path(); g.setLineDash(o.dash || []); g.strokeStyle = C(T, o.c || 'line', 0.95 * a); g.lineWidth = o.w ?? 3; g.stroke();
+    g.setLineDash([]);
+    const end = pts[pts.length - 1];
+    if (o.head && (o.k ?? 1) < 1) {
+      g.fillStyle = C(T, o.c || 'line', a); g.beginPath(); g.arc(end[0], end[1], 6, 0, 2 * Math.PI); g.fill();
+      g.strokeStyle = T.line(0.35 * a); g.lineWidth = 1.5; g.beginPath(); g.moveTo(end[0], F.y); g.lineTo(end[0], F.y + F.h); g.stroke();
+    }
+    g.restore();
+    return { end, last };
+  }
+
+  // ---- filled area between a curve and a base level (data y). o = { base, c, a, k, x0, x1 (data x span) } ----
+  function area(g, T, F, xs, ys, o = {}) {
+    const a = o.a ?? 1; if (a <= 0) return;
+    const base = o.base ?? F.yr[0], x0 = o.x0 ?? xs[0];
+    const x1 = Math.min(o.x1 ?? xs[xs.length - 1], lerp(xs[0], xs[xs.length - 1], clamp(o.k ?? 1)));
+    if (x1 <= x0) return;
+    g.save(); g.beginPath(); g.rect(F.x, F.y, F.w, F.h); g.clip();
+    g.beginPath(); g.moveTo(F.X(x0), F.Y(base)); let started = false;
+    for (let i = 0; i < xs.length; i++) {
+      if (xs[i] < x0) continue; if (xs[i] > x1) break;
+      g.lineTo(F.X(xs[i]), F.Y(ys[i])); started = true;
+    }
+    if (!started) { g.restore(); return; }
+    g.lineTo(F.X(x1), F.Y(base)); g.closePath();
+    g.fillStyle = C(T, o.c || 'line', (o.fa ?? 0.16) * a); g.fill();
+    g.restore();
+  }
+
+  // ---- bars (a histogram): xs = bar centres (data), ys = heights; o = { bw (data width), base, c, a, k (grow),
+  //      stroke, fa (fill alpha), hl: [indices drawn in the accent] } ----
+  function bars(g, T, F, xs, ys, o = {}) {
+    const a = o.a ?? 1; if (a <= 0) return;
+    const base = o.base ?? F.yr[0], bw = o.bw ?? (xs[1] - xs[0]) * 0.8;
+    g.save();
+    for (let i = 0; i < xs.length; i++) {
+      const ki = eo(clamp((o.k ?? 1) * 1.6 - i / xs.length * 0.6));
+      if (ki <= 0) continue;
+      const hv = lerp(base, ys[i], ki), x0 = F.X(xs[i] - bw / 2), x1 = F.X(xs[i] + bw / 2), y0 = F.Y(base), y1 = F.Y(hv);
+      if (Math.abs(y1 - y0) < 0.75) continue;
+      const hl = (o.hl || []).includes(i), c = hl ? 'acc' : (o.c || 'line');
+      g.fillStyle = C(T, c, (o.fa ?? 0.22) * a); g.fillRect(x0, Math.min(y0, y1), x1 - x0, Math.abs(y1 - y0));
+      g.strokeStyle = C(T, c, 0.9 * a); g.lineWidth = o.stroke ?? 1.6; g.strokeRect(x0 + 0.5, Math.min(y0, y1) + 0.5, x1 - x0 - 1, Math.abs(y1 - y0) - 1);
+    }
+    g.restore();
+  }
+
+  // ---- candles: d = { open, high, low, close } arrays, xs = data x per candle; o = { n (how many shown, may be
+  //      fractional: the last one grows), bw (px), hl (index in the accent), a } ----
+  function candles(g, T, F, d, xs, o = {}) {
+    const a = o.a ?? 1; if (a <= 0) return;
+    const n = o.n ?? xs.length, bw = o.bw ?? 10;
+    g.save();
+    for (let i = 0; i < Math.min(xs.length, Math.ceil(n)); i++) {
+      const grow = clamp(n - i);
+      const op = d.open[i], cl = lerp(op, d.close[i], eo(grow)), hi = lerp(op, d.high[i], eo(grow)), lo = lerp(op, d.low[i], eo(grow));
+      const up = d.close[i] >= op, hl = o.hl === i, cx = F.X(xs[i]);
+      const col = hl ? T.acc(a) : up ? T.line(0.95 * a) : T.hi(0.9 * a);
+      g.strokeStyle = col; g.lineWidth = hl ? 2.4 : 1.6;
+      g.beginPath(); g.moveTo(cx, F.Y(hi)); g.lineTo(cx, F.Y(lo)); g.stroke();
+      const y0 = F.Y(Math.max(op, cl)), y1 = F.Y(Math.min(op, cl)), hh = Math.max(2, y1 - y0);
+      if (up && !hl) { g.fillStyle = 'rgba(255,255,255,0.95)'; g.fillRect(cx - bw / 2, y0, bw, hh); g.strokeRect(cx - bw / 2 + 0.5, y0 + 0.5, bw - 1, hh - 1); }
+      else { g.fillStyle = col; g.fillRect(cx - bw / 2, y0, bw, hh); }
+    }
+    g.restore();
+  }
+
+  // ---- reference lines: o = { c, a, dash, w, label, at ('start'|'end'), size } ----
+  function hline(g, T, F, v, o = {}) {
+    const a = o.a ?? 1; if (a <= 0) return;
+    const py = F.Y(v), k = clamp(o.k ?? 1);
+    g.save(); g.setLineDash(o.dash ?? [10, 8]); g.strokeStyle = C(T, o.c || 'hi', 0.75 * a); g.lineWidth = o.w ?? 2;
+    g.beginPath(); g.moveTo(F.x, py); g.lineTo(F.x + F.w * k, py); g.stroke(); g.setLineDash([]);
+    if (o.label && k > 0.6) { g.globalAlpha = clamp((k - 0.6) * 2.5); tag(g, T, o.label, o.at === 'start' ? F.x + 10 : F.x + F.w - 10, py - 10, { c: o.c || 'hi', align: o.at === 'start' ? 'left' : 'right', a, size: o.size }); }
+    g.restore();
+  }
+  function vline(g, T, F, v, o = {}) {
+    const a = o.a ?? 1; if (a <= 0) return;
+    const px = F.X(v), k = clamp(o.k ?? 1);
+    g.save(); g.setLineDash(o.dash ?? [10, 8]); g.strokeStyle = C(T, o.c || 'hi', 0.75 * a); g.lineWidth = o.w ?? 2;
+    g.beginPath(); g.moveTo(px, F.y + F.h); g.lineTo(px, F.y + F.h - F.h * k); g.stroke(); g.setLineDash([]);
+    if (o.label && k > 0.6) { g.globalAlpha = clamp((k - 0.6) * 2.5); tag(g, T, o.label, px + (o.dx ?? 0), (o.y ?? F.y) - 6, { c: o.c || 'hi', align: o.align || 'center', a, size: o.size }); }
+    g.restore();
+  }
+
+  // ---- a marker dot with a ring; o = { r, c, a, pulse (0-1 expanding ring) } ----
+  function dot(g, T, x, y, o = {}) {
+    const a = o.a ?? 1; if (a <= 0) return;
+    const r = (o.r ?? 7) * (o.s ?? 1);
+    g.save();
+    g.fillStyle = 'rgba(255,255,255,0.95)'; g.beginPath(); g.arc(x, y, r + 3, 0, 2 * Math.PI); g.fill();
+    g.fillStyle = C(T, o.c || 'line', a); g.beginPath(); g.arc(x, y, r, 0, 2 * Math.PI); g.fill();
+    g.strokeStyle = C(T, o.c || 'line', 0.55 * a); g.lineWidth = 1.6; g.beginPath(); g.arc(x, y, r + 7, 0, 2 * Math.PI); g.stroke();
+    if (o.pulse > 0 && o.pulse < 1) { g.strokeStyle = C(T, o.c || 'line', 0.8 * a * (1 - o.pulse)); g.beginPath(); g.arc(x, y, r + 7 + 34 * o.pulse, 0, 2 * Math.PI); g.stroke(); }
+    g.restore();
+  }
+
+  // ---- text: o = { size, wt, c, a, align, mono, ls, roll (0-1), frame, seed, base ('alphabetic'|'middle') } ----
+  function text(g, T, s, x, y, o = {}) {
+    const a = o.a ?? 1; if (a <= 0 || !s) return 0;
+    g.save(); g.globalAlpha = 1; g.textAlign = o.align || 'left'; g.textBaseline = o.base || 'alphabetic';
+    g.letterSpacing = (o.ls ?? 0) + 'px';
+    g.font = `${o.wt ?? 500} ${o.size ?? 28}px ${o.mono ? FONT.mono : FONT.ui}`;
+    if (o.maxW) HUD.fitFont(g, s, o.wt ?? 500, o.size ?? 28, o.mono ? FONT.mono : FONT.ui, o.maxW, 12);
+    g.fillStyle = C(T, o.c || 'hi', a);
+    const str = o.roll !== undefined ? HUD.rollText(s, o.roll, o.frame ?? 0, o.seed ?? 0) : s;
+    g.fillText(str, x, y);
+    const w = g.measureText(s).width;
+    g.restore();
+    return w;
+  }
+
+  // ---- a value that rolls in and locks in the accent: o = { size, a, roll, frame, unit, flash, c (before lock) } ----
+  function value(g, T, s, x, y, o = {}) {
+    const a = o.a ?? 1, roll = o.roll ?? 1; if (a <= 0 || roll <= 0) return { w: 0 };
+    const size = o.size ?? 72, locked = roll >= 1;
+    g.save(); g.textAlign = 'left'; g.textBaseline = 'alphabetic';
+    g.font = `${o.wt ?? 400} ${size}px ${FONT.ui}`;
+    const adv = g.measureText('0').width * 1.02;
+    const total = (() => { let w = 0; for (const ch of s) w += (ch === '.' || ch === ',' || ch === ' ') ? g.measureText(ch).width * 1.1 : adv; return w; })();
+    let x0 = o.align === 'right' ? x - total : o.align === 'center' ? x - total / 2 : x;
+    g.fillStyle = locked ? (o.flash ? T.hi(a) : C(T, o.lc || 'acc', a)) : C(T, o.c || 'line', 0.85 * a);
+    const vw = HUD.monoText(g, HUD.rollText(s, roll, o.frame ?? 0, o.seed ?? 11), x0, y, adv);
+    if (o.unit) {
+      g.font = `500 ${Math.round(size * 0.36)}px ${FONT.ui}`; g.fillStyle = locked ? C(T, o.lc || 'acc', 0.9 * a) : T.line(0.6 * a);
+      g.fillText(o.unit, x0 + vw + 8, y);
+    }
+    g.restore();
+    return { w: vw, x0, bb: [x0, y - size * 0.78, x0 + vw, y + size * 0.06] };
+  }
+
+  // ---- a small filled tag: o = { c ('line'|'acc'|'hi'), a, align, size } ----
+  function tag(g, T, s, x, y, o = {}) {
+    const a = o.a ?? 1; if (a <= 0) return;
+    g.save(); g.letterSpacing = '1px'; g.font = `600 ${o.size ?? 19}px ${FONT.ui}`; g.textBaseline = 'alphabetic';
+    const w = g.measureText(s).width + 18, h = (o.size ?? 19) + 11;
+    const x0 = o.align === 'right' ? x - w : o.align === 'center' ? x - w / 2 : x;
+    g.fillStyle = C(T, o.c || 'line', 0.95 * a); g.fillRect(x0, y - h, w, h);
+    g.fillStyle = `rgba(255,255,255,${a})`; g.textAlign = 'left'; g.fillText(s, x0 + 9, y - 8);
+    g.restore();
+    return [x0, y - h, x0 + w, y];
+  }
+
+  // ---- target lock (HUD.targetBox) and leader, re-exported ----
+  const lock = (g, T, bb, k, o = {}) => HUD.targetBox(g, T, bb, k, o);
+  const leader = (g, T, a, b, c, k, o = {}) => HUD.leader(g, T, a, b, c, k, o);
+
+  // ---- scene life: the scan-in (a vertical scan line reveals the stage left to right) and the scan-erase at the
+  //      end. Use: const sx = QC.scanIn(t) ... QC.clipStage(g, sx) ... draw ... g.restore(); QC.scanLine(g, T, sx). ----
+  const STAGE = { x0: 30, x1: 1050, y0: 552, y1: 1478 };
+  const scanIn = (t, t0 = 0, dur = 0.6) => lerp(STAGE.x0, STAGE.x1, eio((t - t0) / dur));
+  const scanOut = (t, t1, dur = 0.4) => lerp(STAGE.x0, STAGE.x1, eio((t - (t1 - dur)) / dur));
+  function clipStage(g, xIn = STAGE.x1, xOut = STAGE.x0) {   // keep [xOut, xIn] of the stage; call g.restore() after
+    g.save(); g.beginPath(); g.rect(xOut, 0, Math.max(0, xIn - xOut), 1920); g.clip();
+  }
+  function scanLine(g, T, x, a = 1) {
+    if (x <= STAGE.x0 + 1 || x >= STAGE.x1 - 1 || a <= 0) return;
+    g.save();
+    const gr = g.createLinearGradient(x - 60, 0, x + 6, 0);
+    gr.addColorStop(0, T.line(0)); gr.addColorStop(1, T.line(0.16 * a));
+    g.fillStyle = gr; g.fillRect(x - 60, STAGE.y0, 66, STAGE.y1 - STAGE.y0);
+    g.strokeStyle = T.line(0.9 * a); g.lineWidth = 2; g.beginPath(); g.moveTo(x, STAGE.y0); g.lineTo(x, STAGE.y1); g.stroke();
+    g.restore();
+  }
+
+  // ---- LaTeX formulas: inline SVG (typeset by MathJax at build time) in a DOM layer over the canvas ----
+  // init once with the scene's TEX map; each frame: tex.begin(); tex.show(id, {...}); ... tex.end();
+  const tex = (function () {
+    let layer = null, nodes = {}, shown = {}, MAP = {}, ACC = '', LINE = '';
+    function init(root, map, T) {
+      MAP = map; ACC = T.acc(1); LINE = T.line(1); layer = document.createElement('div');
+      layer.style.cssText = 'position:absolute;left:0;top:0;width:1080px;height:1920px;pointer-events:none;';
+      const st = document.createElement('style');
+      st.textContent = `.qtex{position:absolute;left:0;top:0;transform-origin:0 0;color:${T.hi(1)};will-change:clip-path,opacity}
+        .qtex svg{display:block;width:100%;height:100%;overflow:visible}
+        .qtex .acc{color:var(--acc)} .qtex .blu{color:${T.line(1)}}`;
+      layer.appendChild(st);
+      for (const id in map) {
+        const d = document.createElement('div'); d.className = 'qtex'; d.innerHTML = map[id].svg; d.style.display = 'none';
+        layer.appendChild(d); nodes[id] = d;
+      }
+      root.appendChild(layer);
+    }
+    function begin() { shown = {}; }
+    // o = { x, y, size (em px), align ('left'|'center'|'right'), valign ('base'|'middle'|'top'), k (reveal 0-1, left to
+    //       right), cut (0-1 erased from the left), a, lock (true: the \class{acc} parts turn orange), clip [x0, x1] px }
+    function show(id, o = {}) {
+      const f = MAP[id], d = nodes[id]; if (!f || !d) throw new Error('no formula ' + id);
+      const em = o.size ?? 56, w = f.w * em, h = f.h * em;
+      let x = o.x ?? 540, y = o.y ?? 0;
+      if (o.align === 'center') x -= w / 2; else if (o.align === 'right') x -= w;
+      const top = o.valign === 'top' ? y : o.valign === 'middle' ? y - h / 2 : y - (f.h - f.a) * em;
+      const k = clamp(o.k ?? 1), cut = clamp(o.cut ?? 0);
+      let L = cut * w, R = (1 - k) * w;
+      if (o.clip) { L = Math.max(L, o.clip[0] - x); R = Math.max(R, x + w - o.clip[1]); }
+      const a = o.a ?? 1;
+      if (a <= 0 || L + R >= w) return { bb: [x, top, x + w, top + h], w, h };
+      d.style.display = 'block'; d.style.width = w + 'px'; d.style.height = h + 'px';
+      d.style.transform = `translate(${x}px, ${top}px)`; d.style.opacity = a;
+      d.style.clipPath = `inset(-20px ${R}px -20px ${L}px)`;
+      d.style.setProperty('--acc', o.lock ? ACC : LINE);
+      shown[id] = 1;
+      return { bb: [x, top, x + w, top + h], w, h };
+    }
+    function end() { for (const id in nodes) if (!shown[id]) nodes[id].style.display = 'none'; }
+    return { init, begin, show, end };
+  })();
+
+  return { frame, panel, axes, line, area, bars, candles, hline, vline, dot, text, value, tag, lock, leader,
+    STAGE, scanIn, scanOut, clipStage, scanLine, tex, fmt, pow10, MINUS, clamp, lerp, eo, eio };
+})();
+// QCHART END
 
 
-      // ---- small HUD helpers: every text block on its own plate; the accent only on a value the frame it locks ----
-      const ADD = HOLOHUD.ADD, UI = HUD.FONT.ui, MONO = HUD.FONT.mono;
-      const fnt = (wt, px, fam) => wt + " " + px + "px " + (fam || UI);
-      // a text plate: rows [{ s, wt, px, mono, col, ls }] type in with k; o.right anchors its right edge at x
-      function tagPlate(x, y, rows, a, k, f, o = {}) {
-        if (a <= 0 || k <= 0) return null;
-        const px = o.padX ?? 18, py = o.padY ?? 14, gap = o.gap ?? 10;
-        g.save(); g.textBaseline = "alphabetic"; g.textAlign = "left";
-        let tw = 0, th = 0;
-        rows.forEach((r) => { g.letterSpacing = (r.ls ?? 1) + "px"; g.font = fnt(r.wt || 500, r.px, r.mono ? MONO : UI); tw = Math.max(tw, g.measureText(r.s).width); th += r.px; });
-        th += gap * (rows.length - 1);
-        const bw = Math.max(o.w || 0, tw) + px * 2, bh = th + py * 2, bx = o.right ? x - bw : x;
-        HUD.plate(g, T, bx, y, bw * eo(Math.min(1, k * 2.5)), bh, a);
-        g.globalCompositeOperation = ADD;
-        let yy = y + py;
-        rows.forEach((r, i) => {
-          yy += r.px; g.letterSpacing = (r.ls ?? 1) + "px"; g.font = fnt(r.wt || 500, r.px, r.mono ? MONO : UI);
-          g.fillStyle = (r.col || T.hi)(a);
-          g.fillText(HUD.rollText(r.s, clamp(k * 1.6 - 0.22 - i * 0.2), f, 5 + i * 3), bx + px, yy - r.px * 0.14);
-          yy += gap;
-        });
-        g.letterSpacing = "0px"; g.restore();
-        return [bx, y, bw, bh];
-      }
-      // a power of ten: base digits + raised exponent, rolled as one string (locks right to left); returns its width
-      function powVal(x, y, px, parts, k, f) {
-        const digits = parts.map((p) => p.d || "").join(""), rolled = HUD.rollText(digits, k, f, 31);
-        let cx = x, j = 0;
-        for (const p of parts) {
-          const sup = !!p.sup, sz = sup ? Math.round(px * 0.5) : px, yy = sup ? y - px * 0.4 : y;
-          g.font = fnt(sup ? 400 : 300, sz);
-          if (p.t) { if (k > 0) g.fillText(p.t, cx, yy); cx += g.measureText(p.t).width + (p.gap || 0); continue; }
-          const s = rolled.slice(j, j + p.d.length); j += p.d.length;
-          cx += HUD.monoText(g, s, cx, yy, g.measureText("0").width * 1.02) + (p.gap || 0);
-        }
-        return cx - x;
-      }
-      // a spec card in the engine's layout (index, label, big value, progress bar, detail), with the value drawn by valFn
-      function card(x, y, wd, c, s, o = {}) {
-        const a = o.alpha ?? 1, big = o.big ?? 100;
-        if (s.reveal <= 0 || a <= 0) return null;
-        const r = eo(s.reveal);
-        g.save(); g.font = fnt(500, 24); const dl = c.detail ? HUD.wrap(g, c.detail, wd).length : 0;
-        const sub = c.sub ? 34 : 0, hh = 48 + sub + big * 0.9 + 12 + (dl ? 34 + dl * 30 : 0) + 20;
-        HUD.plate(g, T, x - 22, y - 20, (wd + 44) * r, hh + 20, a * clamp(s.reveal * 2));
-        g.globalCompositeOperation = ADD;
-        g.strokeStyle = T.line(0.9 * a); g.lineWidth = 1.6; g.beginPath(); g.moveTo(x, y); g.lineTo(x + wd * r, y); g.stroke();
-        g.fillStyle = T.line(0.9 * a); g.fillRect(x, y - 3, 34 * r, 6);
-        g.textBaseline = "alphabetic"; g.textAlign = "left";
-        g.font = "20px " + MONO; g.fillStyle = T.dim(0.95 * a * r); g.fillText(o.index || "", x, y + 34);
-        g.letterSpacing = "2px"; HUD.fitFont(g, c.label, 600, 27, UI, wd - 56, 22);
-        g.fillStyle = T.hi(0.95 * a * clamp(r * 2 - 0.6)); g.fillText(HUD.rollText(c.label, clamp(s.reveal * 1.6 - 0.2), s.frame, 3), x + 48, y + 35);
-        g.letterSpacing = "0px";
-        let h = 48;
-        if (c.sub) { g.font = fnt(500, 24); g.fillStyle = T.line(0.9 * a * clamp(s.reveal * 2 - 0.5)); g.fillText(HUD.rollText(c.sub, clamp(s.reveal * 1.4 - 0.3), s.frame, 9), x, y + 74); h += sub; }
-        if (s.roll > 0) {
-          const locked = s.roll >= 1;
-          g.fillStyle = locked ? (s.flash ? T.hi(a) : T.acc(a)) : T.line(0.85 * a);
-          c.val(x - 2, y + h + big * 0.8, big, s.roll, s.frame, locked);
-          h += big * 0.9;
-          g.fillStyle = T.dim(0.35 * a); g.fillRect(x, y + h + 8, wd, 2);
-          g.fillStyle = locked ? T.acc(0.9 * a) : T.line(0.9 * a); g.fillRect(x, y + h + 8, wd * clamp(s.roll), 2);
-          h += 12;
-        }
-        if (c.detail && s.detail > 0) {
-          g.font = fnt(500, 24); g.fillStyle = T.line(0.85 * a * clamp(s.detail * 2));
-          HUD.wrap(g, c.detail, wd).forEach((ln, i) => g.fillText(HUD.rollText(ln, clamp(s.detail * 1.5 - i * 0.2), s.frame, 21 + i), x, y + h + 34 + i * 30));
-        }
-        g.restore();
-        return [x - 22, y - 20, wd + 44, hh + 20];
-      }
-      // 3-frame flash window after a lock
-      const flashAt = (t, t0) => t >= t0 && t < t0 + 3 / FPS;
-
-      // the two price cards of the 90 put (also drawn by s8, unchanged, while they dissolve)
-      function priceCards(f, a, k1, k2, roll2, flash) {
-        if (k1 > 0 && a > 0) card(92, 612, 392, { label: "ONE VOLATILITY (15.6%)",
-          val: (x, y, px, kk, fr) => { g.fillStyle = T.dim(0.95 * a); powVal(x, y, px, [{ d: "0" }, { t: "." }, { d: "014" }], 1, fr); } },
-          { reveal: k1, roll: k1 >= 1 ? 0.99 : 0, frame: f }, { big: 84, index: "07", alpha: a });
-        if (k2 > 0 && a > 0) card(586, 612, 400, { label: "WITH CRASHES · SIMULATED",
-          val: (x, y, px, kk, fr) => powVal(x, y, px, [{ d: "0" }, { t: "." }, { d: "090" }], kk, fr) },
-          { reveal: k2, roll: roll2, frame: f, flash }, { big: 84, index: "07", alpha: a });
-      }
+      // ---- s7: "And what pays in a crash? A low-strike put. So traders pay more for it." ----
+      // The 90 put's payoff at expiry against the stock price. On "crash?" an arrow on the x axis takes the stock from
+      // S0 = 100 to 80 (the model's -20% crash); on "low-strike" the payoff formula types in and the strike K = 90 is
+      // marked; on "put." the hockey stick max(90 - S_T, 0) draws and the payoff at 80 (= 10) locks. On "So traders pay
+      // more for it" a compact price comparison: one sigma (15.6%) 0.014 against 0.090 with crashes (x6.4), 0.090
+      // locking on "more" (s8 then starts from that market price).
+      // words: 0 And 1 what 2 pays 3 in 4 a 5 crash? 6 A 7 low-strike 8 put. 9 So 10 traders 11 pay 12 more 13 for 14 it.
+      const { HUD } = HOLOHUD;
+      const T = HUD.theme(218, 22), FPS = 24;
+      const { clamp, lerp, eo, eio, fmt } = QC;
       const g = document.getElementById("s7-cv").getContext("2d");
+      const w = (i) => W[i];
+      const M = NUM.model, P90 = NUM.put90;
+      const K = P90.K, S0 = M.S0, SC = S0 * (1 + M.crash), PAY = Math.max(K - SC, 0);
+      const CRASH = "CRASH " + fmt(100 * M.crash, 0) + "%";
+      const PX = { x: 40, y: 724, w: 1000, h: 742 };
+      const F = QC.frame(170, 872, 820, 470, [60, 120], [0, 30]);
+      const SX = [], SY = [];
+      for (let i = 0; i <= 120; i++) { const s = 60 + i * 0.5; SX.push(s); SY.push(Math.max(K - s, 0)); }
+      // the hockey stick draws over [tSt0, tSt1] with an ease; tAt(x) = when its head passes x
+      const tQ = 0.25, tS0 = 0.5, tArr = w(5) - 0.08, tTex = w(7) - 0.12, tK = w(7) + 0.02;
+      const tSt0 = w(8) - 0.12, tSt1 = w(8) + 0.3;
+      const inv = (k) => (k < 0.5 ? Math.cbrt(k / 4) : 1 - Math.cbrt(2 * (1 - k)) / 2);
+      const tAt = (x) => tSt0 + inv((x - 60) / 60) * (tSt1 - tSt0);
+      const t80 = tAt(SC), tPay = t80 + 0.2;
+      const tCmp = w(9) - 0.04, tB = w(11) - 0.06, tMore = w(12) - 0.08;
+      const hit = (t, t0) => t - t0 > 0 && t - t0 < 3 / FPS;
       const st = { t: 0 };
+      // the comparison box (upper right of the chart, where the payoff is zero)
+      const BX = { x: 470, y: 884, w: 546, h: 226 }, LB = 218;
+      function init() { QC.tex.init(document.querySelector('[data-composition-id="s7"]'), TEX, T); }
+      function arrow(x0, x1, y, k, a) {   // a thick arrow along y, from x0 towards x1, drawn up to k
+        if (k <= 0) return;
+        const xe = lerp(x0, x1, eo(k)), dir = Math.sign(x1 - x0);
+        g.save(); g.strokeStyle = T.acc(0.95 * a); g.fillStyle = T.acc(0.95 * a); g.lineWidth = 5; g.lineCap = "round";
+        g.beginPath(); g.moveTo(x0, y); g.lineTo(xe - dir * 12, y); g.stroke();
+        g.beginPath(); g.moveTo(xe, y); g.lineTo(xe - dir * 18, y - 10); g.lineTo(xe - dir * 18, y + 10); g.closePath(); g.fill();
+        g.restore();
+      }
+      function bar(x, y, len, h, c, a) {
+        if (len <= 0 || a <= 0) return;
+        g.save(); g.fillStyle = T[c](0.22 * a); g.fillRect(x, y, len, h);
+        g.strokeStyle = T[c](0.9 * a); g.lineWidth = 1.6; g.strokeRect(x + 0.5, y + 0.5, len - 1, h - 1); g.restore();
+      }
       function draw() {
         const t = st.t, f = Math.floor(t * FPS);
-        g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, WF, HF);
-        const cam = camAt(t), sc = scanState(t, 1.0);
-        const out = 1 - clamp((t - (DUR - 0.3)) / 0.22);
-        HOLO.drawPad(g, cam, WF, HF, { hue: T.hue, rot: (29.28 + t) * 0.06 });
-        const kput = clamp((t - (w(7) - 0.1)) / 0.3);
-        const info = holo.draw(g, model(t), cam, Object.assign({ hue: T.hue, glow: 1, focus: kput > 0 ? "c2" : undefined, dim: lerp(1, 0.55, kput),
-          flash: { c2: t > w(7) + 0.12 ? 1 : 0, stk: t >= tCrash && t < tCrash + 0.3 ? 1 : 0 } }, sc));
-        // the lost 20 points lift off the block and are erased
-        const ks = clamp((t - tCrash) / 0.42);
-        if (ks > 0 && ks < 1) {
-          const bc = Object.assign({}, cam, { target: [cam.target[0] - 0.06 * eo(ks), cam.target[1] - 0.22 * eo(ks), cam.target[2]] });
-          holo.draw(g, SLAB, bc, { hue: T.hue, glow: 1, flash: { slab: 1 }, scanDown: { y: lerp(1.02, 0.78, eio(clamp((ks - 0.25) / 0.75))) } });
+        g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, 1080, 1920);
+        QC.tex.begin();
+        const xIn = QC.scanIn(t, 0, 0.6), xOut = t > DUR - 0.4 ? QC.scanOut(t, DUR, 0.4) : QC.STAGE.x0;
+        QC.clipStage(g, xIn, xOut);
+        const clip = [xOut, xIn];
+        // ---- the top strip: the question, then the payoff formula on "low-strike put" ----
+        QC.panel(g, T, 40, 566, 1000, 142, { open: clamp(t / 0.45), op: 0.9 });
+        const aQ = clamp((t - tQ) / 0.3) * (1 - clamp((t - (tTex - 0.15)) / 0.2));
+        QC.text(g, T, "WHAT PAYS IN A CRASH?", 540, 649, { size: 34, wt: 600, ls: 2, align: "center", a: aQ,
+          roll: clamp((t - tQ) / 0.5), frame: f });
+        const aF = clamp((t - tTex) / 0.2);
+        if (aF > 0) QC.tex.show("payoff", { x: 540, y: 637, size: 54, align: "center", valign: "middle", a: aF,
+          k: clamp((t - tTex) / 0.45), clip });
+        // ---- the chart ----
+        QC.panel(g, T, PX.x, PX.y, PX.w, PX.h, { open: clamp((t - 0.1) / 0.45), title: `${K} put · payoff at expiry`, index: "07",
+          sub: `strike K = ${K} · stock today S₀ = ${S0} · ${M.T_months} month`, tag: "MODEL", frame: f });
+        QC.axes(g, T, F, { k: clamp((t - 0.25) / 0.5), xt: [60, 70, 80, 90, 100, 110, 120], yt: [0, 10, 20, 30],
+          xl: "stock price at expiry", yl: "put payoff" });
+        const y0 = F.Y(0);
+        // the strike K = 90, marked on "low-strike"
+        const kK = clamp((t - tK) / 0.3);
+        if (kK > 0) {
+          const xk = F.X(K), top = y0 - 96;
+          g.save(); g.setLineDash([7, 6]); g.strokeStyle = T.hi(0.7); g.lineWidth = 2;
+          g.beginPath(); g.moveTo(xk, y0); g.lineTo(xk, lerp(y0, top, eo(kK))); g.stroke(); g.restore();
+          QC.tag(g, T, `K = ${K}`, xk, top - 4, { c: "hi", align: "center", a: clamp((kK - 0.5) * 2), size: 19 });
         }
-        // the put contract scans in on "low-strike"
-        const kc = clamp((t - tPut) / 0.38);
-        let cinfo = null;
-        if (kc > 0) {
-          const cs = sc.scanDown ? sc : (kc < 1 ? { scan: { y: lerp(-0.02, CH + 0.08, eio(kc)), band: 0.06 } } : {});
-          cinfo = holo.draw(g, CARD, cam, Object.assign({ hue: T.hue, glow: 1, flash: { card: t > w(8) + 0.2 && t < w(8) + 0.2 + 3 / FPS ? 1 : 0 } }, cs));
-          if (kc < 1 && !sc.scanDown) HOLO.drawScanPlane(g, cam, WF, HF, lerp(-0.02, CH + 0.08, eio(kc)), { hue: T.hue, r: 0.42, c: [CX, 0, CZ], alpha: 0.8 });
+        // the payoff, drawn left to right on "put."
+        const kS = clamp((t - tSt0) / (tSt1 - tSt0));
+        if (kS > 0) QC.line(g, T, F, SX, SY, { k: eio(kS), c: "line", w: 3.6, head: true });
+        // the stock today, then the crash: 100 -> 80 along the axis on "crash?"
+        const aS0 = clamp((t - tS0) / 0.25);
+        if (aS0 > 0) QC.dot(g, T, F.X(S0), y0, { c: "hi", r: 6, a: aS0 });
+        const kA = clamp((t - tArr) / 0.35);
+        arrow(F.X(S0) - 10, F.X(SC), y0, kA, 1);
+        QC.tag(g, T, CRASH, F.X(K) + 22, y0 - 20, { c: "acc", a: clamp((kA - 0.5) * 2.5), size: 19 });
+        // where the crash lands, the put pays 10: locks just after the stick passes 80
+        const kP = clamp((t - t80) / 0.2);
+        if (kP > 0) {
+          const px = F.X(SC), py = F.Y(PAY);
+          g.save(); g.setLineDash([6, 6]); g.strokeStyle = T.acc(0.85); g.lineWidth = 2;
+          g.beginPath(); g.moveTo(px, y0); g.lineTo(px, lerp(y0, py, eo(kP))); g.stroke(); g.restore();
+          if (kP >= 1) {
+            QC.dot(g, T, px, py, { c: "acc", r: 7, pulse: clamp((t - tPay) / 0.7) });
+            QC.lock(g, T, [px - 8, py - 8, px + 8, py + 8], clamp((t - tPay) / 0.3), { pad: 14, flash: hit(t, tPay + 0.3) });
+          }
+          const kv = clamp((t - t80) / 0.35);
+          QC.text(g, T, "PAYS", px - 32, py + 54, { size: 24, wt: 600, ls: 2, align: "right", a: clamp(kv * 3) });
+          QC.value(g, T, PAY.toFixed(0), px - 32, py + 136, { size: 84, align: "right", roll: kv, frame: f, flash: hit(t, t80 + 0.35) });
         }
-        if (sc.plane !== undefined) HOLO.drawScanPlane(g, cam, WF, HF, sc.plane, { hue: T.hue, r: 1.05, alpha: sc.planeA });
-
-        // the stock's plate: STOCK, its price counting down 100 -> 80 on "crash?", and the 20% it lost
-        const ka = clamp((t - 0.3) / 0.35) * (1 - clamp((t - (w(9) - 0.1)) / 0.3)) * out;
-        if (ka > 0) {
-          const price = Math.round(lerp(100, 80, eio((t - tCrash) / 0.16)));
-          const top = P3(cam, SX + SW / 2, stockH(t), SZ + SW / 2);
-          const sp = tagPlate(top[0] + 26, top[1] - 34, [{ s: "STOCK", wt: 600, px: 24, ls: 2 }, { s: String(price), wt: 300, px: 60, col: t >= tCrash ? T.hi : T.line, ls: 0 }], ka, clamp((t - 0.3) / 0.35), f, { w: 118 });
-          if (t >= tCrash && sp) tagPlate(sp[0] + sp[2] + 10, sp[1] + 40, [{ s: "−20%", wt: 600, px: 28, col: T.hi, ls: 1 }], ka * clamp((t - tCrash) / 0.15), 1, f, { padY: 10 });
+        // ---- the price comparison: what the 90 put costs with one sigma, and with crashes ----
+        const kB = clamp((t - tCmp) / 0.3);
+        if (kB > 0) {
+          const bx = BX.x + 24, rx = BX.x + BX.w - 24, by = BX.y;
+          QC.panel(g, T, BX.x, BX.y, BX.w, BX.h, { open: kB, op: 0.96 });
+          const aH = clamp((t - tCmp - 0.05) / 0.25);
+          QC.text(g, T, `${K} PUT · PRICE TODAY`, bx, by + 38, { size: 21, wt: 600, ls: 2, c: "hi", a: aH, roll: clamp((t - tCmp) / 0.4), frame: f });
+          // one sigma, flat at the at-the-money 15.6%
+          const kA1 = clamp((t - tCmp - 0.1) / 0.3);
+          QC.text(g, T, `ONE σ (${(100 * P90.atm_iv).toFixed(1)}%)`, bx, by + 86, { size: 25, wt: 500, c: "hi", a: clamp(kA1 * 3) });
+          QC.value(g, T, P90.price_one_vol.toFixed(3), rx, by + 90, { size: 46, align: "right", roll: kA1, frame: f, lc: "hi", seed: 3 });
+          bar(bx, by + 102, LB / P90.ratio * eo(kA1), 12, "line", clamp(kA1 * 3));
+          // with crashes: the bar grows 6.4 times on "pay more"; 0.090 locks on "more"
+          const kB1 = clamp((t - tB) / 0.25), kG = clamp((t - (tB + 0.04)) / (tMore - tB - 0.04));
+          const locked = t >= tMore;
+          QC.text(g, T, "WITH CRASHES", bx, by + 168, { size: 25, wt: 500, c: "hi", a: kB1 });
+          const vB = QC.value(g, T, P90.price_model.toFixed(3), rx, by + 180, { size: 62, align: "right", roll: clamp((t - tB) / (tMore - tB)),
+            frame: f, flash: hit(t, tMore), seed: 7, a: kB1 });
+          bar(bx, by + 192, lerp(LB / P90.ratio, LB, eio(kG)), 12, locked ? "acc" : "line", kB1);
+          const kR = clamp((t - tMore) / 0.2);
+          if (kR > 0) {
+            QC.tag(g, T, "×" + P90.ratio.toFixed(1), bx + LB + 12, by + 216, { c: "acc", a: kR, size: 23 });
+            if (vB.bb) QC.lock(g, T, vB.bb, clamp((t - tMore) / 0.25), { pad: 10, flash: hit(t, tMore + 0.25) });
+          }
         }
-
-        // the payoff ruler under the columns: stock price at expiry
-        const kr = clamp((t - (w(7) + 0.05)) / 0.3) * out;
-        if (kr > 0) {
-          const TK = PS.map((S, i) => [S, P3(cam, PX(i), 0, PZ + 0.13)]);
-          const yR = Math.max(...TK.map((q) => q[1][1])) + 12, xL = TK[0][1][0], xR = TK[6][1][0];
-          HUD.plate(g, T, xL - 26, yR, (xR - xL + 52) * eo(kr), 50, kr);
-          g.save(); g.globalCompositeOperation = ADD; g.textAlign = "center"; g.textBaseline = "alphabetic"; g.font = "22px " + MONO;
-          TK.forEach(([S, q]) => { g.fillStyle = (S === 80 ? T.hi : T.line)(0.95 * kr); g.fillRect(q[0] - 0.5, yR, 1, 8); g.fillText(String(S), q[0], yR + 36); });
-          g.textAlign = "left"; g.font = "18px " + MONO; g.fillStyle = T.dim(0.95 * kr); g.fillText("STOCK AT EXPIRY · PAYOFF = max(90 − S, 0)", xL - 22, yR - 8);
-          g.restore();
-          // what the put pays where the crash left the stock
-          const c2 = info.bbox.c2, k80 = clamp((t - (w(8) - 0.05)) / 0.3) * out;
-          if (c2 && k80 > 0) HUD.marker(g, T, [(c2[0] + c2[2]) / 2, c2[1] - 4], "PAYS 10", k80, clamp((t - w(8)) / 0.5), 1);
-        }
-
-        // the contract's face: a plate on its page area
-        if (cinfo && cinfo.bbox.card && kc > 0.6) {
-          const q0 = P3(cam, CX - CW / 2 + 0.03, 0.02 + CH - 0.1, CZ + 0.013), q1 = P3(cam, CX + CW / 2 - 0.03, 0.06, CZ + 0.013);
-          const kf = clamp((kc - 0.6) / 0.4) * out;
-          tagPlate(q0[0] + 4, q0[1] + 6, [{ s: "PUT", wt: 600, px: 40, ls: 4 }, { s: "STRIKE 90", wt: 500, px: 24, col: T.line }, { s: "1 MONTH", wt: 500, px: 24, col: T.line }],
-            kf, clamp((t - (tPut + 0.25)) / 0.45), f, { w: Math.max(80, q1[0] - q0[0] - 44), padY: 10, gap: 8 });
-          // "put.": the lock on the contract
-          const kt = clamp((t - (w(8) - 0.02)) / 0.22);
-          if (kt > 0 && out > 0) HUD.targetBox(g, T, cinfo.bbox.card, kt, { flash: flashAt(t, w(8) + 0.2), tag: "TGT 07 · 90 PUT", alpha: out, pad: 22 });
-        }
-
-        // "So traders pay more": the put's price with one volatility, then with crashes (the accent, on "pay"); both cards are
-        // held through the cut (s8 draws them identically and dissolves them as the 0.090 coin appears)
-        priceCards(f, 1, clamp((t - (w(9) - 0.12)) / 0.32), clamp((t - (w(9) - 0.04)) / 0.32), clamp((t - (w(11) - 0.28)) / 0.32), flashAt(t, w(11) + 0.04));
-        const kx = clamp((t - (w(12) - 0.06)) / 0.25) * out;
-        if (kx > 0) tagPlate(468, 790, [{ s: "×6.4", wt: 400, px: 58, col: T.hi, ls: 1 }], kx, clamp((t - (w(12) - 0.06)) / 0.25), f, { padY: 8, padX: 22 });
+        g.restore();
+        QC.scanLine(g, T, xIn < QC.STAGE.x1 ? xIn : xOut);
+        QC.tex.end();
       }
+      if (typeof init === "function") init();     // before the tween: fromTo renders (and draws) at once
       const tl = gsap.timeline({ paused: true });
       tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: draw }, 0);
       draw();

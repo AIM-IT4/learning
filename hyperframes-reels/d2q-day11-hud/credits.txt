@@ -1,19 +1,25 @@
-Day 11/30 · Making Quant Easy (the volatility smile), light HUD version: credits
+Day 11/30 · Making Quant Easy (the volatility smile), light HUD version with quant charts: credits
 
 Voice: unchanged from the isometric version (voice/pick.json): an English narrator designed from a text description, not a
   real person, spoken by VoxCPM2 (openbmb/VoxCPM2, Apache-2.0, free for commercial use) on CPU; every take speech-checked.
 Look: a light-mode variant of the Sci-fi Hologram HUD style of the Lemo-Opuscar style library (styles/hologram-hud/
   STYLE.md; light stage, deep-blue lines, white plates, an orange accent, at the founder's request), built with its
   wireframe and HUD engine (holo.js, hud.js, mkmodel.mjs; MIT, Copyright (c) 2026 Lemomo (LemoLab),
-  https://github.com/lemomo-ai/lemo-opuscar), bundled with a light mode added (work/holohud.js). Our own scenes,
-  models, story and data; no LemoLab credit is needed on screen. The trader guide is Desk2Quant's own, drawn in code.
+  https://github.com/lemomo-ai/lemo-opuscar), bundled with a light mode added (work/holohud.js); its plates, target
+  locks, rolling values and chips frame our own charts (work/qchart.js: candles, curves, histograms, paths, tables).
+  Our own scenes, story and data; no LemoLab credit is needed on screen. The trader guide is Desk2Quant's own.
+Formulas: typeset from TeX to SVG at build time with MathJax 3 (mathjax-full 3.2.2, Apache-2.0; tools/tex2svg.mjs),
+  every number in them generated from work/numbers.json (tools/formulas.py).
 Type: Fredoka for captions, labels and numbers (the series font; SIL OFL 1.1, assets/fonts/Fredoka-OFL.txt), Share Tech
   Mono for HUD micro data (SIL OFL 1.1), Inter as the fallback for σ and superscripts (SIL OFL 1.1).
 Music: an original synth score, A minor, 112 BPM, synthesised in numpy (tools/bed_hud.py with bed_synth.py); no samples.
 Sound effects: CC0 1.0 from the uisfx library bundled with Real SFX (assets/sfx/PICKS.json): scifi/scanning, minimal/check,
   minimal/select, scifi/blocked, dreamy/achievement, minimal/typing, studio/send, zen/complete. No CC BY, NC or ND material.
 Logo and the Quant Formula Sheet cover: Desk2Quant's own.
-Data: work/smile.py (unchanged): S&P 500 closes 282.70 (16 Oct 1987) and 224.84 (19 Oct 1987); the normal-curve odds; an
+Data: work/smile.py: the S&P 500's daily open, high, low and close, 1 Sep - 30 Oct 1987 (S&P Dow Jones Indices' index
+  levels, via Yahoo Finance ^GSPC; work/data/spx_1987.csv), including the closes 282.70 (16 Oct) and 224.84 (19 Oct);
+  the normal-curve odds; the 90 put's Black-Scholes price against volatility and the Newton steps to its implied vol; a
+  fan of 40 simulated ten-year paths of the model (seed 2); an
   illustrative fat-tailed curve (Student-t, 3 degrees of freedom, same spread); an illustrative crash model (15% volatility
   plus a fixed -20% crash at 0.1 a year, zero rates) simulated with a fixed seed (11; 1,000,000 paths) and checked against
   its exact series price. Labelled ILLUSTRATIVE and SIMULATED on screen and in the caption.

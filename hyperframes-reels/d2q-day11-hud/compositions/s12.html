@@ -1,10 +1,6 @@
 <template>
   <style>
     @font-face { font-family: "Fredoka"; font-weight: 300 700; src: url("assets/fonts/fredoka-700.woff2"); }
-    @font-face { font-family: "Rajdhani"; font-weight: 300; src: url("assets/fonts/rajdhani-300.woff2"); }
-    @font-face { font-family: "Rajdhani"; font-weight: 400; src: url("assets/fonts/rajdhani-400.woff2"); }
-    @font-face { font-family: "Rajdhani"; font-weight: 500; src: url("assets/fonts/rajdhani-500.woff2"); }
-    @font-face { font-family: "Rajdhani"; font-weight: 600; src: url("assets/fonts/rajdhani-600.woff2"); }
     @font-face { font-family: "ShareTechMono"; font-weight: 400; src: url("assets/fonts/sharetechmono.woff2"); }
     @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
     #root { position: absolute; inset: 0; overflow: hidden; }
@@ -16,6 +12,10 @@
   <script>
     (function () {
       /*DATA*/ const DUR = 4.6; const W = [0.16, 0.34, 0.52, 0.62, 1.04, 1.16, 1.44, 1.8, 2.06, 2.26, 2.98, 3.28, 3.44, 3.6, 3.68, 3.94, 4.2]; /*END*/
+      const TEX_IDS = ["flat"];
+      const NUM_KEYS = ["bell", "normal", "model"];
+      /*TEX*/ const TEX = {"flat": {"svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" focusable=\"false\" viewBox=\"0 -750 10827.3 1037.2\"><g stroke=\"currentColor\" fill=\"currentColor\" stroke-width=\"0\" transform=\"scale(1,-1)\"><g data-mml-node=\"math\"><g data-mml-node=\"msub\"><g data-mml-node=\"mi\"><path data-c=\"1D70E\" d=\"M184 -11Q116 -11 74 34T31 147Q31 247 104 333T274 430Q275 431 414 431H552Q553 430 555 429T559 427T562 425T565 422T567 420T569 416T570 412T571 407T572 401Q572 357 507 357Q500 357 490 357T476 358H416L421 348Q439 310 439 263Q439 153 359 71T184 -11ZM361 278Q361 358 276 358Q152 358 115 184Q114 180 114 178Q106 141 106 117Q106 67 131 47T188 26Q242 26 287 73Q316 103 334 153T356 233T361 278Z\"></path></g><g data-mml-node=\"TeXAtom\" transform=\"translate(604,-150) scale(0.707)\" data-mjx-texclass=\"ORD\"><g data-mml-node=\"mtext\"><path data-c=\"69\" d=\"M69 609Q69 637 87 653T131 669Q154 667 171 652T188 609Q188 579 171 564T129 549Q104 549 87 564T69 609ZM247 0Q232 3 143 3Q132 3 106 3T56 1L34 0H26V46H42Q70 46 91 49Q100 53 102 60T104 102V205V293Q104 345 102 359T88 378Q74 385 41 385H30V408Q30 431 32 431L42 432Q52 433 70 434T106 436Q123 437 142 438T171 441T182 442H185V62Q190 52 197 50T232 46H255V0H247Z\"></path><path data-c=\"6D\" d=\"M41 46H55Q94 46 102 60V68Q102 77 102 91T102 122T103 161T103 203Q103 234 103 269T102 328V351Q99 370 88 376T43 385H25V408Q25 431 27 431L37 432Q47 433 65 434T102 436Q119 437 138 438T167 441T178 442H181V402Q181 364 182 364T187 369T199 384T218 402T247 421T285 437Q305 442 336 442Q351 442 364 440T387 434T406 426T421 417T432 406T441 395T448 384T452 374T455 366L457 361L460 365Q463 369 466 373T475 384T488 397T503 410T523 422T546 432T572 439T603 442Q729 442 740 329Q741 322 741 190V104Q741 66 743 59T754 49Q775 46 803 46H819V0H811L788 1Q764 2 737 2T699 3Q596 3 587 0H579V46H595Q656 46 656 62Q657 64 657 200Q656 335 655 343Q649 371 635 385T611 402T585 404Q540 404 506 370Q479 343 472 315T464 232V168V108Q464 78 465 68T468 55T477 49Q498 46 526 46H542V0H534L510 1Q487 2 460 2T422 3Q319 3 310 0H302V46H318Q379 46 379 62Q380 64 380 200Q379 335 378 343Q372 371 358 385T334 402T308 404Q263 404 229 370Q202 343 195 315T187 232V168V108Q187 78 188 68T191 55T200 49Q221 46 249 46H265V0H257L234 1Q210 2 183 2T145 3Q42 3 33 0H25V46H41Z\" transform=\"translate(278,0)\"></path><path data-c=\"70\" d=\"M36 -148H50Q89 -148 97 -134V-126Q97 -119 97 -107T97 -77T98 -38T98 6T98 55T98 106Q98 140 98 177T98 243T98 296T97 335T97 351Q94 370 83 376T38 385H20V408Q20 431 22 431L32 432Q42 433 61 434T98 436Q115 437 135 438T165 441T176 442H179V416L180 390L188 397Q247 441 326 441Q407 441 464 377T522 216Q522 115 457 52T310 -11Q242 -11 190 33L182 40V-45V-101Q182 -128 184 -134T195 -145Q216 -148 244 -148H260V-194H252L228 -193Q205 -192 178 -192T140 -191Q37 -191 28 -194H20V-148H36ZM424 218Q424 292 390 347T305 402Q234 402 182 337V98Q222 26 294 26Q345 26 384 80T424 218Z\" transform=\"translate(1111,0)\"></path></g></g></g><g data-mml-node=\"mo\" transform=\"translate(1832.7,0)\"><path data-c=\"28\" d=\"M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z\"></path></g><g data-mml-node=\"mi\" transform=\"translate(2221.7,0)\"><path data-c=\"1D43E\" d=\"M285 628Q285 635 228 637Q205 637 198 638T191 647Q191 649 193 661Q199 681 203 682Q205 683 214 683H219Q260 681 355 681Q389 681 418 681T463 682T483 682Q500 682 500 674Q500 669 497 660Q496 658 496 654T495 648T493 644T490 641T486 639T479 638T470 637T456 637Q416 636 405 634T387 623L306 305Q307 305 490 449T678 597Q692 611 692 620Q692 635 667 637Q651 637 651 648Q651 650 654 662T659 677Q662 682 676 682Q680 682 711 681T791 680Q814 680 839 681T869 682Q889 682 889 672Q889 650 881 642Q878 637 862 637Q787 632 726 586Q710 576 656 534T556 455L509 418L518 396Q527 374 546 329T581 244Q656 67 661 61Q663 59 666 57Q680 47 717 46H738Q744 38 744 37T741 19Q737 6 731 0H720Q680 3 625 3Q503 3 488 0H478Q472 6 472 9T474 27Q478 40 480 43T491 46H494Q544 46 544 71Q544 75 517 141T485 216L427 354L359 301L291 248L268 155Q245 63 245 58Q245 51 253 49T303 46H334Q340 37 340 35Q340 19 333 5Q328 0 317 0Q314 0 280 1T180 2Q118 2 85 2T49 1Q31 1 31 11Q31 13 34 25Q38 41 42 43T65 46Q92 46 125 49Q139 52 144 61Q147 65 216 339T285 628Z\"></path></g><g data-mml-node=\"mo\" transform=\"translate(3110.7,0)\"><path data-c=\"29\" d=\"M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z\"></path></g><g data-mml-node=\"mo\" transform=\"translate(3777.5,0)\"><path data-c=\"3D\" d=\"M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z\"></path></g><g data-mml-node=\"mi\" transform=\"translate(4833.3,0)\"><path data-c=\"1D70E\" d=\"M184 -11Q116 -11 74 34T31 147Q31 247 104 333T274 430Q275 431 414 431H552Q553 430 555 429T559 427T562 425T565 422T567 420T569 416T570 412T571 407T572 401Q572 357 507 357Q500 357 490 357T476 358H416L421 348Q439 310 439 263Q439 153 359 71T184 -11ZM361 278Q361 358 276 358Q152 358 115 184Q114 180 114 178Q106 141 106 117Q106 67 131 47T188 26Q242 26 287 73Q316 103 334 153T356 233T361 278Z\"></path></g><g data-mml-node=\"mtext\" transform=\"translate(5404.3,0)\"><path data-c=\"A0\" d=\"\"></path></g><g data-mml-node=\"mtext\" transform=\"translate(5654.3,0)\"><path data-c=\"A0\" d=\"\"></path></g><g data-mml-node=\"mtext\" transform=\"translate(5904.3,0)\"><path data-c=\"66\" d=\"M273 0Q255 3 146 3Q43 3 34 0H26V46H42Q70 46 91 49Q99 52 103 60Q104 62 104 224V385H33V431H104V497L105 564L107 574Q126 639 171 668T266 704Q267 704 275 704T289 705Q330 702 351 679T372 627Q372 604 358 590T321 576T284 590T270 627Q270 647 288 667H284Q280 668 273 668Q245 668 223 647T189 592Q183 572 182 497V431H293V385H185V225Q185 63 186 61T189 57T194 54T199 51T206 49T213 48T222 47T231 47T241 46T251 46H282V0H273Z\"></path><path data-c=\"6F\" d=\"M28 214Q28 309 93 378T250 448Q340 448 405 380T471 215Q471 120 407 55T250 -10Q153 -10 91 57T28 214ZM250 30Q372 30 372 193V225V250Q372 272 371 288T364 326T348 362T317 390T268 410Q263 411 252 411Q222 411 195 399Q152 377 139 338T126 246V226Q126 130 145 91Q177 30 250 30Z\" transform=\"translate(306,0)\"></path><path data-c=\"72\" d=\"M36 46H50Q89 46 97 60V68Q97 77 97 91T98 122T98 161T98 203Q98 234 98 269T98 328L97 351Q94 370 83 376T38 385H20V408Q20 431 22 431L32 432Q42 433 60 434T96 436Q112 437 131 438T160 441T171 442H174V373Q213 441 271 441H277Q322 441 343 419T364 373Q364 352 351 337T313 322Q288 322 276 338T263 372Q263 381 265 388T270 400T273 405Q271 407 250 401Q234 393 226 386Q179 341 179 207V154Q179 141 179 127T179 101T180 81T180 66V61Q181 59 183 57T188 54T193 51T200 49T207 48T216 47T225 47T235 46T245 46H276V0H267Q249 3 140 3Q37 3 28 0H20V46H36Z\" transform=\"translate(806,0)\"></path><path data-c=\"20\" d=\"\" transform=\"translate(1198,0)\"></path><path data-c=\"65\" d=\"M28 218Q28 273 48 318T98 391T163 433T229 448Q282 448 320 430T378 380T406 316T415 245Q415 238 408 231H126V216Q126 68 226 36Q246 30 270 30Q312 30 342 62Q359 79 369 104L379 128Q382 131 395 131H398Q415 131 415 121Q415 117 412 108Q393 53 349 21T250 -11Q155 -11 92 58T28 218ZM333 275Q322 403 238 411H236Q228 411 220 410T195 402T166 381T143 340T127 274V267H333V275Z\" transform=\"translate(1448,0)\"></path><path data-c=\"76\" d=\"M338 431Q344 429 422 429Q479 429 503 431H508V385H497Q439 381 423 345Q421 341 356 172T288 -2Q283 -11 263 -11Q244 -11 239 -2Q99 359 98 364Q93 378 82 381T43 385H19V431H25L33 430Q41 430 53 430T79 430T104 429T122 428Q217 428 232 431H240V385H226Q187 384 184 370Q184 366 235 234L286 102L377 341V349Q377 363 367 372T349 383T335 385H331V431H338Z\" transform=\"translate(1892,0)\"></path><path data-c=\"65\" d=\"M28 218Q28 273 48 318T98 391T163 433T229 448Q282 448 320 430T378 380T406 316T415 245Q415 238 408 231H126V216Q126 68 226 36Q246 30 270 30Q312 30 342 62Q359 79 369 104L379 128Q382 131 395 131H398Q415 131 415 121Q415 117 412 108Q393 53 349 21T250 -11Q155 -11 92 58T28 218ZM333 275Q322 403 238 411H236Q228 411 220 410T195 402T166 381T143 340T127 274V267H333V275Z\" transform=\"translate(2420,0)\"></path><path data-c=\"72\" d=\"M36 46H50Q89 46 97 60V68Q97 77 97 91T98 122T98 161T98 203Q98 234 98 269T98 328L97 351Q94 370 83 376T38 385H20V408Q20 431 22 431L32 432Q42 433 60 434T96 436Q112 437 131 438T160 441T171 442H174V373Q213 441 271 441H277Q322 441 343 419T364 373Q364 352 351 337T313 322Q288 322 276 338T263 372Q263 381 265 388T270 400T273 405Q271 407 250 401Q234 393 226 386Q179 341 179 207V154Q179 141 179 127T179 101T180 81T180 66V61Q181 59 183 57T188 54T193 51T200 49T207 48T216 47T225 47T235 46T245 46H276V0H267Q249 3 140 3Q37 3 28 0H20V46H36Z\" transform=\"translate(2864,0)\"></path><path data-c=\"79\" d=\"M69 -66Q91 -66 104 -80T118 -116Q118 -134 109 -145T91 -160Q84 -163 97 -166Q104 -168 111 -168Q131 -168 148 -159T175 -138T197 -106T213 -75T225 -43L242 0L170 183Q150 233 125 297Q101 358 96 368T80 381Q79 382 78 382Q66 385 34 385H19V431H26L46 430Q65 430 88 429T122 428Q129 428 142 428T171 429T200 430T224 430L233 431H241V385H232Q183 385 185 366L286 112Q286 113 332 227L376 341V350Q376 365 366 373T348 383T334 385H331V431H337H344Q351 431 361 431T382 430T405 429T422 429Q477 429 503 431H508V385H497Q441 380 422 345Q420 343 378 235T289 9T227 -131Q180 -204 113 -204Q69 -204 44 -177T19 -116Q19 -89 35 -78T69 -66Z\" transform=\"translate(3256,0)\"></path><path data-c=\"A0\" d=\"\" transform=\"translate(3784,0)\"></path></g><g data-mml-node=\"mi\" transform=\"translate(9938.3,0)\"><path data-c=\"1D43E\" d=\"M285 628Q285 635 228 637Q205 637 198 638T191 647Q191 649 193 661Q199 681 203 682Q205 683 214 683H219Q260 681 355 681Q389 681 418 681T463 682T483 682Q500 682 500 674Q500 669 497 660Q496 658 496 654T495 648T493 644T490 641T486 639T479 638T470 637T456 637Q416 636 405 634T387 623L306 305Q307 305 490 449T678 597Q692 611 692 620Q692 635 667 637Q651 637 651 648Q651 650 654 662T659 677Q662 682 676 682Q680 682 711 681T791 680Q814 680 839 681T869 682Q889 682 889 672Q889 650 881 642Q878 637 862 637Q787 632 726 586Q710 576 656 534T556 455L509 418L518 396Q527 374 546 329T581 244Q656 67 661 61Q663 59 666 57Q680 47 717 46H738Q744 38 744 37T741 19Q737 6 731 0H720Q680 3 625 3Q503 3 488 0H478Q472 6 472 9T474 27Q478 40 480 43T491 46H494Q544 46 544 71Q544 75 517 141T485 216L427 354L359 301L291 248L268 155Q245 63 245 58Q245 51 253 49T303 46H334Q340 37 340 35Q340 19 333 5Q328 0 317 0Q314 0 280 1T180 2Q118 2 85 2T49 1Q31 1 31 11Q31 13 34 25Q38 41 42 43T65 46Q92 46 125 49Q139 52 144 61Q147 65 216 339T285 628Z\"></path></g></g></g></svg>", "w": 10.8273, "h": 1.0372000000000001, "a": 0.28720000000000007, "va": -0.65}}; /*ENDTEX*/
+      /*NUM*/ const NUM = {"bell":{"x":[-5.0,-4.95,-4.9,-4.85,-4.8,-4.75,-4.7,-4.65,-4.6,-4.55,-4.5,-4.45,-4.4,-4.35,-4.3,-4.25,-4.2,-4.15,-4.1,-4.05,-4.0,-3.95,-3.9,-3.85,-3.8,-3.75,-3.7,-3.65,-3.6,-3.55,-3.5,-3.45,-3.4,-3.35,-3.3,-3.25,-3.2,-3.15,-3.1,-3.05,-3.0,-2.95,-2.9,-2.85,-2.8,-2.75,-2.7,-2.65,-2.6,-2.55,-2.5,-2.45,-2.4,-2.35,-2.3,-2.25,-2.2,-2.15,-2.1,-2.05,-2.0,-1.95,-1.9,-1.85,-1.8,-1.75,-1.7,-1.65,-1.6,-1.55,-1.5,-1.45,-1.4,-1.35,-1.3,-1.25,-1.2,-1.15,-1.1,-1.05,-1.0,-0.95,-0.9,-0.85,-0.8,-0.75,-0.7,-0.65,-0.6,-0.55,-0.5,-0.45,-0.4,-0.35,-0.3,-0.25,-0.2,-0.15,-0.1,-0.05,0.0,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4,0.45,0.5,0.55,0.6,0.65,0.7,0.75,0.8,0.85,0.9,0.95,1.0,1.05,1.1,1.15,1.2,1.25,1.3,1.35,1.4,1.45,1.5,1.55,1.6,1.65,1.7,1.75,1.8,1.85,1.9,1.95,2.0,2.05,2.1,2.15,2.2,2.25,2.3,2.35,2.4,2.45,2.5,2.55,2.6,2.65,2.7,2.75,2.8,2.85,2.9,2.95,3.0,3.05,3.1,3.15,3.2,3.25,3.3,3.35,3.4,3.45,3.5,3.55,3.6,3.65,3.7,3.75,3.8,3.85,3.9,3.95,4.0,4.05,4.1,4.15,4.2,4.25,4.3,4.35,4.4,4.45,4.5,4.55,4.6,4.65,4.7,4.75,4.8,4.85,4.9,4.95,5.0],"normal":[0.00012,0.00014,0.00016,0.00019,0.00022,0.00026,0.0003,0.00035,0.0004,0.00047,0.00054,0.00062,0.00071,0.00082,0.00094,0.00107,0.00122,0.00139,0.00159,0.00181,0.00205,0.00232,0.00263,0.00297,0.00335,0.00377,0.00424,0.00476,0.00534,0.00598,0.00668,0.00745,0.0083,0.00923,0.01025,0.01137,0.01258,0.0139,0.01534,0.0169,0.01859,0.02042,0.02239,0.02451,0.02679,0.02924,0.03186,0.03466,0.03765,0.04083,0.04421,0.0478,0.05159,0.0556,0.05983,0.06427,0.06894,0.07383,0.07894,0.08427,0.08982,0.09558,0.10156,0.10774,0.11411,0.12068,0.12741,0.13432,0.14137,0.14856,0.15587,0.16329,0.17078,0.17834,0.18594,0.19356,0.20118,0.20877,0.2163,0.22375,0.23109,0.2383,0.24534,0.2522,0.25884,0.26523,0.27136,0.27719,0.2827,0.28787,0.29267,0.29708,0.30109,0.30466,0.3078,0.31048,0.31269,0.31441,0.31565,0.3164,0.31665,0.3164,0.31565,0.31441,0.31269,0.31048,0.3078,0.30466,0.30109,0.29708,0.29267,0.28787,0.2827,0.27719,0.27136,0.26523,0.25884,0.2522,0.24534,0.2383,0.23109,0.22375,0.2163,0.20877,0.20118,0.19356,0.18594,0.17834,0.17078,0.16329,0.15587,0.14856,0.14137,0.13432,0.12741,0.12068,0.11411,0.10774,0.10156,0.09558,0.08982,0.08427,0.07894,0.07383,0.06894,0.06427,0.05983,0.0556,0.05159,0.0478,0.04421,0.04083,0.03765,0.03466,0.03186,0.02924,0.02679,0.02451,0.02239,0.02042,0.01859,0.0169,0.01534,0.0139,0.01258,0.01137,0.01025,0.00923,0.0083,0.00745,0.00668,0.00598,0.00534,0.00476,0.00424,0.00377,0.00335,0.00297,0.00263,0.00232,0.00205,0.00181,0.00159,0.00139,0.00122,0.00107,0.00094,0.00082,0.00071,0.00062,0.00054,0.00047,0.0004,0.00035,0.0003,0.00026,0.00022,0.00019,0.00016,0.00014,0.00012],"fat":[0.0018,0.00187,0.00194,0.00202,0.0021,0.00218,0.00227,0.00236,0.00246,0.00256,0.00267,0.00278,0.0029,0.00303,0.00316,0.0033,0.00344,0.0036,0.00376,0.00393,0.00412,0.00431,0.00451,0.00473,0.00496,0.0052,0.00545,0.00573,0.00602,0.00632,0.00665,0.007,0.00737,0.00776,0.00818,0.00862,0.0091,0.00961,0.01015,0.01074,0.01136,0.01202,0.01274,0.0135,0.01432,0.01521,0.01616,0.01717,0.01827,0.01945,0.02073,0.0221,0.02358,0.02519,0.02692,0.02879,0.03082,0.03302,0.0354,0.03798,0.04078,0.04383,0.04713,0.05073,0.05463,0.05888,0.06351,0.06854,0.07402,0.07998,0.08646,0.09351,0.10117,0.1095,0.11853,0.12832,0.13892,0.15036,0.1627,0.17597,0.19018,0.20537,0.22153,0.23863,0.25663,0.27547,0.29503,0.31518,0.33574,0.35648,0.37715,0.39743,0.417,0.43549,0.45253,0.46774,0.48077,0.49127,0.49899,0.50371,0.5053,0.50371,0.49899,0.49127,0.48077,0.46774,0.45253,0.43549,0.417,0.39743,0.37715,0.35648,0.33574,0.31518,0.29503,0.27547,0.25663,0.23863,0.22153,0.20537,0.19018,0.17597,0.1627,0.15036,0.13892,0.12832,0.11853,0.1095,0.10117,0.09351,0.08646,0.07998,0.07402,0.06854,0.06351,0.05888,0.05463,0.05073,0.04713,0.04383,0.04078,0.03798,0.0354,0.03302,0.03082,0.02879,0.02692,0.02519,0.02358,0.0221,0.02073,0.01945,0.01827,0.01717,0.01616,0.01521,0.01432,0.0135,0.01274,0.01202,0.01136,0.01074,0.01015,0.00961,0.0091,0.00862,0.00818,0.00776,0.00737,0.007,0.00665,0.00632,0.00602,0.00573,0.00545,0.0052,0.00496,0.00473,0.00451,0.00431,0.00412,0.00393,0.00376,0.0036,0.00344,0.0033,0.00316,0.00303,0.0029,0.00278,0.00267,0.00256,0.00246,0.00236,0.00227,0.00218,0.0021,0.00202,0.00194,0.00187,0.0018],"fat_note":"illustrative fat-tailed curve: Student-t, 3 degrees of freedom, same 1.26% spread","p_below_4sd_normal":3.167124183311986e-05,"p_below_4sd_fat":0.003082686569418579,"ratio_4sd":97.3339342253038,"per_year_normal":0.007981152941946205,"per_year_fat":0.7768370154934819},"normal":{"sigma_annual":0.2,"sd_day":0.01259881576697424,"sd_day_pct":1.26,"z":16.245118944980245,"z_round":16.2,"z_log":18.176091372488322,"log10_p":-58.917444667227635,"log10_p_log":-73.39889381004846,"p_mantissa":1.2093592556760298,"p_exp":-59,"days_since_big_bang":3477600000000.0,"log10_expected_since_big_bang":-46.37616504004485},"model":{"S0":100.0,"T_months":1,"r":0.0,"sigma":0.15,"crash":-0.2,"crash_rate":0.1,"crash_every_years":10.0,"paths":1000000,"seed":11,"paths_with_crash":8171,"strikes":[80,85,90,95,100,105,110,115,120],"rows":[{"K":80,"type":"put","price_mc":0.011170796819100525,"se":0.00022787166802043185,"price_exact":0.011436687340088323,"iv_mc":0.2971392935386652,"iv_exact":0.29789448503711385,"iv_pct":29.7},{"K":85,"type":"put","price_mc":0.04132806321287731,"se":0.0005460852083054605,"price_exact":0.04218832731875371,"iv_mc":0.26383954829524925,"iv_exact":0.2646242088807321,"iv_pct":26.4},{"K":90,"type":"put","price_mc":0.08956271432408816,"se":0.0009590692873856381,"price_exact":0.09138424359041891,"iv_mc":0.20737032529458066,"iv_exact":0.2081507484808209,"iv_pct":20.7},{"K":95,"type":"put","price_mc":0.3451030209296069,"se":0.0015988297801790997,"price_exact":0.3480027603303514,"iv_mc":0.16685960618501114,"iv_exact":0.1673144601786464,"iv_pct":16.7},{"K":100,"type":"call","price_mc":1.7980148763496528,"se":0.002648573688870384,"price_exact":1.7984101093213365,"iv_mc":0.156138714617461,"iv_exact":0.15617304226471088,"iv_pct":15.6},{"K":105,"type":"call","price_mc":0.30936375092849205,"se":0.0010844343914216742,"price_exact":0.30922075562338525,"iv_mc":0.1532664539703412,"iv_exact":0.15324418940092535,"iv_pct":15.3},{"K":110,"type":"call","price_mc":0.02453095169269709,"se":0.0002790418582786498,"price_exact":0.02448231426731061,"iv_mc":0.15217279697582725,"iv_exact":0.1521303785608618,"iv_pct":15.2},{"K":115,"type":"call","price_mc":0.0009501218600889001,"se":4.964552527029973e-05,"price_exact":0.0008885289361257162,"iv_mc":0.15237690309625118,"iv_exact":0.15157960467492973,"iv_pct":15.2},{"K":120,"type":"call","price_mc":1.5744911687713554e-05,"se":6.316785701074801e-06,"price_exact":1.5476242483741354e-05,"iv_mc":0.15138784852358356,"iv_exact":0.15125869899311462,"iv_pct":15.1}],"iv_pct":{"80":29.7,"85":26.4,"90":20.7,"95":16.7,"100":15.6,"105":15.3,"110":15.2,"115":15.2,"120":15.1}}}; /*ENDNUM*/
 // HOLOHUD: the Sci-fi Hologram HUD engine as one classic script, for HyperFrames scenes (copy it verbatim into a
 // scene's IIFE). HOLO = wireframe engine (holo.js), HUD = UI layer (hud.js), MKM = model builder (mkmodel.mjs), unchanged
 // except that ES-module exports became closures and the fetch-based model loader was dropped.
@@ -999,166 +999,676 @@ const HOLOHUD = (function () {
   })();
   return { HOLO, HUD, MKM, LIGHT, ADD };
 })();
+// QCHART: the quant chart kit for the light HUD scenes (panels, axes, curves, candles, bars, markers, rolling values,
+// target locks and typeset LaTeX formulas). Needs HOLOHUD above it. Pure functions of what you pass in: call them from
+// draw() every frame. Colours are theme keys ('line' blue, 'hi' navy, 'dim' pale blue, 'acc' orange) or CSS strings.
+const QC = (function () {
+  const { HUD } = HOLOHUD, FONT = HUD.FONT;
+  const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x)), lerp = (a, b, k) => a + (b - a) * k;
+  const eo = (x) => 1 - Math.pow(1 - clamp(x), 3);
+  const eio = (x) => { x = clamp(x); return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
+  const C = (T, c, a) => (typeof c === 'function' ? c(a) : (T[c] && typeof T[c] === 'function') ? T[c](a) : c);
+  const MINUS = '−';
+  const fmt = (v, d = 2) => (v < 0 ? MINUS : '') + Math.abs(v).toFixed(d);
+  const SUP = { '-': '⁻', '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹' };
+  const pow10 = (e) => '10' + String(e).split('').map((ch) => SUP[ch] || ch).join('');
 
-      // ---- the HUD scene scaffold (shared by every scene; keep it as is) ----
-      const { HOLO, HUD, MKM } = HOLOHUD;
-      const T = HUD.theme(218, 22), WF = 1080, HF = 1920, FPS = 24;
-      const holo = new HOLO.Holo(WF, HF);
-      const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x)), lerp = (a, b, k) => a + (b - a) * k;
-      const eo = (x) => 1 - Math.pow(1 - clamp(x), 3), eio = (x) => { x = clamp(x); return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
-      // HOME: every scene starts and ends on this camera, so the projector pad never jumps at a cut
-      const HOME = { target: [0, 0.5, 0], yaw: 0.35, pitch: 0.32, dist: 7.6, fov: 0.62, cx: 540, cy: 1010 };
-      const camMix = (a, b, k) => ({ target: a.target.map((v, i) => lerp(v, b.target[i], k)), yaw: lerp(a.yaw, b.yaw, k), pitch: lerp(a.pitch, b.pitch, k),
-        dist: lerp(a.dist, b.dist, k), fov: lerp(a.fov, b.fov, k), cx: lerp(a.cx, b.cx, k), cy: lerp(a.cy, b.cy, k) });
-      // build a model from MKM primitives in world units (no normalising: heights stay honest), ready for holo.draw
-      const build = (fn) => { const m = new MKM.Model("m"); fn(m); return HOLO.prepModel(m.toJSON()); };
-      // scan in over the first 0.6 s (the scan plane grows the subject), erase over the last 0.4 s; yTop = the subject's height
-      const scanState = (t, yTop) => {
-        const kin = clamp(t / 0.6), kout = clamp((t - (DUR - 0.42)) / 0.4);
-        if (kout > 0) return { scanDown: { y: lerp(yTop + 0.1, -0.05, eio(kout)) }, plane: lerp(yTop + 0.1, -0.05, eio(kout)), planeA: 1 - 0.3 * kout };
-        if (kin < 1) return { scan: { y: lerp(-0.05, yTop + 0.12, eio(kin)), band: 0.07 }, plane: lerp(-0.05, yTop + 0.12, eio(kin)), planeA: 1 };
-        return {};
-      };
-      const P3 = (cam, x, y, z) => { const c = HOLO.makeCamera(cam, WF, HF), o = new Float32Array(3); c.project(x, y, z, o); return [o[0], o[1], o[2]]; };
+  // ---- a plot frame: data -> px. xr, yr: data ranges; for a log axis pass log10 values and format ticks with pow10 ----
+  function frame(x, y, w, h, xr, yr) {
+    return { x, y, w, h, xr, yr,
+      X: (v) => x + (v - xr[0]) / (xr[1] - xr[0]) * w,
+      Y: (v) => y + h - (v - yr[0]) / (yr[1] - yr[0]) * h,
+      ix: (px) => xr[0] + (px - x) / w * (xr[1] - xr[0]) };
+  }
+
+  // ---- panel: white plate + corner brackets, opening from its centre; title row (index tick, title, sub, tag) ----
+  function panel(g, T, x, y, w, h, o = {}) {
+    const a = o.a ?? 1, k = o.open ?? 1;
+    if (a <= 0 || k <= 0) return;
+    const ow = w * (0.5 + 0.5 * eo(k));
+    HUD.plate(g, T, x + (w - ow) / 2, y, ow, h, clamp(k * 1.5) * a, { op: o.op ?? 0.82 });
+    if (!o.title) return;
+    const ta = a * clamp((k - 0.45) * 2.2);
+    if (ta <= 0) return;
+    g.save(); g.globalAlpha = ta; g.textBaseline = 'alphabetic'; g.textAlign = 'left';
+    g.fillStyle = T.line(1); g.fillRect(x + 24, y + 22, 30 * eo(k), 4);
+    let tx = x + 24;
+    if (o.index) { g.font = `400 19px ${FONT.mono}`; g.fillStyle = T.dim(1); g.fillText(o.index, tx, y + 54); tx += 38; }
+    g.letterSpacing = '2px'; g.font = `600 ${o.ts ?? 26}px ${FONT.ui}`; g.fillStyle = T.hi(1);
+    g.fillText(HUD.rollText(o.title.toUpperCase().replace(/Σ/g, 'σ').replace(/Λ/g, 'λ'), clamp(k * 1.4 - 0.3), o.frame ?? 0, 5), tx, y + 54);
+    if (o.sub) { g.letterSpacing = '1px'; g.font = `400 19px ${FONT.mono}`; g.fillStyle = T.dim(1); g.fillText(o.sub.toUpperCase().replace(/Σ/g, 'σ').replace(/Λ/g, 'λ'), x + 24, y + 82); }
+    if (o.tag) {
+      g.letterSpacing = '1.5px'; g.font = `600 17px ${FONT.ui}`;
+      const tw = g.measureText(o.tag).width + 20, bx = x + w - 24 - tw;
+      g.strokeStyle = C(T, o.tagC || 'line', 0.9); g.lineWidth = 1.2; g.strokeRect(bx, y + 32, tw, 28);
+      g.fillStyle = C(T, o.tagC || 'line', 1); g.fillText(o.tag, bx + 10, y + 52);
+    }
+    g.restore();
+  }
+
+  // ---- a tick label; "10⁻⁵⁹"-style labels (QC.pow10) are drawn as the base plus a raised, smaller exponent in the
+  //      same face, so no superscript glyph falls back to another font ----
+  const SUPR = { '\u207b': MINUS, '\u2070': '0', '\u00b9': '1', '\u00b2': '2', '\u00b3': '3', '\u2074': '4', '\u2075': '5', '\u2076': '6', '\u2077': '7', '\u2078': '8', '\u2079': '9' };
+  function tick(g, s, x, y, align, sz) {
+    const m = /^(.*?)([\u207b\u2070\u00b9\u00b2\u00b3\u2074-\u2079]+)$/.exec(s);
+    if (!m) { g.textAlign = align; g.fillText(s, x, y); return; }
+    const base = m[1], ex = m[2].split('').map((c) => SUPR[c]).join('');
+    const f0 = g.font, fe = f0.replace(/(\d+(?:\.\d+)?)px/, (_, n) => Math.round(n * 0.68) + 'px');
+    const wb = g.measureText(base).width; g.font = fe; const we = g.measureText(ex).width; g.font = f0;
+    const tw = wb + 2 + we, x0 = align === 'right' ? x - tw : align === 'center' ? x - tw / 2 : x;
+    g.textAlign = 'left'; g.fillText(base, x0, y);
+    g.font = fe; g.fillText(ex, x0 + wb + 2, y - sz * 0.42); g.font = f0;
+  }
+
+  // ---- axes: o = { xt, yt (tick values), xf, yf (tick formats), xl, yl (axis titles), grid, k (draw-in 0-1), a,
+  //      xAt (data y of the x axis; default yr[0]), yAt (data x of the y axis; default xr[0]), size (tick px) } ----
+  function axes(g, T, F, o = {}) {
+    const a = o.a ?? 1, k = eo(o.k ?? 1);
+    if (a <= 0 || k <= 0) return;
+    const xAt = F.Y(o.xAt ?? F.yr[0]), yAt = F.X(o.yAt ?? F.xr[0]), sz = o.size ?? 21;
+    g.save(); g.textBaseline = 'alphabetic';
+    if (o.grid !== false) {
+      g.strokeStyle = T.dim(0.22 * a); g.lineWidth = 1;
+      g.beginPath();
+      (o.yt || []).forEach((v) => { const py = F.Y(v); g.moveTo(F.x, py); g.lineTo(F.x + F.w * k, py); });
+      (o.xt || []).forEach((v) => { const px = F.X(v); g.moveTo(px, F.y + F.h); g.lineTo(px, F.y + F.h - F.h * k); });
+      g.stroke();
+    }
+    g.strokeStyle = T.hi(0.85 * a); g.lineWidth = 2;
+    g.beginPath(); g.moveTo(F.x, xAt); g.lineTo(F.x + F.w * k, xAt);
+    if (!o.noY) { g.moveTo(yAt, F.y + F.h); g.lineTo(yAt, F.y + F.h - F.h * k); }
+    g.stroke();
+    g.font = `400 ${sz}px ${FONT.mono}`; g.fillStyle = T.hi(0.85 * a);
+    g.textAlign = 'center';
+    (o.xt || []).forEach((v, i) => {
+      const px = F.X(v), ka = clamp((k - i / Math.max(1, o.xt.length) * 0.6) * 3);
+      if (ka <= 0) return;
+      g.globalAlpha = ka; g.beginPath(); g.moveTo(px, xAt); g.lineTo(px, xAt + 8); g.stroke();
+      tick(g, o.xf ? o.xf(v) : String(v), px, xAt + 12 + sz, 'center', sz);
+    });
+    g.globalAlpha = 1;
+    if (!o.noY) {
+      g.textAlign = 'right';
+      (o.yt || []).forEach((v, i) => {
+        const py = F.Y(v), ka = clamp((k - i / Math.max(1, o.yt.length) * 0.6) * 3);
+        if (ka <= 0) return;
+        g.globalAlpha = ka; g.beginPath(); g.moveTo(yAt, py); g.lineTo(yAt - 8, py); g.stroke();
+        tick(g, o.yf ? o.yf(v) : String(v), yAt - 14, py + sz * 0.36, 'right', sz);
+      });
+    }
+    g.globalAlpha = a * clamp(k * 2 - 1);
+    g.letterSpacing = '1.5px'; g.font = `500 ${sz - 2}px ${FONT.mono}`; g.fillStyle = T.line(0.95);
+    if (o.xl) { g.textAlign = 'right'; g.fillText(o.xl.toUpperCase().replace(/Σ/g, 'σ').replace(/Λ/g, 'λ'), F.x + F.w, xAt + 2 * sz + 26); }
+    if (o.yl) { g.textAlign = 'left'; g.fillText(o.yl.toUpperCase().replace(/Σ/g, 'σ').replace(/Λ/g, 'λ'), yAt - (o.ylDx ?? 0), F.y - 16); }
+    g.restore();
+  }
+
+  // ---- a curve. o = { c, w, a, k (0-1 of the x range drawn, left to right) or x1 (data x drawn up to), dash, glow,
+  //      head (a dot + short scan line at the drawing front), clipY (keep inside the frame vertically) } ----
+  function line(g, T, F, xs, ys, o = {}) {
+    const a = o.a ?? 1; if (a <= 0) return null;
+    const xEnd = o.x1 ?? lerp(xs[0], xs[xs.length - 1], clamp(o.k ?? 1));
+    g.save();
+    if (o.clipY !== false) { g.beginPath(); g.rect(F.x - 4, F.y - 4, F.w + 8, F.h + 8); g.clip(); }
+    const pts = []; let last = null;
+    for (let i = 0; i < xs.length; i++) {
+      if (xs[i] > xEnd) {
+        if (i > 0) { const f = (xEnd - xs[i - 1]) / (xs[i] - xs[i - 1]); last = [xEnd, lerp(ys[i - 1], ys[i], f)]; pts.push([F.X(last[0]), F.Y(last[1])]); }
+        break;
+      }
+      pts.push([F.X(xs[i]), F.Y(ys[i])]); last = [xs[i], ys[i]];
+    }
+    if (pts.length < 2) { g.restore(); return null; }
+    const path = () => { g.beginPath(); g.moveTo(pts[0][0], pts[0][1]); for (let i = 1; i < pts.length; i++) g.lineTo(pts[i][0], pts[i][1]); };
+    g.lineJoin = 'round'; g.lineCap = 'round';
+    if (o.glow !== false) { path(); g.strokeStyle = C(T, o.c || 'line', 0.16 * a); g.lineWidth = (o.w ?? 3) + 8; g.stroke(); }
+    path(); g.setLineDash(o.dash || []); g.strokeStyle = C(T, o.c || 'line', 0.95 * a); g.lineWidth = o.w ?? 3; g.stroke();
+    g.setLineDash([]);
+    const end = pts[pts.length - 1];
+    if (o.head && (o.k ?? 1) < 1) {
+      g.fillStyle = C(T, o.c || 'line', a); g.beginPath(); g.arc(end[0], end[1], 6, 0, 2 * Math.PI); g.fill();
+      g.strokeStyle = T.line(0.35 * a); g.lineWidth = 1.5; g.beginPath(); g.moveTo(end[0], F.y); g.lineTo(end[0], F.y + F.h); g.stroke();
+    }
+    g.restore();
+    return { end, last };
+  }
+
+  // ---- filled area between a curve and a base level (data y). o = { base, c, a, k, x0, x1 (data x span) } ----
+  function area(g, T, F, xs, ys, o = {}) {
+    const a = o.a ?? 1; if (a <= 0) return;
+    const base = o.base ?? F.yr[0], x0 = o.x0 ?? xs[0];
+    const x1 = Math.min(o.x1 ?? xs[xs.length - 1], lerp(xs[0], xs[xs.length - 1], clamp(o.k ?? 1)));
+    if (x1 <= x0) return;
+    g.save(); g.beginPath(); g.rect(F.x, F.y, F.w, F.h); g.clip();
+    g.beginPath(); g.moveTo(F.X(x0), F.Y(base)); let started = false;
+    for (let i = 0; i < xs.length; i++) {
+      if (xs[i] < x0) continue; if (xs[i] > x1) break;
+      g.lineTo(F.X(xs[i]), F.Y(ys[i])); started = true;
+    }
+    if (!started) { g.restore(); return; }
+    g.lineTo(F.X(x1), F.Y(base)); g.closePath();
+    g.fillStyle = C(T, o.c || 'line', (o.fa ?? 0.16) * a); g.fill();
+    g.restore();
+  }
+
+  // ---- bars (a histogram): xs = bar centres (data), ys = heights; o = { bw (data width), base, c, a, k (grow),
+  //      stroke, fa (fill alpha), hl: [indices drawn in the accent] } ----
+  function bars(g, T, F, xs, ys, o = {}) {
+    const a = o.a ?? 1; if (a <= 0) return;
+    const base = o.base ?? F.yr[0], bw = o.bw ?? (xs[1] - xs[0]) * 0.8;
+    g.save();
+    for (let i = 0; i < xs.length; i++) {
+      const ki = eo(clamp((o.k ?? 1) * 1.6 - i / xs.length * 0.6));
+      if (ki <= 0) continue;
+      const hv = lerp(base, ys[i], ki), x0 = F.X(xs[i] - bw / 2), x1 = F.X(xs[i] + bw / 2), y0 = F.Y(base), y1 = F.Y(hv);
+      if (Math.abs(y1 - y0) < 0.75) continue;
+      const hl = (o.hl || []).includes(i), c = hl ? 'acc' : (o.c || 'line');
+      g.fillStyle = C(T, c, (o.fa ?? 0.22) * a); g.fillRect(x0, Math.min(y0, y1), x1 - x0, Math.abs(y1 - y0));
+      g.strokeStyle = C(T, c, 0.9 * a); g.lineWidth = o.stroke ?? 1.6; g.strokeRect(x0 + 0.5, Math.min(y0, y1) + 0.5, x1 - x0 - 1, Math.abs(y1 - y0) - 1);
+    }
+    g.restore();
+  }
+
+  // ---- candles: d = { open, high, low, close } arrays, xs = data x per candle; o = { n (how many shown, may be
+  //      fractional: the last one grows), bw (px), hl (index in the accent), a } ----
+  function candles(g, T, F, d, xs, o = {}) {
+    const a = o.a ?? 1; if (a <= 0) return;
+    const n = o.n ?? xs.length, bw = o.bw ?? 10;
+    g.save();
+    for (let i = 0; i < Math.min(xs.length, Math.ceil(n)); i++) {
+      const grow = clamp(n - i);
+      const op = d.open[i], cl = lerp(op, d.close[i], eo(grow)), hi = lerp(op, d.high[i], eo(grow)), lo = lerp(op, d.low[i], eo(grow));
+      const up = d.close[i] >= op, hl = o.hl === i, cx = F.X(xs[i]);
+      const col = hl ? T.acc(a) : up ? T.line(0.95 * a) : T.hi(0.9 * a);
+      g.strokeStyle = col; g.lineWidth = hl ? 2.4 : 1.6;
+      g.beginPath(); g.moveTo(cx, F.Y(hi)); g.lineTo(cx, F.Y(lo)); g.stroke();
+      const y0 = F.Y(Math.max(op, cl)), y1 = F.Y(Math.min(op, cl)), hh = Math.max(2, y1 - y0);
+      if (up && !hl) { g.fillStyle = 'rgba(255,255,255,0.95)'; g.fillRect(cx - bw / 2, y0, bw, hh); g.strokeRect(cx - bw / 2 + 0.5, y0 + 0.5, bw - 1, hh - 1); }
+      else { g.fillStyle = col; g.fillRect(cx - bw / 2, y0, bw, hh); }
+    }
+    g.restore();
+  }
+
+  // ---- reference lines: o = { c, a, dash, w, label, at ('start'|'end'), size } ----
+  function hline(g, T, F, v, o = {}) {
+    const a = o.a ?? 1; if (a <= 0) return;
+    const py = F.Y(v), k = clamp(o.k ?? 1);
+    g.save(); g.setLineDash(o.dash ?? [10, 8]); g.strokeStyle = C(T, o.c || 'hi', 0.75 * a); g.lineWidth = o.w ?? 2;
+    g.beginPath(); g.moveTo(F.x, py); g.lineTo(F.x + F.w * k, py); g.stroke(); g.setLineDash([]);
+    if (o.label && k > 0.6) { g.globalAlpha = clamp((k - 0.6) * 2.5); tag(g, T, o.label, o.at === 'start' ? F.x + 10 : F.x + F.w - 10, py - 10, { c: o.c || 'hi', align: o.at === 'start' ? 'left' : 'right', a, size: o.size }); }
+    g.restore();
+  }
+  function vline(g, T, F, v, o = {}) {
+    const a = o.a ?? 1; if (a <= 0) return;
+    const px = F.X(v), k = clamp(o.k ?? 1);
+    g.save(); g.setLineDash(o.dash ?? [10, 8]); g.strokeStyle = C(T, o.c || 'hi', 0.75 * a); g.lineWidth = o.w ?? 2;
+    g.beginPath(); g.moveTo(px, F.y + F.h); g.lineTo(px, F.y + F.h - F.h * k); g.stroke(); g.setLineDash([]);
+    if (o.label && k > 0.6) { g.globalAlpha = clamp((k - 0.6) * 2.5); tag(g, T, o.label, px + (o.dx ?? 0), (o.y ?? F.y) - 6, { c: o.c || 'hi', align: o.align || 'center', a, size: o.size }); }
+    g.restore();
+  }
+
+  // ---- a marker dot with a ring; o = { r, c, a, pulse (0-1 expanding ring) } ----
+  function dot(g, T, x, y, o = {}) {
+    const a = o.a ?? 1; if (a <= 0) return;
+    const r = (o.r ?? 7) * (o.s ?? 1);
+    g.save();
+    g.fillStyle = 'rgba(255,255,255,0.95)'; g.beginPath(); g.arc(x, y, r + 3, 0, 2 * Math.PI); g.fill();
+    g.fillStyle = C(T, o.c || 'line', a); g.beginPath(); g.arc(x, y, r, 0, 2 * Math.PI); g.fill();
+    g.strokeStyle = C(T, o.c || 'line', 0.55 * a); g.lineWidth = 1.6; g.beginPath(); g.arc(x, y, r + 7, 0, 2 * Math.PI); g.stroke();
+    if (o.pulse > 0 && o.pulse < 1) { g.strokeStyle = C(T, o.c || 'line', 0.8 * a * (1 - o.pulse)); g.beginPath(); g.arc(x, y, r + 7 + 34 * o.pulse, 0, 2 * Math.PI); g.stroke(); }
+    g.restore();
+  }
+
+  // ---- text: o = { size, wt, c, a, align, mono, ls, roll (0-1), frame, seed, base ('alphabetic'|'middle') } ----
+  function text(g, T, s, x, y, o = {}) {
+    const a = o.a ?? 1; if (a <= 0 || !s) return 0;
+    g.save(); g.globalAlpha = 1; g.textAlign = o.align || 'left'; g.textBaseline = o.base || 'alphabetic';
+    g.letterSpacing = (o.ls ?? 0) + 'px';
+    g.font = `${o.wt ?? 500} ${o.size ?? 28}px ${o.mono ? FONT.mono : FONT.ui}`;
+    if (o.maxW) HUD.fitFont(g, s, o.wt ?? 500, o.size ?? 28, o.mono ? FONT.mono : FONT.ui, o.maxW, 12);
+    g.fillStyle = C(T, o.c || 'hi', a);
+    const str = o.roll !== undefined ? HUD.rollText(s, o.roll, o.frame ?? 0, o.seed ?? 0) : s;
+    g.fillText(str, x, y);
+    const w = g.measureText(s).width;
+    g.restore();
+    return w;
+  }
+
+  // ---- a value that rolls in and locks in the accent: o = { size, a, roll, frame, unit, flash, c (before lock) } ----
+  function value(g, T, s, x, y, o = {}) {
+    const a = o.a ?? 1, roll = o.roll ?? 1; if (a <= 0 || roll <= 0) return { w: 0 };
+    const size = o.size ?? 72, locked = roll >= 1;
+    g.save(); g.textAlign = 'left'; g.textBaseline = 'alphabetic';
+    g.font = `${o.wt ?? 400} ${size}px ${FONT.ui}`;
+    const adv = g.measureText('0').width * 1.02;
+    const total = (() => { let w = 0; for (const ch of s) w += (ch === '.' || ch === ',' || ch === ' ') ? g.measureText(ch).width * 1.1 : adv; return w; })();
+    let x0 = o.align === 'right' ? x - total : o.align === 'center' ? x - total / 2 : x;
+    g.fillStyle = locked ? (o.flash ? T.hi(a) : C(T, o.lc || 'acc', a)) : C(T, o.c || 'line', 0.85 * a);
+    const vw = HUD.monoText(g, HUD.rollText(s, roll, o.frame ?? 0, o.seed ?? 11), x0, y, adv);
+    if (o.unit) {
+      g.font = `500 ${Math.round(size * 0.36)}px ${FONT.ui}`; g.fillStyle = locked ? C(T, o.lc || 'acc', 0.9 * a) : T.line(0.6 * a);
+      g.fillText(o.unit, x0 + vw + 8, y);
+    }
+    g.restore();
+    return { w: vw, x0, bb: [x0, y - size * 0.78, x0 + vw, y + size * 0.06] };
+  }
+
+  // ---- a small filled tag: o = { c ('line'|'acc'|'hi'), a, align, size } ----
+  function tag(g, T, s, x, y, o = {}) {
+    const a = o.a ?? 1; if (a <= 0) return;
+    g.save(); g.letterSpacing = '1px'; g.font = `600 ${o.size ?? 19}px ${FONT.ui}`; g.textBaseline = 'alphabetic';
+    const w = g.measureText(s).width + 18, h = (o.size ?? 19) + 11;
+    const x0 = o.align === 'right' ? x - w : o.align === 'center' ? x - w / 2 : x;
+    g.fillStyle = C(T, o.c || 'line', 0.95 * a); g.fillRect(x0, y - h, w, h);
+    g.fillStyle = `rgba(255,255,255,${a})`; g.textAlign = 'left'; g.fillText(s, x0 + 9, y - 8);
+    g.restore();
+    return [x0, y - h, x0 + w, y];
+  }
+
+  // ---- target lock (HUD.targetBox) and leader, re-exported ----
+  const lock = (g, T, bb, k, o = {}) => HUD.targetBox(g, T, bb, k, o);
+  const leader = (g, T, a, b, c, k, o = {}) => HUD.leader(g, T, a, b, c, k, o);
+
+  // ---- scene life: the scan-in (a vertical scan line reveals the stage left to right) and the scan-erase at the
+  //      end. Use: const sx = QC.scanIn(t) ... QC.clipStage(g, sx) ... draw ... g.restore(); QC.scanLine(g, T, sx). ----
+  const STAGE = { x0: 30, x1: 1050, y0: 552, y1: 1478 };
+  const scanIn = (t, t0 = 0, dur = 0.6) => lerp(STAGE.x0, STAGE.x1, eio((t - t0) / dur));
+  const scanOut = (t, t1, dur = 0.4) => lerp(STAGE.x0, STAGE.x1, eio((t - (t1 - dur)) / dur));
+  function clipStage(g, xIn = STAGE.x1, xOut = STAGE.x0) {   // keep [xOut, xIn] of the stage; call g.restore() after
+    g.save(); g.beginPath(); g.rect(xOut, 0, Math.max(0, xIn - xOut), 1920); g.clip();
+  }
+  function scanLine(g, T, x, a = 1) {
+    if (x <= STAGE.x0 + 1 || x >= STAGE.x1 - 1 || a <= 0) return;
+    g.save();
+    const gr = g.createLinearGradient(x - 60, 0, x + 6, 0);
+    gr.addColorStop(0, T.line(0)); gr.addColorStop(1, T.line(0.16 * a));
+    g.fillStyle = gr; g.fillRect(x - 60, STAGE.y0, 66, STAGE.y1 - STAGE.y0);
+    g.strokeStyle = T.line(0.9 * a); g.lineWidth = 2; g.beginPath(); g.moveTo(x, STAGE.y0); g.lineTo(x, STAGE.y1); g.stroke();
+    g.restore();
+  }
+
+  // ---- LaTeX formulas: inline SVG (typeset by MathJax at build time) in a DOM layer over the canvas ----
+  // init once with the scene's TEX map; each frame: tex.begin(); tex.show(id, {...}); ... tex.end();
+  const tex = (function () {
+    let layer = null, nodes = {}, shown = {}, MAP = {}, ACC = '', LINE = '';
+    function init(root, map, T) {
+      MAP = map; ACC = T.acc(1); LINE = T.line(1); layer = document.createElement('div');
+      layer.style.cssText = 'position:absolute;left:0;top:0;width:1080px;height:1920px;pointer-events:none;';
+      const st = document.createElement('style');
+      st.textContent = `.qtex{position:absolute;left:0;top:0;transform-origin:0 0;color:${T.hi(1)};will-change:clip-path,opacity}
+        .qtex svg{display:block;width:100%;height:100%;overflow:visible}
+        .qtex .acc{color:var(--acc)} .qtex .blu{color:${T.line(1)}}`;
+      layer.appendChild(st);
+      for (const id in map) {
+        const d = document.createElement('div'); d.className = 'qtex'; d.innerHTML = map[id].svg; d.style.display = 'none';
+        layer.appendChild(d); nodes[id] = d;
+      }
+      root.appendChild(layer);
+    }
+    function begin() { shown = {}; }
+    // o = { x, y, size (em px), align ('left'|'center'|'right'), valign ('base'|'middle'|'top'), k (reveal 0-1, left to
+    //       right), cut (0-1 erased from the left), a, lock (true: the \class{acc} parts turn orange), clip [x0, x1] px }
+    function show(id, o = {}) {
+      const f = MAP[id], d = nodes[id]; if (!f || !d) throw new Error('no formula ' + id);
+      const em = o.size ?? 56, w = f.w * em, h = f.h * em;
+      let x = o.x ?? 540, y = o.y ?? 0;
+      if (o.align === 'center') x -= w / 2; else if (o.align === 'right') x -= w;
+      const top = o.valign === 'top' ? y : o.valign === 'middle' ? y - h / 2 : y - (f.h - f.a) * em;
+      const k = clamp(o.k ?? 1), cut = clamp(o.cut ?? 0);
+      let L = cut * w, R = (1 - k) * w;
+      if (o.clip) { L = Math.max(L, o.clip[0] - x); R = Math.max(R, x + w - o.clip[1]); }
+      const a = o.a ?? 1;
+      if (a <= 0 || L + R >= w) return { bb: [x, top, x + w, top + h], w, h };
+      d.style.display = 'block'; d.style.width = w + 'px'; d.style.height = h + 'px';
+      d.style.transform = `translate(${x}px, ${top}px)`; d.style.opacity = a;
+      d.style.clipPath = `inset(-20px ${R}px -20px ${L}px)`;
+      d.style.setProperty('--acc', o.lock ? ACC : LINE);
+      shown[id] = 1;
+      return { bb: [x, top, x + w, top + h], w, h };
+    }
+    function end() { for (const id in nodes) if (!shown[id]) nodes[id].style.display = 'none'; }
+    return { init, begin, show, end };
+  })();
+
+  return { frame, panel, axes, line, area, bars, candles, hline, vline, dot, text, value, tag, lock, leader,
+    STAGE, scanIn, scanOut, clipStage, scanLine, tex, fmt, pow10, MINUS, clamp, lerp, eo, eio };
+})();
+// QCHART END
 
 
-      // words: 0 So 1 here's 2 the 3 answer: 4 with 5 normal 6 returns 7 and 8 one 9 volatility, 10 implied 11 vol 12 would
-      // 13 be 14 flat 15 across 16 strikes.
-      const w = (i) => Math.max(0, W.length > i ? W[i] : 0.12 + i * 0.3);
-      // ---- s12: the answer. s1's strike row (nine tickets, 80..120) scans in; a small normal bell ("normal returns") scans
-      // in at the back left of the pad, behind the row; with one volatility the nine implied-vol columns rise to one level
-      // (15.6%, the at-the-money vol) and a flat beam locks across their tops on "flat" ----
-      const KS = [80, 85, 90, 95, 100, 105, 110, 115, 120], N = 9, DX = 0.165, X0 = -DX * 4;
-      const UV = 0.62 / 20;                                 // world units per implied-vol point (s1: 20% = 0.62 units)
-      const FLAT = 15.6, HFL = FLAT * UV;                   // one volatility for every strike: 15.6% = 0.484 units
-      // the bell: work/numbers.json bell.normal (sd 1.26% a day), x = −5%…+5% every 0.1%, one height scale shared with s13
-      const BX_PCT = 0.1, BN = [0.00012, 0.00016, 0.00022, 0.0003, 0.0004, 0.00054, 0.00071, 0.00094, 0.00122, 0.00159, 0.00205, 0.00263, 0.00335, 0.00424, 0.00534, 0.00668, 0.0083, 0.01025, 0.01258, 0.01534, 0.01859, 0.02239, 0.02679, 0.03186, 0.03765, 0.04421, 0.05159, 0.05983, 0.06894, 0.07894, 0.08982, 0.10156, 0.11411, 0.12741, 0.14137, 0.15587, 0.17078, 0.18594, 0.20118, 0.2163, 0.23109, 0.24534, 0.25884, 0.27136, 0.2827, 0.29267, 0.30109, 0.3078, 0.31269, 0.31565, 0.31665, 0.31565, 0.31269, 0.3078, 0.30109, 0.29267, 0.2827, 0.27136, 0.25884, 0.24534, 0.23109, 0.2163, 0.20118, 0.18594, 0.17078, 0.15587, 0.14137, 0.12741, 0.11411, 0.10156, 0.08982, 0.07894, 0.06894, 0.05983, 0.05159, 0.04421, 0.03765, 0.03186, 0.02679, 0.02239, 0.01859, 0.01534, 0.01258, 0.01025, 0.0083, 0.00668, 0.00534, 0.00424, 0.00335, 0.00263, 0.00205, 0.00159, 0.00122, 0.00094, 0.00071, 0.00054, 0.0004, 0.0003, 0.00022, 0.00016, 0.00012];
-      const BF = [0.0018, 0.00194, 0.0021, 0.00227, 0.00246, 0.00267, 0.0029, 0.00316, 0.00344, 0.00376, 0.00412, 0.00451, 0.00496, 0.00545, 0.00602, 0.00665, 0.00737, 0.00818, 0.0091, 0.01015, 0.01136, 0.01274, 0.01432, 0.01616, 0.01827, 0.02073, 0.02358, 0.02692, 0.03082, 0.0354, 0.04078, 0.04713, 0.05463, 0.06351, 0.07402, 0.08646, 0.10117, 0.11853, 0.13892, 0.1627, 0.19018, 0.22153, 0.25663, 0.29503, 0.33574, 0.37715, 0.417, 0.45253, 0.48077, 0.49899, 0.5053, 0.49899, 0.48077, 0.45253, 0.417, 0.37715, 0.33574, 0.29503, 0.25663, 0.22153, 0.19018, 0.1627, 0.13892, 0.11853, 0.10117, 0.08646, 0.07402, 0.06351, 0.05463, 0.04713, 0.04078, 0.0354, 0.03082, 0.02692, 0.02358, 0.02073, 0.01827, 0.01616, 0.01432, 0.01274, 0.01136, 0.01015, 0.0091, 0.00818, 0.00737, 0.00665, 0.00602, 0.00545, 0.00496, 0.00451, 0.00412, 0.00376, 0.00344, 0.00316, 0.0029, 0.00267, 0.00246, 0.00227, 0.0021, 0.00194, 0.0018];
-      const BXC = -0.11, BZ = -0.8, BW = 0.66, BD = 0.07, BS = 0.42 / 0.5053;   // centre x, depth z, width, thickness, units per density
-      const bxAt = (i) => BXC + (i / 100 - 0.5) * BW;                          // i = 0..100 ↔ −5%…+5%
-      function bell(m, ys, id) {
-        m.part(id, { anchor: [bxAt(64), ys[64] * BS, BZ + BD / 2] }); m.piece(id);
-        const F = [], B = [];
-        for (let i = 0; i <= 100; i++) { F.push(m.vtx([bxAt(i), ys[i] * BS, BZ + BD / 2])); B.push(m.vtx([bxAt(i), ys[i] * BS, BZ - BD / 2])); }
-        for (let i = 0; i < 100; i++) { m.edge(F[i], F[i + 1]); m.edge(B[i], B[i + 1]); m.quad(F[i], F[i + 1], B[i + 1], B[i]); }
-        let pf = -1, pb = -1;                                // rings every 0.5% (rib + two verticals + base rib), the base lines
-        for (let i = 0; i <= 100; i += 5) {
-          const f0 = m.vtx([bxAt(i), 0, BZ + BD / 2]), b0 = m.vtx([bxAt(i), 0, BZ - BD / 2]);
-          m.edge(F[i], B[i]); m.edge(f0, b0);
-          if (ys[i] * BS > 0.006) { m.edge(F[i], f0); m.edge(B[i], b0); }
-          if (pf >= 0) { m.edge(pf, f0); m.edge(pb, b0); }
-          pf = f0; pb = b0;
-        }
-      }
-      const BELL = build((m) => bell(m, BN, "bell"));
-      // timing (all from the words)
-      const tAns = w(3) - 0.08;                            // "answer:" → THE ANSWER plate
-      const tBell = w(5) - 0.12;                           // "normal" → the bell scans in
-      const tR0 = w(8), tRs = 0.1;                         // "one volatility" → the columns rise, 80 → 120
-      const tBeam = w(14) - 0.15, tLock = w(14) + 0.2;     // "flat" → the beam drops onto the tops and locks
-      const fLock = Math.round(tLock * FPS);
-      const colH = (i, t) => { const p = clamp((t - (tR0 + i * tRs)) / 0.45); return p <= 0 ? 0 : HFL * (1 + 0.12 * Math.sin(p * 3.4) * (1 - p)) * eo(p); };
-      function model(t) {
-        return build((m) => {
-          KS.forEach((k, i) => {
-            const x = X0 + i * DX;
-            m.part("t" + i); m.piece("t" + i);
-            m.box([x, 0.11, 0.42], [0.125, 0.2, 0.012]);                       // the option ticket, standing
-            m.box([x, 0.19, 0.42], [0.125, 0.04, 0.012]);                      // its header band
-            const h = colH(i, t);
-            if (h > 0.01) { m.part("c" + i, { anchor: [x, h, 0.08 + 0.0425] }); m.piece("c" + i); m.box([x, h / 2, 0.08], [0.085, h, 0.085]); }
-          });
-          const b = clamp((t - tBeam) / 0.35);
-          if (b > 0) { m.part("beam", { anchor: [X0 - 0.1, HFL + 0.03, 0.155] }); m.piece("beam"); m.box([0, HFL + 0.03 + 0.5 * (1 - eo(b)), 0.08], [DX * 8 + 0.2, 0.03, 0.15]); }
-        });
-      }
-      // high 3/4 over the row, so the bell at the back reads above the columns' tops
-      const SHOT = { target: [0, 0.42, -0.1], yaw: 0.12, pitch: 0.7, dist: 6.6, fov: 0.62, cx: 585, cy: 955 };
-      function camAt(t) {
-        if (t < DUR - 0.75) return camMix(HOME, SHOT, eio((t - 0.15) / 1.0));
-        return camMix(SHOT, HOME, eio((t - (DUR - 0.75)) / 0.6));
-      }
+      // ---- s12: "So here's the answer: with normal returns and one volatility, implied vol would be flat across strikes."
+      // It opens on s11's last frame (the smile, drawn by the chart block copied from s11 byte for byte), holds it through
+      // "So here's" and scan-erases it over "the answer:". Then the ANSWER layout scans in, built across s12 and s13 with no
+      // erase between them: a header (THE ANSWER, with the s2 question)
+      // and two rows, each a small density chart -> an arrow -> a small implied-vol chart. s12 builds the top row: NORMAL
+      // RETURNS (the normal density of daily moves on a log scale: thin tails; its spread, ONE σ, on "one volatility") ->
+      // IMPLIED VOL: FLAT (one level, the money's 15.6%, at every strike 80-120, on "flat across strikes"), the flat formula
+      // under its title, locked on "strikes". Holds into s13 (no erase).
+      // words: 0 So 1 here's 2 the 3 answer: 4 with 5 normal 6 returns 7 and 8 one 9 volatility, 10 implied 11 vol
+      //        12 would 13 be 14 flat 15 across 16 strikes.
+      const { HUD } = HOLOHUD;
+      const T = HUD.theme(218, 22), FPS = 24, FONT = HUD.FONT;
+      const { clamp, lerp, eo, eio } = QC;
       const g = document.getElementById("s12-cv").getContext("2d");
-      const st = { t: 0 };
-      // the strike ruler: s1's plate under the tickets, laid along the row as the camera sees it
-      function ruler(cam, a) {
-        const L = P3(cam, X0 - 0.12, -0.01, 0.62), R = P3(cam, -X0 + 0.12, -0.01, 0.62);
-        const ang = Math.atan2(R[1] - L[1], R[0] - L[0]), len = Math.hypot(R[0] - L[0], R[1] - L[1]), ca = Math.cos(ang), sa = Math.sin(ang);
-        g.save(); g.translate(L[0], L[1]); g.rotate(ang);
-        HUD.plate(g, T, -18, 16, len + 36, 76, a);
-        g.globalCompositeOperation = HOLOHUD.ADD; g.textBaseline = "alphabetic";
-        g.font = "26px " + HUD.FONT.mono; g.textAlign = "center";
-        KS.forEach((k, i) => {
-          const p = P3(cam, X0 + i * DX, -0.01, 0.62), u = (p[0] - L[0]) * ca + (p[1] - L[1]) * sa;
-          g.fillStyle = T.line(0.95 * a); g.fillText(String(k), u, 54); g.fillRect(u - 0.5, 16, 1, 9);
+      const w = (i) => W[i];
+      const hit = (t, t0) => t - t0 > 0 && t - t0 < 3 / FPS;
+      // ======== the s11 smile chart: identical code in s11 and s12 (s12 opens on its final frame) ========
+      // SMILE.chart(t, f, S) draws the chart at time t; S holds the beat times (s11 sets them from its words, s12 draws
+      // the chart at its end state). Its own scope, so its names never meet the scene's.
+      const SMILE = (function () {
+        const M = NUM.model, KS = M.strikes, IV = Object.fromEntries(KS.map((k) => [k, M.iv_pct[String(k)]]));
+        const ROW = Object.fromEntries(M.rows.map((r) => [r.K, r]));
+        const K0 = M.S0, ATM = IV[K0];                        // the money strike (S = 100) and its implied vol, 15.6%
+        const comma = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        const SUB = `S = ${K0} · σ = ${Math.round(M.sigma * 100)}% · ${QC.MINUS}${Math.round(-M.crash * 100)}% crash, 1 in ` +
+          `${M.crash_every_years} years · ${comma(M.paths)} paths`;
+        // the smile: a monotone cubic through the nine points (no overshoot between strikes)
+        function smooth(xs, ys) {
+          const n = xs.length, d = [], m = new Array(n);
+          for (let i = 0; i < n - 1; i++) d.push((ys[i + 1] - ys[i]) / (xs[i + 1] - xs[i]));
+          m[0] = d[0]; m[n - 1] = d[n - 2];
+          for (let i = 1; i < n - 1; i++) m[i] = d[i - 1] * d[i] <= 0 ? 0 : (d[i - 1] + d[i]) / 2;
+          for (let i = 0; i < n - 1; i++) {
+            if (d[i] === 0) { m[i] = 0; m[i + 1] = 0; continue; }
+            const a = m[i] / d[i], b = m[i + 1] / d[i], s = a * a + b * b;
+            if (s > 9) { const k = 3 / Math.sqrt(s); m[i] = k * a * d[i]; m[i + 1] = k * b * d[i]; }
+          }
+          return (x) => {
+            let i = 0; while (i < n - 2 && x > xs[i + 1]) i++;
+            const h = xs[i + 1] - xs[i], u = (x - xs[i]) / h, u2 = u * u, u3 = u2 * u;
+            return (2 * u3 - 3 * u2 + 1) * ys[i] + (u3 - 2 * u2 + u) * h * m[i] + (-2 * u3 + 3 * u2) * ys[i + 1] + (u3 - u2) * h * m[i + 1];
+          };
+        }
+        const SM = smooth(KS, KS.map((k) => IV[k]));
+        const CX = []; for (let k = KS[0]; k <= KS[KS.length - 1] + 1e-9; k += 0.25) CX.push(k);
+        const CY = CX.map(SM);
+        // layout: one chart panel over the stage; the table sits in the empty upper right of the chart
+        const PX = { x: 40, y: 566, w: 1000, h: 900 };
+        const F = QC.frame(150, 740, 850, 610, [77, 123], [10, 35]);
+        const TB = { x: 646, y: 748, w: 354, h: 300 };
+        const HERO = [K0, 90, 80], RISE = 0.36, OTHERS = KS.filter((k) => !HERO.includes(k));
+        const hit = (t, t0) => t - t0 > 0 && t - t0 < 3 / FPS;
+        const pFmt = (v) => { if (v >= 0.01) return v.toFixed(3); const e = Math.floor(Math.log10(v)); return (v / 10 ** e).toFixed(1) + "×" + QC.pow10(e); };
+        const xTickY = F.y + F.h + 12 + 21;
+        const tOn = (k, S) => HERO.includes(k) ? S.tL[k] - RISE : S.tO0 + OTHERS.indexOf(k) * S.tOs;   // when a point shows
+        // where a point is at time t (data y), and how far it has come in
+        function point(k, t, S) {
+          const t0 = tOn(k, S);
+          if (t < t0) return null;
+          if (k === K0) return { v: ATM, a: clamp((t - t0) / 0.2) };
+          const kr = eio(clamp((t - t0) / (HERO.includes(k) ? RISE : 0.32)));
+          return { v: lerp(ATM, IV[k], kr), a: clamp((t - t0) / 0.15), kr };
+        }
+        function chart(t, f, S) {
+          QC.panel(g, T, PX.x, PX.y, PX.w, PX.h, { open: clamp(t / 0.45), title: `Implied vol by strike · ${M.T_months} month`,
+            index: "11", sub: SUB, tag: "SIMULATED", frame: f });
+          QC.axes(g, T, F, { k: clamp((t - 0.15) / 0.5), xt: KS, yt: [10, 15, 20, 25, 30, 35], yf: (v) => v + "%",
+            xl: "strike K", yl: "implied vol" });
+          // ---- the strikes as they are said: a target box on the axis label (100 = AT THE MONEY) ----
+          HERO.forEach((k) => {
+            const kb = clamp((t - S.tTick[k]) / 0.35); if (kb <= 0) return;
+            const px = F.X(k), half = k >= 100 ? 26 : 18;
+            const fade = k === K0 ? 1 : 1 - 0.55 * clamp((t - S.tL[k] - 0.5) / 0.4);
+            QC.lock(g, T, [px - half, xTickY - 19, px + half, xTickY + 5], kb, { pad: 8, alpha: fade,
+              tag: k === K0 ? "AT THE MONEY" : undefined, flash: hit(t, S.tTick[k] + 0.35) });
+          });
+          // ---- the table: strike · Monte Carlo price · implied vol, filling as the points land ----
+          const kTb = clamp((t - (S.tL[K0] - 0.45)) / 0.35);
+          if (kTb > 0) {
+            QC.panel(g, T, TB.x, TB.y, TB.w, TB.h, { open: kTb, op: 0.95 });
+            const a = clamp((kTb - 0.4) * 2);
+            QC.text(g, T, "PRICE → IMPLIED VOL", TB.x + 18, TB.y + 36, { size: 19, wt: 600, ls: 1.5, c: "hi", a, maxW: TB.w - 36 });
+            QC.text(g, T, "  K  TYPE", TB.x + 18, TB.y + 66, { size: 18, mono: true, c: "dim", a });
+            QC.text(g, T, "MC PRICE", TB.x + 236, TB.y + 66, { size: 18, mono: true, c: "dim", a, align: "right" });
+            QC.text(g, T, "IMP VOL", TB.x + TB.w - 22, TB.y + 66, { size: 18, mono: true, c: "dim", a, align: "right" });
+            KS.forEach((k, i) => {
+              const t0 = HERO.includes(k) ? S.tL[k] - 0.32 : tOn(k, S), kr = clamp((t - t0) / 0.3);
+              const y = TB.y + 98 + i * 23.5, R = ROW[k], locked = HERO.includes(k) && t >= S.tL[k];
+              const left = `${String(k).padStart(3)}  ${R.type.toUpperCase().padEnd(4)}`;
+              // the strikes wait in the table (pale), each row fills as its point lands
+              QC.text(g, T, left, TB.x + 18, y, { size: 20, mono: true, c: kr > 0 ? "hi" : "dim", a: kr > 0 ? 1 : 0.55 * a });
+              if (kr <= 0) return;
+              QC.text(g, T, pFmt(R.price_mc), TB.x + 236, y, { size: 20, mono: true, c: "hi", align: "right", roll: kr, frame: f, seed: i + 20 });
+              QC.text(g, T, IV[k].toFixed(1) + "%", TB.x + TB.w - 22, y, { size: 20, mono: true, c: locked ? "acc" : "hi", align: "right", roll: kr, frame: f, seed: i + 40 });
+            });
+          }
+          // ---- ONE σ: the dashed flat line at the money's 15.6%, running out from the money point ----
+          const kF = eo(clamp((t - S.tFlat0) / 0.55)), yA = F.Y(ATM);
+          const bend = eio(clamp((t - S.tBend0) / (S.tBend1 - S.tBend0)));
+          if (kF > 0) {
+            const hiK = clamp((t - S.tFlatHi) / 0.2) * (1 - clamp((t - S.tBend0) / 0.3));   // brightens on "flat line"
+            const a = (0.8 + 0.2 * hiK) * (1 - 0.45 * bend), x0 = F.X(K0);
+            g.save(); g.setLineDash([12, 8]); g.lineDashOffset = -t * 30 * hiK; g.strokeStyle = T.hi(0.8 * a); g.lineWidth = 2 + 1.4 * hiK;
+            g.beginPath(); g.moveTo(lerp(x0, F.x, kF), yA); g.lineTo(lerp(x0, F.x + F.w, kF), yA); g.stroke(); g.restore();
+            QC.tag(g, T, "ONE σ", F.x + F.w - 8, yA - 12, { c: "hi", align: "right", a: clamp((kF - 0.7) * 3.3) * (1 - 0.3 * bend), size: 19 });
+          }
+          // ---- the guides: up from the strike axis to the line, then the gap from the line to the point ----
+          HERO.forEach((k) => {
+            const kg = clamp((t - S.tUp[k]) / 0.32); if (kg <= 0) return;
+            const px = F.X(k), y0 = F.Y(F.yr[0]), fade = (1 - 0.6 * clamp((t - S.tL[k] - 0.4) / 0.5)) * (1 - bend);
+            g.save(); g.setLineDash([5, 6]); g.strokeStyle = T.line(0.75 * fade); g.lineWidth = 1.6;
+            g.beginPath(); g.moveTo(px, y0); g.lineTo(px, lerp(y0, yA, eo(kg))); g.stroke(); g.restore();
+            const p = point(k, t, S);
+            if (p && k !== K0 && bend < 1) {
+              g.save(); g.strokeStyle = T.hi(0.55 * (1 - bend)); g.lineWidth = 1.8;
+              g.beginPath(); g.moveTo(px, yA); g.lineTo(px, F.Y(p.v)); g.stroke(); g.restore();
+            }
+          });
+          // ---- the line bends into the smile; on "smile." the area under it fills and glows ----
+          const kS = clamp((t - S.tSmile + 0.04) / 0.2);
+          if (t >= S.tBend0 - 0.02) {
+            const ys = CY.map((v) => lerp(ATM, v, bend));
+            if (kS > 0) {
+              const top = F.Y(IV[KS[0]]), base = F.Y(F.yr[0]);
+              const gr = g.createLinearGradient(0, top, 0, base);
+              gr.addColorStop(0, T.line(0.46 * kS)); gr.addColorStop(1, T.line(0.1 * kS));
+              g.save(); g.beginPath(); g.moveTo(F.X(CX[0]), base);
+              CX.forEach((x, i) => g.lineTo(F.X(x), F.Y(ys[i])));
+              g.lineTo(F.X(CX[CX.length - 1]), base); g.closePath(); g.fillStyle = gr; g.fill(); g.restore();
+            }
+            g.save(); g.shadowColor = T.line(0.9); g.shadowBlur = 22 * kS;
+            QC.line(g, T, F, CX, ys, { c: "line", w: 3.4 + 1.2 * kS });
+            g.restore();
+          }
+          // ---- the nine points ----
+          KS.forEach((k) => {
+            const p = point(k, t, S); if (!p) return;
+            const hero = HERO.includes(k), locked = hero && t >= S.tL[k];
+            const s = hero ? 1 + 0.35 * Math.sin(Math.PI * clamp((t - S.tL[k]) / 0.25)) : 1;
+            QC.dot(g, T, F.X(k), F.Y(p.v), { c: locked ? "acc" : "line", r: hero ? 7 : 5.5, s: s * eo(p.a), a: p.a });
+          });
+          // ---- the big rolling values ride up with their points and lock as said ----
+          HERO.forEach((k) => {
+            const p = point(k, t, S); if (!p) return;
+            const roll = clamp((t - (S.tL[k] - RISE)) / RISE);
+            if (roll <= 0) return;
+            const px = F.X(k), py = F.Y(p.v);
+            QC.value(g, T, IV[k].toFixed(1), px + 30, py - 20, { size: 68, roll, frame: f, unit: "%", flash: hit(t, S.tL[k]), seed: k });
+            QC.lock(g, T, [px - 8, py - 8, px + 8, py + 8], clamp((t - S.tL[k]) / 0.3), { pad: 14, flash: hit(t, S.tL[k] + 0.3) });
+          });
+          // ---- THE SMILE ----
+          const kT = clamp((t - S.tSmile) / 0.18);
+          if (kT > 0) {
+            const bb = QC.tag(g, T, "THE SMILE", F.X(81.5), F.y + F.h - 26, { c: "hi", a: kT, size: 26 });
+            QC.lock(g, T, bb, kT, { pad: 8, flash: hit(t, S.tSmile + 0.18) });
+          }
+        }
+        return { chart, HERO, K0 };
+      })();
+      // ======== end of the s11 smile chart ========
+      // ======== the ANSWER layout: identical code in s12 and s13 (s13 draws the top row at its end state) ========
+      const B = NUM.bell, M = NUM.model, KS = M.strikes, ATM = M.iv_pct[String(M.S0)], SD = NUM.normal.sd_day_pct;
+      const LN = B.normal.map(Math.log10), LF = B.fat.map(Math.log10);
+      const HD = { x: 40, y: 566, w: 1000, h: 56 }, RH = 414, R1 = 632, R2 = 1056;
+      const SLOT = 0.42;   // how lit a chart slot is while it waits for its data
+      const PL = { x: 40, w: 458 }, PR = { x: 582, w: 458 };
+      const FD = (y0) => QC.frame(PL.x + 84, y0 + 136, 346, 198, [-5, 5], [-4.4, 1.0]);   // density, log10
+      const FV = (y0) => QC.frame(PR.x + 84, y0 + 136, 346, 198, [77, 123], [10, 35]);     // implied vol, %
+      const DAX = { xt: [-4, -2, 0, 2, 4], xf: (v) => (v < 0 ? QC.MINUS : v > 0 ? "+" : "") + Math.abs(v) + (v ? "%" : ""),
+        yt: [0, -2, -4], yf: () => "", xl: "daily move", yl: "density", size: 20 };   // tick labels: logTicks()
+      const VAX = { xt: [80, 90, 100, 110, 120], yt: [10, 20, 30], yf: (v) => v + "%", xl: "strike K", size: 20 };
+      const at = (xs, ys, x) => { let i = 1; while (i < xs.length - 1 && xs[i] < x) i++; return lerp(ys[i - 1], ys[i], (x - xs[i - 1]) / (xs[i] - xs[i - 1])); };
+      // the log-density tick labels: "10" and a raised exponent, both in the tick face (no superscript characters: those
+      // come from a fallback font that the canvas can resolve differently in s12 and s13, and the labels would change at the cut)
+      function logTicks(F, k, a = 1) {
+        const ke = eo(k), yt = DAX.yt;
+        g.save(); g.fillStyle = T.hi(0.85 * a); g.textBaseline = "alphabetic"; g.textAlign = "left";
+        yt.forEach((v, i) => {
+          const ka = clamp((ke - i / yt.length * 0.6) * 3); if (ka <= 0) return;
+          const e = String(v), x1 = F.x - 14, py = F.Y(v) + 20 * 0.36;
+          g.globalAlpha = ka;
+          g.font = `400 14px ${FONT.mono}`; const we = g.measureText(e).width;
+          g.fillText(e, x1 - we, py - 9);
+          g.font = `400 20px ${FONT.mono}`; g.fillText("10", x1 - we - 1 - g.measureText("10").width, py);
         });
-        g.font = "18px " + HUD.FONT.mono; g.fillStyle = T.dim(0.95 * a);
-        g.textAlign = "left"; g.fillText("STRIKE", 0, 80);
-        g.textAlign = "right"; g.fillText("HEIGHT ∝ IMPLIED VOL", len, 80);
         g.restore();
       }
-      // a label plate: index + label rolling in from glyphs, optional micro line under it
-      function tagPlate(x, y, w, idx, label, sub, k, f, a, size) {
-        if (k <= 0 || a <= 0) return;
-        const r = eo(k), h = sub ? 30 + size + 34 : 30 + size + 6;
-        HUD.plate(g, T, x - 20, y - 18, (w + 40) * r, h + 18, a * clamp(k * 2));
-        g.save(); g.globalCompositeOperation = HOLOHUD.ADD; g.textBaseline = "alphabetic"; g.textAlign = "left";
-        g.strokeStyle = T.line(0.9 * a); g.lineWidth = 1.6; g.beginPath(); g.moveTo(x, y); g.lineTo(x + w * r, y); g.stroke();
-        g.fillStyle = T.line(0.9 * a); g.fillRect(x, y - 3, 34 * r, 6);
-        const lx = idx ? x + 46 : x;
-        if (idx) { g.font = "20px " + HUD.FONT.mono; g.fillStyle = T.dim(0.95 * a * r); g.fillText(idx, x, y + 14 + size * 0.86); }
-        g.letterSpacing = "2px"; const fs = HUD.fitFont(g, label, 600, size, HUD.FONT.ui, x + w - lx - 2 * label.length, 22);
-        g.fillStyle = T.hi(0.95 * a * clamp(r * 2 - 0.6)); g.fillText(HUD.rollText(label, clamp(k * 1.6 - 0.2), f, 3), lx, y + 14 + fs * 0.86);
-        g.letterSpacing = "0px";
-        if (sub) {
-          g.font = "18px " + HUD.FONT.mono; g.fillStyle = T.line(0.85 * a * clamp(k * 2 - 1));
-          g.fillText(HUD.rollText(sub, clamp(k * 1.4 - 0.4), f, 7), x, y + 14 + size + 30);
+      // a mini panel's title row, drawn as QC.panel draws its own, but with each part on its own word
+      function head(x, y, pw, o) {
+        g.save(); g.textBaseline = "alphabetic"; g.textAlign = "left";
+        const kb = o.bar ?? 1;
+        if (kb > 0) { g.globalAlpha = clamp(kb * 2); g.fillStyle = T.line(1); g.fillRect(x + 24, y + 22, 30 * eo(kb), 4); }
+        let tx = x + 24;
+        if (o.index && kb > 0) { g.font = `400 19px ${FONT.mono}`; g.fillStyle = T.dim(1); g.fillText(o.index, tx, y + 54); tx += 38; }
+        g.globalAlpha = 1;
+        if (o.title && o.roll > 0) {
+          const s = o.title.toUpperCase();
+          g.letterSpacing = "2px"; g.font = `600 ${o.ts ?? 24}px ${FONT.ui}`; g.fillStyle = T.hi(1);
+          g.fillText(HUD.rollText(s, o.roll, o.frame ?? 0, 5), tx, y + 54);
+          if (o.suffix && o.sroll > 0) g.fillText(HUD.rollText(o.suffix.toUpperCase(), o.sroll, o.frame ?? 0, 9), tx + g.measureText(s).width, y + 54);
+        }
+        if (o.sub && (o.subA ?? 1) > 0) {
+          g.globalAlpha = o.subA ?? 1; g.letterSpacing = "1px"; g.font = `400 19px ${FONT.mono}`; g.fillStyle = T.dim(1);
+          g.fillText(o.sub.toUpperCase().replace(/Σ/g, "σ"), x + 24, y + 82);
+        }
+        if (o.tag && (o.tagA ?? 1) > 0) {
+          g.globalAlpha = o.tagA ?? 1; g.letterSpacing = "1.5px"; g.font = `600 17px ${FONT.ui}`;
+          const tw = g.measureText(o.tag).width + 20, bx = x + pw - 24 - tw;
+          g.strokeStyle = T.line(0.9); g.lineWidth = 1.2; g.strokeRect(bx, y + 32, tw, 28);
+          g.fillStyle = T.line(1); g.fillText(o.tag, bx + 10, y + 52);
         }
         g.restore();
       }
+      // the arrow from a row's density chart to its implied-vol chart
+      function arrow(y0, k) {
+        if (k <= 0) return;
+        const ya = y0 + 136 + 99, x0 = PL.x + PL.w + 10, x1 = lerp(x0 + 18, PR.x - 8, eo(k));
+        g.save(); g.strokeStyle = T.hi(0.95); g.fillStyle = T.hi(0.95); g.lineWidth = 5; g.lineCap = "round";
+        g.beginPath(); g.moveTo(x0, ya); g.lineTo(x1 - 14, ya); g.stroke();
+        g.beginPath(); g.moveTo(x1, ya); g.lineTo(x1 - 18, ya - 11); g.lineTo(x1 - 18, ya + 11); g.closePath(); g.fill();
+        g.restore();
+      }
+      // a tag on a chart with a thin leader down to the point it names
+      function pin(s, tx, ty, px, py, k, o = {}) {
+        if (k <= 0) return;
+        g.save(); g.strokeStyle = T.hi(0.7 * k); g.lineWidth = 1.4;
+        g.beginPath(); g.moveTo(px, py); g.lineTo(px, lerp(py, ty + 4, eo(k))); g.stroke();
+        g.fillStyle = T.hi(k); g.beginPath(); g.arc(px, py, 3.5, 0, 2 * Math.PI); g.fill(); g.restore();
+        QC.tag(g, T, s, tx, ty, { c: o.c || "hi", a: clamp((k - 0.4) * 2.5), size: 18 });
+      }
+      // the header: THE ANSWER, and the interview question it answers
+      function header(t, A, f) {
+        const k = clamp((t - A.hd) / 0.4);
+        if (k <= 0) return;
+        QC.panel(g, T, HD.x, HD.y, HD.w, HD.h, { open: k, op: 0.9 });
+        g.save(); g.fillStyle = T.line(clamp(k * 2)); g.fillRect(HD.x + 24, HD.y + 18, 4, 20); g.restore();
+        QC.text(g, T, "THE ANSWER", HD.x + 42, HD.y + 38, { size: 28, wt: 600, ls: 3, c: "hi", roll: clamp((t - A.ans + 0.3) / 0.42), frame: f });
+        QC.text(g, T, "Q: WHY A DIFFERENT VOLATILITY FOR EVERY STRIKE?", HD.x + HD.w - 24, HD.y + 36,
+          { size: 19, mono: true, ls: 1, c: "dim", align: "right", a: clamp((t - A.ans + 0.1) / 0.4) });
+      }
+      // the top row: NORMAL RETURNS -> IMPLIED VOL: FLAT
+      function topRow(t, A, f, clip) {
+        const y0 = R1, Fd = FD(y0), Fv = FV(y0);
+        // NORMAL RETURNS: the normal density of daily moves (log scale), thin tails, its spread ONE σ
+        const kP = clamp((t - A.L0) / 0.4);
+        QC.panel(g, T, PL.x, y0, PL.w, RH, { open: kP });
+        head(PL.x, y0, PL.w, { bar: kP, index: "12", title: "Normal returns", roll: clamp((t - A.nT) / 0.42), frame: f,
+          sub: "daily moves · log scale", subA: clamp((t - A.nT - 0.15) / 0.3), tag: "MODEL", tagA: clamp((t - A.nT) / 0.3) });
+        QC.axes(g, T, Fd, { ...DAX, k: clamp((t - A.ax) / 0.5) });
+        logTicks(Fd, clamp((t - A.ax) / 0.5));
+        const kS = clamp((t - A.sig) / 0.3);
+        if (kS > 0) {   // ONE σ: the band of ±1 standard deviation
+          g.save(); g.fillStyle = T.line(0.1 * kS); g.fillRect(Fd.X(-SD), Fd.y, Fd.X(SD) - Fd.X(-SD), Fd.h);
+          g.setLineDash([4, 5]); g.strokeStyle = T.line(0.6 * kS); g.lineWidth = 1.4; g.beginPath();
+          [-SD, SD].forEach((v) => { g.moveTo(Fd.X(v), Fd.y + Fd.h); g.lineTo(Fd.X(v), Fd.y + Fd.h * (1 - eo(kS))); });
+          g.stroke(); g.restore();
+          QC.tag(g, T, "ONE σ", Fd.X(0), Fd.y + Fd.h - 10, { c: "hi", align: "center", a: clamp((t - A.sig - 0.15) / 0.25), size: 18 });
+        }
+        const kN = eio(clamp((t - A.n0) / (A.n1 - A.n0)));
+        if (kN > 0) {
+          QC.area(g, T, Fd, B.x, LN, { k: kN, base: Fd.yr[0], fa: 0.08 });
+          QC.line(g, T, Fd, B.x, LN, { k: kN, c: "line", w: 3, head: true });
+        }
+        const kTh = clamp((t - A.thin) / 0.35), xt = -4.4;
+        pin("THIN TAILS", Fd.x + 6, Fd.y + 36, Fd.X(xt), Fd.Y(at(B.x, LN, xt)), kTh);
+        // the arrow, then IMPLIED VOL: FLAT (its slot waits pale, like the bottom row's, and lights on "implied vol")
+        arrow(y0, clamp((t - A.arr) / 0.35));
+        const kSl = clamp((t - A.L0 - 0.1) / 0.5), kR = clamp((t - A.R0) / 0.4), aR = lerp(SLOT, 1, kR);
+        QC.panel(g, T, PR.x, y0, PR.w, RH, { open: kSl, a: aR });
+        head(PR.x, y0, PR.w, { bar: kR, title: "Implied vol:", roll: clamp((t - A.iv) / 0.4), suffix: " flat", sroll: clamp((t - A.flat) / 0.3),
+          frame: f, tag: "MODEL", tagA: clamp((t - A.iv) / 0.3) });
+        QC.axes(g, T, Fv, { ...VAX, k: clamp((kSl - 0.3) / 0.7), a: aR });
+        const kF = clamp((t - A.flat) / (A.f1 - A.flat));
+        if (kF > 0) {
+          const xh = lerp(KS[0], KS[KS.length - 1], eo(kF));
+          QC.line(g, T, Fv, [KS[0], KS[KS.length - 1]], [ATM, ATM], { x1: xh, c: "line", w: 3.4, head: kF < 1 });
+          KS.forEach((k) => { const kd = kF >= 1 ? 1 : clamp((xh - k) / 2.5 + 0.5); if (kd > 0) QC.dot(g, T, Fv.X(k), Fv.Y(ATM), { r: 4.5, s: eo(kd), a: kd }); });
+        }
+        const kFo = clamp((t - A.fx) / 0.45);
+        if (kFo > 0) {
+          const bb = QC.tex.show("flat", { x: PR.x + 24, y: y0 + 72, size: 30, valign: "top", k: kFo, a: clamp(kFo * 3), clip }).bb;
+          const kL = clamp((t - A.lk) / 0.3);
+          if (kL > 0) QC.lock(g, T, bb, kL, { pad: 6, flash: hit(t, A.lk + 0.3) });
+        }
+      }
+      // the bottom row's slots: in s12 they wait, pale and empty; s13 lights them and fills them
+      function slots(kOpen, aLit) {
+        if (kOpen <= 0) return;
+        QC.panel(g, T, PL.x, R2, PL.w, RH, { open: kOpen, a: aLit });
+        QC.panel(g, T, PR.x, R2, PR.w, RH, { open: kOpen, a: aLit });
+        const ka = clamp((kOpen - 0.3) / 0.7);
+        QC.axes(g, T, FD(R2), { ...DAX, k: ka, a: aLit });
+        logTicks(FD(R2), ka, aLit);
+        QC.axes(g, T, FV(R2), { ...VAX, k: ka, a: aLit });
+      }
+      // ======== end of the shared layout ========
+      // the opening: s11's smile at its end state, held from the cut, scan-erased over "the answer:"
+      const S11 = { tUp: {}, tL: {}, tTick: {}, tO0: 0, tOs: 0, tFlat0: 0, tFlatHi: 0, tBend0: 0, tBend1: 1, tSmile: 0 };
+      SMILE.HERO.forEach((k) => { S11.tUp[k] = 0; S11.tL[k] = 0; S11.tTick[k] = 0; });
+      const DONE = 99, tE0 = w(1) + 0.02, tE1 = tE0 + 0.38;
+      // the top row's beats, on the words; the layout scans in once the smile is erased (all done by 4.45 s, before the
+      // cut into s13)
+      const A = { hd: tE1, ans: tE1 + 0.36, L0: tE1 + 0.1, ax: tE1 + 0.3, nT: w(5) - 0.06, n0: w(5) + 0.14, n1: w(6) + 0.4,
+        thin: w(6) + 0.4, sig: w(8), arr: w(9) + 0.3, R0: w(10) - 0.1, iv: w(10) - 0.04, flat: w(14), f1: w(16) - 0.02,
+        fx: w(14) + 0.04, lk: w(16) - 0.15 };
+      const st = { t: 0 };
+      // init() is also called from draw(): the composed timeline's fromTo renders draw() once before init() runs, and a
+      // formula shown at t = 0 would otherwise throw (no formula yet) and stop the scene from registering
+      let texReady = false;
+      function init() { if (texReady) return; texReady = true; QC.tex.init(document.querySelector('[data-composition-id="s12"]'), TEX, T); }
       function draw() {
+        init();
         const t = st.t, f = Math.floor(t * FPS);
-        g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, WF, HF);
-        const cam = camAt(t), sc = scanState(t, HFL + 0.1);
-        const out = 1 - clamp((t - (DUR - 0.4)) / 0.3);                     // HUD panels clear with the scan-erase
-        HOLO.drawPad(g, cam, WF, HF, { hue: T.hue, rot: (58.9 + t) * 0.06 });
-        // the bell scans in on "normal" under its own small scan disc
-        const kb = clamp((t - tBell) / 0.5);
-        if (kb > 0) {
-          const yb = lerp(-0.02, 0.34, eio(kb));
-          const bo = sc.scanDown ? { scanDown: sc.scanDown } : (kb < 1 ? { scan: { y: yb, band: 0.05 } } : {});
-          holo.draw(g, BELL, cam, Object.assign({ hue: T.hue, glow: 1 }, bo));
-          if (kb < 1) HOLO.drawScanPlane(g, cam, WF, HF, yb, { hue: T.hue, r: 0.34, c: [BXC, 0, BZ], alpha: 0.85 });
+        g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, 1080, 1920);
+        QC.tex.begin();
+        if (t < tE1) {   // s11's smile, held from the cut, erased over "the answer:"
+          const xOut = QC.scanOut(t, tE1, tE1 - tE0);
+          QC.clipStage(g, QC.STAGE.x1, xOut);
+          SMILE.chart(DONE, f, S11);
+          g.restore();
+          QC.scanLine(g, T, xOut);
+        } else {         // then the ANSWER layout scans in
+          const xIn = QC.scanIn(t, tE1, 0.6);
+          QC.clipStage(g, xIn, QC.STAGE.x0);
+          header(t, A, f);
+          slots(clamp((t - A.L0 - 0.1) / 0.5), SLOT);
+          topRow(t, A, f, [QC.STAGE.x0, xIn]);
+          g.restore();
+          QC.scanLine(g, T, xIn);
         }
-        const info = holo.draw(g, model(t), cam, Object.assign({ hue: T.hue, glow: 1 }, sc,
-          { flash: { beam: f >= fLock && f < fLock + 3 ? 1 : 0 } }));
-        if (sc.plane !== undefined) HOLO.drawScanPlane(g, cam, WF, HF, sc.plane, { hue: T.hue, r: 1.05, alpha: sc.planeA });
-        // the strike ruler
-        const a0 = clamp((t - 0.35) / 0.3) * (1 - clamp((t - (DUR - 0.4)) / 0.3));
-        if (a0 > 0) ruler(cam, a0);
-        // "answer:" → the answer plate, with the interview question it answers
-        tagPlate(84, 592, 470, "A", "THE ANSWER", "Q: WHY A DIFFERENT VOLATILITY FOR EVERY STRIKE?", clamp((t - tAns) / 0.45), f, out, 40);
-        // "normal returns" → the bell's label, a leader from its right shoulder
-        const kl = clamp((t - (w(5) + 0.05)) / 0.45);
-        if (kl > 0 && out > 0) {
-          const an = P3(cam, bxAt(62), BN[62] * BS, BZ + BD / 2), px = 742, py = 780;
-          HUD.leader(g, T, [an[0], an[1]], [px - 40, py + 34], [px - 22, py + 34], clamp(kl * 1.4), { alpha: out });
-          tagPlate(px, py, 250, "", "NORMAL RETURNS", "BELL CURVE · THIN TAILS", clamp(kl * 1.4 - 0.3), f, out, 28);
-        }
-        // the target box locks onto the nine columns and the beam on "flat"
-        const cols = Array.from({ length: N }, (_, i) => info.bbox["c" + i]).filter(Boolean);
-        if (cols.length === N) {
-          const bb = [Math.min(...cols.map((b) => b[0])), Math.min(...cols.map((b) => b[1])), Math.max(...cols.map((b) => b[2])), Math.max(...cols.map((b) => b[3]))];
-          const k = clamp((t - (w(14) - 0.02)) / 0.22), flash = f >= fLock && f < fLock + 3, ba = 1 - clamp((t - (DUR - 0.45)) / 0.25);
-          if (ba > 0) HUD.targetBox(g, T, bb, k, { flash, tag: ba > 0.7 ? "TGT 02 · FLAT" : "", alpha: ba });
-        }
-        // the spec card: one volatility; the value computes while the columns rise and locks in the accent on "flat"
-        const rv = clamp((t - (w(8) - 0.1)) / 0.4);
-        if (rv > 0 && out > 0) {
-          HUD.specCard(g, T, 84, 718, { label: "ONE VOLATILITY", value: FLAT.toFixed(1), unit: "%" },
-            { reveal: rv, roll: f >= fLock ? 1 : Math.min(0.99, clamp((t - w(9)) / (tLock - w(9)))), frame: f, flash: f === fLock }, { w: 330, big: 84, index: "02", alpha: out });
-        }
+        QC.tex.end();
       }
+      if (typeof init === "function") init();     // before the tween: fromTo renders (and draws) at once
       const tl = gsap.timeline({ paused: true });
       tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: draw }, 0);
       draw();

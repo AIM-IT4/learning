@@ -1,10 +1,6 @@
 <template>
   <style>
     @font-face { font-family: "Fredoka"; font-weight: 300 700; src: url("assets/fonts/fredoka-700.woff2"); }
-    @font-face { font-family: "Rajdhani"; font-weight: 300; src: url("assets/fonts/rajdhani-300.woff2"); }
-    @font-face { font-family: "Rajdhani"; font-weight: 400; src: url("assets/fonts/rajdhani-400.woff2"); }
-    @font-face { font-family: "Rajdhani"; font-weight: 500; src: url("assets/fonts/rajdhani-500.woff2"); }
-    @font-face { font-family: "Rajdhani"; font-weight: 600; src: url("assets/fonts/rajdhani-600.woff2"); }
     @font-face { font-family: "ShareTechMono"; font-weight: 400; src: url("assets/fonts/sharetechmono.woff2"); }
     @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
     #root { position: absolute; inset: 0; overflow: hidden; }
@@ -16,6 +12,10 @@
   <script>
     (function () {
       /*DATA*/ const DUR = 5.8; const W = [0.16, 0.32, 0.6, 1.217, 2.4, 2.48, 2.94, 3.4, 3.72, 5.08, 5.32, 5.52]; /*END*/
+      const TEX_IDS = [];
+      const NUM_KEYS = ["spx1987", "crash"];
+      /*TEX*/ const TEX = {}; /*ENDTEX*/
+      /*NUM*/ const NUM = {"spx1987":{"source":"S&P 500 daily levels (S&P Dow Jones Indices), via Yahoo Finance ^GSPC","date":["1987-09-01","1987-09-02","1987-09-03","1987-09-04","1987-09-08","1987-09-09","1987-09-10","1987-09-11","1987-09-14","1987-09-15","1987-09-16","1987-09-17","1987-09-18","1987-09-21","1987-09-22","1987-09-23","1987-09-24","1987-09-25","1987-09-28","1987-09-29","1987-09-30","1987-10-01","1987-10-02","1987-10-05","1987-10-06","1987-10-07","1987-10-08","1987-10-09","1987-10-12","1987-10-13","1987-10-14","1987-10-15","1987-10-16","1987-10-19","1987-10-20","1987-10-21","1987-10-22","1987-10-23","1987-10-26","1987-10-27","1987-10-28","1987-10-29","1987-10-30"],"open":[329.81,323.4,321.47,320.21,316.68,313.6,313.92,317.14,322.02,323.07,317.75,314.94,314.98,314.92,310.54,319.49,321.09,319.72,320.16,323.2,321.69,321.83,327.33,328.07,328.08,319.22,318.54,314.16,311.07,309.39,314.52,305.21,298.08,282.7,225.06,236.83,258.24,248.29,248.2,227.67,233.19,233.31,244.77],"high":[332.18,324.53,324.29,322.03,316.7,315.41,317.59,322.45,323.81,323.08,319.5,316.08,316.99,317.66,319.51,321.83,322.01,320.55,325.33,324.63,322.53,327.34,328.94,328.57,328.08,319.39,319.34,315.04,311.07,314.53,314.52,305.23,298.92,282.7,245.62,259.27,258.38,250.7,248.22,237.81,238.58,246.69,254.04],"low":[322.83,318.76,317.39,316.53,308.56,312.29,313.92,317.13,320.4,317.63,314.61,313.45,314.86,310.12,308.69,319.12,319.12,318.1,320.16,320.27,320.16,321.83,327.22,326.09,319.17,315.78,312.02,310.97,306.76,309.39,304.78,298.07,281.52,224.83,216.46,236.83,242.99,242.76,227.26,227.67,226.26,233.28,244.77],"close":[323.4,321.68,320.21,316.7,313.56,313.92,317.13,321.98,323.08,317.74,314.86,314.93,314.86,310.54,319.5,321.19,319.72,320.16,323.2,321.69,321.83,327.33,328.07,328.08,319.22,318.54,314.16,311.07,309.39,314.52,305.23,298.08,282.7,224.84,236.83,258.38,248.25,248.22,227.67,233.19,233.28,244.77,251.79],"crash_index":33},"crash":{"date":"19 Oct 1987","prev_date":"16 Oct 1987","close_prev":282.7,"close":224.84,"points":57.86,"ret":-0.20466926070038904,"ret_pct":-20.47,"logret":-0.22899722656567034}}; /*ENDNUM*/
 // HOLOHUD: the Sci-fi Hologram HUD engine as one classic script, for HyperFrames scenes (copy it verbatim into a
 // scene's IIFE). HOLO = wireframe engine (holo.js), HUD = UI layer (hud.js), MKM = model builder (mkmodel.mjs), unchanged
 // except that ES-module exports became closures and the fetch-based model loader was dropped.
@@ -999,214 +999,430 @@ const HOLOHUD = (function () {
   })();
   return { HOLO, HUD, MKM, LIGHT, ADD };
 })();
+// QCHART: the quant chart kit for the light HUD scenes (panels, axes, curves, candles, bars, markers, rolling values,
+// target locks and typeset LaTeX formulas). Needs HOLOHUD above it. Pure functions of what you pass in: call them from
+// draw() every frame. Colours are theme keys ('line' blue, 'hi' navy, 'dim' pale blue, 'acc' orange) or CSS strings.
+const QC = (function () {
+  const { HUD } = HOLOHUD, FONT = HUD.FONT;
+  const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x)), lerp = (a, b, k) => a + (b - a) * k;
+  const eo = (x) => 1 - Math.pow(1 - clamp(x), 3);
+  const eio = (x) => { x = clamp(x); return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
+  const C = (T, c, a) => (typeof c === 'function' ? c(a) : (T[c] && typeof T[c] === 'function') ? T[c](a) : c);
+  const MINUS = '−';
+  const fmt = (v, d = 2) => (v < 0 ? MINUS : '') + Math.abs(v).toFixed(d);
+  const SUP = { '-': '⁻', '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹' };
+  const pow10 = (e) => '10' + String(e).split('').map((ch) => SUP[ch] || ch).join('');
 
-      // ---- the HUD scene scaffold (shared by every scene; keep it as is) ----
-      const { HOLO, HUD, MKM } = HOLOHUD;
-      const T = HUD.theme(218, 22), WF = 1080, HF = 1920, FPS = 24;
-      const holo = new HOLO.Holo(WF, HF);
-      const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x)), lerp = (a, b, k) => a + (b - a) * k;
-      const eo = (x) => 1 - Math.pow(1 - clamp(x), 3), eio = (x) => { x = clamp(x); return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
-      // HOME: every scene starts and ends on this camera, so the projector pad never jumps at a cut
-      const HOME = { target: [0, 0.5, 0], yaw: 0.35, pitch: 0.32, dist: 7.6, fov: 0.62, cx: 540, cy: 1010 };
-      const camMix = (a, b, k) => ({ target: a.target.map((v, i) => lerp(v, b.target[i], k)), yaw: lerp(a.yaw, b.yaw, k), pitch: lerp(a.pitch, b.pitch, k),
-        dist: lerp(a.dist, b.dist, k), fov: lerp(a.fov, b.fov, k), cx: lerp(a.cx, b.cx, k), cy: lerp(a.cy, b.cy, k) });
-      // build a model from MKM primitives in world units (no normalising: heights stay honest), ready for holo.draw
-      const build = (fn) => { const m = new MKM.Model("m"); fn(m); return HOLO.prepModel(m.toJSON()); };
-      // scan in over the first 0.6 s (the scan plane grows the subject), erase over the last 0.4 s; yTop = the subject's height
-      const scanState = (t, yTop) => {
-        const kin = clamp(t / 0.6), kout = clamp((t - (DUR - 0.42)) / 0.4);
-        if (kout > 0) return { scanDown: { y: lerp(yTop + 0.1, -0.05, eio(kout)) }, plane: lerp(yTop + 0.1, -0.05, eio(kout)), planeA: 1 - 0.3 * kout };
-        if (kin < 1) return { scan: { y: lerp(-0.05, yTop + 0.12, eio(kin)), band: 0.07 }, plane: lerp(-0.05, yTop + 0.12, eio(kin)), planeA: 1 };
-        return {};
-      };
-      const P3 = (cam, x, y, z) => { const c = HOLO.makeCamera(cam, WF, HF), o = new Float32Array(3); c.project(x, y, z, o); return [o[0], o[1], o[2]]; };
+  // ---- a plot frame: data -> px. xr, yr: data ranges; for a log axis pass log10 values and format ticks with pow10 ----
+  function frame(x, y, w, h, xr, yr) {
+    return { x, y, w, h, xr, yr,
+      X: (v) => x + (v - xr[0]) / (xr[1] - xr[0]) * w,
+      Y: (v) => y + h - (v - yr[0]) / (yr[1] - yr[0]) * h,
+      ix: (px) => xr[0] + (px - x) / w * (xr[1] - xr[0]) };
+  }
 
+  // ---- panel: white plate + corner brackets, opening from its centre; title row (index tick, title, sub, tag) ----
+  function panel(g, T, x, y, w, h, o = {}) {
+    const a = o.a ?? 1, k = o.open ?? 1;
+    if (a <= 0 || k <= 0) return;
+    const ow = w * (0.5 + 0.5 * eo(k));
+    HUD.plate(g, T, x + (w - ow) / 2, y, ow, h, clamp(k * 1.5) * a, { op: o.op ?? 0.82 });
+    if (!o.title) return;
+    const ta = a * clamp((k - 0.45) * 2.2);
+    if (ta <= 0) return;
+    g.save(); g.globalAlpha = ta; g.textBaseline = 'alphabetic'; g.textAlign = 'left';
+    g.fillStyle = T.line(1); g.fillRect(x + 24, y + 22, 30 * eo(k), 4);
+    let tx = x + 24;
+    if (o.index) { g.font = `400 19px ${FONT.mono}`; g.fillStyle = T.dim(1); g.fillText(o.index, tx, y + 54); tx += 38; }
+    g.letterSpacing = '2px'; g.font = `600 ${o.ts ?? 26}px ${FONT.ui}`; g.fillStyle = T.hi(1);
+    g.fillText(HUD.rollText(o.title.toUpperCase().replace(/Σ/g, 'σ').replace(/Λ/g, 'λ'), clamp(k * 1.4 - 0.3), o.frame ?? 0, 5), tx, y + 54);
+    if (o.sub) { g.letterSpacing = '1px'; g.font = `400 19px ${FONT.mono}`; g.fillStyle = T.dim(1); g.fillText(o.sub.toUpperCase().replace(/Σ/g, 'σ').replace(/Λ/g, 'λ'), x + 24, y + 82); }
+    if (o.tag) {
+      g.letterSpacing = '1.5px'; g.font = `600 17px ${FONT.ui}`;
+      const tw = g.measureText(o.tag).width + 20, bx = x + w - 24 - tw;
+      g.strokeStyle = C(T, o.tagC || 'line', 0.9); g.lineWidth = 1.2; g.strokeRect(bx, y + 32, tw, 28);
+      g.fillStyle = C(T, o.tagC || 'line', 1); g.fillText(o.tag, bx + 10, y + 52);
+    }
+    g.restore();
+  }
+
+  // ---- a tick label; "10⁻⁵⁹"-style labels (QC.pow10) are drawn as the base plus a raised, smaller exponent in the
+  //      same face, so no superscript glyph falls back to another font ----
+  const SUPR = { '\u207b': MINUS, '\u2070': '0', '\u00b9': '1', '\u00b2': '2', '\u00b3': '3', '\u2074': '4', '\u2075': '5', '\u2076': '6', '\u2077': '7', '\u2078': '8', '\u2079': '9' };
+  function tick(g, s, x, y, align, sz) {
+    const m = /^(.*?)([\u207b\u2070\u00b9\u00b2\u00b3\u2074-\u2079]+)$/.exec(s);
+    if (!m) { g.textAlign = align; g.fillText(s, x, y); return; }
+    const base = m[1], ex = m[2].split('').map((c) => SUPR[c]).join('');
+    const f0 = g.font, fe = f0.replace(/(\d+(?:\.\d+)?)px/, (_, n) => Math.round(n * 0.68) + 'px');
+    const wb = g.measureText(base).width; g.font = fe; const we = g.measureText(ex).width; g.font = f0;
+    const tw = wb + 2 + we, x0 = align === 'right' ? x - tw : align === 'center' ? x - tw / 2 : x;
+    g.textAlign = 'left'; g.fillText(base, x0, y);
+    g.font = fe; g.fillText(ex, x0 + wb + 2, y - sz * 0.42); g.font = f0;
+  }
+
+  // ---- axes: o = { xt, yt (tick values), xf, yf (tick formats), xl, yl (axis titles), grid, k (draw-in 0-1), a,
+  //      xAt (data y of the x axis; default yr[0]), yAt (data x of the y axis; default xr[0]), size (tick px) } ----
+  function axes(g, T, F, o = {}) {
+    const a = o.a ?? 1, k = eo(o.k ?? 1);
+    if (a <= 0 || k <= 0) return;
+    const xAt = F.Y(o.xAt ?? F.yr[0]), yAt = F.X(o.yAt ?? F.xr[0]), sz = o.size ?? 21;
+    g.save(); g.textBaseline = 'alphabetic';
+    if (o.grid !== false) {
+      g.strokeStyle = T.dim(0.22 * a); g.lineWidth = 1;
+      g.beginPath();
+      (o.yt || []).forEach((v) => { const py = F.Y(v); g.moveTo(F.x, py); g.lineTo(F.x + F.w * k, py); });
+      (o.xt || []).forEach((v) => { const px = F.X(v); g.moveTo(px, F.y + F.h); g.lineTo(px, F.y + F.h - F.h * k); });
+      g.stroke();
+    }
+    g.strokeStyle = T.hi(0.85 * a); g.lineWidth = 2;
+    g.beginPath(); g.moveTo(F.x, xAt); g.lineTo(F.x + F.w * k, xAt);
+    if (!o.noY) { g.moveTo(yAt, F.y + F.h); g.lineTo(yAt, F.y + F.h - F.h * k); }
+    g.stroke();
+    g.font = `400 ${sz}px ${FONT.mono}`; g.fillStyle = T.hi(0.85 * a);
+    g.textAlign = 'center';
+    (o.xt || []).forEach((v, i) => {
+      const px = F.X(v), ka = clamp((k - i / Math.max(1, o.xt.length) * 0.6) * 3);
+      if (ka <= 0) return;
+      g.globalAlpha = ka; g.beginPath(); g.moveTo(px, xAt); g.lineTo(px, xAt + 8); g.stroke();
+      tick(g, o.xf ? o.xf(v) : String(v), px, xAt + 12 + sz, 'center', sz);
+    });
+    g.globalAlpha = 1;
+    if (!o.noY) {
+      g.textAlign = 'right';
+      (o.yt || []).forEach((v, i) => {
+        const py = F.Y(v), ka = clamp((k - i / Math.max(1, o.yt.length) * 0.6) * 3);
+        if (ka <= 0) return;
+        g.globalAlpha = ka; g.beginPath(); g.moveTo(yAt, py); g.lineTo(yAt - 8, py); g.stroke();
+        tick(g, o.yf ? o.yf(v) : String(v), yAt - 14, py + sz * 0.36, 'right', sz);
+      });
+    }
+    g.globalAlpha = a * clamp(k * 2 - 1);
+    g.letterSpacing = '1.5px'; g.font = `500 ${sz - 2}px ${FONT.mono}`; g.fillStyle = T.line(0.95);
+    if (o.xl) { g.textAlign = 'right'; g.fillText(o.xl.toUpperCase().replace(/Σ/g, 'σ').replace(/Λ/g, 'λ'), F.x + F.w, xAt + 2 * sz + 26); }
+    if (o.yl) { g.textAlign = 'left'; g.fillText(o.yl.toUpperCase().replace(/Σ/g, 'σ').replace(/Λ/g, 'λ'), yAt - (o.ylDx ?? 0), F.y - 16); }
+    g.restore();
+  }
+
+  // ---- a curve. o = { c, w, a, k (0-1 of the x range drawn, left to right) or x1 (data x drawn up to), dash, glow,
+  //      head (a dot + short scan line at the drawing front), clipY (keep inside the frame vertically) } ----
+  function line(g, T, F, xs, ys, o = {}) {
+    const a = o.a ?? 1; if (a <= 0) return null;
+    const xEnd = o.x1 ?? lerp(xs[0], xs[xs.length - 1], clamp(o.k ?? 1));
+    g.save();
+    if (o.clipY !== false) { g.beginPath(); g.rect(F.x - 4, F.y - 4, F.w + 8, F.h + 8); g.clip(); }
+    const pts = []; let last = null;
+    for (let i = 0; i < xs.length; i++) {
+      if (xs[i] > xEnd) {
+        if (i > 0) { const f = (xEnd - xs[i - 1]) / (xs[i] - xs[i - 1]); last = [xEnd, lerp(ys[i - 1], ys[i], f)]; pts.push([F.X(last[0]), F.Y(last[1])]); }
+        break;
+      }
+      pts.push([F.X(xs[i]), F.Y(ys[i])]); last = [xs[i], ys[i]];
+    }
+    if (pts.length < 2) { g.restore(); return null; }
+    const path = () => { g.beginPath(); g.moveTo(pts[0][0], pts[0][1]); for (let i = 1; i < pts.length; i++) g.lineTo(pts[i][0], pts[i][1]); };
+    g.lineJoin = 'round'; g.lineCap = 'round';
+    if (o.glow !== false) { path(); g.strokeStyle = C(T, o.c || 'line', 0.16 * a); g.lineWidth = (o.w ?? 3) + 8; g.stroke(); }
+    path(); g.setLineDash(o.dash || []); g.strokeStyle = C(T, o.c || 'line', 0.95 * a); g.lineWidth = o.w ?? 3; g.stroke();
+    g.setLineDash([]);
+    const end = pts[pts.length - 1];
+    if (o.head && (o.k ?? 1) < 1) {
+      g.fillStyle = C(T, o.c || 'line', a); g.beginPath(); g.arc(end[0], end[1], 6, 0, 2 * Math.PI); g.fill();
+      g.strokeStyle = T.line(0.35 * a); g.lineWidth = 1.5; g.beginPath(); g.moveTo(end[0], F.y); g.lineTo(end[0], F.y + F.h); g.stroke();
+    }
+    g.restore();
+    return { end, last };
+  }
+
+  // ---- filled area between a curve and a base level (data y). o = { base, c, a, k, x0, x1 (data x span) } ----
+  function area(g, T, F, xs, ys, o = {}) {
+    const a = o.a ?? 1; if (a <= 0) return;
+    const base = o.base ?? F.yr[0], x0 = o.x0 ?? xs[0];
+    const x1 = Math.min(o.x1 ?? xs[xs.length - 1], lerp(xs[0], xs[xs.length - 1], clamp(o.k ?? 1)));
+    if (x1 <= x0) return;
+    g.save(); g.beginPath(); g.rect(F.x, F.y, F.w, F.h); g.clip();
+    g.beginPath(); g.moveTo(F.X(x0), F.Y(base)); let started = false;
+    for (let i = 0; i < xs.length; i++) {
+      if (xs[i] < x0) continue; if (xs[i] > x1) break;
+      g.lineTo(F.X(xs[i]), F.Y(ys[i])); started = true;
+    }
+    if (!started) { g.restore(); return; }
+    g.lineTo(F.X(x1), F.Y(base)); g.closePath();
+    g.fillStyle = C(T, o.c || 'line', (o.fa ?? 0.16) * a); g.fill();
+    g.restore();
+  }
+
+  // ---- bars (a histogram): xs = bar centres (data), ys = heights; o = { bw (data width), base, c, a, k (grow),
+  //      stroke, fa (fill alpha), hl: [indices drawn in the accent] } ----
+  function bars(g, T, F, xs, ys, o = {}) {
+    const a = o.a ?? 1; if (a <= 0) return;
+    const base = o.base ?? F.yr[0], bw = o.bw ?? (xs[1] - xs[0]) * 0.8;
+    g.save();
+    for (let i = 0; i < xs.length; i++) {
+      const ki = eo(clamp((o.k ?? 1) * 1.6 - i / xs.length * 0.6));
+      if (ki <= 0) continue;
+      const hv = lerp(base, ys[i], ki), x0 = F.X(xs[i] - bw / 2), x1 = F.X(xs[i] + bw / 2), y0 = F.Y(base), y1 = F.Y(hv);
+      if (Math.abs(y1 - y0) < 0.75) continue;
+      const hl = (o.hl || []).includes(i), c = hl ? 'acc' : (o.c || 'line');
+      g.fillStyle = C(T, c, (o.fa ?? 0.22) * a); g.fillRect(x0, Math.min(y0, y1), x1 - x0, Math.abs(y1 - y0));
+      g.strokeStyle = C(T, c, 0.9 * a); g.lineWidth = o.stroke ?? 1.6; g.strokeRect(x0 + 0.5, Math.min(y0, y1) + 0.5, x1 - x0 - 1, Math.abs(y1 - y0) - 1);
+    }
+    g.restore();
+  }
+
+  // ---- candles: d = { open, high, low, close } arrays, xs = data x per candle; o = { n (how many shown, may be
+  //      fractional: the last one grows), bw (px), hl (index in the accent), a } ----
+  function candles(g, T, F, d, xs, o = {}) {
+    const a = o.a ?? 1; if (a <= 0) return;
+    const n = o.n ?? xs.length, bw = o.bw ?? 10;
+    g.save();
+    for (let i = 0; i < Math.min(xs.length, Math.ceil(n)); i++) {
+      const grow = clamp(n - i);
+      const op = d.open[i], cl = lerp(op, d.close[i], eo(grow)), hi = lerp(op, d.high[i], eo(grow)), lo = lerp(op, d.low[i], eo(grow));
+      const up = d.close[i] >= op, hl = o.hl === i, cx = F.X(xs[i]);
+      const col = hl ? T.acc(a) : up ? T.line(0.95 * a) : T.hi(0.9 * a);
+      g.strokeStyle = col; g.lineWidth = hl ? 2.4 : 1.6;
+      g.beginPath(); g.moveTo(cx, F.Y(hi)); g.lineTo(cx, F.Y(lo)); g.stroke();
+      const y0 = F.Y(Math.max(op, cl)), y1 = F.Y(Math.min(op, cl)), hh = Math.max(2, y1 - y0);
+      if (up && !hl) { g.fillStyle = 'rgba(255,255,255,0.95)'; g.fillRect(cx - bw / 2, y0, bw, hh); g.strokeRect(cx - bw / 2 + 0.5, y0 + 0.5, bw - 1, hh - 1); }
+      else { g.fillStyle = col; g.fillRect(cx - bw / 2, y0, bw, hh); }
+    }
+    g.restore();
+  }
+
+  // ---- reference lines: o = { c, a, dash, w, label, at ('start'|'end'), size } ----
+  function hline(g, T, F, v, o = {}) {
+    const a = o.a ?? 1; if (a <= 0) return;
+    const py = F.Y(v), k = clamp(o.k ?? 1);
+    g.save(); g.setLineDash(o.dash ?? [10, 8]); g.strokeStyle = C(T, o.c || 'hi', 0.75 * a); g.lineWidth = o.w ?? 2;
+    g.beginPath(); g.moveTo(F.x, py); g.lineTo(F.x + F.w * k, py); g.stroke(); g.setLineDash([]);
+    if (o.label && k > 0.6) { g.globalAlpha = clamp((k - 0.6) * 2.5); tag(g, T, o.label, o.at === 'start' ? F.x + 10 : F.x + F.w - 10, py - 10, { c: o.c || 'hi', align: o.at === 'start' ? 'left' : 'right', a, size: o.size }); }
+    g.restore();
+  }
+  function vline(g, T, F, v, o = {}) {
+    const a = o.a ?? 1; if (a <= 0) return;
+    const px = F.X(v), k = clamp(o.k ?? 1);
+    g.save(); g.setLineDash(o.dash ?? [10, 8]); g.strokeStyle = C(T, o.c || 'hi', 0.75 * a); g.lineWidth = o.w ?? 2;
+    g.beginPath(); g.moveTo(px, F.y + F.h); g.lineTo(px, F.y + F.h - F.h * k); g.stroke(); g.setLineDash([]);
+    if (o.label && k > 0.6) { g.globalAlpha = clamp((k - 0.6) * 2.5); tag(g, T, o.label, px + (o.dx ?? 0), (o.y ?? F.y) - 6, { c: o.c || 'hi', align: o.align || 'center', a, size: o.size }); }
+    g.restore();
+  }
+
+  // ---- a marker dot with a ring; o = { r, c, a, pulse (0-1 expanding ring) } ----
+  function dot(g, T, x, y, o = {}) {
+    const a = o.a ?? 1; if (a <= 0) return;
+    const r = (o.r ?? 7) * (o.s ?? 1);
+    g.save();
+    g.fillStyle = 'rgba(255,255,255,0.95)'; g.beginPath(); g.arc(x, y, r + 3, 0, 2 * Math.PI); g.fill();
+    g.fillStyle = C(T, o.c || 'line', a); g.beginPath(); g.arc(x, y, r, 0, 2 * Math.PI); g.fill();
+    g.strokeStyle = C(T, o.c || 'line', 0.55 * a); g.lineWidth = 1.6; g.beginPath(); g.arc(x, y, r + 7, 0, 2 * Math.PI); g.stroke();
+    if (o.pulse > 0 && o.pulse < 1) { g.strokeStyle = C(T, o.c || 'line', 0.8 * a * (1 - o.pulse)); g.beginPath(); g.arc(x, y, r + 7 + 34 * o.pulse, 0, 2 * Math.PI); g.stroke(); }
+    g.restore();
+  }
+
+  // ---- text: o = { size, wt, c, a, align, mono, ls, roll (0-1), frame, seed, base ('alphabetic'|'middle') } ----
+  function text(g, T, s, x, y, o = {}) {
+    const a = o.a ?? 1; if (a <= 0 || !s) return 0;
+    g.save(); g.globalAlpha = 1; g.textAlign = o.align || 'left'; g.textBaseline = o.base || 'alphabetic';
+    g.letterSpacing = (o.ls ?? 0) + 'px';
+    g.font = `${o.wt ?? 500} ${o.size ?? 28}px ${o.mono ? FONT.mono : FONT.ui}`;
+    if (o.maxW) HUD.fitFont(g, s, o.wt ?? 500, o.size ?? 28, o.mono ? FONT.mono : FONT.ui, o.maxW, 12);
+    g.fillStyle = C(T, o.c || 'hi', a);
+    const str = o.roll !== undefined ? HUD.rollText(s, o.roll, o.frame ?? 0, o.seed ?? 0) : s;
+    g.fillText(str, x, y);
+    const w = g.measureText(s).width;
+    g.restore();
+    return w;
+  }
+
+  // ---- a value that rolls in and locks in the accent: o = { size, a, roll, frame, unit, flash, c (before lock) } ----
+  function value(g, T, s, x, y, o = {}) {
+    const a = o.a ?? 1, roll = o.roll ?? 1; if (a <= 0 || roll <= 0) return { w: 0 };
+    const size = o.size ?? 72, locked = roll >= 1;
+    g.save(); g.textAlign = 'left'; g.textBaseline = 'alphabetic';
+    g.font = `${o.wt ?? 400} ${size}px ${FONT.ui}`;
+    const adv = g.measureText('0').width * 1.02;
+    const total = (() => { let w = 0; for (const ch of s) w += (ch === '.' || ch === ',' || ch === ' ') ? g.measureText(ch).width * 1.1 : adv; return w; })();
+    let x0 = o.align === 'right' ? x - total : o.align === 'center' ? x - total / 2 : x;
+    g.fillStyle = locked ? (o.flash ? T.hi(a) : C(T, o.lc || 'acc', a)) : C(T, o.c || 'line', 0.85 * a);
+    const vw = HUD.monoText(g, HUD.rollText(s, roll, o.frame ?? 0, o.seed ?? 11), x0, y, adv);
+    if (o.unit) {
+      g.font = `500 ${Math.round(size * 0.36)}px ${FONT.ui}`; g.fillStyle = locked ? C(T, o.lc || 'acc', 0.9 * a) : T.line(0.6 * a);
+      g.fillText(o.unit, x0 + vw + 8, y);
+    }
+    g.restore();
+    return { w: vw, x0, bb: [x0, y - size * 0.78, x0 + vw, y + size * 0.06] };
+  }
+
+  // ---- a small filled tag: o = { c ('line'|'acc'|'hi'), a, align, size } ----
+  function tag(g, T, s, x, y, o = {}) {
+    const a = o.a ?? 1; if (a <= 0) return;
+    g.save(); g.letterSpacing = '1px'; g.font = `600 ${o.size ?? 19}px ${FONT.ui}`; g.textBaseline = 'alphabetic';
+    const w = g.measureText(s).width + 18, h = (o.size ?? 19) + 11;
+    const x0 = o.align === 'right' ? x - w : o.align === 'center' ? x - w / 2 : x;
+    g.fillStyle = C(T, o.c || 'line', 0.95 * a); g.fillRect(x0, y - h, w, h);
+    g.fillStyle = `rgba(255,255,255,${a})`; g.textAlign = 'left'; g.fillText(s, x0 + 9, y - 8);
+    g.restore();
+    return [x0, y - h, x0 + w, y];
+  }
+
+  // ---- target lock (HUD.targetBox) and leader, re-exported ----
+  const lock = (g, T, bb, k, o = {}) => HUD.targetBox(g, T, bb, k, o);
+  const leader = (g, T, a, b, c, k, o = {}) => HUD.leader(g, T, a, b, c, k, o);
+
+  // ---- scene life: the scan-in (a vertical scan line reveals the stage left to right) and the scan-erase at the
+  //      end. Use: const sx = QC.scanIn(t) ... QC.clipStage(g, sx) ... draw ... g.restore(); QC.scanLine(g, T, sx). ----
+  const STAGE = { x0: 30, x1: 1050, y0: 552, y1: 1478 };
+  const scanIn = (t, t0 = 0, dur = 0.6) => lerp(STAGE.x0, STAGE.x1, eio((t - t0) / dur));
+  const scanOut = (t, t1, dur = 0.4) => lerp(STAGE.x0, STAGE.x1, eio((t - (t1 - dur)) / dur));
+  function clipStage(g, xIn = STAGE.x1, xOut = STAGE.x0) {   // keep [xOut, xIn] of the stage; call g.restore() after
+    g.save(); g.beginPath(); g.rect(xOut, 0, Math.max(0, xIn - xOut), 1920); g.clip();
+  }
+  function scanLine(g, T, x, a = 1) {
+    if (x <= STAGE.x0 + 1 || x >= STAGE.x1 - 1 || a <= 0) return;
+    g.save();
+    const gr = g.createLinearGradient(x - 60, 0, x + 6, 0);
+    gr.addColorStop(0, T.line(0)); gr.addColorStop(1, T.line(0.16 * a));
+    g.fillStyle = gr; g.fillRect(x - 60, STAGE.y0, 66, STAGE.y1 - STAGE.y0);
+    g.strokeStyle = T.line(0.9 * a); g.lineWidth = 2; g.beginPath(); g.moveTo(x, STAGE.y0); g.lineTo(x, STAGE.y1); g.stroke();
+    g.restore();
+  }
+
+  // ---- LaTeX formulas: inline SVG (typeset by MathJax at build time) in a DOM layer over the canvas ----
+  // init once with the scene's TEX map; each frame: tex.begin(); tex.show(id, {...}); ... tex.end();
+  const tex = (function () {
+    let layer = null, nodes = {}, shown = {}, MAP = {}, ACC = '', LINE = '';
+    function init(root, map, T) {
+      MAP = map; ACC = T.acc(1); LINE = T.line(1); layer = document.createElement('div');
+      layer.style.cssText = 'position:absolute;left:0;top:0;width:1080px;height:1920px;pointer-events:none;';
+      const st = document.createElement('style');
+      st.textContent = `.qtex{position:absolute;left:0;top:0;transform-origin:0 0;color:${T.hi(1)};will-change:clip-path,opacity}
+        .qtex svg{display:block;width:100%;height:100%;overflow:visible}
+        .qtex .acc{color:var(--acc)} .qtex .blu{color:${T.line(1)}}`;
+      layer.appendChild(st);
+      for (const id in map) {
+        const d = document.createElement('div'); d.className = 'qtex'; d.innerHTML = map[id].svg; d.style.display = 'none';
+        layer.appendChild(d); nodes[id] = d;
+      }
+      root.appendChild(layer);
+    }
+    function begin() { shown = {}; }
+    // o = { x, y, size (em px), align ('left'|'center'|'right'), valign ('base'|'middle'|'top'), k (reveal 0-1, left to
+    //       right), cut (0-1 erased from the left), a, lock (true: the \class{acc} parts turn orange), clip [x0, x1] px }
+    function show(id, o = {}) {
+      const f = MAP[id], d = nodes[id]; if (!f || !d) throw new Error('no formula ' + id);
+      const em = o.size ?? 56, w = f.w * em, h = f.h * em;
+      let x = o.x ?? 540, y = o.y ?? 0;
+      if (o.align === 'center') x -= w / 2; else if (o.align === 'right') x -= w;
+      const top = o.valign === 'top' ? y : o.valign === 'middle' ? y - h / 2 : y - (f.h - f.a) * em;
+      const k = clamp(o.k ?? 1), cut = clamp(o.cut ?? 0);
+      let L = cut * w, R = (1 - k) * w;
+      if (o.clip) { L = Math.max(L, o.clip[0] - x); R = Math.max(R, x + w - o.clip[1]); }
+      const a = o.a ?? 1;
+      if (a <= 0 || L + R >= w) return { bb: [x, top, x + w, top + h], w, h };
+      d.style.display = 'block'; d.style.width = w + 'px'; d.style.height = h + 'px';
+      d.style.transform = `translate(${x}px, ${top}px)`; d.style.opacity = a;
+      d.style.clipPath = `inset(-20px ${R}px -20px ${L}px)`;
+      d.style.setProperty('--acc', o.lock ? ACC : LINE);
+      shown[id] = 1;
+      return { bb: [x, top, x + w, top + h], w, h };
+    }
+    function end() { for (const id in nodes) if (!shown[id]) nodes[id].style.display = 'none'; }
+    return { init, begin, show, end };
+  })();
+
+  return { frame, panel, axes, line, area, bars, candles, hline, vline, dot, text, value, tag, lock, leader,
+    STAGE, scanIn, scanOut, clipStage, scanLine, tex, fmt, pow10, MINUS, clamp, lerp, eo, eio };
+})();
+// QCHART END
+
+
+      // ---- s3: "On October 19th, 1987, the S&P 500 fell 20.47% in one day." ----
+      // The real S&P 500 daily candles, 1 Sep - 30 Oct 1987, drawn day by day; 19 Oct is locked on the date axis as it is
+      // said; the 19 Oct candle drops 282.70 -> 224.84 on "fell", and -20.47% locks on "20.47%"; the days after appear
+      // faint on "in one day", so the one candle stands alone.
       // words: 0 On 1 October 2 19th, 3 1987, 4 the 5 S&P 6 500 7 fell 8 20.47% 9 in 10 one 11 day.
-      const w = (i) => Math.max(0, W.length > i ? W[i] : 0.12 + i * 0.3);
-      const ADD = HOLOHUD.ADD, F3 = 3 / FPS;
-      const hit = (t, t0) => t >= t0 && t < t0 + F3;                          // a three-frame flash from t0 (target locks)
-      const hit1 = (t, t0) => t >= t0 && t < t0 + 1 / FPS;                    // a one-frame flash (a value turning amber)
-      // values in monospaced digits with a square decimal point sized to the type (so it reads at any size)
-      const monoW = (s, adv) => [...s].reduce((a, ch) => a + (ch === "." ? adv * 0.46 : adv), 0);
-      const monoVal = (g, s, x, y, adv, fs) => { let cx = x; for (const ch of s) { if (ch === ".") { const d = Math.max(5, Math.round(fs * 0.12)); g.fillRect(Math.round(cx + adv * 0.23 - d / 2), y - d, d, d); cx += adv * 0.46; } else { const cw = g.measureText(ch).width; g.fillText(ch, cx + (adv - cw) / 2, y); cx += adv; } } return cx - x; };
-      const OUT = (t) => 1 - clamp((t - (DUR - 0.45)) / 0.3);                // the HUD leaves with the scan-erase
-      // the film time of this scene's start (its host's data-start), so the pad's slow turn carries on across the cut
-      const S0 = (() => { try { const v = parseFloat(document.querySelector('[data-composition-id="s3"][data-start]').getAttribute("data-start")); return isFinite(v) ? v : 0; } catch (e) { return 0; } })();
-      // camera keys [time, cam], cubic in-out between them (HOME at both ends)
-      const camPath = (t, K) => { if (t <= K[0][0]) return K[0][1]; for (let i = 0; i < K.length - 1; i++) if (t < K[i + 1][0]) return camMix(K[i][1], K[i + 1][1], eio((t - K[i][0]) / (K[i + 1][0] - K[i][0]))); return K[K.length - 1][1]; };
-      // an oriented box (axes U, V, Z; full sizes s), for the calendar's leaning boards
-      const obox = (m, c, U, V, Z, s) => {
-        const id = [];
-        for (const k of [-1, 1]) for (const j of [-1, 1]) for (const i of [-1, 1]) id.push(m.vtx([0, 1, 2].map((a) => c[a] + U[a] * i * s[0] / 2 + V[a] * j * s[1] / 2 + Z[a] * k * s[2] / 2)));
-        [[0, 1], [2, 3], [4, 5], [6, 7], [0, 2], [1, 3], [4, 6], [5, 7], [0, 4], [1, 5], [2, 6], [3, 7]].forEach(([a, b]) => m.edge(id[a], id[b]));
-        [[0, 1, 3, 2], [4, 5, 7, 6], [0, 1, 5, 4], [2, 3, 7, 6], [0, 2, 6, 4], [1, 3, 7, 5]].forEach((q) => m.quad(...q.map((i) => id[i])));
-      };
-      const sq = (m, x, y, z, s) => { const a = m.vtx([x - s / 2, y, z - s / 2]), b = m.vtx([x + s / 2, y, z - s / 2]), c = m.vtx([x + s / 2, y, z + s / 2]), d = m.vtx([x - s / 2, y, z + s / 2]); m.edge(a, b); m.edge(b, c); m.edge(c, d); m.edge(d, a); };
-
-      // ---- s3: 19 Oct 1987. A desk calendar (an A-frame stand, coil rings, a stack of pages) shows the date on its top
-      // page, a plate printed in the page's plane: OCT on "October", 19 on "19th", 1987 on "1987". Then the S&P 500's two
-      // daily closes stand as columns, height proportional to the level (1 unit = 300 points): Friday 282.70 and Monday,
-      // which starts at Friday's level. On "fell" Monday's top slab (the 57.86 points it lost) flies off up its axis and
-      // is scan-erased, leaving 224.84; on "20.47%" the box locks on Monday and the card's value rolls in, amber ----
-      const PTS = 300;                                                         // S&P 500 points per world unit (height ∝ level)
-      const C16 = 282.70, C19 = 224.84, H16 = C16 / PTS, H19 = C19 / PTS;     // closes (numbers.json), their heights
-      const FX = 0.04, MX = 0.48, CZc = -0.1, CW = 0.2, YTOP = H16;
-      const CAL = { x: -0.44, z: 0.3, w: 0.54, h: 0.46, d: 0.28 };
-      const CL = Math.hypot(CAL.h, CAL.d / 2);
-      const VF = [0, CAL.h / CL, -CAL.d / 2 / CL], NF = [0, CAL.d / 2 / CL, CAL.h / CL];     // front board: up it, its outward normal
-      const VB = [0, CAL.h / CL, CAL.d / 2 / CL], NB = [0, CAL.d / 2 / CL, -CAL.h / CL];     // back board
-      const onFront = (u, s, n) => [CAL.x + u * CAL.w, CAL.h - VF[1] * s + NF[1] * n, CAL.z - VF[2] * s + NF[2] * n];   // u across, s down from the top
-      const PG = { u0: -0.47, u1: 0.47, s0: 0.04, s1: CL - 0.02, n: 0.017 };   // the top page
-      const tFell = w(7), tLock = w(8);
-      const SIDE = (t) => 1 - clamp((t - (DUR - 0.85)) / 0.3);                // the closes and the dimension leave before the camera heads home
-      const kSlab = (t) => eo((t - tFell) / 0.55);                             // the lost slab flies up its axis…
-      const kErase = (t) => clamp((t - (tFell + 0.12)) / 0.45);               // …and is scan-erased from its top
-      function calendar(m) {
-        obox(m, onFront(0, CL / 2, -0.005), [1, 0, 0], VF, NF, [CAL.w, CL, 0.008]);                             // front board
-        obox(m, [CAL.x, CAL.h / 2, CAL.z - CAL.d / 4], [1, 0, 0], VB, NB, [CAL.w, CL, 0.008]);                    // back board
-        for (const [k, n] of [[2, 0.006], [1, 0.0115], [0, PG.n]]) {                                             // the pages
-          const A = m.vtx(onFront(PG.u0, PG.s0, n)), B = m.vtx(onFront(PG.u1, PG.s0, n)), C = m.vtx(onFront(PG.u1, PG.s1 - k * 0.008, n)), D = m.vtx(onFront(PG.u0, PG.s1 - k * 0.008, n));
-          m.edge(A, B); m.edge(B, C); m.edge(C, D); m.edge(D, A); m.quad(A, B, C, D);
-        }
-        for (let i = 0; i < 11; i++) m.circle([CAL.x + (i - 5) / 5 * 0.43 * CAL.w, CAL.h - 0.014, CAL.z], [1, 0, 0], 0.028, 10);   // coil rings
-      }
-      function column(m, x, h0, h1) { m.box([x, (h0 + h1) / 2, CZc], [CW, h1 - h0, CW]); for (let p = 50; p < C16; p += 50) if (p / PTS > h0 + 0.01 && p / PTS < h1 - 0.01) sq(m, x, p / PTS, CZc, CW); }
-      function model(t) {
-        return build((m) => {
-          m.part("cal", { anchor: onFront(0, CL / 2, PG.n) }); m.piece("cal"); calendar(m);
-          m.part("fri", { anchor: [FX, H16, CZc + CW / 2] }); m.piece("fri"); column(m, FX, 0, H16);
-          m.part("mon", { anchor: [MX - CW / 2, H19, CZc + CW / 2] }); m.piece("mon"); column(m, MX, 0, t < tFell ? H16 : H19);
-        });
-      }
-      function slabModel() {
-        return build((m) => { m.part("slab", { anchor: [MX + CW / 2, (H19 + H16) / 2, CZc + CW / 2] }); m.piece("slab", { explode: [0, 0.3, 0], hot: true }); column(m, MX, H19, H16); });
-      }
-      const SLAB = slabModel();
-      const CALSHOT = { target: [-0.25, 0.25, 0.15], yaw: 0.3, pitch: 0.3, dist: 4.6, fov: 0.62, cx: 406, cy: 1110 };
-      const CALDRIFT = { target: [-0.27, 0.24, 0.16], yaw: 0.27, pitch: 0.3, dist: 4.45, fov: 0.62, cx: 406, cy: 1112 };
-      const COLS = { target: [0.22, 0.45, -0.05], yaw: 0.15, pitch: 0.13, dist: 5.75, fov: 0.62, cx: 640, cy: 1050 };
-      const COLS2 = { target: [0.24, 0.45, -0.05], yaw: 0.1, pitch: 0.12, dist: 5.62, fov: 0.62, cx: 632, cy: 1052 };
-      const camAt = (t) => camPath(t, [[0.15, HOME], [1.05, CALSHOT], [Math.max(1.6, w(3) + 0.35), CALDRIFT], [Math.max(2.45, w(5)), COLS], [DUR - 0.75, COLS2], [DUR - 0.15, HOME]]);
-
+      const { HUD } = HOLOHUD;
+      const T = HUD.theme(218, 22), FPS = 24;
+      const { clamp, lerp, eo, eio } = QC;
       const g = document.getElementById("s3-cv").getContext("2d");
-      // a target lock, clipped to the stage so its oversized entry never reaches the subtitles, the chip rail or the guide;
-      // its tag is drawn here as the engine draws it, but with the text fading with the box (the engine's tag text ignores alpha)
-      const lockBox = (bb, k, o) => {
-        g.save(); g.beginPath(); g.rect(40, 560, 1000, 910); g.clip();
-        HUD.targetBox(g, T, bb, k, Object.assign({}, o, { tag: undefined, alpha: (o.alpha ?? 1) * k * k }));   // faint while oversized, solid as it fits
-        const e = eo(k), a = (o.alpha ?? 1) * clamp(k * 4);
-        if (o.tag && e > 0.8 && a > 0.01) {
-          const pad = o.pad ?? 26, x0 = bb[0] - pad, y0 = bb[1] - pad, x1 = bb[2] + pad, y1 = bb[3] + pad, s = lerp(1.9, 1, e);
-          const ta = a * clamp((e - 0.8) * 5), tx = (x0 + x1) / 2 - (x1 - x0) / 2 * s, ty = (y0 + y1) / 2 - (y1 - y0) / 2 * s - 8;
-          g.font = "600 22px " + HUD.FONT.ui; g.textBaseline = "bottom"; g.textAlign = "left";
-          const tw = g.measureText(o.tag).width + 20;
-          g.globalCompositeOperation = HOLOHUD.ADD; g.fillStyle = o.flash ? T.hi(0.95 * ta) : T.line(0.9 * ta); g.fillRect(tx, ty - 30, tw, 30);
-          g.globalAlpha = ta; g.fillStyle = T.bg0; g.fillText(o.tag, tx + 10, ty - 4);
-        }
-        g.restore();
-      };
-      // the date plate, printed in the plane of the calendar's top page (an affine fit of the page's projected corners)
-      function datePlate(cam, t, f, a) {
-        const rv = clamp((t - (w(1) - 0.1)) / 0.3);
-        if (rv <= 0 || a <= 0) return;
-        const PW = 300, PH = 252, p0 = P3(cam, ...onFront(PG.u0, PG.s0, PG.n + 0.002)), p1 = P3(cam, ...onFront(PG.u1, PG.s0, PG.n + 0.002)), p2 = P3(cam, ...onFront(PG.u0, PG.s1, PG.n + 0.002));
-        g.save();
-        g.setTransform((p1[0] - p0[0]) / PW, (p1[1] - p0[1]) / PW, (p2[0] - p0[0]) / PH, (p2[1] - p0[1]) / PH, p0[0], p0[1]);
-        HUD.plate(g, T, 0, 0, PW, PH, a * eo(rv), { op: 0.86 });
-        g.globalCompositeOperation = ADD; g.textBaseline = "alphabetic"; g.textAlign = "left";
-        const kM = clamp((t - (w(1) - 0.05)) / 0.25), kD = clamp((t - (w(2) - 0.06)) / 0.28), kY = clamp((t - (w(3) - 0.06)) / 0.3);
-        // month band
-        g.fillStyle = T.line(0.92 * a * eo(rv)); g.fillRect(12, 12, (PW - 24) * eo(rv), 54);
-        g.font = "600 34px " + HUD.FONT.ui; g.letterSpacing = "5px";
-        const wOct = g.measureText("OCT ").width, wAll = g.measureText("OCT 1987").width, x0 = (PW - wAll) / 2;
-        g.fillStyle = T.bg0;
-        g.fillText(HUD.rollText("OCT", kM, f, 2), x0, 52);
-        g.fillText(HUD.rollText("1987", kY, f, 5), x0 + wOct, 52);
-        // the day, big and light
-        g.letterSpacing = "0px"; g.font = "300 148px " + HUD.FONT.ui; g.textAlign = "center"; g.fillStyle = T.hi(a);
-        g.fillText(HUD.rollText("19", kD, f, 7), PW / 2, 208);
-        g.font = "500 26px " + HUD.FONT.ui; g.letterSpacing = "6px"; g.fillStyle = T.line(0.95 * a);
-        g.fillText(HUD.rollText("MONDAY", clamp((t - (w(2) + 0.12)) / 0.3), f, 9), PW / 2 + 3, 240);
-        g.restore();
-      }
-      // the closes, on one plate under the two columns, with the scale note
-      function closes(cam, t, f, a) {
-        const rv = clamp((t - (w(5) - 0.15)) / 0.35) * a;
-        if (rv <= 0) return;
-        g.textAlign = "left";
-        const zf = CZc + CW / 2, pf = P3(cam, FX, 0, zf), pm = P3(cam, MX, 0, zf);
-        const x0 = pf[0] - 128, x1 = pm[0] + 128, y0 = Math.max(pf[1], pm[1]) + 14;
-        HUD.plate(g, T, x0, y0, x1 - x0, 146, rv);
-        g.save(); g.globalCompositeOperation = ADD; g.textBaseline = "alphabetic";
-        g.font = "22px " + HUD.FONT.mono + ', "DejaVu Sans"'; g.fillStyle = T.dim(rv);
-        g.textAlign = "left"; g.fillText("S&P 500 DAILY CLOSES", x0 + 14, y0 + 27); g.fillText("HEIGHT ∝ S&P 500 LEVEL", x0 + 14, y0 + 53);
-        g.textAlign = "center";
-        const kF = clamp((t - (w(6) - 0.2)) / 0.35), kM = clamp((t - (tFell - 0.02)) / 0.35);
-        g.font = "600 22px " + HUD.FONT.ui; g.letterSpacing = "2px"; g.fillStyle = T.line(rv);
-        g.fillText("FRI 16 OCT", pf[0], y0 + 84); g.fillText("MON 19 OCT", pm[0], y0 + 84);
-        g.letterSpacing = "0px"; g.font = "300 58px " + HUD.FONT.ui; g.fillStyle = T.hi(rv); g.textAlign = "left";
-        const adv = g.measureText("0").width * 1.04;
-        const mono = (s, cx) => monoVal(g, s, cx - monoW(s, adv) / 2, y0 + 134, adv, 58);
-        if (kF > 0) mono(HUD.rollText("282.70", kF, f, 13), pf[0]);
-        if (kM > 0) mono(HUD.rollText("224.84", kM, f, 17), pm[0]);
-        g.restore();
-      }
+      const w = (i) => W[i];
+      const S = NUM.spx1987, CR = NUM.crash, n = S.date.length, ci = S.crash_index;
+      const MON = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+      const lab = (i) => { const p = S.date[i].split("-"); return `${+p[2]} ${MON[+p[1] - 1]}`; };
+      const PX = { x: 40, y: 566, w: 1000, h: 884 };
+      const F = QC.frame(150, 716, 850, 626, [-0.9, n - 0.1], [200, 340]);
+      const XS = S.date.map((_, i) => i);
+      const xt = [0, S.date.indexOf("1987-09-15"), S.date.indexOf("1987-10-01"), ci];
+      const before = { open: S.open.slice(0, ci), high: S.high.slice(0, ci), low: S.low.slice(0, ci), close: S.close.slice(0, ci) };
+      const crash = { open: [S.open[ci]], high: [S.high[ci]], low: [S.low[ci]], close: [S.close[ci]] };
+      const after = { open: S.open.slice(ci + 1), high: S.high.slice(ci + 1), low: S.low.slice(ci + 1), close: S.close.slice(ci + 1) };
+      const tDate = w(2), tC0 = 0.4, tC1 = w(4) + 0.1, tCrash = w(7) - 0.06, tLock = w(8), tAfter = w(9) - 0.1;
+      const hit = (t, t0) => t - t0 > 0 && t - t0 < 3 / FPS;
       const st = { t: 0 };
+      function init() { QC.tex.init(document.querySelector('[data-composition-id="s3"]'), TEX, T); }
       function draw() {
         const t = st.t, f = Math.floor(t * FPS);
-        g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, WF, HF);
-        const cam = camAt(t), sc = scanState(t, YTOP), out = OUT(t);
-        HOLO.drawPad(g, cam, WF, HF, { hue: T.hue, rot: (S0 + t) * 0.06 });
-        const info = holo.draw(g, model(t), cam, Object.assign({ hue: T.hue, glow: 1 }, sc, { flash: { mon: hit(t, tFell) ? 1 : 0, fri: 0 } }));
-        // the lost slab: off up its axis, scan-erased from the top down as it goes
-        const ks = kSlab(t), ke = kErase(t);
-        let slabInfo = null;
-        if (t >= tFell && ke < 1) {
-          const off = 0.3 * ks, y = lerp(H16 + off + 0.02, H19 + off - 0.02, eio(ke));
-          slabInfo = holo.draw(g, SLAB, cam, { hue: T.hue, glow: 1, explode: { slab: ks }, scanDown: ke > 0 ? { y } : undefined });
-          if (ke > 0) HOLO.drawScanPlane(g, cam, WF, HF, y, { hue: T.hue, r: 0.2, c: [MX, 0, CZc], alpha: 0.8 * (1 - ke) });
+        g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, 1080, 1920);
+        QC.tex.begin();
+        const xIn = QC.scanIn(t, 0, 0.6), xOut = t > DUR - 0.4 ? QC.scanOut(t, DUR, 0.4) : QC.STAGE.x0;
+        QC.clipStage(g, xIn, xOut);
+        QC.panel(g, T, PX.x, PX.y, PX.w, PX.h, { open: clamp(t / 0.45), title: "S&P 500 · daily", index: "03",
+          sub: "1 Sep – 30 Oct 1987 · open, high, low, close", tag: "REAL DATA", frame: f });
+        QC.axes(g, T, F, { k: clamp((t - 0.15) / 0.5), xt, xf: lab, yt: [200, 220, 240, 260, 280, 300, 320, 340],
+          xl: "trading days", yl: "index level" });
+        // 19 Oct locked on the date axis as it is said
+        const kD = clamp((t - tDate) / 0.35);
+        if (kD > 0) {
+          const px = F.X(ci), py = F.y + F.h + 33;
+          QC.lock(g, T, [px - 40, py - 20, px + 40, py + 8], kD, { pad: 10, tag: "MON 19 OCT", flash: hit(t, tDate + 0.35) });
         }
-        if (sc.plane !== undefined) HOLO.drawScanPlane(g, cam, WF, HF, sc.plane, { hue: T.hue, r: 1.05, alpha: sc.planeA });
-        datePlate(cam, t, f, out);
-        // Friday's level, carried across as a dashed line once Monday has fallen below it
-        const kl = clamp((t - (tFell + 0.3)) / 0.4) * SIDE(t);
-        if (kl > 0) {
-          const a0 = P3(cam, FX + CW / 2, H16, CZc + CW / 2), a1 = P3(cam, lerp(FX + CW / 2, MX + CW / 2 + 0.07, kl), H16, CZc + CW / 2);
-          g.save(); g.globalCompositeOperation = ADD; g.strokeStyle = T.dim(0.9 * kl); g.lineWidth = 1.5; g.setLineDash([7, 6]);
-          g.beginPath(); g.moveTo(a0[0], a0[1]); g.lineTo(a1[0], a1[1]); g.stroke(); g.restore();
+        // the days before, drawn one by one
+        const nB = lerp(0, ci, clamp((t - tC0) / (tC1 - tC0)));
+        QC.candles(g, T, F, before, XS.slice(0, ci), { n: nB, bw: 12 });
+        // the last close before the crash
+        const k16 = clamp((t - (tC1 - 0.1)) / 0.4);
+        if (k16 > 0) {
+          QC.hline(g, T, F, CR.close_prev, { k: k16, c: "hi", a: 0.8 });
+          QC.tag(g, T, "FRI 16 OCT  282.70", F.x + 10, F.Y(CR.close_prev) - 10, { c: "hi", a: k16, size: 18 });
         }
-        closes(cam, t, f, SIDE(t));
-        // a dimension beside Monday: what the slab took with it (57.86 points), measured from Friday's level down
-        const kd = clamp((t - (tFell + 0.1)) / 0.35), ad = clamp((t - (tFell + 0.1)) / 0.2) * SIDE(t);
-        if (kd > 0 && ad > 0) {
-          const xd = MX + CW / 2 + 0.07, top = P3(cam, xd, H16, CZc + CW / 2), bot = P3(cam, xd, H19, CZc + CW / 2), yt = lerp(bot[1], top[1], eo(kd));
-          g.save(); g.globalCompositeOperation = ADD; g.strokeStyle = T.hi(0.9 * ad); g.lineWidth = 1.6;
-          g.beginPath(); g.moveTo(bot[0] - 9, bot[1]); g.lineTo(bot[0] + 9, bot[1]); g.moveTo(bot[0], bot[1]); g.lineTo(lerp(bot[0], top[0], eo(kd)), yt);
-          if (kd >= 1) { g.moveTo(top[0] - 9, top[1]); g.lineTo(top[0] + 9, top[1]); }
-          g.stroke(); g.restore();
-          const ka = clamp((t - (tFell + 0.3)) / 0.25) * ad;
-          if (ka > 0) {
-            g.save(); g.font = "600 22px " + HUD.FONT.ui; g.letterSpacing = "1px";
-            const lab = HUD.rollText("−57.86 PTS", clamp((t - (tFell + 0.3)) / 0.3), f, 23), tw = g.measureText("−57.86 PTS").width + 22, my = (top[1] + bot[1]) / 2;
-            HUD.plate(g, T, top[0] + 14, my - 18, tw, 36, ka);
-            g.globalCompositeOperation = ADD; g.fillStyle = T.hi(ka); g.textBaseline = "middle"; g.textAlign = "left"; g.fillText(lab, top[0] + 25, my + 1);
-            g.restore();
-          }
+        // the crash candle: 282.70 -> 224.84 on "fell"
+        const kC = clamp((t - tCrash) / 0.45);
+        if (kC > 0) {
+          QC.candles(g, T, F, crash, [ci], { n: eio(kC), bw: 15, hl: kC >= 1 && t >= tLock ? 0 : -1 });
+          QC.hline(g, T, F, CR.close, { k: clamp((kC - 0.6) * 2.5), c: "acc", a: 0.9 });
+          QC.tag(g, T, "MON 19 OCT  224.84", F.x + 10, F.Y(CR.close) + 34, { c: "acc", a: clamp((kC - 0.7) * 3.3), size: 18 });
+          // the drop, measured beside the candle
+          const x = F.X(ci) + 26, y0 = F.Y(CR.close_prev), y1 = lerp(y0, F.Y(CR.close), eio(kC));
+          g.save(); g.strokeStyle = T.acc(0.9); g.lineWidth = 2;
+          g.beginPath(); g.moveTo(x - 6, y0); g.lineTo(x + 6, y0); g.moveTo(x, y0); g.lineTo(x, y1); g.moveTo(x - 6, y1); g.lineTo(x + 6, y1); g.stroke();
+          g.restore();
+          QC.text(g, T, "−57.86", x + 12, (y0 + y1) / 2 + 8, { size: 22, mono: true, c: "acc", a: clamp((kC - 0.5) * 2) });
         }
-        // target lock on Monday as the value is said; leader from the cut to the card
-        const kb = clamp((t - (tLock - 0.22)) / 0.22);
-        if (kb > 0 && info.bbox.mon) lockBox(info.bbox.mon, kb, { flash: hit(t, tLock), tag: "TGT 03 · MON", alpha: out, pad: 20 });
-        const cx = 92, cy = 590, cw = 404;
-        const an = info.anchor.mon, lp = clamp((t - (tLock - 0.15)) / 0.5);
-        if (lp > 0 && an) HUD.leader(g, T, [an[0], an[1]], [cx + cw + 62, cy + 92], [cx + cw + 24, cy + 92], lp, { alpha: out, pulse: clamp((t - tLock) / 0.6) });
-        // the card: S&P 500 · one day, −20.47 % rolls in and locks amber on "20.47%"
-        const rv = clamp((t - (w(5) - 0.1)) / 0.4);
-        if (rv > 0 && out > 0) {
-          HUD.specCard(g, T, cx, cy, { label: "S&P 500 · ONE DAY", value: "−20.47", unit: "%" },
-            { reveal: rv, roll: clamp((t - (tLock - 0.35)) / 0.4), detail: 0, frame: f, flash: hit1(t, tLock + 0.05) },
-            { w: cw, big: 104, index: "02", alpha: out });
+        // -20.47% locks on "20.47%", with a target box on the candle and a callout
+        const kL = clamp((t - (tLock - 0.3)) / 0.4);
+        if (kL > 0) {
+          const cx = F.X(ci);
+          QC.lock(g, T, [cx - 14, F.Y(CR.close_prev), cx + 14, F.Y(CR.close)], clamp((t - tLock) / 0.3),
+            { pad: 14, flash: hit(t, tLock + 0.3) });
+          const bx = 186, by = 1066;
+          QC.leader(g, T, [cx - 4, F.Y(CR.close) + 4], [cx - 70, by + 64], [bx + 400, by + 64], clamp((t - tLock) / 0.4));
+          QC.panel(g, T, bx - 22, by - 52, 444, 196, { open: clamp((t - tLock + 0.1) / 0.3), op: 0.95 });
+          QC.text(g, T, "19 OCT 1987 · ONE DAY", bx, by - 10, { size: 21, wt: 600, ls: 2, c: "hi", a: clamp((t - tLock) / 0.3), roll: clamp((t - tLock) / 0.4), frame: f });
+          QC.value(g, T, "−20.47", bx - 4, by + 92, { size: 104, roll: kL, frame: f, unit: "%", flash: hit(t, tLock) });
+          QC.text(g, T, "282.70 → 224.84 · S&P 500 close", bx, by + 128, { size: 21, mono: true, c: "line", a: clamp((t - tLock - 0.2) / 0.4) });
         }
+        // the days after, faint: one candle stands alone
+        const kA = clamp((t - tAfter) / 0.5);
+        if (kA > 0) {
+          QC.candles(g, T, F, after, XS.slice(ci + 1), { n: lerp(0, n - ci - 1, kA), bw: 11, a: 0.32 });
+          const pulse = clamp((t - w(10)) / 0.6);
+          if (pulse > 0 && pulse < 1) QC.dot(g, T, F.X(ci), F.Y(CR.close), { c: "acc", r: 6, pulse });
+        }
+        g.restore();
+        QC.scanLine(g, T, xIn < QC.STAGE.x1 ? xIn : xOut);
+        QC.tex.end();
       }
+      if (typeof init === "function") init();     // before the tween: fromTo renders (and draws) at once
       const tl = gsap.timeline({ paused: true });
       tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: draw }, 0);
       draw();

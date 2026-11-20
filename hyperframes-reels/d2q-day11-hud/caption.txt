@@ -13,6 +13,6 @@ Day 11/30 · Making Quant Easy
 💬 Comment FORMULA and we'll DM you the free Quant Formula Sheet
 ➡️ Save this, share it with a friend, and follow @desk2quant for all 30 days
 
-Illustrative example. The S&P 500 closes are real (16 and 19 October 1987); the 1.26% day assumes 20% volatility; the fat-tailed curve is illustrative. The smile comes from an illustrative model (15% volatility plus a 20% crash about once every ten years, zero rates), simulated with a fixed seed (1,000,000 paths). Not investment advice.
+Illustrative example. The S&P 500 daily levels are real (September–October 1987); the 1.26% day assumes 20% volatility; the fat-tailed curve is illustrative. The smile comes from an illustrative model (15% volatility plus a 20% crash about once every ten years, zero rates), simulated with a fixed seed (1,000,000 paths). Not investment advice.
 
 #quantfinance #volatilitysmile #impliedvolatility #blackscholes #options #quantinterview #makingquanteasy #desk2quant

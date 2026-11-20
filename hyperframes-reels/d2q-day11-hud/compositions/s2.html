@@ -1,10 +1,6 @@
 <template>
   <style>
     @font-face { font-family: "Fredoka"; font-weight: 300 700; src: url("assets/fonts/fredoka-700.woff2"); }
-    @font-face { font-family: "Rajdhani"; font-weight: 300; src: url("assets/fonts/rajdhani-300.woff2"); }
-    @font-face { font-family: "Rajdhani"; font-weight: 400; src: url("assets/fonts/rajdhani-400.woff2"); }
-    @font-face { font-family: "Rajdhani"; font-weight: 500; src: url("assets/fonts/rajdhani-500.woff2"); }
-    @font-face { font-family: "Rajdhani"; font-weight: 600; src: url("assets/fonts/rajdhani-600.woff2"); }
     @font-face { font-family: "ShareTechMono"; font-weight: 400; src: url("assets/fonts/sharetechmono.woff2"); }
     @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
     #root { position: absolute; inset: 0; overflow: hidden; }
@@ -16,6 +12,10 @@
   <script>
     (function () {
       /*DATA*/ const DUR = 4.51; const W = [0.16, 0.34, 0.46, 0.88, 1.36, 1.58, 1.76, 1.88, 2.0, 2.26, 2.52, 2.66, 2.84, 3.32, 3.58, 3.84]; /*END*/
+      const TEX_IDS = ["bs_put", "bs_d"];
+      const NUM_KEYS = ["normal", "model"];
+      /*TEX*/ const TEX = {"bs_put": {"svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" focusable=\"false\" viewBox=\"0 -891.7 13724.9 1141.7\"><g stroke=\"currentColor\" fill=\"currentColor\" stroke-width=\"0\" transform=\"scale(1,-1)\"><g data-mml-node=\"math\"><g data-mml-node=\"mi\"><path data-c=\"1D443\" d=\"M287 628Q287 635 230 637Q206 637 199 638T192 648Q192 649 194 659Q200 679 203 681T397 683Q587 682 600 680Q664 669 707 631T751 530Q751 453 685 389Q616 321 507 303Q500 302 402 301H307L277 182Q247 66 247 59Q247 55 248 54T255 50T272 48T305 46H336Q342 37 342 35Q342 19 335 5Q330 0 319 0Q316 0 282 1T182 2Q120 2 87 2T51 1Q33 1 33 11Q33 13 36 25Q40 41 44 43T67 46Q94 46 127 49Q141 52 146 61Q149 65 218 339T287 628ZM645 554Q645 567 643 575T634 597T609 619T560 635Q553 636 480 637Q463 637 445 637T416 636T404 636Q391 635 386 627Q384 621 367 550T332 412T314 344Q314 342 395 342H407H430Q542 342 590 392Q617 419 631 471T645 554Z\"></path></g><g data-mml-node=\"mo\" transform=\"translate(1028.8,0)\"><path data-c=\"3D\" d=\"M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z\"></path></g><g data-mml-node=\"mi\" transform=\"translate(2084.6,0)\"><path data-c=\"1D43E\" d=\"M285 628Q285 635 228 637Q205 637 198 638T191 647Q191 649 193 661Q199 681 203 682Q205 683 214 683H219Q260 681 355 681Q389 681 418 681T463 682T483 682Q500 682 500 674Q500 669 497 660Q496 658 496 654T495 648T493 644T490 641T486 639T479 638T470 637T456 637Q416 636 405 634T387 623L306 305Q307 305 490 449T678 597Q692 611 692 620Q692 635 667 637Q651 637 651 648Q651 650 654 662T659 677Q662 682 676 682Q680 682 711 681T791 680Q814 680 839 681T869 682Q889 682 889 672Q889 650 881 642Q878 637 862 637Q787 632 726 586Q710 576 656 534T556 455L509 418L518 396Q527 374 546 329T581 244Q656 67 661 61Q663 59 666 57Q680 47 717 46H738Q744 38 744 37T741 19Q737 6 731 0H720Q680 3 625 3Q503 3 488 0H478Q472 6 472 9T474 27Q478 40 480 43T491 46H494Q544 46 544 71Q544 75 517 141T485 216L427 354L359 301L291 248L268 155Q245 63 245 58Q245 51 253 49T303 46H334Q340 37 340 35Q340 19 333 5Q328 0 317 0Q314 0 280 1T180 2Q118 2 85 2T49 1Q31 1 31 11Q31 13 34 25Q38 41 42 43T65 46Q92 46 125 49Q139 52 144 61Q147 65 216 339T285 628Z\"></path></g><g data-mml-node=\"msup\" transform=\"translate(2973.6,0)\"><g data-mml-node=\"mi\"><path data-c=\"1D452\" d=\"M39 168Q39 225 58 272T107 350T174 402T244 433T307 442H310Q355 442 388 420T421 355Q421 265 310 237Q261 224 176 223Q139 223 138 221Q138 219 132 186T125 128Q125 81 146 54T209 26T302 45T394 111Q403 121 406 121Q410 121 419 112T429 98T420 82T390 55T344 24T281 -1T205 -11Q126 -11 83 42T39 168ZM373 353Q367 405 305 405Q272 405 244 391T199 357T170 316T154 280T149 261Q149 260 169 260Q282 260 327 284T373 353Z\"></path></g><g data-mml-node=\"TeXAtom\" transform=\"translate(499,413) scale(0.707)\" data-mjx-texclass=\"ORD\"><g data-mml-node=\"mo\"><path data-c=\"2212\" d=\"M84 237T84 250T98 270H679Q694 262 694 250T679 230H98Q84 237 84 250Z\"></path></g><g data-mml-node=\"mi\" transform=\"translate(778,0)\"><path data-c=\"1D45F\" d=\"M21 287Q22 290 23 295T28 317T38 348T53 381T73 411T99 433T132 442Q161 442 183 430T214 408T225 388Q227 382 228 382T236 389Q284 441 347 441H350Q398 441 422 400Q430 381 430 363Q430 333 417 315T391 292T366 288Q346 288 334 299T322 328Q322 376 378 392Q356 405 342 405Q286 405 239 331Q229 315 224 298T190 165Q156 25 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 114 189T154 366Q154 405 128 405Q107 405 92 377T68 316T57 280Q55 278 41 278H27Q21 284 21 287Z\"></path></g><g data-mml-node=\"mi\" transform=\"translate(1229,0)\"><path data-c=\"1D447\" d=\"M40 437Q21 437 21 445Q21 450 37 501T71 602L88 651Q93 669 101 677H569H659Q691 677 697 676T704 667Q704 661 687 553T668 444Q668 437 649 437Q640 437 637 437T631 442L629 445Q629 451 635 490T641 551Q641 586 628 604T573 629Q568 630 515 631Q469 631 457 630T439 622Q438 621 368 343T298 60Q298 48 386 46Q418 46 427 45T436 36Q436 31 433 22Q429 4 424 1L422 0Q419 0 415 0Q410 0 363 1T228 2Q99 2 64 0H49Q43 6 43 9T45 27Q49 40 55 46H83H94Q174 46 189 55Q190 56 191 56Q196 59 201 76T241 233Q258 301 269 344Q339 619 339 625Q339 630 310 630H279Q212 630 191 624Q146 614 121 583T67 467Q60 445 57 441T43 437H40Z\"></path></g></g></g><g data-mml-node=\"mi\" transform=\"translate(4889.4,0)\"><path data-c=\"1D441\" d=\"M234 637Q231 637 226 637Q201 637 196 638T191 649Q191 676 202 682Q204 683 299 683Q376 683 387 683T401 677Q612 181 616 168L670 381Q723 592 723 606Q723 633 659 637Q635 637 635 648Q635 650 637 660Q641 676 643 679T653 683Q656 683 684 682T767 680Q817 680 843 681T873 682Q888 682 888 672Q888 650 880 642Q878 637 858 637Q787 633 769 597L620 7Q618 0 599 0Q585 0 582 2Q579 5 453 305L326 604L261 344Q196 88 196 79Q201 46 268 46H278Q284 41 284 38T282 19Q278 6 272 0H259Q228 2 151 2Q123 2 100 2T63 2T46 1Q31 1 31 10Q31 14 34 26T39 40Q41 46 62 46Q130 49 150 85Q154 91 221 362L289 634Q287 635 234 637Z\"></path></g><g data-mml-node=\"mo\" transform=\"translate(5777.4,0)\"><path data-c=\"28\" d=\"M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z\"></path></g><g data-mml-node=\"mo\" transform=\"translate(6166.4,0)\"><path data-c=\"2212\" d=\"M84 237T84 250T98 270H679Q694 262 694 250T679 230H98Q84 237 84 250Z\"></path></g><g data-mml-node=\"msub\" transform=\"translate(6944.4,0)\"><g data-mml-node=\"mi\"><path data-c=\"1D451\" d=\"M366 683Q367 683 438 688T511 694Q523 694 523 686Q523 679 450 384T375 83T374 68Q374 26 402 26Q411 27 422 35Q443 55 463 131Q469 151 473 152Q475 153 483 153H487H491Q506 153 506 145Q506 140 503 129Q490 79 473 48T445 8T417 -8Q409 -10 393 -10Q359 -10 336 5T306 36L300 51Q299 52 296 50Q294 48 292 46Q233 -10 172 -10Q117 -10 75 30T33 157Q33 205 53 255T101 341Q148 398 195 420T280 442Q336 442 364 400Q369 394 369 396Q370 400 396 505T424 616Q424 629 417 632T378 637H357Q351 643 351 645T353 664Q358 683 366 683ZM352 326Q329 405 277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q233 26 290 98L298 109L352 326Z\"></path></g><g data-mml-node=\"mn\" transform=\"translate(553,-150) scale(0.707)\"><path data-c=\"32\" d=\"M109 429Q82 429 66 447T50 491Q50 562 103 614T235 666Q326 666 387 610T449 465Q449 422 429 383T381 315T301 241Q265 210 201 149L142 93L218 92Q375 92 385 97Q392 99 409 186V189H449V186Q448 183 436 95T421 3V0H50V19V31Q50 38 56 46T86 81Q115 113 136 137Q145 147 170 174T204 211T233 244T261 278T284 308T305 340T320 369T333 401T340 431T343 464Q343 527 309 573T212 619Q179 619 154 602T119 569T109 550Q109 549 114 549Q132 549 151 535T170 489Q170 464 154 447T109 429Z\"></path></g></g><g data-mml-node=\"mo\" transform=\"translate(7900.9,0)\"><path data-c=\"29\" d=\"M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z\"></path></g><g data-mml-node=\"mo\" transform=\"translate(8512.2,0)\"><path data-c=\"2212\" d=\"M84 237T84 250T98 270H679Q694 262 694 250T679 230H98Q84 237 84 250Z\"></path></g><g data-mml-node=\"mi\" transform=\"translate(9512.4,0)\"><path data-c=\"1D446\" d=\"M308 24Q367 24 416 76T466 197Q466 260 414 284Q308 311 278 321T236 341Q176 383 176 462Q176 523 208 573T273 648Q302 673 343 688T407 704H418H425Q521 704 564 640Q565 640 577 653T603 682T623 704Q624 704 627 704T632 705Q645 705 645 698T617 577T585 459T569 456Q549 456 549 465Q549 471 550 475Q550 478 551 494T553 520Q553 554 544 579T526 616T501 641Q465 662 419 662Q362 662 313 616T263 510Q263 480 278 458T319 427Q323 425 389 408T456 390Q490 379 522 342T554 242Q554 216 546 186Q541 164 528 137T492 78T426 18T332 -20Q320 -22 298 -22Q199 -22 144 33L134 44L106 13Q83 -14 78 -18T65 -22Q52 -22 52 -14Q52 -11 110 221Q112 227 130 227H143Q149 221 149 216Q149 214 148 207T144 186T142 153Q144 114 160 87T203 47T255 29T308 24Z\"></path></g><g data-mml-node=\"mstyle\" transform=\"translate(10157.4,0)\"><g data-mml-node=\"mspace\"></g></g><g data-mml-node=\"mi\" transform=\"translate(10324.4,0)\"><path data-c=\"1D441\" d=\"M234 637Q231 637 226 637Q201 637 196 638T191 649Q191 676 202 682Q204 683 299 683Q376 683 387 683T401 677Q612 181 616 168L670 381Q723 592 723 606Q723 633 659 637Q635 637 635 648Q635 650 637 660Q641 676 643 679T653 683Q656 683 684 682T767 680Q817 680 843 681T873 682Q888 682 888 672Q888 650 880 642Q878 637 858 637Q787 633 769 597L620 7Q618 0 599 0Q585 0 582 2Q579 5 453 305L326 604L261 344Q196 88 196 79Q201 46 268 46H278Q284 41 284 38T282 19Q278 6 272 0H259Q228 2 151 2Q123 2 100 2T63 2T46 1Q31 1 31 10Q31 14 34 26T39 40Q41 46 62 46Q130 49 150 85Q154 91 221 362L289 634Q287 635 234 637Z\"></path></g><g data-mml-node=\"mo\" transform=\"translate(11212.4,0)\"><path data-c=\"28\" d=\"M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z\"></path></g><g data-mml-node=\"mo\" transform=\"translate(11601.4,0)\"><path data-c=\"2212\" d=\"M84 237T84 250T98 270H679Q694 262 694 250T679 230H98Q84 237 84 250Z\"></path></g><g data-mml-node=\"msub\" transform=\"translate(12379.4,0)\"><g data-mml-node=\"mi\"><path data-c=\"1D451\" d=\"M366 683Q367 683 438 688T511 694Q523 694 523 686Q523 679 450 384T375 83T374 68Q374 26 402 26Q411 27 422 35Q443 55 463 131Q469 151 473 152Q475 153 483 153H487H491Q506 153 506 145Q506 140 503 129Q490 79 473 48T445 8T417 -8Q409 -10 393 -10Q359 -10 336 5T306 36L300 51Q299 52 296 50Q294 48 292 46Q233 -10 172 -10Q117 -10 75 30T33 157Q33 205 53 255T101 341Q148 398 195 420T280 442Q336 442 364 400Q369 394 369 396Q370 400 396 505T424 616Q424 629 417 632T378 637H357Q351 643 351 645T353 664Q358 683 366 683ZM352 326Q329 405 277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q233 26 290 98L298 109L352 326Z\"></path></g><g data-mml-node=\"mn\" transform=\"translate(553,-150) scale(0.707)\"><path data-c=\"31\" d=\"M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z\"></path></g></g><g data-mml-node=\"mo\" transform=\"translate(13335.9,0)\"><path data-c=\"29\" d=\"M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z\"></path></g></g></g></svg>", "w": 13.7249, "h": 1.1417, "a": 0.25, "va": -0.566}, "bs_d": {"svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" focusable=\"false\" viewBox=\"0 -1674.4 13243.2 2694.4\"><g stroke=\"currentColor\" fill=\"currentColor\" stroke-width=\"0\" transform=\"scale(1,-1)\"><g data-mml-node=\"math\"><g data-mml-node=\"msub\"><g data-mml-node=\"mi\"><path data-c=\"1D451\" d=\"M366 683Q367 683 438 688T511 694Q523 694 523 686Q523 679 450 384T375 83T374 68Q374 26 402 26Q411 27 422 35Q443 55 463 131Q469 151 473 152Q475 153 483 153H487H491Q506 153 506 145Q506 140 503 129Q490 79 473 48T445 8T417 -8Q409 -10 393 -10Q359 -10 336 5T306 36L300 51Q299 52 296 50Q294 48 292 46Q233 -10 172 -10Q117 -10 75 30T33 157Q33 205 53 255T101 341Q148 398 195 420T280 442Q336 442 364 400Q369 394 369 396Q370 400 396 505T424 616Q424 629 417 632T378 637H357Q351 643 351 645T353 664Q358 683 366 683ZM352 326Q329 405 277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q233 26 290 98L298 109L352 326Z\"></path></g><g data-mml-node=\"TeXAtom\" transform=\"translate(553,-150) scale(0.707)\" data-mjx-texclass=\"ORD\"><g data-mml-node=\"mn\"><path data-c=\"31\" d=\"M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z\"></path></g><g data-mml-node=\"mo\" transform=\"translate(500,0)\"><path data-c=\"2C\" d=\"M78 35T78 60T94 103T137 121Q165 121 187 96T210 8Q210 -27 201 -60T180 -117T154 -158T130 -185T117 -194Q113 -194 104 -185T95 -172Q95 -168 106 -156T131 -126T157 -76T173 -3V9L172 8Q170 7 167 6T161 3T152 1T140 0Q113 0 96 17Z\"></path></g><g data-mml-node=\"mn\" transform=\"translate(778,0)\"><path data-c=\"32\" d=\"M109 429Q82 429 66 447T50 491Q50 562 103 614T235 666Q326 666 387 610T449 465Q449 422 429 383T381 315T301 241Q265 210 201 149L142 93L218 92Q375 92 385 97Q392 99 409 186V189H449V186Q448 183 436 95T421 3V0H50V19V31Q50 38 56 46T86 81Q115 113 136 137Q145 147 170 174T204 211T233 244T261 278T284 308T305 340T320 369T333 401T340 431T343 464Q343 527 309 573T212 619Q179 619 154 602T119 569T109 550Q109 549 114 549Q132 549 151 535T170 489Q170 464 154 447T109 429Z\"></path></g></g></g><g data-mml-node=\"mo\" transform=\"translate(1784.5,0)\"><path data-c=\"3D\" d=\"M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z\"></path></g><g data-mml-node=\"mfrac\" transform=\"translate(2840.2,0)\"><g data-mml-node=\"mrow\" transform=\"translate(220,809.5)\"><g data-mml-node=\"mi\"><path data-c=\"6C\" d=\"M42 46H56Q95 46 103 60V68Q103 77 103 91T103 124T104 167T104 217T104 272T104 329Q104 366 104 407T104 482T104 542T103 586T103 603Q100 622 89 628T44 637H26V660Q26 683 28 683L38 684Q48 685 67 686T104 688Q121 689 141 690T171 693T182 694H185V379Q185 62 186 60Q190 52 198 49Q219 46 247 46H263V0H255L232 1Q209 2 183 2T145 3T107 3T57 1L34 0H26V46H42Z\"></path><path data-c=\"6E\" d=\"M41 46H55Q94 46 102 60V68Q102 77 102 91T102 122T103 161T103 203Q103 234 103 269T102 328V351Q99 370 88 376T43 385H25V408Q25 431 27 431L37 432Q47 433 65 434T102 436Q119 437 138 438T167 441T178 442H181V402Q181 364 182 364T187 369T199 384T218 402T247 421T285 437Q305 442 336 442Q450 438 463 329Q464 322 464 190V104Q464 66 466 59T477 49Q498 46 526 46H542V0H534L510 1Q487 2 460 2T422 3Q319 3 310 0H302V46H318Q379 46 379 62Q380 64 380 200Q379 335 378 343Q372 371 358 385T334 402T308 404Q263 404 229 370Q202 343 195 315T187 232V168V108Q187 78 188 68T191 55T200 49Q221 46 249 46H265V0H257L234 1Q210 2 183 2T145 3Q42 3 33 0H25V46H41Z\" transform=\"translate(278,0)\"></path></g><g data-mml-node=\"mo\" transform=\"translate(834,0)\"><path data-c=\"2061\" d=\"\"></path></g><g data-mml-node=\"mo\" transform=\"translate(834,0)\"><path data-c=\"28\" d=\"M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z\"></path></g><g data-mml-node=\"mi\" transform=\"translate(1223,0)\"><path data-c=\"1D446\" d=\"M308 24Q367 24 416 76T466 197Q466 260 414 284Q308 311 278 321T236 341Q176 383 176 462Q176 523 208 573T273 648Q302 673 343 688T407 704H418H425Q521 704 564 640Q565 640 577 653T603 682T623 704Q624 704 627 704T632 705Q645 705 645 698T617 577T585 459T569 456Q549 456 549 465Q549 471 550 475Q550 478 551 494T553 520Q553 554 544 579T526 616T501 641Q465 662 419 662Q362 662 313 616T263 510Q263 480 278 458T319 427Q323 425 389 408T456 390Q490 379 522 342T554 242Q554 216 546 186Q541 164 528 137T492 78T426 18T332 -20Q320 -22 298 -22Q199 -22 144 33L134 44L106 13Q83 -14 78 -18T65 -22Q52 -22 52 -14Q52 -11 110 221Q112 227 130 227H143Q149 221 149 216Q149 214 148 207T144 186T142 153Q144 114 160 87T203 47T255 29T308 24Z\"></path></g><g data-mml-node=\"TeXAtom\" data-mjx-texclass=\"ORD\" transform=\"translate(1868,0)\"><g data-mml-node=\"mo\"><path data-c=\"2F\" d=\"M423 750Q432 750 438 744T444 730Q444 725 271 248T92 -240Q85 -250 75 -250Q68 -250 62 -245T56 -231Q56 -221 230 257T407 740Q411 750 423 750Z\"></path></g></g><g data-mml-node=\"mi\" transform=\"translate(2368,0)\"><path data-c=\"1D43E\" d=\"M285 628Q285 635 228 637Q205 637 198 638T191 647Q191 649 193 661Q199 681 203 682Q205 683 214 683H219Q260 681 355 681Q389 681 418 681T463 682T483 682Q500 682 500 674Q500 669 497 660Q496 658 496 654T495 648T493 644T490 641T486 639T479 638T470 637T456 637Q416 636 405 634T387 623L306 305Q307 305 490 449T678 597Q692 611 692 620Q692 635 667 637Q651 637 651 648Q651 650 654 662T659 677Q662 682 676 682Q680 682 711 681T791 680Q814 680 839 681T869 682Q889 682 889 672Q889 650 881 642Q878 637 862 637Q787 632 726 586Q710 576 656 534T556 455L509 418L518 396Q527 374 546 329T581 244Q656 67 661 61Q663 59 666 57Q680 47 717 46H738Q744 38 744 37T741 19Q737 6 731 0H720Q680 3 625 3Q503 3 488 0H478Q472 6 472 9T474 27Q478 40 480 43T491 46H494Q544 46 544 71Q544 75 517 141T485 216L427 354L359 301L291 248L268 155Q245 63 245 58Q245 51 253 49T303 46H334Q340 37 340 35Q340 19 333 5Q328 0 317 0Q314 0 280 1T180 2Q118 2 85 2T49 1Q31 1 31 11Q31 13 34 25Q38 41 42 43T65 46Q92 46 125 49Q139 52 144 61Q147 65 216 339T285 628Z\"></path></g><g data-mml-node=\"mo\" transform=\"translate(3257,0)\"><path data-c=\"29\" d=\"M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z\"></path></g><g data-mml-node=\"mo\" transform=\"translate(3868.2,0)\"><path data-c=\"2B\" d=\"M56 237T56 250T70 270H369V420L370 570Q380 583 389 583Q402 583 409 568V270H707Q722 262 722 250T707 230H409V-68Q401 -82 391 -82H389H387Q375 -82 369 -68V230H70Q56 237 56 250Z\"></path></g><g data-mml-node=\"mrow\" transform=\"translate(4868.4,0)\"><g data-mml-node=\"mo\" transform=\"translate(0 -0.5)\"><path data-c=\"28\" d=\"M152 251Q152 646 388 850H416Q422 844 422 841Q422 837 403 816T357 753T302 649T255 482T236 250Q236 124 255 19T301 -147T356 -251T403 -315T422 -340Q422 -343 416 -349H388Q359 -325 332 -296T271 -213T212 -97T170 56T152 251Z\"></path></g><g data-mml-node=\"mi\" transform=\"translate(458,0)\"><path data-c=\"1D45F\" d=\"M21 287Q22 290 23 295T28 317T38 348T53 381T73 411T99 433T132 442Q161 442 183 430T214 408T225 388Q227 382 228 382T236 389Q284 441 347 441H350Q398 441 422 400Q430 381 430 363Q430 333 417 315T391 292T366 288Q346 288 334 299T322 328Q322 376 378 392Q356 405 342 405Q286 405 239 331Q229 315 224 298T190 165Q156 25 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 114 189T154 366Q154 405 128 405Q107 405 92 377T68 316T57 280Q55 278 41 278H27Q21 284 21 287Z\"></path></g><g data-mml-node=\"mo\" transform=\"translate(1131.2,0)\"><path data-c=\"B1\" d=\"M56 320T56 333T70 353H369V502Q369 651 371 655Q376 666 388 666Q402 666 405 654T409 596V500V353H707Q722 345 722 333Q722 320 707 313H409V40H707Q722 32 722 20T707 0H70Q56 7 56 20T70 40H369V313H70Q56 320 56 333Z\"></path></g><g data-mml-node=\"mstyle\" transform=\"translate(2131.4,0)\"><g data-mml-node=\"mfrac\"><g data-mml-node=\"mn\" transform=\"translate(220,394) scale(0.707)\"><path data-c=\"31\" d=\"M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z\"></path></g><g data-mml-node=\"mn\" transform=\"translate(220,-345) scale(0.707)\"><path data-c=\"32\" d=\"M109 429Q82 429 66 447T50 491Q50 562 103 614T235 666Q326 666 387 610T449 465Q449 422 429 383T381 315T301 241Q265 210 201 149L142 93L218 92Q375 92 385 97Q392 99 409 186V189H449V186Q448 183 436 95T421 3V0H50V19V31Q50 38 56 46T86 81Q115 113 136 137Q145 147 170 174T204 211T233 244T261 278T284 308T305 340T320 369T333 401T340 431T343 464Q343 527 309 573T212 619Q179 619 154 602T119 569T109 550Q109 549 114 549Q132 549 151 535T170 489Q170 464 154 447T109 429Z\"></path></g><rect width=\"553.6\" height=\"60\" x=\"120\" y=\"220\"></rect></g></g><g data-mml-node=\"msup\" transform=\"translate(2925,0)\"><g data-mml-node=\"mi\" class=\" acc\"><path data-c=\"1D70E\" d=\"M184 -11Q116 -11 74 34T31 147Q31 247 104 333T274 430Q275 431 414 431H552Q553 430 555 429T559 427T562 425T565 422T567 420T569 416T570 412T571 407T572 401Q572 357 507 357Q500 357 490 357T476 358H416L421 348Q439 310 439 263Q439 153 359 71T184 -11ZM361 278Q361 358 276 358Q152 358 115 184Q114 180 114 178Q106 141 106 117Q106 67 131 47T188 26Q242 26 287 73Q316 103 334 153T356 233T361 278Z\"></path></g><g data-mml-node=\"mn\" transform=\"translate(604,363) scale(0.707)\"><path data-c=\"32\" d=\"M109 429Q82 429 66 447T50 491Q50 562 103 614T235 666Q326 666 387 610T449 465Q449 422 429 383T381 315T301 241Q265 210 201 149L142 93L218 92Q375 92 385 97Q392 99 409 186V189H449V186Q448 183 436 95T421 3V0H50V19V31Q50 38 56 46T86 81Q115 113 136 137Q145 147 170 174T204 211T233 244T261 278T284 308T305 340T320 369T333 401T340 431T343 464Q343 527 309 573T212 619Q179 619 154 602T119 569T109 550Q109 549 114 549Q132 549 151 535T170 489Q170 464 154 447T109 429Z\"></path></g></g><g data-mml-node=\"mo\" transform=\"translate(3932.6,0) translate(0 -0.5)\"><path data-c=\"29\" d=\"M305 251Q305 -145 69 -349H56Q43 -349 39 -347T35 -338Q37 -333 60 -307T108 -239T160 -136T204 27T221 250T204 473T160 636T108 740T60 807T35 839Q35 850 50 850H56H69Q197 743 256 566Q305 425 305 251Z\"></path></g></g><g data-mml-node=\"mi\" transform=\"translate(9259,0)\"><path data-c=\"1D447\" d=\"M40 437Q21 437 21 445Q21 450 37 501T71 602L88 651Q93 669 101 677H569H659Q691 677 697 676T704 667Q704 661 687 553T668 444Q668 437 649 437Q640 437 637 437T631 442L629 445Q629 451 635 490T641 551Q641 586 628 604T573 629Q568 630 515 631Q469 631 457 630T439 622Q438 621 368 343T298 60Q298 48 386 46Q418 46 427 45T436 36Q436 31 433 22Q429 4 424 1L422 0Q419 0 415 0Q410 0 363 1T228 2Q99 2 64 0H49Q43 6 43 9T45 27Q49 40 55 46H83H94Q174 46 189 55Q190 56 191 56Q196 59 201 76T241 233Q258 301 269 344Q339 619 339 625Q339 630 310 630H279Q212 630 191 624Q146 614 121 583T67 467Q60 445 57 441T43 437H40Z\"></path></g></g><g data-mml-node=\"mrow\" transform=\"translate(4137.5,-926)\"><g data-mml-node=\"mi\" class=\" acc\"><path data-c=\"1D70E\" d=\"M184 -11Q116 -11 74 34T31 147Q31 247 104 333T274 430Q275 431 414 431H552Q553 430 555 429T559 427T562 425T565 422T567 420T569 416T570 412T571 407T572 401Q572 357 507 357Q500 357 490 357T476 358H416L421 348Q439 310 439 263Q439 153 359 71T184 -11ZM361 278Q361 358 276 358Q152 358 115 184Q114 180 114 178Q106 141 106 117Q106 67 131 47T188 26Q242 26 287 73Q316 103 334 153T356 233T361 278Z\"></path></g><g data-mml-node=\"msqrt\" transform=\"translate(571,0)\"><g transform=\"translate(853,0)\"><g data-mml-node=\"mi\"><path data-c=\"1D447\" d=\"M40 437Q21 437 21 445Q21 450 37 501T71 602L88 651Q93 669 101 677H569H659Q691 677 697 676T704 667Q704 661 687 553T668 444Q668 437 649 437Q640 437 637 437T631 442L629 445Q629 451 635 490T641 551Q641 586 628 604T573 629Q568 630 515 631Q469 631 457 630T439 622Q438 621 368 343T298 60Q298 48 386 46Q418 46 427 45T436 36Q436 31 433 22Q429 4 424 1L422 0Q419 0 415 0Q410 0 363 1T228 2Q99 2 64 0H49Q43 6 43 9T45 27Q49 40 55 46H83H94Q174 46 189 55Q190 56 191 56Q196 59 201 76T241 233Q258 301 269 344Q339 619 339 625Q339 630 310 630H279Q212 630 191 624Q146 614 121 583T67 467Q60 445 57 441T43 437H40Z\"></path></g></g><g data-mml-node=\"mo\" transform=\"translate(0,106)\"><path data-c=\"221A\" d=\"M95 178Q89 178 81 186T72 200T103 230T169 280T207 309Q209 311 212 311H213Q219 311 227 294T281 177Q300 134 312 108L397 -77Q398 -77 501 136T707 565T814 786Q820 800 834 800Q841 800 846 794T853 782V776L620 293L385 -193Q381 -200 366 -200Q357 -200 354 -197Q352 -195 256 15L160 225L144 214Q129 202 113 190T95 178Z\"></path></g><rect width=\"704\" height=\"60\" x=\"853\" y=\"846\"></rect></g></g><rect width=\"10163\" height=\"60\" x=\"120\" y=\"220\"></rect></g></g></g></svg>", "w": 13.2432, "h": 2.6944, "a": 1.02, "va": -2.308}}; /*ENDTEX*/
+      /*NUM*/ const NUM = {"normal":{"sigma_annual":0.2,"sd_day":0.01259881576697424,"sd_day_pct":1.26,"z":16.245118944980245,"z_round":16.2,"z_log":18.176091372488322,"log10_p":-58.917444667227635,"log10_p_log":-73.39889381004846,"p_mantissa":1.2093592556760298,"p_exp":-59,"days_since_big_bang":3477600000000.0,"log10_expected_since_big_bang":-46.37616504004485},"model":{"S0":100.0,"T_months":1,"r":0.0,"sigma":0.15,"crash":-0.2,"crash_rate":0.1,"crash_every_years":10.0,"paths":1000000,"seed":11,"paths_with_crash":8171,"strikes":[80,85,90,95,100,105,110,115,120],"rows":[{"K":80,"type":"put","price_mc":0.011170796819100525,"se":0.00022787166802043185,"price_exact":0.011436687340088323,"iv_mc":0.2971392935386652,"iv_exact":0.29789448503711385,"iv_pct":29.7},{"K":85,"type":"put","price_mc":0.04132806321287731,"se":0.0005460852083054605,"price_exact":0.04218832731875371,"iv_mc":0.26383954829524925,"iv_exact":0.2646242088807321,"iv_pct":26.4},{"K":90,"type":"put","price_mc":0.08956271432408816,"se":0.0009590692873856381,"price_exact":0.09138424359041891,"iv_mc":0.20737032529458066,"iv_exact":0.2081507484808209,"iv_pct":20.7},{"K":95,"type":"put","price_mc":0.3451030209296069,"se":0.0015988297801790997,"price_exact":0.3480027603303514,"iv_mc":0.16685960618501114,"iv_exact":0.1673144601786464,"iv_pct":16.7},{"K":100,"type":"call","price_mc":1.7980148763496528,"se":0.002648573688870384,"price_exact":1.7984101093213365,"iv_mc":0.156138714617461,"iv_exact":0.15617304226471088,"iv_pct":15.6},{"K":105,"type":"call","price_mc":0.30936375092849205,"se":0.0010844343914216742,"price_exact":0.30922075562338525,"iv_mc":0.1532664539703412,"iv_exact":0.15324418940092535,"iv_pct":15.3},{"K":110,"type":"call","price_mc":0.02453095169269709,"se":0.0002790418582786498,"price_exact":0.02448231426731061,"iv_mc":0.15217279697582725,"iv_exact":0.1521303785608618,"iv_pct":15.2},{"K":115,"type":"call","price_mc":0.0009501218600889001,"se":4.964552527029973e-05,"price_exact":0.0008885289361257162,"iv_mc":0.15237690309625118,"iv_exact":0.15157960467492973,"iv_pct":15.2},{"K":120,"type":"call","price_mc":1.5744911687713554e-05,"se":6.316785701074801e-06,"price_exact":1.5476242483741354e-05,"iv_mc":0.15138784852358356,"iv_exact":0.15125869899311462,"iv_pct":15.1}],"iv_pct":{"80":29.7,"85":26.4,"90":20.7,"95":16.7,"100":15.6,"105":15.3,"110":15.2,"115":15.2,"120":15.1}}}; /*ENDNUM*/
 // HOLOHUD: the Sci-fi Hologram HUD engine as one classic script, for HyperFrames scenes (copy it verbatim into a
 // scene's IIFE). HOLO = wireframe engine (holo.js), HUD = UI layer (hud.js), MKM = model builder (mkmodel.mjs), unchanged
 // except that ES-module exports became closures and the fetch-based model loader was dropped.
@@ -999,200 +999,475 @@ const HOLOHUD = (function () {
   })();
   return { HOLO, HUD, MKM, LIGHT, ADD };
 })();
+// QCHART: the quant chart kit for the light HUD scenes (panels, axes, curves, candles, bars, markers, rolling values,
+// target locks and typeset LaTeX formulas). Needs HOLOHUD above it. Pure functions of what you pass in: call them from
+// draw() every frame. Colours are theme keys ('line' blue, 'hi' navy, 'dim' pale blue, 'acc' orange) or CSS strings.
+const QC = (function () {
+  const { HUD } = HOLOHUD, FONT = HUD.FONT;
+  const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x)), lerp = (a, b, k) => a + (b - a) * k;
+  const eo = (x) => 1 - Math.pow(1 - clamp(x), 3);
+  const eio = (x) => { x = clamp(x); return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
+  const C = (T, c, a) => (typeof c === 'function' ? c(a) : (T[c] && typeof T[c] === 'function') ? T[c](a) : c);
+  const MINUS = '−';
+  const fmt = (v, d = 2) => (v < 0 ? MINUS : '') + Math.abs(v).toFixed(d);
+  const SUP = { '-': '⁻', '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹' };
+  const pow10 = (e) => '10' + String(e).split('').map((ch) => SUP[ch] || ch).join('');
 
-      // ---- the HUD scene scaffold (shared by every scene; keep it as is) ----
-      const { HOLO, HUD, MKM } = HOLOHUD;
-      const T = HUD.theme(218, 22), WF = 1080, HF = 1920, FPS = 24;
-      const holo = new HOLO.Holo(WF, HF);
-      const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x)), lerp = (a, b, k) => a + (b - a) * k;
-      const eo = (x) => 1 - Math.pow(1 - clamp(x), 3), eio = (x) => { x = clamp(x); return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
-      // HOME: every scene starts and ends on this camera, so the projector pad never jumps at a cut
-      const HOME = { target: [0, 0.5, 0], yaw: 0.35, pitch: 0.32, dist: 7.6, fov: 0.62, cx: 540, cy: 1010 };
-      const camMix = (a, b, k) => ({ target: a.target.map((v, i) => lerp(v, b.target[i], k)), yaw: lerp(a.yaw, b.yaw, k), pitch: lerp(a.pitch, b.pitch, k),
-        dist: lerp(a.dist, b.dist, k), fov: lerp(a.fov, b.fov, k), cx: lerp(a.cx, b.cx, k), cy: lerp(a.cy, b.cy, k) });
-      // build a model from MKM primitives in world units (no normalising: heights stay honest), ready for holo.draw
-      const build = (fn) => { const m = new MKM.Model("m"); fn(m); return HOLO.prepModel(m.toJSON()); };
-      // scan in over the first 0.6 s (the scan plane grows the subject), erase over the last 0.4 s; yTop = the subject's height
-      const scanState = (t, yTop) => {
-        const kin = clamp(t / 0.6), kout = clamp((t - (DUR - 0.42)) / 0.4);
-        if (kout > 0) return { scanDown: { y: lerp(yTop + 0.1, -0.05, eio(kout)) }, plane: lerp(yTop + 0.1, -0.05, eio(kout)), planeA: 1 - 0.3 * kout };
-        if (kin < 1) return { scan: { y: lerp(-0.05, yTop + 0.12, eio(kin)), band: 0.07 }, plane: lerp(-0.05, yTop + 0.12, eio(kin)), planeA: 1 };
-        return {};
-      };
-      const P3 = (cam, x, y, z) => { const c = HOLO.makeCamera(cam, WF, HF), o = new Float32Array(3); c.project(x, y, z, o); return [o[0], o[1], o[2]]; };
+  // ---- a plot frame: data -> px. xr, yr: data ranges; for a log axis pass log10 values and format ticks with pow10 ----
+  function frame(x, y, w, h, xr, yr) {
+    return { x, y, w, h, xr, yr,
+      X: (v) => x + (v - xr[0]) / (xr[1] - xr[0]) * w,
+      Y: (v) => y + h - (v - yr[0]) / (yr[1] - yr[0]) * h,
+      ix: (px) => xr[0] + (px - x) / w * (xr[1] - xr[0]) };
+  }
 
-      // words: 0 Then 1 the 2 interviewer 3 asks: 4 so 5 why 6 does 7 the 8 market 9 quote 10 a 11 different 12 volatility
-      //        13 for 14 every 15 strike?
-      const w = (i) => Math.max(0, W.length > i ? W[i] : 0.12 + i * 0.3);
-      const ADD = HOLOHUD.ADD, F3 = 3 / FPS;
-      const hit = (t, t0) => t >= t0 && t < t0 + F3;                          // a three-frame flash from t0
-      const OUT = (t) => 1 - clamp((t - (DUR - 0.45)) / 0.3);                // the HUD leaves with the scan-erase
-      // the film time of this scene's start (its host's data-start), so the pad's slow turn carries on across the cut
-      const S0 = (() => { try { const v = parseFloat(document.querySelector('[data-composition-id="s2"][data-start]').getAttribute("data-start")); return isFinite(v) ? v : 0; } catch (e) { return 0; } })();
-      // camera keys [time, cam], cubic in-out between them (HOME at both ends)
-      const camPath = (t, K) => { if (t <= K[0][0]) return K[0][1]; for (let i = 0; i < K.length - 1; i++) if (t < K[i + 1][0]) return camMix(K[i][1], K[i + 1][1], eio((t - K[i][0]) / (K[i + 1][0] - K[i][0]))); return K[K.length - 1][1]; };
-      // an oriented box (axes U, V, Z; full sizes s), for parts that lean: chair backs, the laptop screen
-      const obox = (m, c, U, V, Z, s) => {
-        const id = [];
-        for (const k of [-1, 1]) for (const j of [-1, 1]) for (const i of [-1, 1]) id.push(m.vtx([0, 1, 2].map((a) => c[a] + U[a] * i * s[0] / 2 + V[a] * j * s[1] / 2 + Z[a] * k * s[2] / 2)));
-        [[0, 1], [2, 3], [4, 5], [6, 7], [0, 2], [1, 3], [4, 6], [5, 7], [0, 4], [1, 5], [2, 6], [3, 7]].forEach(([a, b]) => m.edge(id[a], id[b]));
-        [[0, 1, 3, 2], [4, 5, 7, 6], [0, 1, 5, 4], [2, 3, 7, 6], [0, 2, 6, 4], [1, 3, 7, 5]].forEach((q) => m.quad(...q.map((i) => id[i])));
-      };
+  // ---- panel: white plate + corner brackets, opening from its centre; title row (index tick, title, sub, tag) ----
+  function panel(g, T, x, y, w, h, o = {}) {
+    const a = o.a ?? 1, k = o.open ?? 1;
+    if (a <= 0 || k <= 0) return;
+    const ow = w * (0.5 + 0.5 * eo(k));
+    HUD.plate(g, T, x + (w - ow) / 2, y, ow, h, clamp(k * 1.5) * a, { op: o.op ?? 0.82 });
+    if (!o.title) return;
+    const ta = a * clamp((k - 0.45) * 2.2);
+    if (ta <= 0) return;
+    g.save(); g.globalAlpha = ta; g.textBaseline = 'alphabetic'; g.textAlign = 'left';
+    g.fillStyle = T.line(1); g.fillRect(x + 24, y + 22, 30 * eo(k), 4);
+    let tx = x + 24;
+    if (o.index) { g.font = `400 19px ${FONT.mono}`; g.fillStyle = T.dim(1); g.fillText(o.index, tx, y + 54); tx += 38; }
+    g.letterSpacing = '2px'; g.font = `600 ${o.ts ?? 26}px ${FONT.ui}`; g.fillStyle = T.hi(1);
+    g.fillText(HUD.rollText(o.title.toUpperCase().replace(/Σ/g, 'σ').replace(/Λ/g, 'λ'), clamp(k * 1.4 - 0.3), o.frame ?? 0, 5), tx, y + 54);
+    if (o.sub) { g.letterSpacing = '1px'; g.font = `400 19px ${FONT.mono}`; g.fillStyle = T.dim(1); g.fillText(o.sub.toUpperCase().replace(/Σ/g, 'σ').replace(/Λ/g, 'λ'), x + 24, y + 82); }
+    if (o.tag) {
+      g.letterSpacing = '1.5px'; g.font = `600 17px ${FONT.ui}`;
+      const tw = g.measureText(o.tag).width + 20, bx = x + w - 24 - tw;
+      g.strokeStyle = C(T, o.tagC || 'line', 0.9); g.lineWidth = 1.2; g.strokeRect(bx, y + 32, tw, 28);
+      g.fillStyle = C(T, o.tagC || 'line', 1); g.fillText(o.tag, bx + 10, y + 52);
+    }
+    g.restore();
+  }
 
-      // ---- s2: the interview. A desk with a chair on each side, facing each other across it (the interviewer on the
-      // left, his laptop open in front of him); his question types onto a plate word by word as it is spoken. In front
-      // of the desk, s1's nine volatility columns stand on the strike row, small and all one height; on "different"
-      // they jump to uneven heights (an illustrative market skew, no numbers), a "?" over each; on "strike?" the target
-      // box locks onto them ----
-      const KS = [80, 85, 90, 95, 100, 105, 110, 115, 120], N = 9, DX = 0.165, X0 = -DX * 4, ZR = 0.56, CW = 0.07, PL = 0.012;
-      const VS = 0.0105;                                                       // column height per 1 % of volatility
-      const FLAT = 20, SKEW = [29.5, 26.2, 22.4, 18.8, 16.4, 15.4, 15.0, 15.3, 16.0];   // % (illustrative skew; never shown)
-      const DZ = -0.42, TOPY = 0.4, YTOP = 0.53;                                // desk centre z, desk-top height, the tallest point
-      const tJ = w(11) - 0.05, tLock = w(15);
-      const colH = (i, t) => {                                                 // one height, then a jump with a little spring
-        const p = clamp((t - (tJ + i * 0.03)) / 0.38), h0 = FLAT * VS, h1 = SKEW[i] * VS;
-        return h0 + (h1 - h0) * (eo(p) + 0.45 * Math.sin(p * Math.PI) * (1 - p));
-      };
-      function chair(m, cx, cz, f) {                                           // f = +1: faces +x (its back on the -x side)
-        const S = 0.2, SY = 0.235, TH = 0.024, L = 0.02, bx = cx - f * (S / 2 - L / 2), fx = cx + f * (S / 2 - L / 2);
-        const RK = 0.035, PH = 0.28, PL2 = Math.hypot(RK, PH), V = [-f * RK / PL2, PH / PL2, 0], U = [V[1], -V[0], 0], Z = [0, 0, 1];
-        m.box([cx, SY - TH / 2, cz], [S, TH, S]);                                                  // seat
-        for (const z of [cz - S / 2 + L / 2, cz + S / 2 - L / 2]) {
-          m.box([fx, (SY - TH) / 2, z], [L, SY - TH, L]);                                           // front leg
-          m.box([bx, (SY - TH) / 2, z], [L, SY - TH, L]);                                           // back leg
-          obox(m, [bx - f * RK / 2, SY + PH / 2, z], U, V, Z, [L, PL2, L]);                         // back post, raked
-          m.box([cx, 0.075, z], [S - L, L * 0.7, L * 0.7]);                                          // side stretcher
-        }
-        obox(m, [bx - f * RK * 0.72, SY + PH * 0.72, cz], U, V, Z, [0.016, 0.14, S - L]);          // backrest
+  // ---- a tick label; "10⁻⁵⁹"-style labels (QC.pow10) are drawn as the base plus a raised, smaller exponent in the
+  //      same face, so no superscript glyph falls back to another font ----
+  const SUPR = { '\u207b': MINUS, '\u2070': '0', '\u00b9': '1', '\u00b2': '2', '\u00b3': '3', '\u2074': '4', '\u2075': '5', '\u2076': '6', '\u2077': '7', '\u2078': '8', '\u2079': '9' };
+  function tick(g, s, x, y, align, sz) {
+    const m = /^(.*?)([\u207b\u2070\u00b9\u00b2\u00b3\u2074-\u2079]+)$/.exec(s);
+    if (!m) { g.textAlign = align; g.fillText(s, x, y); return; }
+    const base = m[1], ex = m[2].split('').map((c) => SUPR[c]).join('');
+    const f0 = g.font, fe = f0.replace(/(\d+(?:\.\d+)?)px/, (_, n) => Math.round(n * 0.68) + 'px');
+    const wb = g.measureText(base).width; g.font = fe; const we = g.measureText(ex).width; g.font = f0;
+    const tw = wb + 2 + we, x0 = align === 'right' ? x - tw : align === 'center' ? x - tw / 2 : x;
+    g.textAlign = 'left'; g.fillText(base, x0, y);
+    g.font = fe; g.fillText(ex, x0 + wb + 2, y - sz * 0.42); g.font = f0;
+  }
+
+  // ---- axes: o = { xt, yt (tick values), xf, yf (tick formats), xl, yl (axis titles), grid, k (draw-in 0-1), a,
+  //      xAt (data y of the x axis; default yr[0]), yAt (data x of the y axis; default xr[0]), size (tick px) } ----
+  function axes(g, T, F, o = {}) {
+    const a = o.a ?? 1, k = eo(o.k ?? 1);
+    if (a <= 0 || k <= 0) return;
+    const xAt = F.Y(o.xAt ?? F.yr[0]), yAt = F.X(o.yAt ?? F.xr[0]), sz = o.size ?? 21;
+    g.save(); g.textBaseline = 'alphabetic';
+    if (o.grid !== false) {
+      g.strokeStyle = T.dim(0.22 * a); g.lineWidth = 1;
+      g.beginPath();
+      (o.yt || []).forEach((v) => { const py = F.Y(v); g.moveTo(F.x, py); g.lineTo(F.x + F.w * k, py); });
+      (o.xt || []).forEach((v) => { const px = F.X(v); g.moveTo(px, F.y + F.h); g.lineTo(px, F.y + F.h - F.h * k); });
+      g.stroke();
+    }
+    g.strokeStyle = T.hi(0.85 * a); g.lineWidth = 2;
+    g.beginPath(); g.moveTo(F.x, xAt); g.lineTo(F.x + F.w * k, xAt);
+    if (!o.noY) { g.moveTo(yAt, F.y + F.h); g.lineTo(yAt, F.y + F.h - F.h * k); }
+    g.stroke();
+    g.font = `400 ${sz}px ${FONT.mono}`; g.fillStyle = T.hi(0.85 * a);
+    g.textAlign = 'center';
+    (o.xt || []).forEach((v, i) => {
+      const px = F.X(v), ka = clamp((k - i / Math.max(1, o.xt.length) * 0.6) * 3);
+      if (ka <= 0) return;
+      g.globalAlpha = ka; g.beginPath(); g.moveTo(px, xAt); g.lineTo(px, xAt + 8); g.stroke();
+      tick(g, o.xf ? o.xf(v) : String(v), px, xAt + 12 + sz, 'center', sz);
+    });
+    g.globalAlpha = 1;
+    if (!o.noY) {
+      g.textAlign = 'right';
+      (o.yt || []).forEach((v, i) => {
+        const py = F.Y(v), ka = clamp((k - i / Math.max(1, o.yt.length) * 0.6) * 3);
+        if (ka <= 0) return;
+        g.globalAlpha = ka; g.beginPath(); g.moveTo(yAt, py); g.lineTo(yAt - 8, py); g.stroke();
+        tick(g, o.yf ? o.yf(v) : String(v), yAt - 14, py + sz * 0.36, 'right', sz);
+      });
+    }
+    g.globalAlpha = a * clamp(k * 2 - 1);
+    g.letterSpacing = '1.5px'; g.font = `500 ${sz - 2}px ${FONT.mono}`; g.fillStyle = T.line(0.95);
+    if (o.xl) { g.textAlign = 'right'; g.fillText(o.xl.toUpperCase().replace(/Σ/g, 'σ').replace(/Λ/g, 'λ'), F.x + F.w, xAt + 2 * sz + 26); }
+    if (o.yl) { g.textAlign = 'left'; g.fillText(o.yl.toUpperCase().replace(/Σ/g, 'σ').replace(/Λ/g, 'λ'), yAt - (o.ylDx ?? 0), F.y - 16); }
+    g.restore();
+  }
+
+  // ---- a curve. o = { c, w, a, k (0-1 of the x range drawn, left to right) or x1 (data x drawn up to), dash, glow,
+  //      head (a dot + short scan line at the drawing front), clipY (keep inside the frame vertically) } ----
+  function line(g, T, F, xs, ys, o = {}) {
+    const a = o.a ?? 1; if (a <= 0) return null;
+    const xEnd = o.x1 ?? lerp(xs[0], xs[xs.length - 1], clamp(o.k ?? 1));
+    g.save();
+    if (o.clipY !== false) { g.beginPath(); g.rect(F.x - 4, F.y - 4, F.w + 8, F.h + 8); g.clip(); }
+    const pts = []; let last = null;
+    for (let i = 0; i < xs.length; i++) {
+      if (xs[i] > xEnd) {
+        if (i > 0) { const f = (xEnd - xs[i - 1]) / (xs[i] - xs[i - 1]); last = [xEnd, lerp(ys[i - 1], ys[i], f)]; pts.push([F.X(last[0]), F.Y(last[1])]); }
+        break;
       }
-      function desk(m) {
-        m.box([0, TOPY - 0.015, DZ], [0.56, 0.03, 0.66]);                                          // top
-        m.box([0, TOPY - 0.055, DZ], [0.5, 0.05, 0.6]);                                            // apron
-        for (const x of [-0.235, 0.235]) for (const z of [DZ - 0.285, DZ + 0.285]) m.box([x, (TOPY - 0.08) / 2, z], [0.03, TOPY - 0.08, 0.03]);   // legs
-        m.box([-0.12, TOPY + 0.006, DZ + 0.03], [0.13, 0.012, 0.19]);                              // laptop base
-        const a = 0.26, V = [Math.sin(a), Math.cos(a), 0], U = [Math.cos(a), -Math.sin(a), 0];
-        obox(m, [-0.055 + V[0] * 0.066, TOPY + 0.012 + V[1] * 0.066, DZ + 0.03], U, V, [0, 0, 1], [0.008, 0.132, 0.19]);   // its screen
-        m.box([0.13, TOPY + 0.002, DZ - 0.02], [0.11, 0.004, 0.15]);                               // the candidate's CV
-      }
-      function model(t) {
-        return build((m) => {
-          m.part("desk", { anchor: [0, TOPY, DZ] }); m.piece("desk"); desk(m);
-          m.part("chairA", { anchor: [-0.6, 0.44, DZ] }); m.piece("chairA"); chair(m, -0.47, DZ, 1);
-          m.part("chairB", { anchor: [0.6, 0.44, DZ] }); m.piece("chairB"); chair(m, 0.47, DZ, -1);
-          m.part("row"); m.piece("row", { box: false }); m.box([0, PL / 2, ZR], [DX * 8 + 0.16, PL, 0.13]);   // the strike row
-          for (let i = 0; i < N; i++) {
-            const h = colH(i, t), x = X0 + i * DX;
-            m.part("c" + i, { anchor: [x, PL + h, ZR] }); m.piece("c" + i); m.box([x, PL + h / 2, ZR], [CW, h, CW]);
-          }
-        });
-      }
-      const SHOT = { target: [0, 0.24, 0.08], yaw: 0.08, pitch: 0.48, dist: 5.9, fov: 0.62, cx: 540, cy: 1070 };
-      const PUSH = { target: [0, 0.24, 0.08], yaw: 0.04, pitch: 0.47, dist: 5.8, fov: 0.62, cx: 540, cy: 1066 };
-      const camAt = (t) => camPath(t, [[0.15, HOME], [1.45, SHOT], [DUR - 0.75, PUSH], [DUR - 0.15, HOME]]);
+      pts.push([F.X(xs[i]), F.Y(ys[i])]); last = [xs[i], ys[i]];
+    }
+    if (pts.length < 2) { g.restore(); return null; }
+    const path = () => { g.beginPath(); g.moveTo(pts[0][0], pts[0][1]); for (let i = 1; i < pts.length; i++) g.lineTo(pts[i][0], pts[i][1]); };
+    g.lineJoin = 'round'; g.lineCap = 'round';
+    if (o.glow !== false) { path(); g.strokeStyle = C(T, o.c || 'line', 0.16 * a); g.lineWidth = (o.w ?? 3) + 8; g.stroke(); }
+    path(); g.setLineDash(o.dash || []); g.strokeStyle = C(T, o.c || 'line', 0.95 * a); g.lineWidth = o.w ?? 3; g.stroke();
+    g.setLineDash([]);
+    const end = pts[pts.length - 1];
+    if (o.head && (o.k ?? 1) < 1) {
+      g.fillStyle = C(T, o.c || 'line', a); g.beginPath(); g.arc(end[0], end[1], 6, 0, 2 * Math.PI); g.fill();
+      g.strokeStyle = T.line(0.35 * a); g.lineWidth = 1.5; g.beginPath(); g.moveTo(end[0], F.y); g.lineTo(end[0], F.y + F.h); g.stroke();
+    }
+    g.restore();
+    return { end, last };
+  }
 
+  // ---- filled area between a curve and a base level (data y). o = { base, c, a, k, x0, x1 (data x span) } ----
+  function area(g, T, F, xs, ys, o = {}) {
+    const a = o.a ?? 1; if (a <= 0) return;
+    const base = o.base ?? F.yr[0], x0 = o.x0 ?? xs[0];
+    const x1 = Math.min(o.x1 ?? xs[xs.length - 1], lerp(xs[0], xs[xs.length - 1], clamp(o.k ?? 1)));
+    if (x1 <= x0) return;
+    g.save(); g.beginPath(); g.rect(F.x, F.y, F.w, F.h); g.clip();
+    g.beginPath(); g.moveTo(F.X(x0), F.Y(base)); let started = false;
+    for (let i = 0; i < xs.length; i++) {
+      if (xs[i] < x0) continue; if (xs[i] > x1) break;
+      g.lineTo(F.X(xs[i]), F.Y(ys[i])); started = true;
+    }
+    if (!started) { g.restore(); return; }
+    g.lineTo(F.X(x1), F.Y(base)); g.closePath();
+    g.fillStyle = C(T, o.c || 'line', (o.fa ?? 0.16) * a); g.fill();
+    g.restore();
+  }
+
+  // ---- bars (a histogram): xs = bar centres (data), ys = heights; o = { bw (data width), base, c, a, k (grow),
+  //      stroke, fa (fill alpha), hl: [indices drawn in the accent] } ----
+  function bars(g, T, F, xs, ys, o = {}) {
+    const a = o.a ?? 1; if (a <= 0) return;
+    const base = o.base ?? F.yr[0], bw = o.bw ?? (xs[1] - xs[0]) * 0.8;
+    g.save();
+    for (let i = 0; i < xs.length; i++) {
+      const ki = eo(clamp((o.k ?? 1) * 1.6 - i / xs.length * 0.6));
+      if (ki <= 0) continue;
+      const hv = lerp(base, ys[i], ki), x0 = F.X(xs[i] - bw / 2), x1 = F.X(xs[i] + bw / 2), y0 = F.Y(base), y1 = F.Y(hv);
+      if (Math.abs(y1 - y0) < 0.75) continue;
+      const hl = (o.hl || []).includes(i), c = hl ? 'acc' : (o.c || 'line');
+      g.fillStyle = C(T, c, (o.fa ?? 0.22) * a); g.fillRect(x0, Math.min(y0, y1), x1 - x0, Math.abs(y1 - y0));
+      g.strokeStyle = C(T, c, 0.9 * a); g.lineWidth = o.stroke ?? 1.6; g.strokeRect(x0 + 0.5, Math.min(y0, y1) + 0.5, x1 - x0 - 1, Math.abs(y1 - y0) - 1);
+    }
+    g.restore();
+  }
+
+  // ---- candles: d = { open, high, low, close } arrays, xs = data x per candle; o = { n (how many shown, may be
+  //      fractional: the last one grows), bw (px), hl (index in the accent), a } ----
+  function candles(g, T, F, d, xs, o = {}) {
+    const a = o.a ?? 1; if (a <= 0) return;
+    const n = o.n ?? xs.length, bw = o.bw ?? 10;
+    g.save();
+    for (let i = 0; i < Math.min(xs.length, Math.ceil(n)); i++) {
+      const grow = clamp(n - i);
+      const op = d.open[i], cl = lerp(op, d.close[i], eo(grow)), hi = lerp(op, d.high[i], eo(grow)), lo = lerp(op, d.low[i], eo(grow));
+      const up = d.close[i] >= op, hl = o.hl === i, cx = F.X(xs[i]);
+      const col = hl ? T.acc(a) : up ? T.line(0.95 * a) : T.hi(0.9 * a);
+      g.strokeStyle = col; g.lineWidth = hl ? 2.4 : 1.6;
+      g.beginPath(); g.moveTo(cx, F.Y(hi)); g.lineTo(cx, F.Y(lo)); g.stroke();
+      const y0 = F.Y(Math.max(op, cl)), y1 = F.Y(Math.min(op, cl)), hh = Math.max(2, y1 - y0);
+      if (up && !hl) { g.fillStyle = 'rgba(255,255,255,0.95)'; g.fillRect(cx - bw / 2, y0, bw, hh); g.strokeRect(cx - bw / 2 + 0.5, y0 + 0.5, bw - 1, hh - 1); }
+      else { g.fillStyle = col; g.fillRect(cx - bw / 2, y0, bw, hh); }
+    }
+    g.restore();
+  }
+
+  // ---- reference lines: o = { c, a, dash, w, label, at ('start'|'end'), size } ----
+  function hline(g, T, F, v, o = {}) {
+    const a = o.a ?? 1; if (a <= 0) return;
+    const py = F.Y(v), k = clamp(o.k ?? 1);
+    g.save(); g.setLineDash(o.dash ?? [10, 8]); g.strokeStyle = C(T, o.c || 'hi', 0.75 * a); g.lineWidth = o.w ?? 2;
+    g.beginPath(); g.moveTo(F.x, py); g.lineTo(F.x + F.w * k, py); g.stroke(); g.setLineDash([]);
+    if (o.label && k > 0.6) { g.globalAlpha = clamp((k - 0.6) * 2.5); tag(g, T, o.label, o.at === 'start' ? F.x + 10 : F.x + F.w - 10, py - 10, { c: o.c || 'hi', align: o.at === 'start' ? 'left' : 'right', a, size: o.size }); }
+    g.restore();
+  }
+  function vline(g, T, F, v, o = {}) {
+    const a = o.a ?? 1; if (a <= 0) return;
+    const px = F.X(v), k = clamp(o.k ?? 1);
+    g.save(); g.setLineDash(o.dash ?? [10, 8]); g.strokeStyle = C(T, o.c || 'hi', 0.75 * a); g.lineWidth = o.w ?? 2;
+    g.beginPath(); g.moveTo(px, F.y + F.h); g.lineTo(px, F.y + F.h - F.h * k); g.stroke(); g.setLineDash([]);
+    if (o.label && k > 0.6) { g.globalAlpha = clamp((k - 0.6) * 2.5); tag(g, T, o.label, px + (o.dx ?? 0), (o.y ?? F.y) - 6, { c: o.c || 'hi', align: o.align || 'center', a, size: o.size }); }
+    g.restore();
+  }
+
+  // ---- a marker dot with a ring; o = { r, c, a, pulse (0-1 expanding ring) } ----
+  function dot(g, T, x, y, o = {}) {
+    const a = o.a ?? 1; if (a <= 0) return;
+    const r = (o.r ?? 7) * (o.s ?? 1);
+    g.save();
+    g.fillStyle = 'rgba(255,255,255,0.95)'; g.beginPath(); g.arc(x, y, r + 3, 0, 2 * Math.PI); g.fill();
+    g.fillStyle = C(T, o.c || 'line', a); g.beginPath(); g.arc(x, y, r, 0, 2 * Math.PI); g.fill();
+    g.strokeStyle = C(T, o.c || 'line', 0.55 * a); g.lineWidth = 1.6; g.beginPath(); g.arc(x, y, r + 7, 0, 2 * Math.PI); g.stroke();
+    if (o.pulse > 0 && o.pulse < 1) { g.strokeStyle = C(T, o.c || 'line', 0.8 * a * (1 - o.pulse)); g.beginPath(); g.arc(x, y, r + 7 + 34 * o.pulse, 0, 2 * Math.PI); g.stroke(); }
+    g.restore();
+  }
+
+  // ---- text: o = { size, wt, c, a, align, mono, ls, roll (0-1), frame, seed, base ('alphabetic'|'middle') } ----
+  function text(g, T, s, x, y, o = {}) {
+    const a = o.a ?? 1; if (a <= 0 || !s) return 0;
+    g.save(); g.globalAlpha = 1; g.textAlign = o.align || 'left'; g.textBaseline = o.base || 'alphabetic';
+    g.letterSpacing = (o.ls ?? 0) + 'px';
+    g.font = `${o.wt ?? 500} ${o.size ?? 28}px ${o.mono ? FONT.mono : FONT.ui}`;
+    if (o.maxW) HUD.fitFont(g, s, o.wt ?? 500, o.size ?? 28, o.mono ? FONT.mono : FONT.ui, o.maxW, 12);
+    g.fillStyle = C(T, o.c || 'hi', a);
+    const str = o.roll !== undefined ? HUD.rollText(s, o.roll, o.frame ?? 0, o.seed ?? 0) : s;
+    g.fillText(str, x, y);
+    const w = g.measureText(s).width;
+    g.restore();
+    return w;
+  }
+
+  // ---- a value that rolls in and locks in the accent: o = { size, a, roll, frame, unit, flash, c (before lock) } ----
+  function value(g, T, s, x, y, o = {}) {
+    const a = o.a ?? 1, roll = o.roll ?? 1; if (a <= 0 || roll <= 0) return { w: 0 };
+    const size = o.size ?? 72, locked = roll >= 1;
+    g.save(); g.textAlign = 'left'; g.textBaseline = 'alphabetic';
+    g.font = `${o.wt ?? 400} ${size}px ${FONT.ui}`;
+    const adv = g.measureText('0').width * 1.02;
+    const total = (() => { let w = 0; for (const ch of s) w += (ch === '.' || ch === ',' || ch === ' ') ? g.measureText(ch).width * 1.1 : adv; return w; })();
+    let x0 = o.align === 'right' ? x - total : o.align === 'center' ? x - total / 2 : x;
+    g.fillStyle = locked ? (o.flash ? T.hi(a) : C(T, o.lc || 'acc', a)) : C(T, o.c || 'line', 0.85 * a);
+    const vw = HUD.monoText(g, HUD.rollText(s, roll, o.frame ?? 0, o.seed ?? 11), x0, y, adv);
+    if (o.unit) {
+      g.font = `500 ${Math.round(size * 0.36)}px ${FONT.ui}`; g.fillStyle = locked ? C(T, o.lc || 'acc', 0.9 * a) : T.line(0.6 * a);
+      g.fillText(o.unit, x0 + vw + 8, y);
+    }
+    g.restore();
+    return { w: vw, x0, bb: [x0, y - size * 0.78, x0 + vw, y + size * 0.06] };
+  }
+
+  // ---- a small filled tag: o = { c ('line'|'acc'|'hi'), a, align, size } ----
+  function tag(g, T, s, x, y, o = {}) {
+    const a = o.a ?? 1; if (a <= 0) return;
+    g.save(); g.letterSpacing = '1px'; g.font = `600 ${o.size ?? 19}px ${FONT.ui}`; g.textBaseline = 'alphabetic';
+    const w = g.measureText(s).width + 18, h = (o.size ?? 19) + 11;
+    const x0 = o.align === 'right' ? x - w : o.align === 'center' ? x - w / 2 : x;
+    g.fillStyle = C(T, o.c || 'line', 0.95 * a); g.fillRect(x0, y - h, w, h);
+    g.fillStyle = `rgba(255,255,255,${a})`; g.textAlign = 'left'; g.fillText(s, x0 + 9, y - 8);
+    g.restore();
+    return [x0, y - h, x0 + w, y];
+  }
+
+  // ---- target lock (HUD.targetBox) and leader, re-exported ----
+  const lock = (g, T, bb, k, o = {}) => HUD.targetBox(g, T, bb, k, o);
+  const leader = (g, T, a, b, c, k, o = {}) => HUD.leader(g, T, a, b, c, k, o);
+
+  // ---- scene life: the scan-in (a vertical scan line reveals the stage left to right) and the scan-erase at the
+  //      end. Use: const sx = QC.scanIn(t) ... QC.clipStage(g, sx) ... draw ... g.restore(); QC.scanLine(g, T, sx). ----
+  const STAGE = { x0: 30, x1: 1050, y0: 552, y1: 1478 };
+  const scanIn = (t, t0 = 0, dur = 0.6) => lerp(STAGE.x0, STAGE.x1, eio((t - t0) / dur));
+  const scanOut = (t, t1, dur = 0.4) => lerp(STAGE.x0, STAGE.x1, eio((t - (t1 - dur)) / dur));
+  function clipStage(g, xIn = STAGE.x1, xOut = STAGE.x0) {   // keep [xOut, xIn] of the stage; call g.restore() after
+    g.save(); g.beginPath(); g.rect(xOut, 0, Math.max(0, xIn - xOut), 1920); g.clip();
+  }
+  function scanLine(g, T, x, a = 1) {
+    if (x <= STAGE.x0 + 1 || x >= STAGE.x1 - 1 || a <= 0) return;
+    g.save();
+    const gr = g.createLinearGradient(x - 60, 0, x + 6, 0);
+    gr.addColorStop(0, T.line(0)); gr.addColorStop(1, T.line(0.16 * a));
+    g.fillStyle = gr; g.fillRect(x - 60, STAGE.y0, 66, STAGE.y1 - STAGE.y0);
+    g.strokeStyle = T.line(0.9 * a); g.lineWidth = 2; g.beginPath(); g.moveTo(x, STAGE.y0); g.lineTo(x, STAGE.y1); g.stroke();
+    g.restore();
+  }
+
+  // ---- LaTeX formulas: inline SVG (typeset by MathJax at build time) in a DOM layer over the canvas ----
+  // init once with the scene's TEX map; each frame: tex.begin(); tex.show(id, {...}); ... tex.end();
+  const tex = (function () {
+    let layer = null, nodes = {}, shown = {}, MAP = {}, ACC = '', LINE = '';
+    function init(root, map, T) {
+      MAP = map; ACC = T.acc(1); LINE = T.line(1); layer = document.createElement('div');
+      layer.style.cssText = 'position:absolute;left:0;top:0;width:1080px;height:1920px;pointer-events:none;';
+      const st = document.createElement('style');
+      st.textContent = `.qtex{position:absolute;left:0;top:0;transform-origin:0 0;color:${T.hi(1)};will-change:clip-path,opacity}
+        .qtex svg{display:block;width:100%;height:100%;overflow:visible}
+        .qtex .acc{color:var(--acc)} .qtex .blu{color:${T.line(1)}}`;
+      layer.appendChild(st);
+      for (const id in map) {
+        const d = document.createElement('div'); d.className = 'qtex'; d.innerHTML = map[id].svg; d.style.display = 'none';
+        layer.appendChild(d); nodes[id] = d;
+      }
+      root.appendChild(layer);
+    }
+    function begin() { shown = {}; }
+    // o = { x, y, size (em px), align ('left'|'center'|'right'), valign ('base'|'middle'|'top'), k (reveal 0-1, left to
+    //       right), cut (0-1 erased from the left), a, lock (true: the \class{acc} parts turn orange), clip [x0, x1] px }
+    function show(id, o = {}) {
+      const f = MAP[id], d = nodes[id]; if (!f || !d) throw new Error('no formula ' + id);
+      const em = o.size ?? 56, w = f.w * em, h = f.h * em;
+      let x = o.x ?? 540, y = o.y ?? 0;
+      if (o.align === 'center') x -= w / 2; else if (o.align === 'right') x -= w;
+      const top = o.valign === 'top' ? y : o.valign === 'middle' ? y - h / 2 : y - (f.h - f.a) * em;
+      const k = clamp(o.k ?? 1), cut = clamp(o.cut ?? 0);
+      let L = cut * w, R = (1 - k) * w;
+      if (o.clip) { L = Math.max(L, o.clip[0] - x); R = Math.max(R, x + w - o.clip[1]); }
+      const a = o.a ?? 1;
+      if (a <= 0 || L + R >= w) return { bb: [x, top, x + w, top + h], w, h };
+      d.style.display = 'block'; d.style.width = w + 'px'; d.style.height = h + 'px';
+      d.style.transform = `translate(${x}px, ${top}px)`; d.style.opacity = a;
+      d.style.clipPath = `inset(-20px ${R}px -20px ${L}px)`;
+      d.style.setProperty('--acc', o.lock ? ACC : LINE);
+      shown[id] = 1;
+      return { bb: [x, top, x + w, top + h], w, h };
+    }
+    function end() { for (const id in nodes) if (!shown[id]) nodes[id].style.display = 'none'; }
+    return { init, begin, show, end };
+  })();
+
+  return { frame, panel, axes, line, area, bars, candles, hline, vline, dot, text, value, tag, lock, leader,
+    STAGE, scanIn, scanOut, clipStage, scanLine, tex, fmt, pow10, MINUS, clamp, lerp, eo, eio };
+})();
+// QCHART END
+
+
+      // ---- s2: "Then the interviewer asks: so why does the market quote a different volatility for every strike?" ----
+      // s1's strip and chart carry over unchanged (no scan-in). On "asks:" a scan swaps the formula strip for the INTERVIEW
+      // QUESTION plate, whose "?" locks on "why". On "market quote" a market quote (navy diamond) appears on each option;
+      // on "different" the quotes slide off the 20% line to their own levels (model.iv_pct; illustrative, values not
+      // printed: they are s11's payoff), each with a gap line, and the flat line turns dashed: BLACK–SCHOLES: ONE σ.
+      // On "strike?" the 80 quote, the most different, locks with a "?". Scan-erase at the end.
+      // words: 0 Then 1 the 2 interviewer 3 asks: 4 so 5 why 6 does 7 the 8 market 9 quote 10 a 11 different
+      //        12 volatility 13 for 14 every 15 strike?
+      const { HUD } = HOLOHUD;
+      const T = HUD.theme(218, 22), FPS = 24;
+      const { clamp, lerp, eo, eio } = QC;
       const g = document.getElementById("s2-cv").getContext("2d");
-      // a target lock, clipped to the stage so its oversized entry never reaches the subtitles, the chip rail or the guide;
-      // its tag is drawn here as the engine draws it, but with the text fading with the box (the engine's tag text ignores alpha)
-      const lockBox = (bb, k, o) => {
-        g.save(); g.beginPath(); g.rect(40, 560, 1000, 910); g.clip();
-        HUD.targetBox(g, T, bb, k, Object.assign({}, o, { tag: undefined, alpha: (o.alpha ?? 1) * k * k }));   // faint while oversized, solid as it fits
-        const e = eo(k), a = (o.alpha ?? 1) * clamp(k * 4);
-        if (o.tag && e > 0.8 && a > 0.01) {
-          const pad = o.pad ?? 26, x0 = bb[0] - pad, y0 = bb[1] - pad, x1 = bb[2] + pad, y1 = bb[3] + pad, s = lerp(1.9, 1, e);
-          const ta = a * clamp((e - 0.8) * 5), tx = (x0 + x1) / 2 - (x1 - x0) / 2 * s, ty = (y0 + y1) / 2 - (y1 - y0) / 2 * s - 8;
-          g.font = "600 22px " + HUD.FONT.ui; g.textBaseline = "bottom"; g.textAlign = "left";
-          const tw = g.measureText(o.tag).width + 20;
-          g.globalCompositeOperation = HOLOHUD.ADD; g.fillStyle = o.flash ? T.hi(0.95 * ta) : T.line(0.9 * ta); g.fillRect(tx, ty - 30, tw, 30);
-          g.globalAlpha = ta; g.fillStyle = T.bg0; g.fillText(o.tag, tx + 10, ty - 4);
-        }
-        g.restore();
-      };
-      // the strike ruler under the row, as in s1 (numbers on their own plate; the heights are illustrative)
-      function ruler(cam, a) {
-        if (a <= 0) return;
-        const zr = ZR + 0.15, L = P3(cam, X0 - 0.1, 0, zr), R = P3(cam, -X0 + 0.1, 0, zr), y0 = Math.max(L[1], R[1]) + 12;
-        HUD.plate(g, T, L[0] - 16, y0, R[0] - L[0] + 32, 80, a);
-        g.save(); g.globalCompositeOperation = ADD; g.textBaseline = "alphabetic";
-        g.font = "26px " + HUD.FONT.mono; g.textAlign = "center";
-        KS.forEach((k, i) => { const p = P3(cam, X0 + i * DX, 0, zr); g.fillStyle = T.line(0.95 * a); g.fillText(String(k), p[0], y0 + 38); g.fillRect(p[0] - 0.5, y0, 1, 9); });
-        g.font = "22px " + HUD.FONT.mono; g.fillStyle = T.dim(a);
-        g.textAlign = "left"; g.fillText("STRIKE", L[0] - 2, y0 + 68);
-        g.textAlign = "right"; g.fillText("HEIGHTS ILLUSTRATIVE", R[0] + 2, y0 + 68);
-        g.restore();
-      }
-      // a "?" over each column once they jump
-      function markers(cam, t, a) {
-        const out = [];
-        for (let i = 0; i < N; i++) {
-          const t0 = tJ + 0.1 + i * 0.03, k = clamp((t - t0) / 0.16);
-          if (k <= 0) continue;
-          const p = P3(cam, X0 + i * DX, PL + colH(i, t), ZR); p[1] -= 26;
-          HUD.marker(g, T, p, "?", a * k, clamp((t - t0) / 0.5), 1);
-          out.push(p);
-        }
-        return out;
-      }
-      // the interviewer's question, typed word by word on its spoken word
-      const QW = [["WHY", 5, 0], ["A", 10, 0], ["DIFFERENT", 11, 0], ["VOLATILITY", 12, 0], ["FOR", 13, 1], ["EVERY", 14, 1], ["STRIKE?", 15, 1]];
-      function question(cam, t, f, a) {
-        const rv = clamp((t - (w(2) - 0.12)) / 0.42);
-        if (rv <= 0 || a <= 0) return;
-        const x = 96, y = 604, wd = 888, r = eo(rv);
-        g.save(); g.letterSpacing = "1px";
-        const fs = HUD.fitFont(g, "WHY A DIFFERENT VOLATILITY", 600, 50, HUD.FONT.ui, wd - 20, 30);
-        g.restore();
-        const lh = Math.round(fs * 1.25), hh = 54 + 2 * lh + 6;
-        HUD.plate(g, T, x - 24, y - 22, (wd + 48) * r, hh + 22, a * clamp(rv * 2));
-        // the interviewer's leader: from his chair back up to the plate
-        const an = P3(cam, -0.47 - 0.12, 0.45, DZ), by = y + hh, ex = Math.min(an[0] - 46, x + 120);
-        HUD.leader(g, T, [an[0], an[1]], [ex, by + 34], [ex, by + 1], clamp((t - (w(2) + 0.05)) / 0.5), { alpha: a });
-        g.save(); g.globalCompositeOperation = ADD; g.textBaseline = "alphabetic"; g.textAlign = "left";
-        g.strokeStyle = T.line(0.9 * a); g.lineWidth = 1.6; g.beginPath(); g.moveTo(x, y); g.lineTo(x + wd * r, y); g.stroke();
-        g.fillStyle = T.line(0.9 * a); g.fillRect(x, y - 3, 34 * r, 6);
-        g.font = "20px " + HUD.FONT.mono; g.fillStyle = T.dim(0.95 * a * r); g.fillText("Q", x, y + 35);
-        g.font = "600 26px " + HUD.FONT.ui; g.letterSpacing = "3px"; g.fillStyle = T.hi(0.95 * a * clamp(r * 2 - 0.6));
-        g.fillText(HUD.rollText("INTERVIEWER", clamp(rv * 1.6 - 0.2), f, 3), x + 40, y + 36);
-        g.font = "22px " + HUD.FONT.mono; g.letterSpacing = "0px"; g.textAlign = "right"; g.fillStyle = T.dim(0.9 * a * r);
-        g.fillText("ASKS", x + wd, y + 35);
-        // the words, laid out at their final places so nothing shifts while they type
-        g.textAlign = "left"; g.font = `600 ${fs}px ${HUD.FONT.ui}`; g.letterSpacing = "1px";
-        const lineX = [x, x]; let cur = null, typing = false, done = true;
-        QW.forEach(([word, wi, ln]) => {
-          const t0 = w(wi) - 0.04, n = t < t0 ? 0 : Math.min(word.length, Math.floor((t - t0) * 48) + 1);
-          const wx = lineX[ln], yy = y + 52 + (ln + 1) * lh - Math.round(lh * 0.28);
-          lineX[ln] += g.measureText(word + " ").width;
-          if (n < word.length) done = false;
-          if (n <= 0) return;
-          const s = word.slice(0, n);
-          g.fillStyle = word === "DIFFERENT" ? T.line(a) : T.hi(a);
-          g.fillText(s, wx, yy);
-          cur = [wx + g.measureText(s).width + 6, yy];
-          if (n < word.length || t - t0 < word.length / 48 + 0.12) typing = true;
-        });
-        if (cur && !(done && t > w(15) + 0.5) && (typing || f % 12 < 7)) { g.fillStyle = T.line(0.85 * a); g.fillRect(cur[0], cur[1] - fs * 0.72, Math.round(fs * 0.42), Math.round(fs * 0.74)); }
-        g.restore();
-      }
+      const w = (i) => W[i];
+      const SIG = 100 * NUM.normal.sigma_annual, KS = NUM.model.strikes, IV = NUM.model.iv_pct;
+      // as in s1 (same place across the cut)
+      const PS = { x: 40, y: 566, w: 1000, h: 204 }, PX = { x: 40, y: 784, w: 1000, h: 682 };
+      const F = QC.frame(170, 936, 820, 424, [76, 124], [10, 35]);
+      // the most different quote: the one farthest from the flat line (the 80 strike)
+      const KQ = KS.reduce((a, K) => (Math.abs(IV[K] - SIG) > Math.abs(IV[a] - SIG) ? K : a), KS[0]);
+      const tAsk = w(3) - 0.08, tWhy = w(5) + 0.04, tMkt = w(8), tDiff = w(11), tLab = w(12) + 0.06, tQ = w(15) + 0.17;
+      const Q1 = "Why a different volatility", Q2 = "for every strike?", QS = 42, QX = PS.x + PS.w - 120;
+      const hit = (t, t0) => t - t0 > 0 && t - t0 < 3 / FPS;
       const st = { t: 0 };
-      function draw() {
-        const t = st.t, f = Math.floor(t * FPS);
-        g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, WF, HF);
-        const cam = camAt(t), sc = scanState(t, YTOP), out = OUT(t);
-        HOLO.drawPad(g, cam, WF, HF, { hue: T.hue, rot: (S0 + t) * 0.06 });
-        const fl = {}; if (hit(t, tLock)) for (let i = 0; i < N; i++) fl["c" + i] = 1;
-        const info = holo.draw(g, model(t), cam, Object.assign({ hue: T.hue, glow: 1 }, sc, { flash: fl }));
-        if (sc.plane !== undefined) HOLO.drawScanPlane(g, cam, WF, HF, sc.plane, { hue: T.hue, r: 1.05, alpha: sc.planeA });
-        ruler(cam, clamp((t - 0.35) / 0.3) * out);
-        const mk = markers(cam, t, out);
-        // the target box locks onto the nine columns (and their "?"s) on "strike?"
-        const bs = []; for (let i = 0; i < N; i++) if (info.bbox["c" + i]) bs.push(info.bbox["c" + i]);
-        const k = clamp((t - (tLock - 0.22)) / 0.22);                      // fitted on the word; flash on its downbeat
-        if (bs.length && k > 0) {
-          const bb = [Math.min(...bs.map((b) => b[0])), Math.min(...bs.map((b) => b[1])), Math.max(...bs.map((b) => b[2])), Math.max(...bs.map((b) => b[3]))];
-          mk.forEach((p) => { bb[1] = Math.min(bb[1], p[1] - 16); bb[2] = Math.max(bb[2], p[0] + 40); });
-          lockBox(bb, k, { flash: hit(t, tLock), tag: "TGT 02 · σ BY STRIKE", alpha: out, pad: 18 });
-        }
-        question(cam, t, f, out);
+      let ROOT = null;
+      function init() { ROOT = document.querySelector('[data-composition-id="s2"]'); QC.tex.init(ROOT, TEX, T); }
+      // a market quote: a navy diamond on a white halo, with a ring
+      const dia = (x, y, r) => { g.beginPath(); g.moveTo(x, y - r); g.lineTo(x + r, y); g.lineTo(x, y + r); g.lineTo(x - r, y); g.closePath(); };
+      function quote(x, y, a, s = 1, pulse = 0) {
+        const r = 10 * s;
+        g.save();
+        g.fillStyle = `rgba(255,255,255,${0.95 * a})`; dia(x, y, r + 4); g.fill();
+        g.fillStyle = T.hi(a); dia(x, y, r); g.fill();
+        g.strokeStyle = T.hi(0.45 * a); g.lineWidth = 1.5; dia(x, y, r + 9); g.stroke();
+        if (pulse > 0 && pulse < 1) { g.strokeStyle = T.hi(0.8 * a * (1 - pulse)); dia(x, y, r + 9 + 30 * pulse); g.stroke(); }
+        g.restore();
       }
+      // QC.tag's look with the box width given apart from the text, so a label can roll from one text to another
+      const L1 = "σ = " + SIG.toFixed(0) + "% FOR EVERY STRIKE", L2 = "BLACK–SCHOLES: ONE σ";
+      function tagW(s) { g.save(); g.letterSpacing = "1px"; g.font = `600 19px ${HUD.FONT.ui}`; const v = g.measureText(s).width + 18; g.restore(); return v; }
+      function tagRoll(s, wd, x, y) {   // right-aligned at x, box bottom at y
+        g.save(); g.letterSpacing = "1px"; g.font = `600 19px ${HUD.FONT.ui}`; g.textBaseline = "alphabetic"; g.textAlign = "left";
+        g.fillStyle = T.line(0.95); g.fillRect(x - wd, y - 30, wd, 30);
+        g.beginPath(); g.rect(x - wd, y - 30, wd, 30); g.clip();
+        g.fillStyle = "rgba(255,255,255,1)"; g.fillText(s, x - wd + 9, y - 8);
+        g.restore();
+      }
+      // a scan line limited to the strip (the swap from formula to question)
+      function stripScan(x, a) {
+        if (a <= 0 || x <= PS.x + 1 || x >= PS.x + PS.w - 1) return;
+        g.save();
+        const gr = g.createLinearGradient(x - 60, 0, x + 6, 0);
+        gr.addColorStop(0, T.line(0)); gr.addColorStop(1, T.line(0.16 * a));
+        g.fillStyle = gr; g.fillRect(x - 60, PS.y, 66, PS.h);
+        g.strokeStyle = T.line(0.9 * a); g.lineWidth = 2; g.beginPath(); g.moveTo(x, PS.y); g.lineTo(x, PS.y + PS.h); g.stroke();
+        g.restore();
+      }
+      function draw() {
+        if (!ROOT) return;   // the timeline renders once before init() (compose.py's tail): nothing to draw yet
+        const t = st.t, f = Math.floor(t * FPS);
+        g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, 1080, 1920);
+        QC.tex.begin();
+        const xIn = QC.STAGE.x1, xOut = t > DUR - 0.4 ? QC.scanOut(t, DUR, 0.4) : QC.STAGE.x0;   // no scan-in: s1's chart carries over
+        QC.clipStage(g, xIn, xOut);
+        // ---- the strip: s1's formula until "asks:", then a scan swaps in the interview question ----
+        QC.panel(g, T, PS.x, PS.y, PS.w, PS.h, { op: 0.9 });
+        const kW = clamp((t - tAsk) / 0.45), xW = lerp(PS.x, PS.x + PS.w, eio(kW));
+        if (kW < 1) {
+          const clip = [Math.max(xOut, xW), xIn];
+          QC.tex.show("bs_put", { x: 540, y: PS.y + 20, size: 40, align: "center", valign: "top", lock: true, clip });
+          QC.tex.show("bs_d", { x: 540, y: PS.y + 80, size: 40, align: "center", valign: "top", lock: true, clip });
+        }
+        // the question card: a title row like a panel's, the question, and a large "?" that locks on "why"
+        const kQm = clamp((t - (tWhy - 0.22)) / 0.22), qb = PS.y + 166;
+        if (kW > 0) {
+          g.save(); g.beginPath(); g.rect(PS.x, PS.y, xW - PS.x, PS.h); g.clip();
+          const kR = clamp((t - tAsk - 0.1) / 0.5);
+          g.fillStyle = T.line(1); g.fillRect(PS.x + 24, PS.y + 22, 30, 4);
+          QC.text(g, T, "02", PS.x + 24, PS.y + 54, { size: 19, wt: 400, mono: true, c: "dim" });
+          QC.text(g, T, "INTERVIEW QUESTION", PS.x + 62, PS.y + 54, { size: 26, wt: 600, ls: 2, roll: kR, frame: f });
+          QC.text(g, T, Q1, PS.x + 24, PS.y + 118, { size: QS, wt: 600 });
+          QC.text(g, T, Q2, PS.x + 24, PS.y + 172, { size: QS, wt: 600 });
+          QC.text(g, T, "?", QX, qb, { size: 124, wt: 600, align: "center", c: kQm >= 1 ? "hi" : "dim" });
+          g.restore();
+          stripScan(xW, 1 - clamp((kW - 0.9) * 10));
+        }
+        if (kQm > 0) {
+          g.save(); g.font = `600 124px ${HUD.FONT.ui}`; g.letterSpacing = "0px"; g.textAlign = "center"; const m = g.measureText("?"); g.restore();
+          QC.lock(g, T, [QX - m.actualBoundingBoxLeft, qb - m.actualBoundingBoxAscent, QX + m.actualBoundingBoxRight, qb + m.actualBoundingBoxDescent],
+            kQm, { pad: 14, flash: hit(t, tWhy) });
+        }
+        // ---- the chart, as s1 left it ----
+        QC.panel(g, T, PX.x, PX.y, PX.w, PX.h, { title: "Black–Scholes · one σ", index: "01", sub: "implied vol by strike", tag: "MODEL", frame: f });
+        QC.axes(g, T, F, { xt: KS, yt: [10, 15, 20, 25, 30, 35], yf: (v) => v + "%", xl: "strike K", yl: "implied vol" });
+        // the flat line turns dashed on "different"
+        const kD = clamp((t - tDiff) / 0.3);
+        if (kD < 1) QC.line(g, T, F, F.xr, [SIG, SIG], { c: "line", w: 3.4, a: 1 - kD });
+        if (kD > 0) QC.line(g, T, F, F.xr, [SIG, SIG], { c: "line", w: 3, dash: [14, 10], a: kD, glow: false });
+        // its label: s1's tag rolls over to BLACK–SCHOLES: ONE σ (the box eases to the new width)
+        const kLb2 = clamp((t - tDiff) / 0.35), tx = F.x + F.w - 6, ty = F.Y(SIG) - 24;
+        if (kLb2 <= 0) QC.tag(g, T, L1, tx, ty, { c: "line", align: "right", size: 19 });
+        else tagRoll(kLb2 < 1 ? HUD.rollText(L2, kLb2, f, 9) : L2, lerp(tagW(L1), tagW(L2), eio(kLb2)), tx, ty);
+        // the options on the line (s1's dots), smaller once the quotes arrive
+        const kM = clamp((t - tMkt) / 0.3);
+        KS.forEach((K) => QC.dot(g, T, F.X(K), F.Y(SIG), { c: "line", r: lerp(6, 4.5, kM), a: 1 - 0.3 * kM }));
+        // the market quotes: appear on "market quote", slide to their own levels on "different", each with a gap line
+        KS.forEach((K, i) => {
+          const kA = clamp((t - (tMkt + i * 0.035)) / 0.2);
+          if (kA <= 0) return;
+          const kS = eio(clamp((t - (tDiff - 0.04 + i * 0.03)) / 0.5)), x = F.X(K), y0 = F.Y(SIG), y = lerp(y0, F.Y(IV[K]), kS);
+          if (kS > 0) { g.save(); g.strokeStyle = T.hi(0.55); g.lineWidth = 2; g.beginPath(); g.moveTo(x, y0); g.lineTo(x, y); g.stroke(); g.restore(); }
+          quote(x, y, clamp(kA * 2), 0.6 + 0.4 * eo(kA), clamp((t - (tMkt + i * 0.035) - 0.2) / 0.25));
+        });
+        // MARKET QUOTES · ILLUSTRATIVE, under the quotes that fall
+        const kLb = clamp((t - tLab) / 0.3);
+        if (kLb > 0) {
+          const by = F.y + F.h - 26, tx = F.x + F.w - 6;
+          const tb = QC.tag(g, T, "ILLUSTRATIVE", tx, by + 7, { c: "hi", align: "right", a: kLb, size: 18 });
+          const lw = QC.text(g, T, "MARKET QUOTES", tb[0] - 14, by, { size: 24, wt: 600, ls: 1.5, align: "right", a: kLb, roll: kLb, frame: f });
+          quote(tb[0] - 14 - lw - 20, by - 9, kLb, 0.7);
+        }
+        // "strike?": the 80 quote, the most different, locks with a "?"
+        const kQ = clamp((t - (tQ - 0.22)) / 0.22);
+        if (kQ > 0) {
+          const x = F.X(KQ), y = F.Y(IV[KQ]), bb = [x - 10, y - 10, x + 10, y + 10];
+          QC.lock(g, T, bb, kQ, { pad: 14, flash: hit(t, tQ) });
+          if (t >= w(15)) QC.tag(g, T, "?", x - 24, y - 32, { c: "hi", align: "right", size: 30, a: clamp((t - w(15)) / 0.12) });
+        }
+        g.restore();
+        QC.scanLine(g, T, xOut);
+        QC.tex.end();
+      }
+      if (typeof init === "function") init();     // before the tween: fromTo renders (and draws) at once
       const tl = gsap.timeline({ paused: true });
       tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: draw }, 0);
       draw();

@@ -183,7 +183,11 @@ def main():
 
     # sound: a scan sweep at every scene, a lock beep on every hero word, a click per docked chip, the glitch on "did.",
     # the smile's ignition, typing for the comment, a send on DM, the closing tone
-    sfx = [("scan", round(c - 0.05, 2), 0.7, 0.10) for c, _, kind in cuts]
+    # (no scan sweep where a chart carries across the cut: s2, s5, s6 and s13 open on the previous scene's chart)
+    # (s12 opens on s11's smile and sweeps it away on "the answer:", so its sweep sounds there)
+    CARRY = {"s2", "s5", "s6", "s12", "s13"}
+    sfx = [("scan", round(win[s][0] - 0.05, 2), 0.7, 0.10) for s, _, kind in SCENES[1:] if s not in CARRY]
+    sfx.append(("scan", round(on["L12a"][1] - 0.05, 2), 0.7, 0.10))
     for lid, sc, toks, acc, rose, hero in SCRIPT:
         if hero:
             sfx.append(("lock", round(on[lid][hero["i"]] + 0.17, 2), 0.5, 0.12))

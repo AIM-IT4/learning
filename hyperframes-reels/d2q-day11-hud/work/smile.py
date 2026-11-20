@@ -132,6 +132,54 @@ for seed in range(1, 200):
 N["path"] = dict(seed=seed, days=len(path) - 1, crash_day=jd[0], values=[round(v, 2) for v in path[::5]], step=5,
                  before=round(float(path[jd[0]]), 2), after=round(float(path[jd[0] + 1]), 2))
 
+# ---------- 4. For the charts ----------
+# 4a. the real S&P 500, 1 Sep - 30 Oct 1987, daily open/high/low/close (data/spx_1987.csv: Yahoo Finance ^GSPC, which
+#     carries S&P Dow Jones Indices' published index levels); the two closes above must match it
+import csv
+HERE = os.path.dirname(os.path.abspath(__file__))
+rows87 = [r_ for r_ in csv.DictReader(open(os.path.join(HERE, "data", "spx_1987.csv")))
+          if "1987-09-01" <= r_["date"] <= "1987-10-30"]
+c87 = {r_["date"]: float(r_["close"]) for r_ in rows87}
+assert c87["1987-10-16"] == c16 and c87["1987-10-19"] == c19
+N["spx1987"] = dict(source="S&P 500 daily levels (S&P Dow Jones Indices), via Yahoo Finance ^GSPC",
+                    date=[r_["date"] for r_ in rows87], open=[float(r_["open"]) for r_ in rows87],
+                    high=[float(r_["high"]) for r_ in rows87], low=[float(r_["low"]) for r_ in rows87],
+                    close=[float(r_["close"]) for r_ in rows87], crash_index=[r_["date"] for r_ in rows87].index("1987-10-19"))
+
+# 4b. the 90 put's Black-Scholes price as a function of volatility, and Newton's method finding its implied vol
+#     (the volatility at which Black-Scholes gives the simulated price)
+p_mkt = r90["price_mc"]
+def vega(K, s):
+    d1 = (log(S0 / K) + 0.5 * s * s * T) / (s * sqrt(T)); return S0 * norm.pdf(d1) * sqrt(T)
+sg = np.round(np.arange(0.05, 0.4001, 0.0025), 4)
+newton = [0.30]                               # start from above: the put's price is convex in vol here, so Newton
+for _ in range(8):                            # walks down onto the root without overshooting
+    s_ = newton[-1]; newton.append(s_ - (bs(S0, 90, T, s_, 0.0, -1) - p_mkt) / vega(90, s_))
+    if abs(newton[-1] - newton[-2]) < 1e-6: break
+assert abs(newton[-1] - r90["iv_mc"]) < 1e-6 and all(a > b for a, b in zip(newton, newton[1:]))
+N["bscurve"] = dict(K=90, S0=S0, T_months=1, sigma=sg.tolist(), price=[bs(S0, 90, T, s_, 0.0, -1) for s_ in sg],
+                    market=p_mkt, one_vol=atm, one_vol_price=p90_bs, iv=r90["iv_mc"],
+                    newton=[dict(sigma=s_, price=bs(S0, 90, T, s_, 0.0, -1)) for s_ in newton])
+
+# 4c. a fan of simulated ten-year paths of the model (seed 2), every 5th trading day, with each path's crash days
+g2 = np.random.default_rng(2); NF, nd = 40, 2520; dt = 1 / 252
+jf = g2.poisson(lam * dt, (NF, nd))
+inc = (r - lam * k - 0.5 * sig * sig) * dt + sig * sqrt(dt) * g2.standard_normal((NF, nd)) + jf * lnJ
+fan = np.concatenate([np.full((NF, 1), S0), S0 * np.exp(np.cumsum(inc, 1))], 1)
+N["fan"] = dict(seed=2, paths=NF, days=nd, step=5, values=[[round(v, 2) for v in p_[::5]] for p_ in fan],
+                crash_days=[np.nonzero(j_)[0].tolist() for j_ in jf], with_crash=int((jf.sum(1) > 0).sum()),
+                crashes=int(jf.sum()))
+assert 0.4 * NF < N["fan"]["with_crash"] < 0.9 * NF          # about 1 - exp(-1) = 63% of ten-year paths see a crash
+
+# 4d. log10 of the daily-move density (per 1% move), normal against the illustrative fat-tailed curve (same 1.26% sd),
+#     from -22% to +6%: the crash (-20.47%) sits where the normal curve has all but vanished
+xl = np.round(np.arange(-22.0, 6.0001, 0.1), 2)
+N["logpdf"] = dict(x=xl.tolist(), normal=[round(float(norm.logpdf(v / sdp) - log(sdp)) / log(10), 3) for v in xl],
+                   fat=[round(float(student_t.logpdf(v / scale_t, nu) - log(scale_t)) / log(10), 3) for v in xl],
+                   crash_x=round(100 * ret, 2),
+                   crash_normal=round(float(norm.logpdf(100 * ret / sdp) - log(sdp)) / log(10), 2),
+                   crash_fat=round(float(student_t.logpdf(100 * ret / scale_t, nu) - log(scale_t)) / log(10), 2))
+
 json.dump(N, open(OUT, "w"), indent=1)
 print(json.dumps({"crash": N["crash"]["ret_pct"], "sd_day": N["normal"]["sd_day_pct"], "z": round(z, 2),
                   "z_log": round(z_log, 2), "log10p": round(log10p, 2), "log10p_log": round(log10p_log, 2),

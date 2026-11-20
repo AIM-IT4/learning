@@ -1,0 +1,19 @@
+{
+ "bs_put": "P = K e^{-rT} N(-d_2) - S\\,N(-d_1)",
+ "bs_d": "d_{1,2} = \\frac{\\ln(S/K) + \\left(r \\pm \\tfrac12\\class{acc}{\\sigma}^2\\right)T}{\\class{acc}{\\sigma}\\sqrt{T}}",
+ "sigma_day": "\\sigma_{\\text{day}} = \\frac{20\\%}{\\sqrt{252}} = \\class{acc}{1.26\\%}",
+ "z_crash": "z = \\frac{-20.47\\%}{1.26\\%} = \\class{acc}{-16.2}",
+ "p_tail": "P(Z \\le -16.2) \\approx \\class{acc}{1.2\\times10^{-59}}",
+ "big_bang": "13.8\\ \\text{bn years} \\times 252 = 3.5\\times10^{12}\\ \\text{days}",
+ "expected": "\\text{expected} \\approx 4\\times10^{-47}\\ \\text{days}",
+ "payoff": "\\text{payoff} = \\max(K - S_T,\\ 0)",
+ "iv_def": "P_{\\text{BS}}(\\class{acc}{\\sigma}) = 0.090\\ \\Rightarrow\\ \\class{acc}{\\sigma_{\\text{imp}} = 20.7\\%}",
+ "newton": "\\sigma_{n+1} = \\sigma_n - \\frac{P_{\\text{BS}}(\\sigma_n) - P_{\\text{mkt}}}{\\text{vega}(\\sigma_n)}",
+ "model": "\\frac{dS}{S} = \\class{blu}{\\sigma\\,dW} \\class{acc}{{}- 20\\%\\,dN}",
+ "model_par": "\\sigma = 15\\%,\\quad \\lambda = 0.1\\ \\text{a year}",
+ "mc_price": "P(K) = \\frac{1}{N}\\sum_{i=1}^{N} \\max\\!\\left(K - S_T^{(i)},\\ 0\\right)",
+ "normal_pdf": "\\varphi(x) = \\frac{1}{\\sigma\\sqrt{2\\pi}}\\,e^{-x^2/2\\sigma^2}",
+ "fat_ratio": "\\frac{P_{\\text{fat}}(\\text{day} < -4\\sigma)}{P_{\\text{normal}}(\\text{day} < -4\\sigma)} \\approx \\class{acc}{97}",
+ "flat": "\\sigma_{\\text{imp}}(K) = \\sigma\\ \\ \\text{for every } K",
+ "skew": "K \\downarrow\\ \\ \\Rightarrow\\ \\ \\class{acc}{\\sigma_{\\text{imp}} \\uparrow}"
+}
