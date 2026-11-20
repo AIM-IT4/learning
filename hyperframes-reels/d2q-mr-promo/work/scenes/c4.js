@@ -17,7 +17,7 @@
       const SC = FACTS.p2_stress, M = FACTS.p2_methods;
       // beats
       const tCard = 0.04, tLib = 0.12, tDesk = w(56) - 0.05, tCur0 = w(58) - 0.1, tClick1 = w(59) - 0.06, tClick2 = w(61) + 0.1;
-      const tStamp = w(64), tSlot = [w(66) - 0.04, w(68) - 0.04, w(70) - 0.06, w(71) - 0.04], tRun = w(73) + 0.1;
+      const tStamp = w(64), tSlot = [w(66) - 0.04, w(68) - 0.04, w(70) - 0.06, w(71) - 0.04], tRun = w(72) - 0.04, tSweep0 = w(62) + 0.05, tSweep1 = w(63) + 0.35;
       const X = 40, W = 1000, Y = 300, H = 540, YL = 866, HL = 474;
       // ---- the illustrative chart: a long at-the-money straddle (Black-Scholes, S0 = K = 100, 10% vol, 3 months, r = 0):
       // its P&L for a spot shock x, revalued in full and by delta-gamma (spot only, so the vega term is zero)
@@ -65,6 +65,17 @@
         const wF = sel === 1 ? 8 : sel === 2 ? 5 : 6, wD = sel === 2 ? 8 : sel === 1 ? 4.5 : 5.5;
         K.line(g, Fr, XS, FULL, { c: C.blue, w: wF, k: kd, a: sel === 2 ? 0.55 : 1, clip: false, glow: sel === 1 ? 0.5 : 0 });
         K.line(g, Fr, XS, DGV, { c: C.red, w: wD, k: kd, a: sel === 1 ? 0.45 : 1, dash: [16, 12], clip: false, glow: sel === 2 ? 0.5 : 0 });
+        // a spot-shock marker sweeps across: the two revaluations, and the gap between them
+        const ks = (t - tSweep0) / (tSweep1 - tSweep0), ka = clamp(ks * 6) * (1 - clamp((t - tStamp + 0.1) / 0.2));
+        if (ka > 0) {
+          const xv = lerp(-0.19, 0.19, eio(clamp(ks))), px = Fr.X(xv);
+          const yF = Fr.Y(straddle(S0 * (1 + xv)) - V0), yD = Fr.Y(DEL * S0 * xv + 0.5 * GAM * (S0 * xv) * (S0 * xv));
+          g.save(); g.globalAlpha *= ka; g.setLineDash([6, 6]); g.strokeStyle = rgba(C.ink, 0.45); g.lineWidth = 2.5;
+          g.beginPath(); g.moveTo(px, Fr.y); g.lineTo(px, Fr.y + Fr.h); g.stroke(); g.setLineDash([]);
+          g.strokeStyle = C.red; g.lineWidth = 4; g.beginPath(); g.moveTo(px + 14, yF); g.lineTo(px + 14, yD); g.stroke();
+          K.dot(g, px, yF, { r: 9, c: C.blue }); K.dot(g, px, yD, { r: 9, c: C.red });
+          g.restore();
+        }
         K.text(g, "← SPOT DOWN", Fr.x, Fr.y + Fr.h + 40, { size: 25, mono: true, ls: 2, c: rgba(C.ink, 0.55) });
         K.text(g, "SPOT UP →", Fr.x + Fr.w, Fr.y + Fr.h + 40, { size: 25, mono: true, ls: 2, align: "right", c: rgba(C.ink, 0.55) });
         K.text(g, "P&L", Fr.x - 4, Fr.y - 14, { size: 25, mono: true, ls: 2, c: rgba(C.ink, 0.55) });
@@ -96,6 +107,11 @@
             K.rr(g, x, y, cw, ch, 22); g.fillStyle = "#f4f6fa"; g.fill();
             g.setLineDash([12, 10]); g.strokeStyle = rgba(C.ink, 0.14); g.lineWidth = 3; K.rr(g, x, y, cw, ch, 22); g.stroke(); g.setLineDash([]);
             g.beginPath(); g.arc(x + 58, y + ch / 2, 34, 0, Math.PI * 2); g.strokeStyle = "#d5dbe4"; g.lineWidth = 3; g.stroke();
+            // a light band sweeps the waiting slot
+            const ph = ((T0 + t) * 0.8 + i * 0.22) % 1.3, bx = x - 120 + ph * (cw + 240);
+            g.save(); K.rr(g, x, y, cw, ch, 22); g.clip();
+            const sg = g.createLinearGradient(bx - 70, 0, bx + 70, 0); sg.addColorStop(0, "rgba(255,255,255,0)"); sg.addColorStop(0.5, "rgba(255,255,255,0.75)"); sg.addColorStop(1, "rgba(255,255,255,0)");
+            g.fillStyle = sg; g.fillRect(bx - 70, y, 140, ch); g.restore();
             if (name) { K.text(g, yr, x + 114, y + 82, { size: 62, ls: -1, c: "#d0d6df" }); K.text(g, name, x + 116, y + 126, { size: 28, mono: true, ls: 2, c: "#d0d6df", maxW: cw - 130 }); }
             else K.text(g, yr, x + 114, y + ch / 2 + 23, { size: 62, ls: -1, c: "#d0d6df" });
             return;
@@ -103,6 +119,7 @@
           const p = K.spring(u, 0.5, 15), sc = lerp(0.6, 1, p), dx = 160 * (1 - eo(clamp(u / 0.3)));
           g.save(); g.translate(x + cw / 2 + dx, y + ch / 2); g.scale(sc, sc); g.translate(-(x + cw / 2), -(y + ch / 2)); g.globalAlpha *= clamp(u / 0.1);
           const hot = run === i;
+          if (u < 0.5) { const q = u / 0.5; g.save(); g.strokeStyle = rgba(C.red, 0.6 * (1 - q)); g.lineWidth = 4; K.rr(g, x - 12 * q, y - 12 * q, cw + 24 * q, ch + 24 * q, 22 + 12 * q); g.stroke(); g.restore(); }
           K.card(g, x, y, cw, ch, { r: 22, blur: 22, dy: 10, fill: hot ? "#fff5f5" : C.white, stroke: hot ? rgba(C.red, 0.7) : rgba(C.ink, 0.12) });
           g.beginPath(); g.arc(x + 58, y + ch / 2, 34, 0, Math.PI * 2); g.fillStyle = C.red; g.fill();
           g.save(); g.strokeStyle = C.white; g.lineWidth = 6; g.lineCap = "round"; g.lineJoin = "round";
@@ -126,8 +143,8 @@
         Pp.dx += sh[0]; Pp.dy += sh[1];
         pricer(t, Pp);
         // the cursor: in from the right, clicks "Full revaluation", then "Delta-gamma-vega", then away
-        if (t > tCur0 && t < tStamp + 0.5) {
-          const c = K.cursorAt(t, [[tCur0, 1120, 1180], [tClick1 - 0.05, 300, Y + 210], [tClick2 - 0.4, 300, Y + 210], [tClick2 - 0.05, 790, Y + 210], [tStamp + 0.45, 1150, Y + 120]], [tClick1, tClick2]);
+        if (t > tCur0 && t < tClick2 + 0.65) {
+          const c = K.cursorAt(t, [[tCur0, 1120, 1180], [tClick1 - 0.05, 300, Y + 210], [tClick2 - 0.4, 300, Y + 210], [tClick2 - 0.05, 790, Y + 210], [tClick2 + 0.6, 1150, Y + 120]], [tClick1, tClick2]);
           K.cursor(g, c.x, c.y, { p: c.p, r: c.r, s: 1.3 });
         }
         K.floor(g);

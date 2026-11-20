@@ -639,11 +639,14 @@
             const gr = g.createLinearGradient(0, Fr.y + Fr.h * 0.1, 0, base); gr.addColorStop(0, rgba(C.red, 0)); gr.addColorStop(1, rgba(C.red, 0.2));
             g.fillStyle = gr; g.fillRect(xa, Fr.y + Fr.h * 0.1, (xb - xa) * eo(kt), Fr.h * 0.9); g.restore();
           }
+          const sw = o.sweep ?? 1, sx = lerp(x0, x1, sw);
           for (let i = 0; i < n; i++) {
             const xl = x0 + i * bw, xc = xl + bw / 2;
             const tailBin = xc < T4.q;
             const rip = o.wave != null ? 1 + 0.03 * Math.sin(2 * Math.PI * o.wave / 1.7 + i * 0.55) : 1;
-            const hgt = Math.max(tailBin ? 7 : 3, Fr.h * 0.94 * T4.f(xc) / peak) * clamp(o.grow ?? 1) * rip;
+            // with a sweep, a bar is at `grow` until the sweep passes it, then full; without one, at `grow`
+            const gk = o.sweep == null ? clamp(o.grow ?? 1) : (sw >= 1 ? 1 : lerp(clamp(o.grow ?? 1), 1, eo(clamp((sx - xc) / 0.8))));
+            const hgt = Math.max(tailBin ? 7 : 3, Fr.h * 0.94 * T4.f(xc) / peak) * gk * rip;
             const px = Fr.X(xl) + 3, pw = Fr.X(xl + bw) - Fr.X(xl) - 6;
             const redK = tailBin ? clamp(kt * 1.6 - (xc - x0) / (T4.q - x0) * 0.6) : 0;
             g.fillStyle = mix(C.blue, C.red, redK);
@@ -652,6 +655,13 @@
           // the baseline
           g.strokeStyle = C.ink; g.lineWidth = 4; g.lineCap = "round";
           g.beginPath(); g.moveTo(Fr.x - 10, base); g.lineTo(Fr.x + Fr.w + 10, base); g.stroke();
+          // the collecting sweep: a thin blue scan line
+          if (sw > 0 && sw < 1) {
+            const px = Fr.X(sx); g.save(); g.globalAlpha *= Math.sin(Math.PI * sw);
+            const gr = g.createLinearGradient(px - 40, 0, px, 0); gr.addColorStop(0, rgba(C.blue, 0)); gr.addColorStop(1, rgba(C.blue, 0.16));
+            g.fillStyle = gr; g.fillRect(px - 40, Fr.y, 40, Fr.h); g.strokeStyle = C.blue; g.lineWidth = 3;
+            g.beginPath(); g.moveTo(px, Fr.y); g.lineTo(px, base); g.stroke(); g.restore();
+          }
           // the VaR line drops in from the top
           const kl = clamp(o.line ?? 0);
           if (kl > 0) {
@@ -708,8 +718,8 @@
           g.save(); apply(g, 540, Y2 + H2 / 2, o.PH || still);
           card(g, X, Y2, W, H2, { r: 32, blur: 40, dy: 20 });
           prov(g, "ILLUSTRATIVE", X + W - 36, Y2 + 88, { align: "right", col: C.steelD, size: 25 });
-          pnlHist(g, Fr, { grow: lerp(0.72, 1, eo(clamp(T / 0.6))), line: clamp((T - o.tVar) / 0.3), tail: clamp((T - o.tTail) / 0.5),
-            es: clamp((T - o.tES) / 0.4), wave: T });
+          pnlHist(g, Fr, { grow: 0.72, sweep: eio(clamp((T - 0.05) / Math.max(0.6, o.tVar - 0.2))), line: clamp((T - o.tVar) / 0.3),
+            tail: clamp((T - o.tTail) / 0.5), es: clamp((T - o.tES) / 0.4), wave: T });
           text(g, "← LOSS", Fr.x, Fr.y + Fr.h + 50, { size: 26, mono: true, ls: 2, c: rgba(C.ink, 0.55) });
           text(g, "DAILY P&L", Fr.x + Fr.w / 2, Fr.y + Fr.h + 50, { size: 26, mono: true, ls: 3, align: "center", c: rgba(C.ink, 0.75) });
           text(g, "GAIN →", Fr.x + Fr.w, Fr.y + Fr.h + 50, { size: 26, mono: true, ls: 2, align: "right", c: rgba(C.ink, 0.55) });
@@ -729,6 +739,13 @@
           const bx = X + 44, by = Y + 150, bw = qw + 72, bh = Q.length * QLH + 40;
           bubble(g, bx, by, bw, bh, { tail: "left" });
           Q.forEach((s, i) => text(g, s, bx + 36, by + 20 + QFS * 0.92 + i * QLH, { size: QFS, ls: -0.5 }));
+          // "VaR" in the question: a red underline draws as the word is spoken
+          const ku = clamp((T - o.tVar) / 0.3);
+          if (ku > 0) {
+            const ux = bx + 36 + tw(g, "Walk me through a ", QFS, false, -0.5), uw = tw(g, "VaR", QFS, false, -0.5), uy = by + 20 + QFS * 0.92 + 10;
+            g.save(); g.strokeStyle = C.red; g.lineWidth = 6; g.lineCap = "round";
+            g.beginPath(); g.moveTo(ux, uy); g.lineTo(ux + uw * eo(ku), uy); g.stroke(); g.restore();
+          }
           const ry = Y + 488;
           field(g, X + 40, ry, W - 150, 62, { r: 31, fill: "#f4f6fa" });
           text(g, "Your answer…", X + 82, ry + 42, { size: 30, c: rgba(C.ink, 0.38) });

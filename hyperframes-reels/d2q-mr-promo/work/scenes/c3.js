@@ -18,6 +18,7 @@
       const DAYS = FACTS.p1_days, TESTS = FACTS.p1_tests;
       // beats
       const tA = 0.04, tVaR = w(32) - 0.05, tES = w(34) - 0.05, tRates = w(38) - 0.04, tFX = w(40) - 0.04, tDesk = w(41) - 0.04;
+      const tOne = w(31) - 0.04, tShort = w(35) - 0.04, tFor = w(36) - 0.05;
       const tB = w(42) - 0.22, tN0 = w(44) - 0.02, tN1 = WE[44] - T0 - 0.05, tDays = w(45) - 0.04, tReal = w(47) - 0.03;
       const tC = w(49) - 0.36, tT = [w(49) - 0.03, w(50) - 0.03, w(51) - 0.03], tRing = w(51) + 0.1;
       const X = 40, W = 1000, Y = 300, H = 1040;
@@ -42,7 +43,7 @@
         K.text(g, "ILLUSTRATIVE", x + tw_ - 26, y + 46, { size: 20, mono: true, ls: 2, align: "right", c: rgba(C.ink, 0.42), a });
         const Fr = K.frame(x + 34, y + 214, tw_ - 68, th - 268, [-7.14, 4.42], [0, 1]);
         g.save(); g.globalAlpha *= a;
-        K.pnlHist(g, Fr, { bw: 0.68, grow: 1, line: kind === "var" ? lit : 1, tail: kind === "es" ? lit : 0, es: kind === "es" ? clamp(lit * 1.3 - 0.3) : 0, lab: false, wave: st.t });
+        K.pnlHist(g, Fr, { bw: 0.68, grow: 1, line: kind === "var" ? lit : 1, tail: kind === "es" ? lit : 0, es: kind === "es" ? clamp((st.t - tShort) / 0.45) : 0, lab: false, wave: st.t });
         g.restore();
       }
       function deskChip(x, y, cw, ch, on, kind, pulse) {
@@ -69,10 +70,17 @@
         K.card(g, X, Y, W, H, { r: 32, blur: 50, dy: 26 });
         K.chip(g, "PROJECT 1", X + 36, Y + 66, { size: 32, fill: C.red, col: C.white, stroke: "rgba(0,0,0,0)", shadow: "rgba(224,49,49,0.35)", h: 60, padX: 24 });
         K.text(g, "OF " + FACTS.projects + " REAL-DATA PROJECTS", X + 268, Y + 76, { size: 26, mono: true, ls: 2, c: rgba(C.ink, 0.55) });
+        // one of three: the first dot lights on "one"
+        for (let i = 0; i < FACTS.projects; i++) {
+          const cx = X + W - 116 + i * 38, on = i === 0 ? clamp((t - tOne) / 0.25) : 0, s = 1 + 0.5 * Math.sin(Math.PI * on) * (on < 1 ? 1 : 0);
+          g.beginPath(); g.arc(cx, Y + 66, 11 * s, 0, Math.PI * 2); g.fillStyle = on > 0.5 ? C.red : "#dfe4eb"; g.fill();
+        }
         g.fillStyle = rgba(C.ink, 0.08); g.fillRect(X + 30, Y + 124, W - 60, 2);
         tile(X + 36, Y + 152, 446, 452, clamp((t - tVaR) / 0.25), "var");
         tile(X + 518, Y + 152, 446, 452, clamp((t - tES) / 0.25), "es");
-        K.text(g, "THE DESK", X + 40, Y + 652, { size: 26, mono: true, ls: 3, c: rgba(C.ink, 0.55) });
+        const kfor = clamp((t - tFor) / 0.3);
+        K.text(g, "THE DESK", X + 40 + 30 * (1 - eo(kfor)), Y + 652, { size: 26, mono: true, ls: 3, c: rgba(C.ink, 0.25 + 0.3 * kfor) });
+        if (kfor > 0) { g.save(); g.strokeStyle = rgba(C.blue, 0.6); g.lineWidth = 3; g.lineCap = "round"; g.beginPath(); g.moveTo(X + 190, Y + 643); g.lineTo(X + 190 + 750 * eo(kfor), Y + 643); g.stroke(); g.restore(); }
         const pd = (t - tDesk) / 0.35;
         deskChip(X + 36, Y + 690, 446, 300, clamp((t - tRates) / 0.25), "rates", Math.max(clamp((t - tRates) / 0.4) < 1 ? clamp((t - tRates) / 0.4) : 0, pd));
         deskChip(X + 518, Y + 690, 446, 300, clamp((t - tFX) / 0.25), "fx", Math.max(clamp((t - tFX) / 0.4) < 1 ? clamp((t - tFX) / 0.4) : 0, pd - 0.15));
@@ -175,7 +183,7 @@
         const Pp = K.combine(K.enter(u, { dx: -340, dy: 30, pitch: 0.1, yaw: 0.35, rot: -0.03, sc: 0.9 }), P);
         const px = X, py = 794, pw = 562, ph = 546;
         g.save(); K.apply(g, px + pw / 2, py + ph / 2, Pp);
-        const sy = lerp(0.05, 0.33, eio(clamp((u - 0.3) / 0.7)));
+        const sy = lerp(0.05, 0.33, eio(clamp((u - 0.3) / 1.9)));
         const ring = clamp((t - tRing) / 0.35);
         K.pdfView(g, "p4", px, py, pw, ph, { title: FACTS.pdf_name, page: FACTS.page_backtest, sy, after: (gg, x0, y0, w0, h0) => {
           if (ring <= 0) return;

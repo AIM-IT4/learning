@@ -12,7 +12,7 @@
   </div>
   <script>
     (function () {
-      /*DATA*/ const DUR = 8.92; const T0 = 8.44; const NEXT = 8.56; const KB = 2; const B = [0.0, 3.38, 8.44, 17.0, 24.68, 29.48, 33.5]; const THEME = ["L", "L", "L", "L", "L", "L", "B"]; const WA = [0.12, 0.3, 0.54, 0.76, 1.06, 1.42, 1.68, 2.08, 2.16, 2.28, 2.5, 2.68, 2.9, 3.14, 3.54, 3.66, 3.76, 3.86, 4.08, 4.3, 4.52, 4.8, 4.92, 5.24, 5.94, 6.48, 6.66, 7.4, 7.76, 8.08, 8.6, 8.82, 9.4, 9.96, 10.04, 10.36, 10.82, 11.0, 11.1, 11.34, 11.53, 11.72, 12.16, 12.62, 12.82, 14.22, 14.5, 14.7, 14.9, 15.28, 15.662, 16.34, 16.64, 17.16, 17.42, 18.06, 18.18, 18.42, 18.7, 19.2, 19.3, 19.9, 20.28, 21.093, 21.5, 21.68, 21.8, 22.14, 22.68, 22.88, 23.02, 23.1, 23.62, 24.0, 24.84, 25.14, 25.64, 26.025, 26.58, 26.96, 27.36, 27.66, 27.88, 28.12, 28.54, 28.62, 28.74, 28.84, 28.96, 29.06, 29.34, 29.64, 29.78, 29.9, 30.02, 30.26, 30.74, 31.22, 31.44, 31.68, 31.92, 32.32, 32.5, 32.82, 33.2, 33.66, 34.32, 34.58, 34.8, 34.92, 35.04, 35.36, 35.48, 35.76, 36.22, 36.38, 36.54, 36.74, 36.88, 37.12, 37.34, 37.6, 37.74, 37.9, 38.0, 38.2, 38.44]; const WE = [0.3, 0.54, 0.76, 1.06, 1.42, 1.68, 2.08, 2.16, 2.28, 2.5, 2.68, 2.9, 3.14, 3.54, 3.66, 3.76, 3.86, 4.08, 4.3, 4.52, 4.8, 4.92, 5.24, 5.94, 6.48, 6.66, 7.4, 7.76, 8.08, 8.6, 8.82, 9.4, 9.96, 10.04, 10.36, 10.82, 11.0, 11.1, 11.34, 11.53, 11.72, 12.16, 12.62, 12.82, 13.72, 14.5, 14.7, 14.9, 15.28, 15.662, 16.34, 16.64, 17.16, 17.42, 18.06, 18.18, 18.42, 18.7, 19.2, 19.3, 19.9, 20.28, 21.093, 21.5, 21.68, 21.8, 22.14, 22.68, 22.88, 23.02, 23.1, 23.62, 24.0, 24.84, 25.14, 25.64, 26.025, 26.58, 26.96, 27.36, 27.66, 27.88, 28.12, 28.54, 28.62, 28.74, 28.84, 28.96, 29.06, 29.34, 29.64, 29.78, 29.9, 30.02, 30.26, 30.74, 31.22, 31.44, 31.68, 31.92, 32.32, 32.5, 32.82, 33.2, 33.66, 34.32, 34.58, 34.8, 34.92, 35.04, 35.36, 35.48, 35.76, 36.22, 36.38, 36.54, 36.74, 36.88, 37.12, 37.34, 37.6, 37.74, 37.9, 38.0, 38.2, 38.44, 38.74]; /*END*/
+      /*DATA*/ const DUR = 11.56; const T0 = 11.01; const NEXT = 11.2; const KB = 2; const B = [0.0, 4.21, 11.01, 22.21, 32.06, 39.36, 45.46]; const THEME = ["L", "L", "L", "L", "L", "L", "B"]; const WA = [0.12, 0.34, 0.64, 0.9, 1.24, 1.56, 1.78, 2.62, 2.7, 2.8, 2.98, 3.16, 3.34, 3.64, 4.37, 4.52, 4.7, 4.86, 5.16, 5.44, 5.86, 6.3, 6.52, 7.17, 7.78, 8.4, 8.66, 9.56, 9.98, 10.38, 11.17, 11.5, 12.36, 12.78, 13.02, 13.4, 14.04, 14.42, 14.64, 14.88, 15.02, 15.3, 16.12, 16.62, 16.94, 18.14, 18.42, 18.64, 18.8, 19.52, 20.19, 21.38, 21.64, 22.37, 22.68, 23.42, 23.52, 23.78, 24.24, 24.97, 25.14, 25.68, 26.14, 27.233, 27.78, 28.06, 28.24, 28.62, 29.57, 29.86, 30.26, 30.38, 30.88, 31.42, 32.22, 32.5, 33.22, 34.03, 35.2, 35.82, 36.24, 36.58, 36.78, 37.14, 38.02, 38.16, 38.3, 38.4, 38.5, 38.6, 38.9, 39.52, 39.6, 39.76, 39.88, 40.57, 41.02, 41.56, 42.2, 42.5, 42.8, 43.3, 43.78, 44.2, 44.7, 45.62, 45.94, 46.62, 46.76, 46.98, 47.22, 47.38, 47.98, 48.57, 48.68, 48.86, 49.1, 49.26, 49.54, 50.27, 50.56, 50.78, 50.96, 51.1, 51.36, 51.62]; const WE = [0.34, 0.64, 0.9, 1.24, 1.56, 1.78, 2.62, 2.7, 2.8, 2.98, 3.16, 3.34, 3.64, 4.37, 4.52, 4.7, 4.86, 5.16, 5.44, 5.86, 6.3, 6.52, 7.17, 7.78, 8.4, 8.66, 9.56, 9.98, 10.38, 11.17, 11.5, 12.36, 12.78, 13.02, 13.4, 14.04, 14.42, 14.64, 14.88, 15.02, 15.3, 16.12, 16.62, 16.94, 17.84, 18.42, 18.64, 18.8, 19.52, 20.19, 21.09, 21.64, 22.37, 22.68, 23.42, 23.52, 23.78, 24.24, 24.97, 25.14, 25.68, 26.14, 27.04, 27.78, 28.06, 28.24, 28.62, 29.52, 29.86, 30.26, 30.38, 30.88, 31.42, 32.22, 32.5, 33.22, 34.03, 34.93, 35.82, 36.24, 36.58, 36.78, 37.14, 38.02, 38.16, 38.3, 38.4, 38.5, 38.6, 38.9, 39.52, 39.6, 39.76, 39.88, 40.57, 41.02, 41.56, 42.2, 42.5, 42.8, 43.3, 43.78, 44.2, 44.7, 45.6, 45.94, 46.62, 46.76, 46.98, 47.22, 47.38, 47.98, 48.57, 48.68, 48.86, 49.1, 49.26, 49.54, 50.27, 50.56, 50.78, 50.96, 51.1, 51.36, 51.62, 51.9]; const IX = {"RISK": 106, "and": 107, "DM": 109, "P50": 111, "off": 112, "The": 113, "code": 114, "seven": 117, "days": 118, "Save": 119, "this": 120, "next": 123, "last": 125}; /*END*/
       /*FACTS*/ const FACTS = {"product":"Market Risk Quant Notes & Lab","topics":"VaR · ES · Backtesting · FRTB","pages":141,"modules":19,"qa":64,"projects":3,"p1_desk":"Rates & FX desk","p1_days":4919,"p1_tests":["Kupiec","Christoffersen","Traffic light"],"p2_desk":"FX options desk","p2_methods":["Full revaluation","Delta-gamma-vega"],"p2_stress":[["GFC","2008"],["COVID","2020"],["","2022"],["YEN UNWIND","2024"]],"p3_desks":5,"p3_parts":["SBM","DRC","RRAO","PLA","IMCC","SES"],"library":["market","curves","instruments","risk","backtest","frtb"],"tests":14,"offer_pct":50,"offer_days":7,"handle":"@desk2quant","site":"desk2quant.com","pdf_name":"market-risk-quant-notes.pdf","page_contents":"4 / 141","page_backtest":"67 / 141","page_frtb":"86 / 141"}; /*ENDFACTS*/
       // ===== K: the Desk2Quant "Ripping" kit, from d2q-day11-rip/work/kit.js (inlined by tools/compose.py) =====
       // The look: warm paper with a faint grid, ink-navy type (D2QSans = Inter Bold), Share Tech Mono for small data (with
@@ -655,11 +655,14 @@
             const gr = g.createLinearGradient(0, Fr.y + Fr.h * 0.1, 0, base); gr.addColorStop(0, rgba(C.red, 0)); gr.addColorStop(1, rgba(C.red, 0.2));
             g.fillStyle = gr; g.fillRect(xa, Fr.y + Fr.h * 0.1, (xb - xa) * eo(kt), Fr.h * 0.9); g.restore();
           }
+          const sw = o.sweep ?? 1, sx = lerp(x0, x1, sw);
           for (let i = 0; i < n; i++) {
             const xl = x0 + i * bw, xc = xl + bw / 2;
             const tailBin = xc < T4.q;
             const rip = o.wave != null ? 1 + 0.03 * Math.sin(2 * Math.PI * o.wave / 1.7 + i * 0.55) : 1;
-            const hgt = Math.max(tailBin ? 7 : 3, Fr.h * 0.94 * T4.f(xc) / peak) * clamp(o.grow ?? 1) * rip;
+            // with a sweep, a bar is at `grow` until the sweep passes it, then full; without one, at `grow`
+            const gk = o.sweep == null ? clamp(o.grow ?? 1) : (sw >= 1 ? 1 : lerp(clamp(o.grow ?? 1), 1, eo(clamp((sx - xc) / 0.8))));
+            const hgt = Math.max(tailBin ? 7 : 3, Fr.h * 0.94 * T4.f(xc) / peak) * gk * rip;
             const px = Fr.X(xl) + 3, pw = Fr.X(xl + bw) - Fr.X(xl) - 6;
             const redK = tailBin ? clamp(kt * 1.6 - (xc - x0) / (T4.q - x0) * 0.6) : 0;
             g.fillStyle = mix(C.blue, C.red, redK);
@@ -668,6 +671,13 @@
           // the baseline
           g.strokeStyle = C.ink; g.lineWidth = 4; g.lineCap = "round";
           g.beginPath(); g.moveTo(Fr.x - 10, base); g.lineTo(Fr.x + Fr.w + 10, base); g.stroke();
+          // the collecting sweep: a thin blue scan line
+          if (sw > 0 && sw < 1) {
+            const px = Fr.X(sx); g.save(); g.globalAlpha *= Math.sin(Math.PI * sw);
+            const gr = g.createLinearGradient(px - 40, 0, px, 0); gr.addColorStop(0, rgba(C.blue, 0)); gr.addColorStop(1, rgba(C.blue, 0.16));
+            g.fillStyle = gr; g.fillRect(px - 40, Fr.y, 40, Fr.h); g.strokeStyle = C.blue; g.lineWidth = 3;
+            g.beginPath(); g.moveTo(px, Fr.y); g.lineTo(px, base); g.stroke(); g.restore();
+          }
           // the VaR line drops in from the top
           const kl = clamp(o.line ?? 0);
           if (kl > 0) {
@@ -724,8 +734,8 @@
           g.save(); apply(g, 540, Y2 + H2 / 2, o.PH || still);
           card(g, X, Y2, W, H2, { r: 32, blur: 40, dy: 20 });
           prov(g, "ILLUSTRATIVE", X + W - 36, Y2 + 88, { align: "right", col: C.steelD, size: 25 });
-          pnlHist(g, Fr, { grow: lerp(0.72, 1, eo(clamp(T / 0.6))), line: clamp((T - o.tVar) / 0.3), tail: clamp((T - o.tTail) / 0.5),
-            es: clamp((T - o.tES) / 0.4), wave: T });
+          pnlHist(g, Fr, { grow: 0.72, sweep: eio(clamp((T - 0.05) / Math.max(0.6, o.tVar - 0.2))), line: clamp((T - o.tVar) / 0.3),
+            tail: clamp((T - o.tTail) / 0.5), es: clamp((T - o.tES) / 0.4), wave: T });
           text(g, "← LOSS", Fr.x, Fr.y + Fr.h + 50, { size: 26, mono: true, ls: 2, c: rgba(C.ink, 0.55) });
           text(g, "DAILY P&L", Fr.x + Fr.w / 2, Fr.y + Fr.h + 50, { size: 26, mono: true, ls: 3, align: "center", c: rgba(C.ink, 0.75) });
           text(g, "GAIN →", Fr.x + Fr.w, Fr.y + Fr.h + 50, { size: 26, mono: true, ls: 2, align: "right", c: rgba(C.ink, 0.55) });
@@ -745,6 +755,13 @@
           const bx = X + 44, by = Y + 150, bw = qw + 72, bh = Q.length * QLH + 40;
           bubble(g, bx, by, bw, bh, { tail: "left" });
           Q.forEach((s, i) => text(g, s, bx + 36, by + 20 + QFS * 0.92 + i * QLH, { size: QFS, ls: -0.5 }));
+          // "VaR" in the question: a red underline draws as the word is spoken
+          const ku = clamp((T - o.tVar) / 0.3);
+          if (ku > 0) {
+            const ux = bx + 36 + tw(g, "Walk me through a ", QFS, false, -0.5), uw = tw(g, "VaR", QFS, false, -0.5), uy = by + 20 + QFS * 0.92 + 10;
+            g.save(); g.strokeStyle = C.red; g.lineWidth = 6; g.lineCap = "round";
+            g.beginPath(); g.moveTo(ux, uy); g.lineTo(ux + uw * eo(ku), uy); g.stroke(); g.restore();
+          }
           const ry = Y + 488;
           field(g, X + 40, ry, W - 150, 62, { r: 31, fill: "#f4f6fa" });
           text(g, "Your answer…", X + 82, ry + 42, { size: 30, c: rgba(C.ink, 0.38) });
@@ -833,6 +850,7 @@
       const DAYS = FACTS.p1_days, TESTS = FACTS.p1_tests;
       // beats
       const tA = 0.04, tVaR = w(32) - 0.05, tES = w(34) - 0.05, tRates = w(38) - 0.04, tFX = w(40) - 0.04, tDesk = w(41) - 0.04;
+      const tOne = w(31) - 0.04, tShort = w(35) - 0.04, tFor = w(36) - 0.05;
       const tB = w(42) - 0.22, tN0 = w(44) - 0.02, tN1 = WE[44] - T0 - 0.05, tDays = w(45) - 0.04, tReal = w(47) - 0.03;
       const tC = w(49) - 0.36, tT = [w(49) - 0.03, w(50) - 0.03, w(51) - 0.03], tRing = w(51) + 0.1;
       const X = 40, W = 1000, Y = 300, H = 1040;
@@ -857,7 +875,7 @@
         K.text(g, "ILLUSTRATIVE", x + tw_ - 26, y + 46, { size: 20, mono: true, ls: 2, align: "right", c: rgba(C.ink, 0.42), a });
         const Fr = K.frame(x + 34, y + 214, tw_ - 68, th - 268, [-7.14, 4.42], [0, 1]);
         g.save(); g.globalAlpha *= a;
-        K.pnlHist(g, Fr, { bw: 0.68, grow: 1, line: kind === "var" ? lit : 1, tail: kind === "es" ? lit : 0, es: kind === "es" ? clamp(lit * 1.3 - 0.3) : 0, lab: false, wave: st.t });
+        K.pnlHist(g, Fr, { bw: 0.68, grow: 1, line: kind === "var" ? lit : 1, tail: kind === "es" ? lit : 0, es: kind === "es" ? clamp((st.t - tShort) / 0.45) : 0, lab: false, wave: st.t });
         g.restore();
       }
       function deskChip(x, y, cw, ch, on, kind, pulse) {
@@ -884,10 +902,17 @@
         K.card(g, X, Y, W, H, { r: 32, blur: 50, dy: 26 });
         K.chip(g, "PROJECT 1", X + 36, Y + 66, { size: 32, fill: C.red, col: C.white, stroke: "rgba(0,0,0,0)", shadow: "rgba(224,49,49,0.35)", h: 60, padX: 24 });
         K.text(g, "OF " + FACTS.projects + " REAL-DATA PROJECTS", X + 268, Y + 76, { size: 26, mono: true, ls: 2, c: rgba(C.ink, 0.55) });
+        // one of three: the first dot lights on "one"
+        for (let i = 0; i < FACTS.projects; i++) {
+          const cx = X + W - 116 + i * 38, on = i === 0 ? clamp((t - tOne) / 0.25) : 0, s = 1 + 0.5 * Math.sin(Math.PI * on) * (on < 1 ? 1 : 0);
+          g.beginPath(); g.arc(cx, Y + 66, 11 * s, 0, Math.PI * 2); g.fillStyle = on > 0.5 ? C.red : "#dfe4eb"; g.fill();
+        }
         g.fillStyle = rgba(C.ink, 0.08); g.fillRect(X + 30, Y + 124, W - 60, 2);
         tile(X + 36, Y + 152, 446, 452, clamp((t - tVaR) / 0.25), "var");
         tile(X + 518, Y + 152, 446, 452, clamp((t - tES) / 0.25), "es");
-        K.text(g, "THE DESK", X + 40, Y + 652, { size: 26, mono: true, ls: 3, c: rgba(C.ink, 0.55) });
+        const kfor = clamp((t - tFor) / 0.3);
+        K.text(g, "THE DESK", X + 40 + 30 * (1 - eo(kfor)), Y + 652, { size: 26, mono: true, ls: 3, c: rgba(C.ink, 0.25 + 0.3 * kfor) });
+        if (kfor > 0) { g.save(); g.strokeStyle = rgba(C.blue, 0.6); g.lineWidth = 3; g.lineCap = "round"; g.beginPath(); g.moveTo(X + 190, Y + 643); g.lineTo(X + 190 + 750 * eo(kfor), Y + 643); g.stroke(); g.restore(); }
         const pd = (t - tDesk) / 0.35;
         deskChip(X + 36, Y + 690, 446, 300, clamp((t - tRates) / 0.25), "rates", Math.max(clamp((t - tRates) / 0.4) < 1 ? clamp((t - tRates) / 0.4) : 0, pd));
         deskChip(X + 518, Y + 690, 446, 300, clamp((t - tFX) / 0.25), "fx", Math.max(clamp((t - tFX) / 0.4) < 1 ? clamp((t - tFX) / 0.4) : 0, pd - 0.15));
@@ -990,7 +1015,7 @@
         const Pp = K.combine(K.enter(u, { dx: -340, dy: 30, pitch: 0.1, yaw: 0.35, rot: -0.03, sc: 0.9 }), P);
         const px = X, py = 794, pw = 562, ph = 546;
         g.save(); K.apply(g, px + pw / 2, py + ph / 2, Pp);
-        const sy = lerp(0.05, 0.33, eio(clamp((u - 0.3) / 0.7)));
+        const sy = lerp(0.05, 0.33, eio(clamp((u - 0.3) / 1.9)));
         const ring = clamp((t - tRing) / 0.35);
         K.pdfView(g, "p4", px, py, pw, ph, { title: FACTS.pdf_name, page: FACTS.page_backtest, sy, after: (gg, x0, y0, w0, h0) => {
           if (ring <= 0) return;

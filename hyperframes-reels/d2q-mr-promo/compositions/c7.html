@@ -12,7 +12,7 @@
   </div>
   <script>
     (function () {
-      /*DATA*/ const DUR = 6.75; const T0 = 33.5; const NEXT = 6.75; const KB = 6; const B = [0.0, 3.38, 8.44, 17.0, 24.68, 29.48, 33.5]; const THEME = ["L", "L", "L", "L", "L", "L", "B"]; const WA = [0.12, 0.3, 0.54, 0.76, 1.06, 1.42, 1.68, 2.08, 2.16, 2.28, 2.5, 2.68, 2.9, 3.14, 3.54, 3.66, 3.76, 3.86, 4.08, 4.3, 4.52, 4.8, 4.92, 5.24, 5.94, 6.48, 6.66, 7.4, 7.76, 8.08, 8.6, 8.82, 9.4, 9.96, 10.04, 10.36, 10.82, 11.0, 11.1, 11.34, 11.53, 11.72, 12.16, 12.62, 12.82, 14.22, 14.5, 14.7, 14.9, 15.28, 15.662, 16.34, 16.64, 17.16, 17.42, 18.06, 18.18, 18.42, 18.7, 19.2, 19.3, 19.9, 20.28, 21.093, 21.5, 21.68, 21.8, 22.14, 22.68, 22.88, 23.02, 23.1, 23.62, 24.0, 24.84, 25.14, 25.64, 26.025, 26.58, 26.96, 27.36, 27.66, 27.88, 28.12, 28.54, 28.62, 28.74, 28.84, 28.96, 29.06, 29.34, 29.64, 29.78, 29.9, 30.02, 30.26, 30.74, 31.22, 31.44, 31.68, 31.92, 32.32, 32.5, 32.82, 33.2, 33.66, 34.32, 34.58, 34.8, 34.92, 35.04, 35.36, 35.48, 35.76, 36.22, 36.38, 36.54, 36.74, 36.88, 37.12, 37.34, 37.6, 37.74, 37.9, 38.0, 38.2, 38.44]; const WE = [0.3, 0.54, 0.76, 1.06, 1.42, 1.68, 2.08, 2.16, 2.28, 2.5, 2.68, 2.9, 3.14, 3.54, 3.66, 3.76, 3.86, 4.08, 4.3, 4.52, 4.8, 4.92, 5.24, 5.94, 6.48, 6.66, 7.4, 7.76, 8.08, 8.6, 8.82, 9.4, 9.96, 10.04, 10.36, 10.82, 11.0, 11.1, 11.34, 11.53, 11.72, 12.16, 12.62, 12.82, 13.72, 14.5, 14.7, 14.9, 15.28, 15.662, 16.34, 16.64, 17.16, 17.42, 18.06, 18.18, 18.42, 18.7, 19.2, 19.3, 19.9, 20.28, 21.093, 21.5, 21.68, 21.8, 22.14, 22.68, 22.88, 23.02, 23.1, 23.62, 24.0, 24.84, 25.14, 25.64, 26.025, 26.58, 26.96, 27.36, 27.66, 27.88, 28.12, 28.54, 28.62, 28.74, 28.84, 28.96, 29.06, 29.34, 29.64, 29.78, 29.9, 30.02, 30.26, 30.74, 31.22, 31.44, 31.68, 31.92, 32.32, 32.5, 32.82, 33.2, 33.66, 34.32, 34.58, 34.8, 34.92, 35.04, 35.36, 35.48, 35.76, 36.22, 36.38, 36.54, 36.74, 36.88, 37.12, 37.34, 37.6, 37.74, 37.9, 38.0, 38.2, 38.44, 38.74]; /*END*/
+      /*DATA*/ const DUR = 7.94; const T0 = 45.46; const NEXT = 7.94; const KB = 6; const B = [0.0, 4.21, 11.01, 22.21, 32.06, 39.36, 45.46]; const THEME = ["L", "L", "L", "L", "L", "L", "B"]; const WA = [0.12, 0.34, 0.64, 0.9, 1.24, 1.56, 1.78, 2.62, 2.7, 2.8, 2.98, 3.16, 3.34, 3.64, 4.37, 4.52, 4.7, 4.86, 5.16, 5.44, 5.86, 6.3, 6.52, 7.17, 7.78, 8.4, 8.66, 9.56, 9.98, 10.38, 11.17, 11.5, 12.36, 12.78, 13.02, 13.4, 14.04, 14.42, 14.64, 14.88, 15.02, 15.3, 16.12, 16.62, 16.94, 18.14, 18.42, 18.64, 18.8, 19.52, 20.19, 21.38, 21.64, 22.37, 22.68, 23.42, 23.52, 23.78, 24.24, 24.97, 25.14, 25.68, 26.14, 27.233, 27.78, 28.06, 28.24, 28.62, 29.57, 29.86, 30.26, 30.38, 30.88, 31.42, 32.22, 32.5, 33.22, 34.03, 35.2, 35.82, 36.24, 36.58, 36.78, 37.14, 38.02, 38.16, 38.3, 38.4, 38.5, 38.6, 38.9, 39.52, 39.6, 39.76, 39.88, 40.57, 41.02, 41.56, 42.2, 42.5, 42.8, 43.3, 43.78, 44.2, 44.7, 45.62, 45.94, 46.62, 46.76, 46.98, 47.22, 47.38, 47.98, 48.57, 48.68, 48.86, 49.1, 49.26, 49.54, 50.27, 50.56, 50.78, 50.96, 51.1, 51.36, 51.62]; const WE = [0.34, 0.64, 0.9, 1.24, 1.56, 1.78, 2.62, 2.7, 2.8, 2.98, 3.16, 3.34, 3.64, 4.37, 4.52, 4.7, 4.86, 5.16, 5.44, 5.86, 6.3, 6.52, 7.17, 7.78, 8.4, 8.66, 9.56, 9.98, 10.38, 11.17, 11.5, 12.36, 12.78, 13.02, 13.4, 14.04, 14.42, 14.64, 14.88, 15.02, 15.3, 16.12, 16.62, 16.94, 17.84, 18.42, 18.64, 18.8, 19.52, 20.19, 21.09, 21.64, 22.37, 22.68, 23.42, 23.52, 23.78, 24.24, 24.97, 25.14, 25.68, 26.14, 27.04, 27.78, 28.06, 28.24, 28.62, 29.52, 29.86, 30.26, 30.38, 30.88, 31.42, 32.22, 32.5, 33.22, 34.03, 34.93, 35.82, 36.24, 36.58, 36.78, 37.14, 38.02, 38.16, 38.3, 38.4, 38.5, 38.6, 38.9, 39.52, 39.6, 39.76, 39.88, 40.57, 41.02, 41.56, 42.2, 42.5, 42.8, 43.3, 43.78, 44.2, 44.7, 45.6, 45.94, 46.62, 46.76, 46.98, 47.22, 47.38, 47.98, 48.57, 48.68, 48.86, 49.1, 49.26, 49.54, 50.27, 50.56, 50.78, 50.96, 51.1, 51.36, 51.62, 51.9]; const IX = {"RISK": 106, "and": 107, "DM": 109, "P50": 111, "off": 112, "The": 113, "code": 114, "seven": 117, "days": 118, "Save": 119, "this": 120, "next": 123, "last": 125}; /*END*/
       /*FACTS*/ const FACTS = {"product":"Market Risk Quant Notes & Lab","topics":"VaR · ES · Backtesting · FRTB","pages":141,"modules":19,"qa":64,"projects":3,"p1_desk":"Rates & FX desk","p1_days":4919,"p1_tests":["Kupiec","Christoffersen","Traffic light"],"p2_desk":"FX options desk","p2_methods":["Full revaluation","Delta-gamma-vega"],"p2_stress":[["GFC","2008"],["COVID","2020"],["","2022"],["YEN UNWIND","2024"]],"p3_desks":5,"p3_parts":["SBM","DRC","RRAO","PLA","IMCC","SES"],"library":["market","curves","instruments","risk","backtest","frtb"],"tests":14,"offer_pct":50,"offer_days":7,"handle":"@desk2quant","site":"desk2quant.com","pdf_name":"market-risk-quant-notes.pdf","page_contents":"4 / 141","page_backtest":"67 / 141","page_frtb":"86 / 141"}; /*ENDFACTS*/
       // ===== K: the Desk2Quant "Ripping" kit, from d2q-day11-rip/work/kit.js (inlined by tools/compose.py) =====
       // The look: warm paper with a faint grid, ink-navy type (D2QSans = Inter Bold), Share Tech Mono for small data (with
@@ -655,11 +655,14 @@
             const gr = g.createLinearGradient(0, Fr.y + Fr.h * 0.1, 0, base); gr.addColorStop(0, rgba(C.red, 0)); gr.addColorStop(1, rgba(C.red, 0.2));
             g.fillStyle = gr; g.fillRect(xa, Fr.y + Fr.h * 0.1, (xb - xa) * eo(kt), Fr.h * 0.9); g.restore();
           }
+          const sw = o.sweep ?? 1, sx = lerp(x0, x1, sw);
           for (let i = 0; i < n; i++) {
             const xl = x0 + i * bw, xc = xl + bw / 2;
             const tailBin = xc < T4.q;
             const rip = o.wave != null ? 1 + 0.03 * Math.sin(2 * Math.PI * o.wave / 1.7 + i * 0.55) : 1;
-            const hgt = Math.max(tailBin ? 7 : 3, Fr.h * 0.94 * T4.f(xc) / peak) * clamp(o.grow ?? 1) * rip;
+            // with a sweep, a bar is at `grow` until the sweep passes it, then full; without one, at `grow`
+            const gk = o.sweep == null ? clamp(o.grow ?? 1) : (sw >= 1 ? 1 : lerp(clamp(o.grow ?? 1), 1, eo(clamp((sx - xc) / 0.8))));
+            const hgt = Math.max(tailBin ? 7 : 3, Fr.h * 0.94 * T4.f(xc) / peak) * gk * rip;
             const px = Fr.X(xl) + 3, pw = Fr.X(xl + bw) - Fr.X(xl) - 6;
             const redK = tailBin ? clamp(kt * 1.6 - (xc - x0) / (T4.q - x0) * 0.6) : 0;
             g.fillStyle = mix(C.blue, C.red, redK);
@@ -668,6 +671,13 @@
           // the baseline
           g.strokeStyle = C.ink; g.lineWidth = 4; g.lineCap = "round";
           g.beginPath(); g.moveTo(Fr.x - 10, base); g.lineTo(Fr.x + Fr.w + 10, base); g.stroke();
+          // the collecting sweep: a thin blue scan line
+          if (sw > 0 && sw < 1) {
+            const px = Fr.X(sx); g.save(); g.globalAlpha *= Math.sin(Math.PI * sw);
+            const gr = g.createLinearGradient(px - 40, 0, px, 0); gr.addColorStop(0, rgba(C.blue, 0)); gr.addColorStop(1, rgba(C.blue, 0.16));
+            g.fillStyle = gr; g.fillRect(px - 40, Fr.y, 40, Fr.h); g.strokeStyle = C.blue; g.lineWidth = 3;
+            g.beginPath(); g.moveTo(px, Fr.y); g.lineTo(px, base); g.stroke(); g.restore();
+          }
           // the VaR line drops in from the top
           const kl = clamp(o.line ?? 0);
           if (kl > 0) {
@@ -724,8 +734,8 @@
           g.save(); apply(g, 540, Y2 + H2 / 2, o.PH || still);
           card(g, X, Y2, W, H2, { r: 32, blur: 40, dy: 20 });
           prov(g, "ILLUSTRATIVE", X + W - 36, Y2 + 88, { align: "right", col: C.steelD, size: 25 });
-          pnlHist(g, Fr, { grow: lerp(0.72, 1, eo(clamp(T / 0.6))), line: clamp((T - o.tVar) / 0.3), tail: clamp((T - o.tTail) / 0.5),
-            es: clamp((T - o.tES) / 0.4), wave: T });
+          pnlHist(g, Fr, { grow: 0.72, sweep: eio(clamp((T - 0.05) / Math.max(0.6, o.tVar - 0.2))), line: clamp((T - o.tVar) / 0.3),
+            tail: clamp((T - o.tTail) / 0.5), es: clamp((T - o.tES) / 0.4), wave: T });
           text(g, "← LOSS", Fr.x, Fr.y + Fr.h + 50, { size: 26, mono: true, ls: 2, c: rgba(C.ink, 0.55) });
           text(g, "DAILY P&L", Fr.x + Fr.w / 2, Fr.y + Fr.h + 50, { size: 26, mono: true, ls: 3, align: "center", c: rgba(C.ink, 0.75) });
           text(g, "GAIN →", Fr.x + Fr.w, Fr.y + Fr.h + 50, { size: 26, mono: true, ls: 2, align: "right", c: rgba(C.ink, 0.55) });
@@ -745,6 +755,13 @@
           const bx = X + 44, by = Y + 150, bw = qw + 72, bh = Q.length * QLH + 40;
           bubble(g, bx, by, bw, bh, { tail: "left" });
           Q.forEach((s, i) => text(g, s, bx + 36, by + 20 + QFS * 0.92 + i * QLH, { size: QFS, ls: -0.5 }));
+          // "VaR" in the question: a red underline draws as the word is spoken
+          const ku = clamp((T - o.tVar) / 0.3);
+          if (ku > 0) {
+            const ux = bx + 36 + tw(g, "Walk me through a ", QFS, false, -0.5), uw = tw(g, "VaR", QFS, false, -0.5), uy = by + 20 + QFS * 0.92 + 10;
+            g.save(); g.strokeStyle = C.red; g.lineWidth = 6; g.lineCap = "round";
+            g.beginPath(); g.moveTo(ux, uy); g.lineTo(ux + uw * eo(ku), uy); g.stroke(); g.restore();
+          }
           const ry = Y + 488;
           field(g, X + 40, ry, W - 150, 62, { r: 31, fill: "#f4f6fa" });
           text(g, "Your answer…", X + 82, ry + 42, { size: 30, c: rgba(C.ink, 0.38) });
@@ -813,7 +830,7 @@
           field, button, slider, toggle, ball, highlight, lock, typingDots, photo, pdfView, T4, pnlHist, tickBadge, bubble, HK, hook, floor, hookBeats };
       })();
 
-      // ---- c7, the call to action (brand-blue block): "Comment RISK, and we will DM you fifty percent off. The code works for
+      // ---- c7, the call to action (brand-blue block): "Comment RISK, and we'll DM you fifty percent off. The code works for
       // seven days. Save this for your next risk interview."
       // Four white cards deal in at once (so the block is never empty): a comment card where RISK types in on "RISK" and
       // posts on "and"; a direct message from desk2quant (typing dots until "DM", then the real cover thumbnail and the
@@ -821,16 +838,16 @@
       // the code itself never appears; "valid 7 days" on "seven days"); a row "Send to a friend preparing for risk
       // interviews" + SAVE (SAVE lights on "Save this", the send row on "next risk interview"); and the DESK2QUANT plate (the
       // real logo, @desk2quant, desk2quant.com). The last frame holds.
-      // words (global): 105 Comment 106 RISK, 107 and 108 we 109 will 110 DM 111 you 112 50% 113 off. 114 The 115 code
-      //   116 works 117 for 118 7 119 days. 120 Save 121 this 122 for 123 your 124 next 125 risk 126 interview.
+      // words: found by their text in tools/timing.py (IX: RISK, and, DM, P50, off, The, code, seven, days, Save, this, next,
+      //   last), so "we'll" or "we will" both work.
       const g = document.getElementById("c7-cv").getContext("2d");
       const { C, clamp, lerp, eo, eio, back, mix, rgba } = K;
       const st = { t: 0 };
       const w = (i) => WA[i] - T0;
       function init() { K.load({ logo: "assets/logo.png", cover: "assets/img/cover.jpg" }, "c7-images", () => draw()); }
       const WORD = "RISK";
-      const tType = w(106) - 0.02, tPost = w(107) + 0.02, tDM = w(110) - 0.08, tOff = w(112) - 0.04, tCode = w(115) - 0.04,
-        tValid = w(118) - 0.04, tSave = w(120) - 0.03, tSend = w(124) - 0.03;
+      const tType = w(IX.RISK) - 0.02, tPost = w(IX.and) + 0.02, tDM = w(IX.DM) - 0.08, tOff = w(IX.P50) - 0.04, tCode = w(IX.code) - 0.04,
+        tValid = w(IX.seven) - 0.04, tSave = w(IX.Save) - 0.03, tSend = w(IX.next) - 0.03;
       const X = 40, W = 1000, SH = "rgba(8,22,90,0.42)";
       const dealt = (t, t0, P0) => K.combine(K.enter(t - t0, Object.assign({ dy: 230, pitch: 0.4, yaw: 0, rot: 0.02, sc: 0.92 }, P0 || {})),
         { dx: 0, dy: K.bob(t, t0 * 7, 2.5), rot: 0, sc: 1, yaw: 0, pitch: 0, a: 1 });
@@ -888,7 +905,7 @@
           g.save(); g.shadowColor = "rgba(120,90,0,0.3)"; g.shadowBlur = 16; g.shadowOffsetY = 6;
           K.rr(g, x0 - 14, Y + 152, (ow + 28) * eo(ko), 82, 14); g.fillStyle = C.yel; g.fill(); g.restore();
           K.text(g, offS, x0, Y + 218, { size: 70, ls: -1, a: clamp(ko * 2) });
-          const gp = ((t - tOff - 0.6) % 1.8) / 0.5;
+          const gp = ((t - tOff - 0.6) % 1.2) / 0.5;
           if (t > tOff + 0.6 && gp < 1) {
             g.save(); K.rr(g, x0 - 14, Y + 152, ow + 28, 82, 14); g.clip();
             const gx = lerp(x0 - 120, x0 + ow + 120, gp);
@@ -922,7 +939,8 @@
           K.rr(g, vx, cy2, vw, chh, chh / 2); g.fillStyle = C.mist; g.fill();
           const ccx = vx + 34, ccy = cy2 + chh / 2;   // a clock glyph
           g.beginPath(); g.arc(ccx, ccy, 15, 0, Math.PI * 2); g.strokeStyle = C.blue; g.lineWidth = 4; g.stroke();
-          g.beginPath(); g.moveTo(ccx, ccy - 8); g.lineTo(ccx, ccy); g.lineTo(ccx + 7, ccy + 4); g.lineCap = "round"; g.stroke();
+          const ha = -Math.PI / 2 + (T0 + t) * Math.PI * 2 / 4;   // the clock's hand turns once every 4 s
+          g.beginPath(); g.moveTo(ccx, ccy); g.lineTo(ccx + 9 * Math.cos(ha), ccy + 9 * Math.sin(ha)); g.lineCap = "round"; g.stroke();
           K.text(g, vs, vx + 62, cy2 + chh / 2 + 11, { size: 30 });
           g.restore();
         }
@@ -948,7 +966,7 @@
         K.card(g, bx, Y, bw, H, { r: 30, blur: 36, dy: 18, shadow: kv > 0.5 ? "rgba(150,20,20,0.45)" : SH, fill: kv > 0.5 ? C.red : C.white });
         K.bookmark(g, bx + 74, Y + H / 2, 46, kv > 0.5 ? C.white : null, kv > 0.5 ? C.white : C.ink, 4.5);
         K.text(g, "SAVE", bx + 118, Y + H / 2 + 14, { size: 40, c: kv > 0.5 ? C.white : C.ink });
-        if (kv > 0 && t - tSave < 0.5) { const q = (t - tSave) / 0.5; g.save(); g.strokeStyle = rgba(C.white, 0.7 * (1 - q)); g.lineWidth = 4; K.rr(g, bx - 14 * q, Y - 14 * q, bw + 28 * q, H + 28 * q, 30 + 14 * q); g.stroke(); g.restore(); }
+        if (kv > 0) { const q = t - tSave < 0.5 ? (t - tSave) / 0.5 : ((t - tSave - 0.5) % 1.4) / 1.4; g.save(); g.strokeStyle = rgba(C.white, 0.7 * (1 - q)); g.lineWidth = 4; K.rr(g, bx - 14 * q, Y - 14 * q, bw + 28 * q, H + 28 * q, 30 + 14 * q); g.stroke(); g.restore(); }
         g.restore();
         g.restore();
       }

@@ -1,4 +1,4 @@
-      // ---- c7, the call to action (brand-blue block): "Comment RISK, and we will DM you fifty percent off. The code works for
+      // ---- c7, the call to action (brand-blue block): "Comment RISK, and we'll DM you fifty percent off. The code works for
       // seven days. Save this for your next risk interview."
       // Four white cards deal in at once (so the block is never empty): a comment card where RISK types in on "RISK" and
       // posts on "and"; a direct message from desk2quant (typing dots until "DM", then the real cover thumbnail and the
@@ -6,16 +6,16 @@
       // the code itself never appears; "valid 7 days" on "seven days"); a row "Send to a friend preparing for risk
       // interviews" + SAVE (SAVE lights on "Save this", the send row on "next risk interview"); and the DESK2QUANT plate (the
       // real logo, @desk2quant, desk2quant.com). The last frame holds.
-      // words (global): 105 Comment 106 RISK, 107 and 108 we 109 will 110 DM 111 you 112 50% 113 off. 114 The 115 code
-      //   116 works 117 for 118 7 119 days. 120 Save 121 this 122 for 123 your 124 next 125 risk 126 interview.
+      // words: found by their text in tools/timing.py (IX: RISK, and, DM, P50, off, The, code, seven, days, Save, this, next,
+      //   last), so "we'll" or "we will" both work.
       const g = document.getElementById("c7-cv").getContext("2d");
       const { C, clamp, lerp, eo, eio, back, mix, rgba } = K;
       const st = { t: 0 };
       const w = (i) => WA[i] - T0;
       function init() { K.load({ logo: "assets/logo.png", cover: "assets/img/cover.jpg" }, "c7-images", () => draw()); }
       const WORD = "RISK";
-      const tType = w(106) - 0.02, tPost = w(107) + 0.02, tDM = w(110) - 0.08, tOff = w(112) - 0.04, tCode = w(115) - 0.04,
-        tValid = w(118) - 0.04, tSave = w(120) - 0.03, tSend = w(124) - 0.03;
+      const tType = w(IX.RISK) - 0.02, tPost = w(IX.and) + 0.02, tDM = w(IX.DM) - 0.08, tOff = w(IX.P50) - 0.04, tCode = w(IX.code) - 0.04,
+        tValid = w(IX.seven) - 0.04, tSave = w(IX.Save) - 0.03, tSend = w(IX.next) - 0.03;
       const X = 40, W = 1000, SH = "rgba(8,22,90,0.42)";
       const dealt = (t, t0, P0) => K.combine(K.enter(t - t0, Object.assign({ dy: 230, pitch: 0.4, yaw: 0, rot: 0.02, sc: 0.92 }, P0 || {})),
         { dx: 0, dy: K.bob(t, t0 * 7, 2.5), rot: 0, sc: 1, yaw: 0, pitch: 0, a: 1 });
@@ -73,7 +73,7 @@
           g.save(); g.shadowColor = "rgba(120,90,0,0.3)"; g.shadowBlur = 16; g.shadowOffsetY = 6;
           K.rr(g, x0 - 14, Y + 152, (ow + 28) * eo(ko), 82, 14); g.fillStyle = C.yel; g.fill(); g.restore();
           K.text(g, offS, x0, Y + 218, { size: 70, ls: -1, a: clamp(ko * 2) });
-          const gp = ((t - tOff - 0.6) % 1.8) / 0.5;
+          const gp = ((t - tOff - 0.6) % 1.2) / 0.5;
           if (t > tOff + 0.6 && gp < 1) {
             g.save(); K.rr(g, x0 - 14, Y + 152, ow + 28, 82, 14); g.clip();
             const gx = lerp(x0 - 120, x0 + ow + 120, gp);
@@ -107,7 +107,8 @@
           K.rr(g, vx, cy2, vw, chh, chh / 2); g.fillStyle = C.mist; g.fill();
           const ccx = vx + 34, ccy = cy2 + chh / 2;   // a clock glyph
           g.beginPath(); g.arc(ccx, ccy, 15, 0, Math.PI * 2); g.strokeStyle = C.blue; g.lineWidth = 4; g.stroke();
-          g.beginPath(); g.moveTo(ccx, ccy - 8); g.lineTo(ccx, ccy); g.lineTo(ccx + 7, ccy + 4); g.lineCap = "round"; g.stroke();
+          const ha = -Math.PI / 2 + (T0 + t) * Math.PI * 2 / 4;   // the clock's hand turns once every 4 s
+          g.beginPath(); g.moveTo(ccx, ccy); g.lineTo(ccx + 9 * Math.cos(ha), ccy + 9 * Math.sin(ha)); g.lineCap = "round"; g.stroke();
           K.text(g, vs, vx + 62, cy2 + chh / 2 + 11, { size: 30 });
           g.restore();
         }
@@ -133,7 +134,7 @@
         K.card(g, bx, Y, bw, H, { r: 30, blur: 36, dy: 18, shadow: kv > 0.5 ? "rgba(150,20,20,0.45)" : SH, fill: kv > 0.5 ? C.red : C.white });
         K.bookmark(g, bx + 74, Y + H / 2, 46, kv > 0.5 ? C.white : null, kv > 0.5 ? C.white : C.ink, 4.5);
         K.text(g, "SAVE", bx + 118, Y + H / 2 + 14, { size: 40, c: kv > 0.5 ? C.white : C.ink });
-        if (kv > 0 && t - tSave < 0.5) { const q = (t - tSave) / 0.5; g.save(); g.strokeStyle = rgba(C.white, 0.7 * (1 - q)); g.lineWidth = 4; K.rr(g, bx - 14 * q, Y - 14 * q, bw + 28 * q, H + 28 * q, 30 + 14 * q); g.stroke(); g.restore(); }
+        if (kv > 0) { const q = t - tSave < 0.5 ? (t - tSave) / 0.5 : ((t - tSave - 0.5) % 1.4) / 1.4; g.save(); g.strokeStyle = rgba(C.white, 0.7 * (1 - q)); g.lineWidth = 4; K.rr(g, bx - 14 * q, Y - 14 * q, bw + 28 * q, H + 28 * q, 30 + 14 * q); g.stroke(); g.restore(); }
         g.restore();
         g.restore();
       }

@@ -15,7 +15,7 @@
       const HB = K.hookBeats(WA);
       // beats
       const tOpen = 0.02, tClear = 0.12, tOut = 0.56, tFly = 0.6, FLY = 0.55, tGlint = w(22) - 0.1, tChips = 0.66;
-      const tPage = w(26) - 0.06, tRing = w(29) - 0.04;
+      const tPage = w(26) - 0.06, tRing = w(29) - 0.04, tTagN = w(20) - 0.04, tTagL = w(22) - 0.04;
       const CNT = [
         { v: FACTS.pages, lab: "PAGES", t0: w(23) - 0.02, t1: WE[23] - T0 - 0.06, tl: w(24) - 0.03, icon: "page" },
         { v: FACTS.modules, lab: "MODULES", t0: w(25) - 0.02, t1: WE[25] - T0 - 0.02, tl: w(26) - 0.03, icon: "grid" },
@@ -48,6 +48,11 @@
             g.fillStyle = gr; g.fillRect(x, y, s, s); }
           g.restore(); }
         K.rr(g, x, y, s, s, 22); g.strokeStyle = "rgba(13,21,38,0.16)"; g.lineWidth = 2; g.stroke();
+        // the tags (facts: the notes PDF; 3 real-data projects in the lab)
+        const k1 = clamp((t - tTagN) / 0.3), k2 = clamp((t - tTagL) / 0.3);
+        // (they straddle the cover's bottom edge, clear of its title)
+        if (k1 > 0) K.chip(g, "NOTES · PDF", x - 14, y + s + 2, { k: k1, size: 26, mono: true, fill: C.ink, col: C.white, stroke: "rgba(0,0,0,0)", h: 50, padX: 18, rot: -0.03, shadow: "rgba(13,21,38,0.3)" });
+        if (k2 > 0) K.chip(g, "LAB · " + FACTS.projects + " PROJECTS", x + s + 14, y + s + 2, { k: k2, size: 26, mono: true, align: "right", fill: C.red, col: C.white, stroke: "rgba(0,0,0,0)", h: 50, padX: 18, rot: 0.03, shadow: "rgba(224,49,49,0.35)" });
         g.restore();
       }
       function page(t, out) {

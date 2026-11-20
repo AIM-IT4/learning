@@ -1,5 +1,5 @@
 """Market Risk promo ("Comment RISK"): one source of truth for timing (the d2q-day11-rip pattern). Reads the caption words
-(voice/out/words.json: 127 words with their on-screen spellings and start/end in vo.wav) and writes the DATA blocks of
+(voice/out/words.json: 126 or 127 words with their on-screen spellings and start/end in vo.wav) and writes the DATA blocks of
 every composition (bg, hud, ov, c1-c7) and the root index.html (scene hosts, the persistent layers, the voice, the music
 and the sound effects), plus a readable work/timing.md.
 
@@ -9,7 +9,7 @@ import json, os, re
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 VO_START = 0.12            # the voice starts at film t = 0.12
-DUR = 40.25                # the film: the voice (one continuous take) ends at 38.74; the end card holds ~1.5 s
+DUR = 53.4                 # the film: the voice (ElevenLabs "Eric") ends at 51.90; the end card holds ~1.5 s
 LEAD = 0.16                # a chapter starts this long before its first word
 XO = 0.36                  # a scene stays this long into the next chapter, for its exit
 
@@ -17,9 +17,27 @@ WJ = json.load(open(os.path.join(HERE, "voice/out/words.json"), encoding="utf-8"
 WORDS = [w["w"] for w in WJ["words"]]
 WA = [round(VO_START + w["s"], 3) for w in WJ["words"]]          # film time of every spoken word's onset
 WE = [round(VO_START + w["e"], 3) for w in WJ["words"]]          # ... and its end
-assert len(WA) == 127, len(WA)
-VO_SECONDS = 38.88         # the length of voice/out/vo.wav (= assets/vo.wav)
+NW = len(WA)
+assert NW in (126, 127), NW   # 127 when the take says "we will", 126 for "we'll"
+import wave as _wave         # the length of the voice file itself (assets/vo.wav = voice/out/vo.wav)
+with _wave.open(os.path.join(HERE, "assets/vo.wav")) as _w:
+    VO_SECONDS = round(_w.getnframes() / _w.getframerate(), 2)
 assert VO_START + WJ["end"] + 1.4 < DUR
+
+
+def ix(word, start=105):
+    """the index of the first spoken word `word` (as shown on screen) at or after `start`: chapter 07's words are found by
+    their text, so a take that says "we will" instead of "we'll" moves them without breaking anything"""
+    for i in range(start, NW):
+        if WORDS[i] == word:
+            return i
+    raise SystemExit(f"word {word!r} not found after {start}")
+
+
+# chapter 07's words
+IX = {"RISK": ix("RISK,"), "and": ix("and"), "DM": ix("DM"), "P50": ix("50%"), "off": ix("off."), "The": ix("The"),
+      "code": ix("code"), "seven": ix("7"), "days": ix("days."), "Save": ix("Save"), "this": ix("this"),
+      "next": ix("next"), "last": NW - 1}
 
 # the 7 chapters: (scene id, first word, theme L light paper / B brand-blue colour block, tag, title tokens [text, key])
 CH = [("c1", 0, "L", "VAR", [["The", 0], ["VaR", 1], ["question", 0]]),
@@ -54,9 +72,9 @@ PAGES = [
     (84, 90, [89]),                   # all the way to the capital number.
     (91, 96, [94, 96]),               # You get the notes, executed notebooks,
     (97, 104, [98, 102]),             # a Python risk library and 14 regression tests.
-    (105, 113, [106, (112, "y"), (113, "y")], [107]),   # Comment RISK, / and we will DM you 50% off.
-    (114, 119, [118, 119]),           # The code works for 7 days.
-    (120, 126, [120, 121]),           # Save this for your next risk interview.
+    (105, IX["off"], [IX["RISK"], (IX["P50"], "y"), (IX["off"], "y")], [IX["and"]]),   # Comment RISK, / and we'll DM you 50% off.
+    (IX["The"], IX["days"], [IX["seven"], IX["days"]]),                                 # The code works for 7 days.
+    (IX["Save"], IX["last"], [IX["Save"], IX["this"]]),                                 # Save this for your next risk interview.
 ]
 
 
@@ -74,7 +92,7 @@ def pages():
         # the hook's first phrase is on screen from frame 1, faint, each word lighting up as it is spoken ("pre")
         out.append({"start": 0.0 if a == 0 else round(WA[a] - 0.05, 3), "pre": 1 if a == 0 else 0, "tok": tok, "br": [i - a for i in br]})
     seen = [t["w"] for p in out for t in p["tok"]]
-    assert seen == list(range(127)), "every spoken word is on some page, once, in order"
+    assert seen == list(range(NW)), "every spoken word is on some page, once, in order"
     return out
 
 
@@ -126,7 +144,7 @@ def sfx_list():
     # DAYS; REAL DATA; the proof; the traffic light's three dots
     add("send", B[2] + 0.1, 0.08)
     add("type", W[32] - 0.14, 0.06)            # (ES lights between two stressed words, "VaR" and "expected": no cue)
-    add("type", W[38] - 0.16, 0.06); add("type", W[40] - 0.16, 0.06)
+    add("type", W[38] - 0.16, 0.06); add("type", W[40] - 0.12, 0.06)
     add("send", W[42] - 0.22, 0.08)
     add("type", WE[44] - 0.32, 0.05); add("type", WE[44] - 0.19, 0.05)
     add("type", W[45] - 0.16, 0.06)
@@ -152,11 +170,11 @@ def sfx_list():
     # c7: the blue block; posted; the DM; the code chip; valid 7 days; the send row; the close
     add("send", B[6] - 0.08, 0.07)            # (before "Comment" starts: a louder whoosh masked its soft onset)
     add("send", W[107] + 0.02, 0.08)
-    add("chip", W[110] + 0.06, 0.08)
-    add("lock", W[115] - 0.02, 0.09)
-    add("type", W[118] - 0.16, 0.06)
-    add("chip", W[124] - 0.02, 0.07)
-    add("end", WE[126] + 0.34, 0.10)
+    add("chip", W[IX["DM"]] + 0.06, 0.08)
+    add("lock", W[IX["code"]] - 0.02, 0.09)
+    add("type", W[IX["seven"]] - 0.16, 0.06)
+    add("chip", W[IX["next"]] - 0.02, 0.07)
+    add("end", WE[IX["last"]] + 0.34, 0.10)
     out = sorted([(n, round(max(0.0, t), 2), d, v) for n, t, d, v in S], key=lambda x: x[1])
     for n, t, d, v in out:
         for i in STRESSED:
@@ -182,7 +200,8 @@ def main():
         a, d, nx = win[s]
         if os.path.exists(comp(s)):
             patch(comp(s), f"const DUR = {d}; const T0 = {a}; const NEXT = {nx}; const KB = {k}; const B = {json.dumps(B)}; "
-                           f"const THEME = {json.dumps(THEME)}; const WA = {json.dumps(WA)}; const WE = {json.dumps(WE)};")
+                           f"const THEME = {json.dumps(THEME)}; const WA = {json.dumps(WA)}; const WE = {json.dumps(WE)}; "
+                           f"const IX = {json.dumps(IX)};")
     hosts = []
     for i, (s, *_) in enumerate(CH):
         if not os.path.exists(comp(s)):

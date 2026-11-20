@@ -1,12 +1,12 @@
 #!/bin/bash
-# The cover: the hook frame just before 02 (3.34 s: the interview question, the blurred answer with its lock, "Built one? Let's see",
+# The cover: the hook frame just before 02 (4.1 s: the interview question, the blurred answer with its lock, "Built one? Let's see",
 # the illustrative P&L histogram, the subtitle "Can you show one you've actually built?"), with the chapter title moved
 # down inside the profile grid's 3:4 crop (y 240-1680) and the hero and subtitle moved down with it. Copies the project
 # to out/cover_proj, patches hud.html (title baseline 260 -> 352), c1.html (the hook +96 px, its floor +96 px) and ov.html (subtitle +100 px),
 # snapshots one frame and saves out/cover.jpg (and out/cover_3x4.jpg, the grid's crop, for checking).
-# usage: bash tools/make_cover.sh [film time, default 3.34]
+# usage: bash tools/make_cover.sh [film time, default 4.1]
 set -e
-HERE=$(cd "$(dirname "$0")/.." && pwd); AT=${1:-3.34}
+HERE=$(cd "$(dirname "$0")/.." && pwd); AT=${1:-4.1}
 P=$HERE/out/cover_proj
 rm -rf "$P"; mkdir -p "$P"
 cp "$HERE"/{index.html,hyperframes.json,meta.json,package.json} "$P"/

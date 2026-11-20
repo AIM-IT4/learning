@@ -50,6 +50,9 @@
         for (let i = 0; i < 3; i++) {
           const ry = gy + 46 + i * 50, run = clamp((t - (tExec + 0.13 * i)) / 0.12), done = t > tExec + 0.13 * i + 0.12;
           g.fillStyle = done ? C.green : rgba(C.ink, 0.2); g.beginPath(); g.arc(gx + 18, ry + 12, 7, 0, Math.PI * 2); g.fill();
+          // the cells keep running in turn (an execution ring cycles through them)
+          const cyc = t > tExec + 0.6 ? Math.floor((t - tExec - 0.6) / 0.45) % 3 : -1, cq = ((t - tExec - 0.6) % 0.45) / 0.45;
+          if (cyc === i) { g.save(); g.strokeStyle = rgba(C.blue, 0.8 * (1 - cq)); g.lineWidth = 3; g.beginPath(); g.arc(gx + 18, ry + 12, 9 + 8 * cq, 0, Math.PI * 2); g.stroke(); g.restore(); }
           K.rr(g, gx + 34, ry + 2, 120 * (0.55 + 0.45 * ((i * 37) % 10) / 10), 9, 4); g.fillStyle = rgba(C.ink, 0.28); g.fill();
           K.rr(g, gx + 34, ry + 18, 120 * run * (0.4 + 0.5 * ((i * 53) % 10) / 10), 9, 4); g.fillStyle = rgba(C.blue, 0.6); g.fill();
         }
@@ -97,6 +100,12 @@
         const bx = x + 40, by = y + 104, bw = 600;
         K.rr(g, bx, by, bw, 12, 6); g.fillStyle = "#e9edf2"; g.fill();
         if (nn > 0) { K.rr(g, bx, by, bw * nn / NT, 12, 6); g.fillStyle = C.green; g.fill(); }
+        if (nn === NT) {   // a shine runs along the full bar
+          const sp = ((t - tTests) % 1.1) / 1.1, sx = bx - 60 + sp * (bw + 120);
+          g.save(); K.rr(g, bx, by, bw, 12, 6); g.clip();
+          const sg = g.createLinearGradient(sx - 50, 0, sx + 50, 0); sg.addColorStop(0, "rgba(255,255,255,0)"); sg.addColorStop(0.5, "rgba(255,255,255,0.8)"); sg.addColorStop(1, "rgba(255,255,255,0)");
+          g.fillStyle = sg; g.fillRect(sx - 50, by, 100, 12); g.restore();
+        }
         // 14 checks, 7 x 2
         const cw = 130, ch = 104, gx = x + (W - 7 * cw) / 2, gy = y + 150;
         for (let i = 0; i < NT; i++) {

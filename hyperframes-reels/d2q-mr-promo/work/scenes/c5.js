@@ -16,6 +16,7 @@
       // beats
       const tCard = 0.04, tStrip = 0.1, tRow = 0.16, tFRTB = w(76) - 0.05, tSA = w(77) - 0.04, tIMA = w(79) - 0.04;
       const tN0 = w(82) - 0.04, tN1 = w(83) + 0.1, tDesks = w(83) - 0.04, tCap = w(89) - 0.05, tNum = w(90) - 0.02;
+      const tVs = w(78) - 0.04, tFlow = w(84) - 0.05;
       const X = 40, W = 1000, Y = 300, H = 560, YS = 880, HS = 150, YB = 1050, HB = 290;
       function column(t, x, y, cw, ch, on, big, sub, parts, t0) {
         const lit = clamp(on);
@@ -51,11 +52,13 @@
         const cw = 448, ch = 378;
         column(t, X + 36, Y + 150, cw, ch, (t - tSA) / 0.25, "SA", "STANDARDISED", PARTS.slice(0, 3), tSA);
         column(t, X + W - 36 - cw, Y + 150, cw, ch, (t - tIMA) / 0.25, "IMA", "INTERNAL MODELS", PARTS.slice(3), tIMA);
-        // vs
-        const kv = clamp((t - tSA - 0.3) / 0.3);
+        // vs: lights and pops on "versus"
+        const kv = clamp((t - tVs) / 0.3), vp = 1 + 0.3 * Math.sin(Math.PI * kv) * (kv < 1 ? 1 : 0);
+        g.save(); g.translate(540, Y + 150 + ch / 2); g.scale(vp, vp); g.translate(-540, -(Y + 150 + ch / 2));
         g.save(); g.shadowColor = "rgba(13,21,38,0.3)"; g.shadowBlur = 14; g.shadowOffsetY = 5;
         g.beginPath(); g.arc(540, Y + 150 + ch / 2, 40, 0, Math.PI * 2); g.fillStyle = mix("#c3cad6", C.ink, kv); g.fill(); g.restore();
         K.text(g, "vs", 540, Y + 150 + ch / 2 + 11, { size: 32, align: "center", c: C.white });
+        g.restore();
         g.restore();
       }
       function desk(x, y, s, col) {   // a neutral desk icon: a monitor on a stand over a desk top
@@ -110,5 +113,16 @@
         bottom(t, K.combine(K.combine(K.enter(t - tRow, { dy: 110, pitch: 0.35, yaw: 0, rot: 0.02, sc: 0.92 }), bob(2.4)), out));
         strip(t, K.combine(K.combine(K.enter(t - tStrip, { dy: 120, pitch: 0.4, yaw: 0, rot: 0.02, sc: 0.92 }), bob(1.3)), out));
         card(t, K.combine(K.combine(K.enter(t - tCard, { dy: 150, pitch: 0.45, yaw: 0, rot: 0.02, sc: 0.92 }), bob(0.3)), out));
+        // "all the way to the capital number": a dot from each desk flows down into CAPITAL
+        const kf = (t - tFlow) / (tCap - tFlow + 0.05);
+        if (kf > 0 && kf < 1.25 && t < NEXT) {
+          for (let i = 0; i < ND; i++) {
+            const q = eio(clamp(kf - 0.06 * i)); if (q <= 0 || q >= 1) continue;
+            const x0 = X + 470 + i * 106, y0 = YS + HS / 2, x1 = 842, y1 = YB + 112;
+            const px = lerp(x0, x1, q), py = lerp(y0, y1, q) - 60 * Math.sin(Math.PI * q);
+            g.save(); g.globalAlpha = 1 - clamp((q - 0.85) / 0.15);
+            K.dot(g, px, py, { r: 10, c: C.red }); g.restore();
+          }
+        }
         K.floor(g);
       }
