@@ -1,0 +1,898 @@
+<template>
+  <style>
+    @font-face { font-family: "D2QSans"; font-weight: 100 900; src: url("assets/fonts/D2QSans.ttf"); }
+    @font-face { font-family: "ShareTechMono"; font-weight: 400; src: url("assets/fonts/sharetechmono.woff2"); }
+    #root { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+    #ov-cv { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    .ov-pre { position: absolute; left: -999px; top: 0; opacity: 0; font-size: 10px; }
+  </style>
+  <div id="root" data-composition-id="ov" data-width="1080" data-height="1920" data-layout-allow-overlap>
+    <canvas id="ov-cv" width="1080" height="1920"></canvas>
+    <span class="ov-pre" style="font-family: D2QSans; font-weight: 700;">0Aa%</span><span class="ov-pre" style="font-family: ShareTechMono;">0Aa</span>
+  </div>
+  <script>
+    (function () {
+      /*DATA*/ const DUR = 46.75; const B = [0.0, 4.06, 10.31, 19.51, 28.58, 34.56, 39.36]; const THEME = ["L", "L", "L", "L", "L", "L", "B"]; const PAGES = [{"start": 0.0, "pre": 1, "tok": [{"s": "Every", "on": 0.12, "w": 0, "k": ""}, {"s": "market", "on": 0.32, "w": 1, "k": ""}, {"s": "risk", "on": 0.58, "w": 2, "k": ""}, {"s": "interview", "on": 0.8, "w": 3, "k": ""}, {"s": "asks", "on": 1.1, "w": 4, "k": ""}, {"s": "about", "on": 1.46, "w": 5, "k": ""}, {"s": "VaR.", "on": 1.84, "w": 6, "k": "r"}], "br": []}, {"start": 2.39, "pre": 0, "tok": [{"s": "Can", "on": 2.44, "w": 7, "k": ""}, {"s": "you", "on": 2.56, "w": 8, "k": ""}, {"s": "show", "on": 2.66, "w": 9, "k": ""}, {"s": "one", "on": 2.84, "w": 10, "k": ""}, {"s": "you've", "on": 3.0, "w": 11, "k": ""}, {"s": "actually", "on": 3.22, "w": 12, "k": ""}, {"s": "built?", "on": 3.44, "w": 13, "k": "r"}], "br": []}, {"start": 4.17, "pre": 0, "tok": [{"s": "This", "on": 4.22, "w": 14, "k": ""}, {"s": "is", "on": 4.36, "w": 15, "k": ""}, {"s": "the", "on": 4.5, "w": 16, "k": ""}, {"s": "Market", "on": 4.6, "w": 17, "k": ""}, {"s": "Risk", "on": 4.84, "w": 18, "k": ""}, {"s": "Quant", "on": 5.1, "w": 19, "k": ""}, {"s": "Notes", "on": 5.36, "w": 20, "k": "r"}, {"s": "and", "on": 5.64, "w": 21, "k": ""}, {"s": "Lab.", "on": 5.76, "w": 22, "k": "r"}], "br": []}, {"start": 6.19, "pre": 0, "tok": [{"s": "141", "on": 6.24, "w": 23, "k": "r"}, {"s": "pages,", "on": 7.06, "w": 24, "k": ""}, {"s": "19", "on": 7.62, "w": 25, "k": "r"}, {"s": "modules,", "on": 7.88, "w": 26, "k": ""}], "br": []}, {"start": 8.63, "pre": 0, "tok": [{"s": "64", "on": 8.68, "w": 27, "k": "r"}, {"s": "interview", "on": 9.04, "w": 28, "k": ""}, {"s": "answers.", "on": 9.4, "w": 29, "k": ""}], "br": []}, {"start": 10.42, "pre": 0, "tok": [{"s": "Project", "on": 10.47, "w": 30, "k": ""}, {"s": "one.", "on": 10.76, "w": 31, "k": ""}, {"s": "VaR", "on": 11.26, "w": 32, "k": "r"}, {"s": "and", "on": 11.54, "w": 33, "k": ""}, {"s": "expected", "on": 11.68, "w": 34, "k": "r"}, {"s": "shortfall", "on": 11.98, "w": 35, "k": "r"}], "br": [2]}, {"start": 12.43, "pre": 0, "tok": [{"s": "for", "on": 12.48, "w": 36, "k": ""}, {"s": "a", "on": 12.66, "w": 37, "k": ""}, {"s": "rates", "on": 12.78, "w": 38, "k": "r"}, {"s": "and", "on": 13.04, "w": 39, "k": ""}, {"s": "FX", "on": 13.18, "w": 40, "k": "r"}, {"s": "desk,", "on": 13.52, "w": 41, "k": ""}], "br": []}, {"start": 13.97, "pre": 0, "tok": [{"s": "backtested", "on": 14.02, "w": 42, "k": ""}, {"s": "over", "on": 14.54, "w": 43, "k": ""}, {"s": "4,919", "on": 14.74, "w": 44, "k": "r"}, {"s": "days", "on": 16.14, "w": 45, "k": "r"}, {"s": "of", "on": 16.42, "w": 46, "k": ""}, {"s": "real", "on": 16.6, "w": 47, "k": ""}, {"s": "data.", "on": 16.76, "w": 48, "k": ""}], "br": []}, {"start": 17.17, "pre": 0, "tok": [{"s": "Kupiec,", "on": 17.22, "w": 49, "k": "r"}, {"s": "Christoffersen,", "on": 17.687, "w": 50, "k": "r"}, {"s": "traffic", "on": 18.62, "w": 51, "k": ""}, {"s": "lights.", "on": 18.84, "w": 52, "k": ""}], "br": []}, {"start": 19.62, "pre": 0, "tok": [{"s": "Project", "on": 19.67, "w": 53, "k": ""}, {"s": "two:", "on": 20.0, "w": 54, "k": ""}, {"s": "an", "on": 20.5, "w": 55, "k": ""}, {"s": "FX", "on": 20.58, "w": 56, "k": "r"}, {"s": "options", "on": 20.94, "w": 57, "k": "r"}, {"s": "desk.", "on": 21.34, "w": 58, "k": ""}], "br": []}, {"start": 21.97, "pre": 0, "tok": [{"s": "Full", "on": 22.02, "w": 59, "k": ""}, {"s": "revaluation", "on": 22.22, "w": 60, "k": "r"}, {"s": "against", "on": 22.82, "w": 61, "k": ""}, {"s": "delta-gamma-vega,", "on": 23.26, "w": 62, "k": "r"}], "br": []}, {"start": 24.197, "pre": 0, "tok": [{"s": "stressed", "on": 24.247, "w": 63, "k": "r"}, {"s": "through", "on": 24.74, "w": 64, "k": ""}, {"s": "the", "on": 24.94, "w": 65, "k": ""}, {"s": "financial", "on": 25.06, "w": 66, "k": ""}, {"s": "crisis,", "on": 25.36, "w": 67, "k": ""}], "br": []}, {"start": 26.01, "pre": 0, "tok": [{"s": "COVID", "on": 26.06, "w": 68, "k": "r"}, {"s": "and", "on": 26.56, "w": 69, "k": ""}, {"s": "the", "on": 26.62, "w": 70, "k": ""}, {"s": "2024", "on": 26.72, "w": 71, "k": "r"}, {"s": "yen", "on": 27.16, "w": 72, "k": ""}, {"s": "unwind.", "on": 27.66, "w": 73, "k": ""}], "br": []}, {"start": 28.69, "pre": 0, "tok": [{"s": "Project", "on": 28.74, "w": 74, "k": ""}, {"s": "three:", "on": 29.26, "w": 75, "k": ""}, {"s": "FRTB.", "on": 29.637, "w": 76, "k": "r"}], "br": []}, {"start": 30.071, "pre": 0, "tok": [{"s": "Standardised", "on": 30.121, "w": 77, "k": "r"}, {"s": "versus", "on": 30.82, "w": 78, "k": ""}, {"s": "internal", "on": 31.2, "w": 79, "k": "r"}, {"s": "models", "on": 31.58, "w": 80, "k": ""}, {"s": "for", "on": 31.9, "w": 81, "k": ""}, {"s": "five", "on": 32.08, "w": 82, "k": ""}, {"s": "desks,", "on": 32.34, "w": 83, "k": ""}], "br": []}, {"start": 32.69, "pre": 0, "tok": [{"s": "all", "on": 32.74, "w": 84, "k": ""}, {"s": "the", "on": 33.04, "w": 85, "k": ""}, {"s": "way", "on": 33.18, "w": 86, "k": ""}, {"s": "to", "on": 33.26, "w": 87, "k": ""}, {"s": "the", "on": 33.4, "w": 88, "k": ""}, {"s": "capital", "on": 33.5, "w": 89, "k": "r"}, {"s": "number.", "on": 33.78, "w": 90, "k": ""}], "br": []}, {"start": 34.67, "pre": 0, "tok": [{"s": "You", "on": 34.72, "w": 91, "k": ""}, {"s": "get", "on": 34.92, "w": 92, "k": ""}, {"s": "the", "on": 35.04, "w": 93, "k": ""}, {"s": "notes,", "on": 35.16, "w": 94, "k": "r"}, {"s": "executed", "on": 35.62, "w": 95, "k": ""}, {"s": "notebooks,", "on": 36.02, "w": 96, "k": "r"}], "br": []}, {"start": 36.57, "pre": 0, "tok": [{"s": "a", "on": 36.62, "w": 97, "k": ""}, {"s": "Python", "on": 36.64, "w": 98, "k": "r"}, {"s": "risk", "on": 36.94, "w": 99, "k": ""}, {"s": "library", "on": 37.18, "w": 100, "k": ""}, {"s": "and", "on": 37.7, "w": 101, "k": ""}, {"s": "14", "on": 37.76, "w": 102, "k": "r"}, {"s": "regression", "on": 38.1, "w": 103, "k": ""}, {"s": "tests.", "on": 38.5, "w": 104, "k": ""}], "br": []}, {"start": 39.47, "pre": 0, "tok": [{"s": "Comment", "on": 39.52, "w": 105, "k": ""}, {"s": "RISK,", "on": 39.82, "w": 106, "k": "r"}, {"s": "and", "on": 40.5, "w": 107, "k": ""}, {"s": "we'll", "on": 40.66, "w": 108, "k": ""}, {"s": "DM", "on": 40.8, "w": 109, "k": ""}, {"s": "you", "on": 41.04, "w": 110, "k": ""}, {"s": "50%", "on": 41.18, "w": 111, "k": "y"}, {"s": "off.", "on": 41.74, "w": 112, "k": "y"}], "br": [2]}, {"start": 42.29, "pre": 0, "tok": [{"s": "The", "on": 42.34, "w": 113, "k": ""}, {"s": "code", "on": 42.48, "w": 114, "k": ""}, {"s": "works", "on": 42.68, "w": 115, "k": ""}, {"s": "for", "on": 42.94, "w": 116, "k": ""}, {"s": "7", "on": 43.1, "w": 117, "k": "r"}, {"s": "days.", "on": 43.4, "w": 118, "k": "r"}], "br": []}, {"start": 43.85, "pre": 0, "tok": [{"s": "Save", "on": 43.9, "w": 119, "k": "r"}, {"s": "this", "on": 44.1, "w": 120, "k": "r"}, {"s": "for", "on": 44.26, "w": 121, "k": ""}, {"s": "your", "on": 44.42, "w": 122, "k": ""}, {"s": "next", "on": 44.52, "w": 123, "k": ""}, {"s": "risk", "on": 44.74, "w": 124, "k": ""}, {"s": "interview.", "on": 45.0, "w": 125, "k": ""}], "br": []}]; /*END*/
+      /*FACTS*/ const FACTS = {"product":"Market Risk Quant Notes & Lab","topics":"VaR · ES · Backtesting · FRTB","pages":141,"modules":19,"qa":64,"projects":3,"p1_desk":"Rates & FX desk","p1_days":4919,"p1_tests":["Kupiec","Christoffersen","Traffic light"],"p2_desk":"FX options desk","p2_methods":["Full revaluation","Delta-gamma-vega"],"p2_stress":[["GFC","2008"],["COVID","2020"],["","2022"],["YEN UNWIND","2024"]],"p3_desks":5,"p3_parts":["SBM","DRC","RRAO","PLA","IMCC","SES"],"library":["market","curves","instruments","risk","backtest","frtb"],"tests":14,"offer_pct":50,"offer_days":7,"handle":"@desk2quant","site":"desk2quant.com","pdf_name":"market-risk-quant-notes.pdf","page_contents":"4 / 141","page_backtest":"67 / 141","page_frtb":"86 / 141"}; /*ENDFACTS*/
+      // ===== K: the Desk2Quant "Ripping" kit, from d2q-day11-rip/work/kit.js (inlined by tools/compose.py) =====
+      // The look: warm paper with a faint grid, ink-navy type (D2QSans = Inter Bold), Share Tech Mono for small data (with
+      // D2QSans as the fallback for arrows and the like), brand blue for colour blocks and data lines, risk red #e03131 as
+      // this reel's accent (pills, title keywords, stamps), yellow only for the "50% OFF" moments. Big white cards with long
+      // soft shadows, thick strokes, app-like UI.
+      // Everything is a pure function of time.
+      const K = (function () {
+        const C = { paper: "#f3efe6", ink: "#0d1526", blue: "#2563eb", blueD: "#1e40af", blueL: "#dbe6fd", blueM: "#93b4f8",
+          yel: "#ffd43b", white: "#ffffff", red: "#e03131", redD: "#b42323", redL: "#fde3e3", sheet: "#f6f5f1",
+          mist: "#eef1f6", steel: "#95a1b3", steelL: "#dfe4eb", steelD: "#6b778a", green: "#12b886", greenD: "#0b8a63", amber: "#fab005" };
+        const F = { sans: '"D2QSans"', mono: '"ShareTechMono", "D2QSans"' };
+        const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+        const lerp = (a, b, k) => a + (b - a) * k;
+        const eo = (x) => 1 - Math.pow(1 - clamp(x), 3);
+        const ei = (x) => Math.pow(clamp(x), 3);
+        const eio = (x) => { x = clamp(x); return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
+        const back = (x, s = 1.7) => { x = clamp(x); const c = s + 1; return 1 + c * Math.pow(x - 1, 3) + s * Math.pow(x - 1, 2); };
+        // a damped spring from 0 to 1, u in seconds since release
+        const spring = (u, z = 0.5, w = 15) => (u <= 0 ? 0 : u > 3 ? 1 : 1 - Math.exp(-z * w * u) * (Math.cos(w * Math.sqrt(1 - z * z) * u) + (z / Math.sqrt(1 - z * z)) * Math.sin(w * Math.sqrt(1 - z * z) * u)));
+        const rnd = (s) => { s = Math.sin(s * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };   // seeded 0..1
+        const hex = (h) => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
+        const mix = (a, b, k, al = 1) => { const A = hex(a), Bc = hex(b); return `rgba(${A.map((v, i) => Math.round(lerp(v, Bc[i], clamp(k)))).join(",")},${al})`; };
+        const rgba = (h, al) => { const A = hex(h); return `rgba(${A.join(",")},${al})`; };
+        const MINUS = "−";
+        const fmt = (v, d = 1) => (v < 0 ? MINUS : "") + Math.abs(v).toFixed(d);
+        const comma = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+        // how blue the frame is at film time t: THEME[k] "B" beats are brand blue; the change takes 0.2 s from the beat start
+        function blueAt(t, B, TH) {
+          let k = 0; for (let i = 0; i < B.length; i++) if (t >= B[i]) k = i;
+          const cur = TH[k] === "B" ? 1 : 0, prev = k > 0 ? (TH[k - 1] === "B" ? 1 : 0) : cur;
+          return lerp(prev, cur, eo((t - B[k]) / 0.2));
+        }
+        const beatAt = (t, B) => { let k = 0; for (let i = 0; i < B.length; i++) if (t >= B[i]) k = i; return k; };
+        // a small decaying shake (u: seconds since the hit), px
+        const shake = (u, amp = 10, seed = 1) => (u <= 0 || u > 0.6 ? [0, 0] :
+          [amp * Math.exp(-u * 9) * Math.sin(u * 83 + seed), amp * 0.7 * Math.exp(-u * 9) * Math.sin(u * 61 + seed * 2.3)]);
+
+        // ---- images: loaded in init (the render waits on __hf.buildReady), drawn only once complete, from smooth
+        // step-by-step downscales cached per size
+        const IMG = {}, CACHE = {};
+        function load(map, readyKey, after) {
+          const ps = Object.entries(map).map(([k, src]) => new Promise((res) => {
+            const im = new Image(); IMG[k] = im;
+            im.onload = () => { res(); if (after) after(); }; im.onerror = () => res(); im.src = src;
+          }));
+          window.__hf = window.__hf || {}; window.__hf.buildReady = window.__hf.buildReady || {};
+          window.__hf.buildReady[readyKey] = Promise.all(ps);
+          return window.__hf.buildReady[readyKey];
+        }
+        const ok = (k) => IMG[k] && IMG[k].complete && IMG[k].naturalWidth > 0;
+        function down(src, sw, sh, wd, ht) {
+          while (sw / 2 >= wd) {
+            const c = document.createElement("canvas"); c.width = Math.round(sw / 2); c.height = Math.round(sh / 2);
+            const cx = c.getContext("2d"); cx.imageSmoothingQuality = "high"; cx.drawImage(src, 0, 0, c.width, c.height);
+            src = c; sw = c.width; sh = c.height;
+          }
+          const c = document.createElement("canvas"); c.width = Math.max(1, Math.round(wd)); c.height = Math.max(1, Math.round(ht));
+          const cx = c.getContext("2d"); cx.imageSmoothingQuality = "high"; cx.drawImage(src, 0, 0, sw, sh, 0, 0, c.width, c.height);
+          return c;
+        }
+        function pic(k, wd) {
+          wd = Math.round(wd); const key = k + "@" + wd;
+          if (CACHE[key]) return CACHE[key];
+          if (!ok(k)) return null;
+          const im = IMG[k];
+          return (CACHE[key] = down(im, im.naturalWidth, im.naturalHeight, wd, wd * im.naturalHeight / im.naturalWidth));
+        }
+
+        // ---- formulas: MathJax SVGs (work/formulas.json, typeset at build time from numbers.json) drawn as images, so
+        // they ride on cards (tilts, springs) like everything else. Each is recoloured: ink text, the \class{acc} parts in
+        // the accent, \class{blu} in brand blue. Keys are id@variant.
+        const TEXM = {};
+        function texLoad(TEX, readyKey, variants, after) {
+          const map = {};
+          for (const [vn, col] of Object.entries(variants)) {
+            for (const id in TEX) {
+              const f = TEX[id], W0 = f.w * 100, H0 = f.h * 100;
+              let s = f.svg.replace(/currentColor/g, col.ink);
+              s = s.replace(/<svg ([^>]*)>/, `<svg $1 width="${W0.toFixed(1)}" height="${H0.toFixed(1)}"><style>.acc{fill:${col.acc};stroke:${col.acc}} .blu{fill:${col.blu || col.ink};stroke:${col.blu || col.ink}}</style>`);
+              map["tex:" + id + "@" + vn] = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(s);
+              TEXM[id] = f;
+            }
+          }
+          return load(map, readyKey, after);
+        }
+        // draw formula id at (x, y = baseline), em px per TeX em; o: align, variant, k (reveal from the left), a
+        function tex(g, id, x, y, em, o = {}) {
+          const f = TEXM[id], key = "tex:" + id + "@" + (o.variant || "ink");
+          if (!f) return { w: 0, h: 0 };
+          const w = f.w * em, h = f.h * em;
+          const x0 = o.align === "center" ? x - w / 2 : o.align === "right" ? x - w : x;
+          const top = o.valign === "middle" ? y - h / 2 : o.valign === "top" ? y : y - (f.h - f.a) * em;
+          const k = clamp(o.k ?? 1);
+          if (ok(key) && k > 0 && (o.a ?? 1) > 0) {
+            g.save(); g.globalAlpha *= o.a ?? 1;
+            if (k < 1) { g.beginPath(); g.rect(x0 - 10, top - 20, (w + 20) * k, h + 40); g.clip(); }
+            g.drawImage(IMG[key], x0, top, w, h);
+            g.restore();
+          }
+          return { w, h, x0, top, bb: [x0, top, x0 + w, top + h] };
+        }
+        const texSize = (id, em) => (TEXM[id] ? { w: TEXM[id].w * em, h: TEXM[id].h * em } : { w: 0, h: 0 });
+
+        // ---- shapes and type
+        function rr(g, x, y, w, h, r) {
+          r = Math.max(0, Math.min(r, w / 2, h / 2));
+          g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r);
+          g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath();
+        }
+        // a white card with a long soft shadow (local coordinates)
+        function card(g, x, y, w, h, o = {}) {
+          g.save();
+          g.shadowColor = o.shadow || "rgba(40,32,12,0.22)"; g.shadowBlur = o.blur ?? 44; g.shadowOffsetY = o.dy ?? 22;
+          rr(g, x, y, w, h, o.r ?? 28); g.fillStyle = o.fill || C.white; g.fill();
+          g.restore();
+          if (o.stroke !== false) { g.save(); rr(g, x, y, w, h, o.r ?? 28); g.strokeStyle = o.stroke || "rgba(13,21,38,0.08)"; g.lineWidth = 1.5; g.stroke(); g.restore(); }
+        }
+        function font(g, size, mono, ls) { g.font = `${mono ? 400 : 700} ${size}px ${mono ? F.mono : F.sans}`; g.letterSpacing = (ls || 0) + "px"; }
+        function tw(g, s, size, mono, ls) { g.save(); font(g, size, mono, ls); const v = g.measureText(s).width; g.restore(); return v; }
+        function text(g, s, x, y, o = {}) {
+          g.save(); font(g, o.size || 30, o.mono, o.ls); g.fillStyle = o.c || C.ink; g.globalAlpha *= o.a ?? 1;
+          g.textAlign = o.align || "left"; g.textBaseline = o.base || "alphabetic";
+          if (o.maxW) { let sz = o.size || 30; while (sz > 12 && g.measureText(s).width > o.maxW) { sz -= 1; font(g, sz, o.mono, o.ls); } }
+          g.fillText(s, x, y);
+          const w = g.measureText(s).width; g.restore(); return w;
+        }
+
+        // ---- poses: a card that enters with a spring and a slight 3D tilt that settles (u: seconds since its start), and
+        // leaves (v: seconds since its exit starts). apply(g, cx, cy, P) sets the transform about the card's centre.
+        function enter(u, o = {}) {
+          const p = spring(u, o.z ?? 0.52, o.w ?? 12.5), q = 1 - p;
+          return { dx: (o.dx ?? 0) * q, dy: (o.dy ?? 150) * q, rot: (o.rot ?? 0.06) * q, sc: lerp(o.sc ?? 0.88, 1, p),
+            yaw: (o.yaw ?? 0.32) * q, pitch: (o.pitch ?? 0.38) * q, a: clamp(u / (o.fade ?? 0.12)) };
+        }
+        function leave(v, o = {}) {
+          const q = eio(clamp(v / (o.dur ?? 0.3)));
+          return { dx: (o.dx ?? 0) * q, dy: (o.dy ?? -140) * q, rot: (o.rot ?? -0.05) * q, sc: lerp(1, o.sc ?? 0.9, q), yaw: 0, pitch: (o.pitch ?? 0.25) * q, a: 1 - q };
+        }
+        const still = { dx: 0, dy: 0, rot: 0, sc: 1, yaw: 0, pitch: 0, a: 1 };
+        function combine(P, Q) { return { dx: P.dx + Q.dx, dy: P.dy + Q.dy, rot: P.rot + Q.rot, sc: P.sc * Q.sc, yaw: P.yaw + Q.yaw, pitch: P.pitch + Q.pitch, a: P.a * Q.a }; }
+        // the pose of a card that enters at tIn and leaves at tOut (scene time)
+        function life(t, tIn, tOut, oi = {}, oo = {}) {
+          let P = t < tIn ? Object.assign({}, still, { a: 0 }) : enter(t - tIn, oi);
+          if (tOut != null && t > tOut) P = combine(P, leave(t - tOut, oo));
+          return P;
+        }
+        function apply(g, cx, cy, P) {
+          g.translate(cx + P.dx, cy + P.dy); g.rotate(P.rot);
+          // a 3D tilt approximated in 2D: turning about the vertical axis narrows and shears; pitching squashes
+          const cy_ = Math.cos(clamp(P.yaw, -1.2, 1.2)), cp = Math.cos(clamp(P.pitch, -1.2, 1.2));
+          g.transform(cy_, 0.18 * Math.sin(P.yaw), -0.1 * Math.sin(P.pitch), cp, 0, 0);
+          g.scale(P.sc, P.sc); g.translate(-cx, -cy);
+          g.globalAlpha *= clamp(P.a);
+        }
+        // a gentle float for resting objects
+        const bob = (t, ph = 0, amp = 4) => amp * Math.sin(2 * Math.PI * t / 3.4 + ph);
+
+        // ---- counters and labels
+        function odometer(g, V, n, x, base, size, col, a) {
+          font(g, size, false, 0);
+          const dw = g.measureText("0").width * 1.02, top = base - size * 0.78, hh = size * 1.06;
+          g.save(); g.beginPath(); g.rect(x - 4, top - size * 0.12, dw * n + 8, hh + size * 0.1); g.clip();
+          for (let p = 0; p < n; p++) {
+            const pw = Math.pow(10, p), lower = V % pw, carry = p === 0 ? V - Math.floor(V) : clamp(lower - (pw - 1));
+            const d = Math.floor(V / pw) % 10, frac = carry;
+            const cx = x + (n - 1 - p) * dw + dw / 2, lead = V < pw && p > 0;
+            g.fillStyle = col; g.globalAlpha = a * (lead ? 0.22 : 1); g.textAlign = "center";
+            g.fillText(String(d), cx, base - frac * hh);
+            g.fillText(String((d + 1) % 10), cx, base + (1 - frac) * hh);
+          }
+          g.restore();
+          return dw * n;
+        }
+        // a number that counts to its target: v the current value, d decimals; digits keep their width (tabular)
+        function count(g, v, d, x, y, o = {}) {
+          const s = (v < 0 || o.neg ? MINUS : (o.plus ? "+" : "")) + Math.abs(v).toFixed(d) + (o.unit || "");
+          g.save(); font(g, o.size || 100, o.mono, o.ls ?? -1); g.fillStyle = o.c || C.ink; g.globalAlpha *= o.a ?? 1;
+          g.textBaseline = "alphabetic";
+          const dw = g.measureText("0").width;
+          const widthOf = (ch) => (/[0-9]/.test(ch) ? dw : g.measureText(ch).width);
+          let W = 0; for (const ch of s) W += widthOf(ch);
+          let px = o.align === "right" ? x - W : o.align === "center" ? x - W / 2 : x;
+          for (const ch of s) { const cw = widthOf(ch); g.textAlign = "center"; g.fillText(ch, px + cw / 2, y); px += cw; }
+          g.restore();
+          return W;
+        }
+
+        // ---- a pill chip with an optional badge, popping in
+        function chip(g, s, x, y, o = {}) {
+          if ((o.k ?? 1) <= 0) return 0;
+          const size = o.size || 30, padX = o.padX ?? 22, bw = o.badge ? size * 1.25 : 0;
+          const w = tw(g, s, size, o.mono, o.ls) + 2 * padX + (bw ? bw + 10 : 0), h = o.h || size * 1.75;
+          const k = o.k ?? 1, sc = lerp(0.5, 1, back(k, 2.4)), a = clamp(k * 3);
+          const ax = o.align === "center" ? x - w / 2 : o.align === "right" ? x - w : x;
+          g.save(); g.globalAlpha *= a * (o.a ?? 1); g.translate(ax + w / 2, y); g.rotate(o.rot || 0); g.scale(sc, sc); g.translate(-(ax + w / 2), -y);
+          card(g, ax, y - h / 2, w, h, { r: o.r ?? h / 2, fill: o.fill || C.white, shadow: o.shadow || "rgba(52,40,14,0.2)", blur: o.blur ?? 18, dy: o.sdy ?? 7, stroke: o.stroke });
+          let tx = ax + padX;
+          if (o.badge) {
+            g.beginPath(); g.arc(tx + bw / 2 - 4, y, bw / 2, 0, Math.PI * 2); g.fillStyle = o.badgeFill || C.blue; g.fill();
+            text(g, o.badge, tx + bw / 2 - 4, y + size * 0.36, { size: o.badgeSize || size * 0.82, c: o.badgeCol || C.white, align: "center", mono: o.badgeMono });
+            tx += bw + 10;
+          }
+          text(g, s, tx, y + size * (o.mono ? 0.34 : 0.36), { size, c: o.col || C.ink, mono: o.mono, ls: o.ls });
+          g.restore();
+          return w;
+        }
+        // a label tag for data provenance: REAL DATA / SIMULATED / ILLUSTRATIVE, mono, with a coloured dot
+        function prov(g, s, x, y, o = {}) {
+          const size = o.size || 26, col = o.col || C.blue, w = tw(g, s, size, true, 1.5) + 58, h = size * 1.7;
+          const ax = o.align === "right" ? x - w : o.align === "center" ? x - w / 2 : x;
+          g.save(); g.globalAlpha *= o.a ?? 1;
+          rr(g, ax, y - h / 2, w, h, h / 2); g.fillStyle = o.fill || rgba(col, 0.1); g.fill();
+          g.strokeStyle = rgba(col, 0.55); g.lineWidth = 2; g.stroke();
+          g.beginPath(); g.arc(ax + 24, y, 7, 0, Math.PI * 2); g.fillStyle = col; g.fill();
+          text(g, s, ax + 42, y + size * 0.34, { size, mono: true, ls: 1.5, c: o.tc || C.ink });
+          g.restore();
+          return w;
+        }
+
+        // ---- a rubber stamp that slams down (u: seconds since the slam starts)
+        function stamp(g, s, x, y, o = {}) {
+          const u = o.u ?? 1; if (u <= 0) return;
+          const size = o.size || 70, col = o.col || C.blue, ls = o.ls ?? 6;
+          const w = tw(g, s, size, false, ls) + 64, h = size * 1.5;
+          const sc = u < 0.12 ? lerp(2.1, 1, ei(u / 0.12)) : 1 + 0.07 * Math.exp(-(u - 0.12) * 16) * Math.sin((u - 0.12) * 46);
+          g.save(); g.globalAlpha *= clamp(u / 0.05) * (o.a ?? 1);
+          g.translate(x, y); g.rotate(o.rot ?? -0.2); g.scale(sc, sc);
+          if (o.fill) { rr(g, -w / 2, -h / 2, w, h, 16); g.fillStyle = o.fill; g.fill(); }
+          g.strokeStyle = col; g.lineWidth = 8; rr(g, -w / 2, -h / 2, w, h, 16); g.stroke();
+          g.lineWidth = 2.5; rr(g, -w / 2 + 11, -h / 2 + 11, w - 22, h - 22, 9); g.stroke();
+          text(g, s, ls / 2, size * 0.36, { size, c: col, align: "center", ls });
+          // worn ink: seeded specks of the ground colour knock out of the stamp
+          g.fillStyle = o.ground || C.white;
+          for (let i = 0; i < 70; i++) { const px = (rnd(i * 3.1 + (o.seed || 1)) - 0.5) * w, py = (rnd(i * 7.7 + (o.seed || 1)) - 0.5) * h; g.globalAlpha = 0.5 * clamp(u / 0.05) * (o.a ?? 1); g.fillRect(px, py, 2.6, 2.6); }
+          g.restore();
+          if (u > 0.1 && u < 0.45) { const r = (u - 0.1) / 0.35; g.save(); g.strokeStyle = rgba(col, 0.45 * (1 - r)); g.lineWidth = 5;
+            g.beginPath(); g.ellipse(x, y, w * 0.55 + 80 * eo(r), h * 0.55 + 56 * eo(r), o.rot ?? -0.2, 0, Math.PI * 2); g.stroke(); g.restore(); }
+        }
+
+        // ---- the arrow cursor (tip at x, y), pressing (p 0..1) and the click ripple (r: seconds since the click)
+        function cursor(g, x, y, o = {}) {
+          const s = (o.s || 1.25) * (1 - 0.12 * (o.p || 0));
+          if (o.r != null && o.r > 0 && o.r < 0.5) { const q = o.r / 0.5; g.save(); g.strokeStyle = rgba(C.blue, 0.7 * (1 - q)); g.lineWidth = 5;
+            g.beginPath(); g.arc(x, y, 12 + 56 * eo(q), 0, Math.PI * 2); g.stroke(); g.restore(); }
+          g.save(); g.translate(x, y); g.scale(s, s); g.globalAlpha *= o.a ?? 1;
+          g.beginPath(); g.moveTo(0, 0); g.lineTo(0, 44); g.lineTo(11, 33); g.lineTo(19, 51); g.lineTo(27, 47); g.lineTo(19, 30); g.lineTo(34, 30); g.closePath();
+          g.shadowColor = "rgba(0,0,0,0.3)"; g.shadowBlur = 10; g.shadowOffsetY = 4; g.fillStyle = C.white; g.fill();
+          g.shadowColor = "transparent"; g.lineWidth = 3; g.lineJoin = "round"; g.strokeStyle = C.ink; g.stroke();
+          g.restore();
+        }
+        // a cursor path: glides between waypoints [[t, x, y], ...] with an ease; clicks [t, ...] press it
+        function cursorAt(t, pts, clicks = []) {
+          let x = pts[0][1], y = pts[0][2];
+          for (let i = 1; i < pts.length; i++) {
+            const [t1, x1, y1] = pts[i], [t0, x0, y0] = pts[i - 1];
+            if (t >= t1) { x = x1; y = y1; continue; }
+            if (t > t0) { const q = eio((t - t0) / (t1 - t0)); x = lerp(x0, x1, q) ; y = lerp(y0, y1, q) - 26 * Math.sin(Math.PI * q); }
+            break;
+          }
+          let p = 0, r = null;
+          for (const c of clicks) { const d = t - c; if (d > -0.08 && d < 0.1) p = Math.max(p, 1 - Math.abs(d) / 0.1); if (d >= 0 && (r == null || d < r)) r = d; }
+          return { x, y, p, r };
+        }
+
+        // ---- icons
+        function check(g, x, y, s, col, lw) {
+          g.save(); g.strokeStyle = col; g.lineWidth = lw || s * 0.18; g.lineCap = "round"; g.lineJoin = "round";
+          g.beginPath(); g.moveTo(x - s * 0.42, y + s * 0.02); g.lineTo(x - s * 0.12, y + s * 0.32); g.lineTo(x + s * 0.44, y - s * 0.3); g.stroke(); g.restore();
+        }
+        function bookmark(g, x, y, s, fill, col, lw) {
+          g.save(); g.beginPath(); g.moveTo(x - s * 0.34, y - s * 0.5); g.lineTo(x + s * 0.34, y - s * 0.5); g.lineTo(x + s * 0.34, y + s * 0.5);
+          g.lineTo(x, y + s * 0.22); g.lineTo(x - s * 0.34, y + s * 0.5); g.closePath(); g.lineJoin = "round";
+          if (fill) { g.fillStyle = fill; g.fill(); }
+          g.strokeStyle = col; g.lineWidth = lw || 4; g.stroke(); g.restore();
+        }
+        function heart(g, x, y, s, col, fill) {
+          g.save(); g.beginPath(); g.moveTo(x, y + s * 0.42);
+          g.bezierCurveTo(x - s * 0.62, y + s * 0.02, x - s * 0.52, y - s * 0.5, x, y - s * 0.18);
+          g.bezierCurveTo(x + s * 0.52, y - s * 0.5, x + s * 0.62, y + s * 0.02, x, y + s * 0.42); g.closePath();
+          if (fill) { g.fillStyle = fill; g.fill(); } g.strokeStyle = col; g.lineWidth = 4; g.stroke(); g.restore();
+        }
+        function plane(g, x, y, s, col, lw) {
+          g.save(); g.strokeStyle = col; g.lineWidth = lw || 4; g.lineJoin = "round"; g.beginPath();
+          g.moveTo(x - s * 0.45, y - s * 0.05); g.lineTo(x + s * 0.45, y - s * 0.42); g.lineTo(x + s * 0.12, y + s * 0.45); g.lineTo(x - s * 0.02, y + s * 0.08); g.closePath();
+          g.moveTo(x - s * 0.02, y + s * 0.08); g.lineTo(x + s * 0.45, y - s * 0.42); g.stroke(); g.restore();
+        }
+        function avatar(g, x, y, r, bg) {   // a neutral person icon (no face)
+          g.save(); g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fillStyle = bg || "#e3e7ef"; g.fill(); g.clip();
+          g.fillStyle = "#a9b3c6"; g.beginPath(); g.arc(x, y - r * 0.2, r * 0.36, 0, Math.PI * 2); g.fill();
+          g.beginPath(); g.ellipse(x, y + r * 0.72, r * 0.66, r * 0.5, 0, 0, Math.PI * 2); g.fill(); g.restore();
+        }
+
+        // ---- chrome pipes: a polyline drawn as a glossy tube; flow (0..1 of its length) fills it with brand-blue light
+        function pathLen(pts) { let L = 0; for (let i = 1; i < pts.length; i++) L += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); return L; }
+        function subPath(pts, L) {   // the first L px of the polyline
+          const out = [pts[0]]; let acc = 0;
+          for (let i = 1; i < pts.length; i++) {
+            const d = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]);
+            if (acc + d >= L) { const f = (L - acc) / d; out.push([lerp(pts[i - 1][0], pts[i][0], f), lerp(pts[i - 1][1], pts[i][1], f)]); return out; }
+            acc += d; out.push(pts[i]);
+          }
+          return out;
+        }
+        function poly(g, pts) { g.beginPath(); g.moveTo(pts[0][0], pts[0][1]); for (let i = 1; i < pts.length; i++) g.lineTo(pts[i][0], pts[i][1]); }
+        function pipe(g, pts, w, o = {}) {
+          const grow = clamp(o.grow ?? 1); if (grow <= 0) return;
+          const L = pathLen(pts), P = grow < 1 ? subPath(pts, L * grow) : pts;
+          g.save(); g.lineCap = "round"; g.lineJoin = "round"; g.globalAlpha *= o.a ?? 1;
+          if (o.base !== false) {
+            g.shadowColor = "rgba(40,32,12,0.22)"; g.shadowBlur = 14; g.shadowOffsetY = 8;
+            poly(g, P); g.strokeStyle = "#8994a7"; g.lineWidth = w; g.stroke();
+            g.shadowColor = "transparent";
+            poly(g, P); g.strokeStyle = "#c9d1dc"; g.lineWidth = w - 6; g.stroke();
+            poly(g, P); g.strokeStyle = "#eef2f6"; g.lineWidth = w * 0.42; g.stroke();
+            poly(g, P); g.strokeStyle = "rgba(255,255,255,0.95)"; g.lineWidth = w * 0.14; g.stroke();
+          }
+          const fl = clamp(o.flow ?? 0);
+          if (fl > 0) {
+            const Q = subPath(P, pathLen(P) * fl);
+            poly(g, Q); g.strokeStyle = rgba(C.blue, 0.95); g.lineWidth = w * 0.5; g.stroke();
+            poly(g, Q); g.strokeStyle = "rgba(255,255,255,0.55)"; g.lineWidth = w * 0.12; g.stroke();
+            if (fl < 1) { const e = Q[Q.length - 1]; g.beginPath(); g.arc(e[0], e[1], w * 0.42, 0, Math.PI * 2); g.fillStyle = "#7fb0ff"; g.fill(); }
+          }
+          g.restore();
+        }
+        // a pipe joint collar
+        function collar(g, x, y, w, h, horiz) {
+          g.save();
+          const gr = horiz ? g.createLinearGradient(x - w / 2, 0, x + w / 2, 0) : g.createLinearGradient(0, y - h / 2, 0, y + h / 2);
+          gr.addColorStop(0, "#7d889b"); gr.addColorStop(0.35, "#f4f6f9"); gr.addColorStop(0.7, "#b9c2cf"); gr.addColorStop(1, "#6f7a8d");
+          rr(g, x - w / 2, y - h / 2, w, h, 5); g.fillStyle = gr; g.fill(); g.restore();
+        }
+
+        // ---- split-flap digits: a cell shows char `cur`, flipping from `prev` (f 0..1)
+        function flapHalf(g, ch, x, y, w, h, top, sy, o) {
+          const hy = y + h / 2;
+          g.save(); g.translate(0, hy); g.scale(1, Math.max(0.001, sy)); g.translate(0, -hy);
+          g.beginPath(); top ? g.rect(x, y, w, h / 2) : g.rect(x, hy, w, h / 2); g.clip();
+          const gr = g.createLinearGradient(0, y, 0, y + h);
+          gr.addColorStop(0, o.bg0 || "#26324b"); gr.addColorStop(0.5, o.bg1 || "#141d31"); gr.addColorStop(1, o.bg2 || "#0b1222");
+          rr(g, x, y, w, h, o.r ?? 8); g.fillStyle = gr; g.fill();
+          if (o.dim > 0) { rr(g, x, y, w, h, o.r ?? 8); g.fillStyle = `rgba(0,0,0,${0.45 * o.dim})`; g.fill(); }
+          const fs = (o.size || h * 0.66) * (ch === "%" ? 0.7 : 1);
+          if (ch && ch !== " ") text(g, ch, x + w / 2, y + h / 2 + fs * 0.36, { size: fs, align: "center", c: o.col || C.white });
+          g.restore();
+        }
+        function flapCell(g, x, y, w, h, prev, cur, f, o = {}) {
+          g.save();
+          g.shadowColor = "rgba(13,21,38,0.25)"; g.shadowBlur = 8; g.shadowOffsetY = 4;
+          rr(g, x, y, w, h, o.r ?? 8); g.fillStyle = "#0b1222"; g.fill(); g.restore();
+          if (f <= 0 || f >= 1 || prev === cur) {
+            const ch = f <= 0 ? prev : cur;
+            flapHalf(g, ch, x, y, w, h, true, 1, o); flapHalf(g, ch, x, y, w, h, false, 1, o);
+          } else if (f < 0.5) {
+            flapHalf(g, cur, x, y, w, h, true, 1, o); flapHalf(g, prev, x, y, w, h, false, 1, o);
+            flapHalf(g, prev, x, y, w, h, true, 1 - 2 * f, Object.assign({}, o, { dim: 2 * f }));
+          } else {
+            flapHalf(g, cur, x, y, w, h, true, 1, o); flapHalf(g, prev, x, y, w, h, false, 1, o);
+            flapHalf(g, cur, x, y, w, h, false, 2 * f - 1, Object.assign({}, o, { dim: 2 - 2 * f }));
+          }
+          // the hinge
+          g.fillStyle = "rgba(0,0,0,0.55)"; g.fillRect(x, y + h / 2 - 1.5, w, 3);
+          g.fillStyle = "rgba(255,255,255,0.08)"; g.fillRect(x, y + h / 2 + 1.5, w, 1);
+        }
+        // the state of a flap that runs through chars seq from t0, dt per flip: { prev, cur, f }
+        function flapState(seq, t0, dt, t) {
+          if (t <= t0) return { prev: seq[0], cur: seq[0], f: 0 };
+          const n = seq.length - 1, u = (t - t0) / dt;
+          if (u >= n) return { prev: seq[n], cur: seq[n], f: 0 };
+          const i = Math.floor(u);
+          return { prev: seq[i], cur: seq[i + 1], f: u - i };
+        }
+        // a row of flap cells: s strings (prev, cur per cell from states)
+        function flapRow(g, states, x, y, cw, ch, gap, o = {}) {
+          states.forEach((S, i) => flapCell(g, x + i * (cw + gap), y, cw, ch, S.prev, S.cur, S.f, o));
+          return states.length * (cw + gap) - gap;
+        }
+
+        // ---- charts (bold): a plot frame maps data to px
+        function frame(x, y, w, h, xr, yr) {
+          return { x, y, w, h, xr, yr,
+            X: (v) => x + (v - xr[0]) / (xr[1] - xr[0]) * w,
+            Y: (v) => y + h - (v - yr[0]) / (yr[1] - yr[0]) * h };
+        }
+        // axes: o = { xt, yt, xf, yf, xl, yl, k (draw-in), a, size, grid, col }
+        function axes(g, Fr, o = {}) {
+          const a = o.a ?? 1, k = eo(o.k ?? 1); if (a <= 0 || k <= 0) return;
+          const sz = o.size ?? 28, col = o.col || C.ink;
+          g.save(); g.globalAlpha *= a;
+          if (o.grid !== false) {
+            g.strokeStyle = rgba(col, 0.09); g.lineWidth = 2; g.beginPath();
+            (o.yt || []).forEach((v) => { const py = Fr.Y(v); g.moveTo(Fr.x, py); g.lineTo(Fr.x + Fr.w * k, py); });
+            g.stroke();
+          }
+          g.strokeStyle = rgba(col, 0.85); g.lineWidth = 4; g.lineCap = "round"; g.beginPath();
+          g.moveTo(Fr.x, Fr.y + Fr.h); g.lineTo(Fr.x + Fr.w * k, Fr.y + Fr.h);
+          if (!o.noY) { g.moveTo(Fr.x, Fr.y + Fr.h); g.lineTo(Fr.x, Fr.y + Fr.h - Fr.h * k); }
+          g.stroke();
+          (o.xt || []).forEach((v, i) => {
+            const ka = clamp((k - i / Math.max(1, o.xt.length) * 0.6) * 3); if (ka <= 0) return;
+            const px = Fr.X(v);
+            g.globalAlpha = a * ka; g.beginPath(); g.moveTo(px, Fr.y + Fr.h); g.lineTo(px, Fr.y + Fr.h + 10); g.stroke();
+            text(g, o.xf ? o.xf(v) : String(v), px, Fr.y + Fr.h + 18 + sz, { size: sz, mono: true, align: "center", c: rgba(col, 0.75) });
+          });
+          if (!o.noY) (o.yt || []).forEach((v, i) => {
+            const ka = clamp((k - i / Math.max(1, o.yt.length) * 0.6) * 3); if (ka <= 0) return;
+            g.globalAlpha = a * ka;
+            text(g, o.yf ? o.yf(v) : String(v), Fr.x - 16, Fr.Y(v) + sz * 0.34, { size: sz, mono: true, align: "right", c: rgba(col, 0.75) });
+          });
+          g.globalAlpha = a * clamp(k * 2 - 1);
+          if (o.xl) text(g, o.xl, Fr.x + Fr.w, Fr.y + Fr.h + 2 * sz + 34, { size: sz - 2, mono: true, ls: 2, align: "right", c: rgba(col, 0.55) });
+          if (o.yl) text(g, o.yl, Fr.x - (o.ylDx ?? 0), Fr.y - 22, { size: sz - 2, mono: true, ls: 2, c: rgba(col, 0.55) });
+          g.restore();
+        }
+        // a curve: o = { c, w, a, k (0..1 drawn left to right) or x1, dash, glow, head }
+        function line(g, Fr, xs, ys, o = {}) {
+          const a = o.a ?? 1; if (a <= 0) return null;
+          const xEnd = o.x1 ?? lerp(xs[0], xs[xs.length - 1], clamp(o.k ?? 1));
+          const pts = [];
+          for (let i = 0; i < xs.length; i++) {
+            if (xs[i] > xEnd) { if (i > 0) { const f = (xEnd - xs[i - 1]) / (xs[i] - xs[i - 1]); pts.push([Fr.X(xEnd), Fr.Y(lerp(ys[i - 1], ys[i], f))]); } break; }
+            pts.push([Fr.X(xs[i]), Fr.Y(ys[i])]);
+          }
+          if (pts.length < 2) return null;
+          g.save(); g.globalAlpha *= a; g.lineJoin = "round"; g.lineCap = "round";
+          if (o.clip !== false) { g.beginPath(); g.rect(Fr.x - 10, Fr.y - 30, Fr.w + 20, Fr.h + 40); g.clip(); }
+          if (o.glow) { g.shadowColor = rgba(o.c || C.blue, 0.5 * o.glow); g.shadowBlur = 24 * o.glow; }
+          poly(g, pts); g.setLineDash(o.dash || []); g.strokeStyle = o.c || C.blue; g.lineWidth = o.w ?? 7; g.stroke();
+          g.setLineDash([]); g.shadowColor = "transparent";
+          const end = pts[pts.length - 1];
+          if (o.head && (o.k ?? 1) < 1) {
+            g.beginPath(); g.arc(end[0], end[1], (o.w ?? 7) * 1.6, 0, Math.PI * 2); g.fillStyle = C.white; g.fill();
+            g.lineWidth = 5; g.strokeStyle = o.c || C.blue; g.stroke();
+          }
+          g.restore();
+          return { end, pts };
+        }
+        function area(g, Fr, xs, ys, o = {}) {
+          const a = o.a ?? 1; if (a <= 0) return;
+          const base = o.base ?? Fr.yr[0], x0 = o.x0 ?? xs[0], x1 = Math.min(o.x1 ?? xs[xs.length - 1], lerp(xs[0], xs[xs.length - 1], clamp(o.k ?? 1)));
+          if (x1 <= x0) return;
+          g.save(); g.beginPath(); g.rect(Fr.x, Fr.y - 30, Fr.w, Fr.h + 30); g.clip();
+          g.beginPath(); g.moveTo(Fr.X(x0), Fr.Y(base));
+          for (let i = 0; i < xs.length; i++) { if (xs[i] < x0) continue; if (xs[i] > x1) break; g.lineTo(Fr.X(xs[i]), Fr.Y(ys[i])); }
+          g.lineTo(Fr.X(x1), Fr.Y(base)); g.closePath();
+          if (o.grad) {
+            const gr = g.createLinearGradient(0, Fr.y, 0, Fr.y + Fr.h);
+            gr.addColorStop(0, rgba(o.c || C.blue, (o.fa ?? 0.3) * a)); gr.addColorStop(1, rgba(o.c || C.blue, 0.03 * a)); g.fillStyle = gr;
+          } else g.fillStyle = rgba(o.c || C.blue, (o.fa ?? 0.18) * a);
+          g.fill(); g.restore();
+        }
+        // candles: d = { open, high, low, close }, xs; o = { n (how many shown; the last grows), bw (px), hl (index:
+        // red), a, drop (0..1.15: the hl candle's body grows down with an overshoot) }
+        function candles(g, Fr, d, xs, o = {}) {
+          const a = o.a ?? 1; if (a <= 0) return;
+          const n = o.n ?? xs.length, bw = o.bw ?? 12;
+          g.save(); g.globalAlpha *= a;
+          for (let i = 0; i < Math.min(xs.length, Math.ceil(n)); i++) {
+            const grow = eo(clamp(n - i)), hl = o.hl === i;
+            const op = d.open[i], cl = lerp(op, d.close[i], grow), hi = lerp(op, d.high[i], grow), lo = lerp(op, d.low[i], grow);
+            const up = d.close[i] >= op, cx = Fr.X(xs[i]), w = hl ? bw * 1.5 : bw;
+            const col = hl ? C.red : up ? C.blue : C.ink;
+            g.strokeStyle = col; g.lineWidth = hl ? 5 : 3.5; g.lineCap = "round";
+            g.beginPath(); g.moveTo(cx, Fr.Y(hi)); g.lineTo(cx, Fr.Y(lo)); g.stroke();
+            const y0 = Fr.Y(Math.max(op, cl)), y1 = Fr.Y(Math.min(op, cl)), hh = Math.max(3, y1 - y0);
+            if (up && !hl) { g.fillStyle = C.white; rr(g, cx - w / 2, y0, w, hh, 3); g.fill(); g.lineWidth = 3.5; g.stroke(); }
+            else { g.fillStyle = col; rr(g, cx - w / 2, y0, w, hh, 3); g.fill(); }
+          }
+          g.restore();
+        }
+        function hline(g, Fr, v, o = {}) {
+          const a = o.a ?? 1, k = clamp(o.k ?? 1); if (a <= 0 || k <= 0) return;
+          const py = Fr.Y(v);
+          g.save(); g.globalAlpha *= a; g.setLineDash(o.dash ?? [14, 10]); g.strokeStyle = o.c || C.ink; g.lineWidth = o.w ?? 4; g.lineCap = "butt";
+          g.lineDashOffset = o.off ?? 0;
+          g.beginPath(); g.moveTo(Fr.x, py); g.lineTo(Fr.x + Fr.w * k, py); g.stroke(); g.restore();
+        }
+        // a big data point: white ring, coloured core, soft shadow; s scale, pulse (0..1) an expanding ring
+        function dot(g, x, y, o = {}) {
+          const a = o.a ?? 1, r = (o.r ?? 13) * (o.s ?? 1); if (a <= 0 || r <= 0) return;
+          g.save(); g.globalAlpha *= a;
+          g.shadowColor = "rgba(13,21,38,0.28)"; g.shadowBlur = 10; g.shadowOffsetY = 4;
+          g.beginPath(); g.arc(x, y, r + 6, 0, Math.PI * 2); g.fillStyle = C.white; g.fill();
+          g.shadowColor = "transparent";
+          g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fillStyle = o.c || C.blue; g.fill();
+          if (o.pulse > 0 && o.pulse < 1) { g.strokeStyle = rgba(o.c || C.blue, 0.75 * (1 - o.pulse)); g.lineWidth = 4; g.beginPath(); g.arc(x, y, r + 8 + 40 * eo(o.pulse), 0, Math.PI * 2); g.stroke(); }
+          g.restore();
+        }
+        // a monotone cubic through points (no overshoot between them)
+        function smooth(xs, ys) {
+          const n = xs.length, d = [], m = new Array(n);
+          for (let i = 0; i < n - 1; i++) d.push((ys[i + 1] - ys[i]) / (xs[i + 1] - xs[i]));
+          m[0] = d[0]; m[n - 1] = d[n - 2];
+          for (let i = 1; i < n - 1; i++) m[i] = d[i - 1] * d[i] <= 0 ? 0 : (d[i - 1] + d[i]) / 2;
+          for (let i = 0; i < n - 1; i++) {
+            if (d[i] === 0) { m[i] = 0; m[i + 1] = 0; continue; }
+            const a = m[i] / d[i], b = m[i + 1] / d[i], s = a * a + b * b;
+            if (s > 9) { const k = 3 / Math.sqrt(s); m[i] = k * a * d[i]; m[i + 1] = k * b * d[i]; }
+          }
+          return (x) => {
+            let i = 0; while (i < n - 2 && x > xs[i + 1]) i++;
+            const h = xs[i + 1] - xs[i], u = (x - xs[i]) / h, u2 = u * u, u3 = u2 * u;
+            return (2 * u3 - 3 * u2 + 1) * ys[i] + (u3 - 2 * u2 + u) * h * m[i] + (-2 * u3 + 3 * u2) * ys[i + 1] + (u3 - u2) * h * m[i + 1];
+          };
+        }
+
+        // ---- app-like UI: a field, a button, a slider, a toggle
+        function field(g, x, y, w, h, o = {}) {
+          rr(g, x, y, w, h, o.r ?? 18); g.fillStyle = o.fill || C.mist; g.fill();
+          g.strokeStyle = o.focus ? C.blue : rgba(C.ink, 0.14); g.lineWidth = o.focus ? 4 : 2; g.stroke();
+          if (o.label) text(g, o.label, x + 22, y - 14, { size: 26, mono: true, ls: 2, c: rgba(C.ink, 0.55) });
+          if (o.value != null) text(g, o.value, x + 24, y + h / 2 + (o.size || 44) * 0.36, { size: o.size || 44, c: o.col || C.ink, mono: o.mono });
+        }
+        function button(g, s, x, y, w, h, o = {}) {
+          const p = o.p || 0, sc = 1 - 0.06 * p;
+          g.save(); g.translate(x + w / 2, y + h / 2); g.scale(sc, sc); g.translate(-(x + w / 2), -(y + h / 2));
+          g.save(); g.shadowColor = rgba(o.fill || C.blue, 0.4); g.shadowBlur = 20 * (1 - p); g.shadowOffsetY = 10 * (1 - p);
+          rr(g, x, y, w, h, o.r ?? h / 2); g.fillStyle = o.fill || C.blue; g.fill(); g.restore();
+          text(g, s, x + w / 2, y + h / 2 + (o.size || 36) * 0.36, { size: o.size || 36, align: "center", c: o.col || C.white, ls: o.ls ?? 1 });
+          g.restore();
+        }
+        function slider(g, x, y, w, v, o = {}) {   // v 0..1
+          g.save(); g.lineCap = "round";
+          g.beginPath(); g.moveTo(x, y); g.lineTo(x + w, y); g.strokeStyle = "#dde3ec"; g.lineWidth = 14; g.stroke();
+          g.beginPath(); g.moveTo(x, y); g.lineTo(x + w * clamp(v), y); g.strokeStyle = o.col || C.blue; g.lineWidth = 14; g.stroke();
+          const kx = x + w * clamp(v);
+          g.shadowColor = "rgba(13,21,38,0.3)"; g.shadowBlur = 10; g.shadowOffsetY = 4;
+          g.beginPath(); g.arc(kx, y, 22 * (1 + 0.15 * (o.p || 0)), 0, Math.PI * 2); g.fillStyle = C.white; g.fill();
+          g.shadowColor = "transparent"; g.lineWidth = 5; g.strokeStyle = o.col || C.blue; g.stroke();
+          g.restore();
+          return kx;
+        }
+        function toggle(g, x, y, on, o = {}) {   // on 0..1
+          const w = o.w || 96, h = o.h || 54;
+          rr(g, x, y - h / 2, w, h, h / 2); g.fillStyle = mix("#cfd6e0", o.col || C.blue, on); g.fill();
+          const kx = lerp(x + h / 2, x + w - h / 2, eio(on));
+          g.save(); g.shadowColor = "rgba(13,21,38,0.3)"; g.shadowBlur = 8; g.shadowOffsetY = 3;
+          g.beginPath(); g.arc(kx, y, h / 2 - 6, 0, Math.PI * 2); g.fillStyle = C.white; g.fill(); g.restore();
+        }
+
+        // ---- glossy balls (particles): one ball at x, y, radius r, colour col
+        function ball(g, x, y, r, col) {
+          const gr = g.createRadialGradient(x - r * 0.35, y - r * 0.4, r * 0.1, x, y, r);
+          gr.addColorStop(0, mix(col, "#ffffff", 0.65)); gr.addColorStop(0.55, col); gr.addColorStop(1, mix(col, "#000000", 0.35));
+          g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fillStyle = gr; g.fill();
+        }
+        // a highlighter sweep (multiply) over [x, y, w, h], u 0..1
+        function highlight(g, x, y, w, h, u, col) {
+          if (u <= 0) return;
+          g.save(); g.globalCompositeOperation = "multiply"; rr(g, x, y, w * eo(u), h, 8); g.fillStyle = col || C.yel; g.fill(); g.restore();
+        }
+
+
+        // ===== additions for the Market Risk promo =====
+        // ---- a padlock: body, keyhole and shackle, centred at x, y (size s); open 0..1 lifts and swings the shackle
+        function lock(g, x, y, s, o = {}) {
+          const col = o.col || C.ink, op = clamp(o.open || 0);
+          g.save(); g.translate(x, y); g.globalAlpha *= o.a ?? 1;
+          g.save(); g.translate(-s * 0.22, -s * 0.04 - s * 0.2 * eo(op)); g.rotate(-0.55 * eio(clamp(op * 1.4 - 0.4)));
+          g.strokeStyle = col; g.lineWidth = s * 0.12; g.lineCap = "round";
+          g.beginPath(); g.moveTo(0, 0); g.lineTo(0, -s * 0.2); g.arc(s * 0.22, -s * 0.2, s * 0.22, Math.PI, 0); g.lineTo(s * 0.44, op > 0 ? -s * 0.12 : 0); g.stroke();
+          g.restore();
+          rr(g, -s * 0.36, -s * 0.06, s * 0.72, s * 0.56, s * 0.1); g.fillStyle = col; g.fill();
+          g.beginPath(); g.arc(0, s * 0.17, s * 0.075, 0, Math.PI * 2); g.fillStyle = o.hole || C.white; g.fill();
+          g.fillRect(-s * 0.025, s * 0.17, s * 0.05, s * 0.15);
+          g.restore();
+        }
+        // ---- a typing bubble with three bouncing dots, top-left at x, y
+        function typingDots(g, x, y, t, o = {}) {
+          const w = o.w || 150, h = o.h || 84;
+          g.save(); g.globalAlpha *= o.a ?? 1;
+          rr(g, x, y, w, h, h / 2); g.fillStyle = o.fill || C.mist; g.fill();
+          for (let d = 0; d < 3; d++) {
+            const ph = Math.max(0, Math.sin(t * 9 - d * 0.9));
+            g.beginPath(); g.arc(x + w / 2 - 34 + d * 34, y + h / 2 - 7 * ph, 9.5, 0, Math.PI * 2);
+            g.fillStyle = rgba(o.col || C.ink, 0.32 + 0.38 * ph); g.fill();
+          }
+          g.restore();
+        }
+        // ---- an image (IMG[key]) of width w with its top-left at x, y: rounded, a soft long shadow, a hairline; returns h
+        function photo(g, key, x, y, w, o = {}) {
+          if (!ok(key)) return 0;
+          const im = IMG[key], h = w * im.naturalHeight / im.naturalWidth, p = pic(key, o.res || w);
+          g.save(); g.globalAlpha *= o.a ?? 1;
+          g.save(); g.shadowColor = o.shadow || "rgba(40,32,12,0.28)"; g.shadowBlur = o.blur ?? 40; g.shadowOffsetY = o.dy ?? 20;
+          rr(g, x, y, w, h, o.r ?? 14); g.fillStyle = C.white; g.fill(); g.restore();
+          g.save(); rr(g, x, y, w, h, o.r ?? 14); g.clip(); g.drawImage(p, x, y, w, h); g.restore();
+          if (o.stroke !== false) { rr(g, x, y, w, h, o.r ?? 14); g.strokeStyle = o.stroke || "rgba(13,21,38,0.14)"; g.lineWidth = 1.5; g.stroke(); }
+          g.restore();
+          return h;
+        }
+        // ---- a PDF viewer window: a toolbar (three dots, the file name, the page number) over a real page image (IMG[key]),
+        // scrolled so the page's fraction sy sits at the top of the view. o: { title, page, sy, pad, a }
+        function pdfView(g, key, x, y, w, h, o = {}) {
+          const bar = o.bar ?? 62, pad = o.pad ?? 16;
+          g.save(); g.globalAlpha *= o.a ?? 1;
+          card(g, x, y, w, h, { r: 24, blur: o.blur ?? 44, dy: o.dy ?? 22, shadow: o.shadow });
+          g.save(); rr(g, x, y, w, h, 24); g.clip();
+          g.fillStyle = "#e9ecf2"; g.fillRect(x, y, w, bar);
+          [C.red, C.amber, C.green].forEach((c, i) => { g.beginPath(); g.arc(x + 30 + i * 26, y + bar / 2, 8, 0, Math.PI * 2); g.fillStyle = c; g.fill(); });
+          if (o.title) text(g, o.title, x + 122, y + bar / 2 + 9, { size: 25, mono: true, c: rgba(C.ink, 0.72), maxW: w - 300 });
+          if (o.page) {
+            const pw = tw(g, o.page, 25, true) + 28;
+            rr(g, x + w - 20 - pw, y + bar / 2 - 19, pw, 38, 19); g.fillStyle = C.white; g.fill();
+            text(g, o.page, x + w - 20 - pw / 2, y + bar / 2 + 9, { size: 25, mono: true, align: "center", c: rgba(C.ink, 0.7) });
+          }
+          g.fillStyle = "#cfd4dd"; g.fillRect(x, y + bar, w, h - bar);
+          if (ok(key)) {
+            const im = IMG[key], pw = w - 2 * pad, ph = pw * im.naturalHeight / im.naturalWidth;
+            const top = y + bar + pad - (o.sy || 0) * ph;
+            g.save(); g.beginPath(); g.rect(x, y + bar, w, h - bar); g.clip();
+            g.shadowColor = "rgba(13,21,38,0.25)"; g.shadowBlur = 18; g.shadowOffsetY = 6;
+            g.fillStyle = C.white; g.fillRect(x + pad, top, pw, ph); g.shadowColor = "transparent";
+            g.drawImage(pic(key, pw), x + pad, top, pw, ph);
+            if (o.after) o.after(g, x + pad, top, pw, ph);
+            g.restore();
+          }
+          g.restore();
+          rr(g, x, y, w, h, 24); g.strokeStyle = "rgba(13,21,38,0.14)"; g.lineWidth = 2; g.stroke();
+          g.fillStyle = "rgba(13,21,38,0.1)"; g.fillRect(x, y + bar - 1, w, 2);
+          g.restore();
+        }
+        // ---- an illustrative daily-P&L histogram: Student-t with 4 d.f. (density 0.375 (1 + x^2/4)^-2.5), its 1% left tail
+        // red, the 99% VaR line at the t4 1% quantile (-3.747) and the ES marker at the mean beyond it (-5.22). Fr: a frame
+        // over x in sd-like units. o: { grow (0..1 bar height), line (0..1 the VaR line drops in), tail (0..1 the tail turns
+        // red), es (0..1 the ES marker), wave (time: a gentle live ripple), bw (bin width), lab (labels on), a }
+        const T4 = { q: -3.747, es: -5.22, f: (x) => 0.375 * Math.pow(1 + x * x / 4, -2.5) };
+        function pnlHist(g, Fr, o = {}) {
+          const a = o.a ?? 1; if (a <= 0) return;
+          const bw = o.bw ?? 0.34, x0 = Fr.xr[0], x1 = Fr.xr[1], n = Math.round((x1 - x0) / bw);
+          const peak = T4.f(0), base = Fr.y + Fr.h;
+          g.save(); g.globalAlpha *= a;
+          // the tail region, shaded once it turns red
+          const kt = clamp(o.tail ?? 0);
+          if (kt > 0) {
+            const xa = Fr.X(x0), xb = Fr.X(T4.q);
+            g.save(); g.globalAlpha *= kt;
+            const gr = g.createLinearGradient(0, Fr.y + Fr.h * 0.1, 0, base); gr.addColorStop(0, rgba(C.red, 0)); gr.addColorStop(1, rgba(C.red, 0.2));
+            g.fillStyle = gr; g.fillRect(xa, Fr.y + Fr.h * 0.1, (xb - xa) * eo(kt), Fr.h * 0.9); g.restore();
+          }
+          for (let i = 0; i < n; i++) {
+            const xl = x0 + i * bw, xc = xl + bw / 2;
+            const tailBin = xc < T4.q;
+            const rip = o.wave != null ? 1 + 0.03 * Math.sin(2 * Math.PI * o.wave / 1.7 + i * 0.55) : 1;
+            const hgt = Math.max(tailBin ? 7 : 3, Fr.h * 0.94 * T4.f(xc) / peak) * clamp(o.grow ?? 1) * rip;
+            const px = Fr.X(xl) + 3, pw = Fr.X(xl + bw) - Fr.X(xl) - 6;
+            const redK = tailBin ? clamp(kt * 1.6 - (xc - x0) / (T4.q - x0) * 0.6) : 0;
+            g.fillStyle = mix(C.blue, C.red, redK);
+            rr(g, px, base - hgt, pw, hgt, Math.min(5, pw / 2)); g.fill();
+          }
+          // the baseline
+          g.strokeStyle = C.ink; g.lineWidth = 4; g.lineCap = "round";
+          g.beginPath(); g.moveTo(Fr.x - 10, base); g.lineTo(Fr.x + Fr.w + 10, base); g.stroke();
+          // the VaR line drops in from the top
+          const kl = clamp(o.line ?? 0);
+          if (kl > 0) {
+            const vx = Fr.X(T4.q), ytop = Fr.y + Fr.h * 0.08;
+            g.save(); g.setLineDash([14, 10]); g.strokeStyle = C.ink; g.lineWidth = 5;
+            g.beginPath(); g.moveTo(vx, ytop); g.lineTo(vx, lerp(ytop, base, eo(kl))); g.stroke(); g.restore();
+            if (o.lab !== false) chip(g, "99% VaR", vx + 14, ytop + 4, { k: clamp(kl * 2 - 0.6), size: 30, fill: C.ink, col: C.white, stroke: "rgba(0,0,0,0)", h: 52, padX: 18 });
+          }
+          // the ES marker: the mean loss beyond VaR
+          const ke = clamp(o.es ?? 0);
+          if (ke > 0) {
+            const ex = Fr.X(T4.es), ey = base - Fr.h * 0.3;
+            g.save(); g.globalAlpha *= clamp(ke * 3);
+            g.strokeStyle = C.red; g.lineWidth = 4; g.lineCap = "round";
+            const xa = Fr.X(x0) + 6, xb = Fr.X(T4.q) - 6, by = base - Fr.h * 0.16;
+            g.beginPath(); g.moveTo(xa, by + 12); g.lineTo(xa, by); g.lineTo(lerp(xa, xb, eo(ke)), by); if (ke > 0.9) g.lineTo(xb, by + 12); g.stroke();
+            g.beginPath(); g.moveTo(ex, by); g.lineTo(ex, ey + 30); g.stroke();
+            g.restore();
+            if (o.lab !== false) chip(g, "ES", ex, ey, { k: ke, size: 32, align: "center", fill: C.red, col: C.white, stroke: "rgba(0,0,0,0)", h: 54, padX: 20, shadow: "rgba(224,49,49,0.35)" });
+          }
+          g.restore();
+          return { vx: Fr.X(T4.q), ex: Fr.X(T4.es), base };
+        }
+        // ---- a big tick in a round badge (a test passed), popping in (k 0..1)
+        function tickBadge(g, x, y, r, k, o = {}) {
+          if (k <= 0) return;
+          const s = back(clamp(k), 2.6);
+          g.save(); g.translate(x, y); g.scale(s, s);
+          g.beginPath(); g.arc(0, 0, r, 0, Math.PI * 2); g.fillStyle = o.fill || C.green; g.fill();
+          check(g, 0, r * 0.02, r * 1.1, o.col || C.white, r * 0.2);
+          g.restore();
+        }
+        // ---- a speech-bubble tail-less rounded bubble with a soft shadow (for chat UIs)
+        function bubble(g, x, y, w, h, o = {}) {
+          g.save();
+          if (o.shadow) { g.shadowColor = o.shadow; g.shadowBlur = 18; g.shadowOffsetY = 8; }
+          rr(g, x, y, w, h, o.r ?? 34); g.fillStyle = o.fill || C.mist; g.fill();
+          g.restore();
+          if (o.tail === "left") { g.beginPath(); g.moveTo(x + 2, y + 28); g.lineTo(x - 16, y + 4); g.lineTo(x + 40, y + 8); g.fillStyle = o.fill || C.mist; g.fill(); }
+          if (o.tail === "right") { g.beginPath(); g.moveTo(x + w - 2, y + 28); g.lineTo(x + w + 16, y + 4); g.lineTo(x + w - 40, y + 8); g.fillStyle = o.fill || C.mist; g.fill(); }
+        }
+
+        // ---- the hook (c1; c2 continues it for the reveal): the interview chat card in front, the illustrative daily-P&L
+        // histogram card behind and below it, and the curiosity pill straddling the two. T = film time. o: { tVar, tTail,
+        // tES, tDots, tAns, tPill (film times), P (chat pose), PH (histogram pose), PP (pill pose), blur (the answer's blur,
+        // px), lockOpen (0..1), lockA (0..1), thumbA (0..1: the answer's cover thumbnail, 0 once it has flown out), pillA }.
+        // The answer: the real cover thumbnail, the product name and its page count (FACTS). IMG.cover must be loaded.
+        const HK = { X: 40, W: 1000, Y: 300, H: 592, Y2: 852, H2: 488, thumb: { x: 378, y: 641, s: 116 } };
+        function hook(g, T, o) {
+          const { X, W, Y, H, Y2, H2 } = HK;
+          const Q = ["Walk me through a VaR", "model you've built."], QFS = 48, QLH = 62;
+          // the histogram card (behind)
+          const Fr = frame(110, Y2 + 128, 860, 270, [-7.14, 4.42], [0, 1]);
+          g.save(); apply(g, 540, Y2 + H2 / 2, o.PH || still);
+          card(g, X, Y2, W, H2, { r: 32, blur: 40, dy: 20 });
+          prov(g, "ILLUSTRATIVE", X + W - 36, Y2 + 88, { align: "right", col: C.steelD, size: 25 });
+          pnlHist(g, Fr, { grow: lerp(0.72, 1, eo(clamp(T / 0.6))), line: clamp((T - o.tVar) / 0.3), tail: clamp((T - o.tTail) / 0.5),
+            es: clamp((T - o.tES) / 0.4), wave: T });
+          text(g, "← LOSS", Fr.x, Fr.y + Fr.h + 50, { size: 26, mono: true, ls: 2, c: rgba(C.ink, 0.55) });
+          text(g, "DAILY P&L", Fr.x + Fr.w / 2, Fr.y + Fr.h + 50, { size: 26, mono: true, ls: 3, align: "center", c: rgba(C.ink, 0.75) });
+          text(g, "GAIN →", Fr.x + Fr.w, Fr.y + Fr.h + 50, { size: 26, mono: true, ls: 2, align: "right", c: rgba(C.ink, 0.55) });
+          g.restore();
+          // the chat card (front)
+          g.save(); apply(g, 540, Y + H / 2, o.P || still);
+          card(g, X, Y, W, H, { r: 32, blur: 52, dy: 28, shadow: "rgba(40,32,12,0.26)" });
+          avatar(g, X + 74, Y + 64, 38);
+          text(g, "Interviewer", X + 130, Y + 60, { size: 38 });
+          text(g, "MARKET RISK", X + 132, Y + 96, { size: 25, mono: true, ls: 2, c: rgba(C.ink, 0.5) });
+          const ph = (T % 1.4) / 1.4;
+          g.save(); g.strokeStyle = rgba(C.green, 0.6 * (1 - ph)); g.lineWidth = 3; g.beginPath(); g.arc(X + W - 150, Y + 62, 8 + 8 * eo(ph), 0, Math.PI * 2); g.stroke(); g.restore();
+          g.beginPath(); g.arc(X + W - 150, Y + 62, 8, 0, Math.PI * 2); g.fillStyle = C.green; g.fill();
+          text(g, "online", X + W - 128, Y + 71, { size: 27, mono: true, c: rgba(C.ink, 0.55) });
+          g.fillStyle = rgba(C.ink, 0.08); g.fillRect(X + 30, Y + 124, W - 60, 2);
+          const qw = Math.max(tw(g, Q[0], QFS, false, -0.5), tw(g, Q[1], QFS, false, -0.5));
+          const bx = X + 44, by = Y + 150, bw = qw + 72, bh = Q.length * QLH + 40;
+          bubble(g, bx, by, bw, bh, { tail: "left" });
+          Q.forEach((s, i) => text(g, s, bx + 36, by + 20 + QFS * 0.92 + i * QLH, { size: QFS, ls: -0.5 }));
+          const ry = Y + 488;
+          field(g, X + 40, ry, W - 150, 62, { r: 31, fill: "#f4f6fa" });
+          text(g, "Your answer…", X + 82, ry + 42, { size: 30, c: rgba(C.ink, 0.38) });
+          if (Math.floor(T * 2.2) % 2 === 0) { g.fillStyle = C.blue; g.fillRect(X + 72, ry + 15, 3, 32); }
+          g.beginPath(); g.arc(X + W - 72, ry + 31, 33, 0, Math.PI * 2); g.fillStyle = C.blue; g.fill();
+          plane(g, X + W - 74, ry + 33, 32, C.white, 4);
+          const ax = X + W - 44, ay = Y + 330;
+          if (T > o.tDots && T < o.tAns + 0.05) typingDots(g, ax - 150, ay + 30, T, { fill: C.blueL, col: C.blue, a: clamp((T - o.tDots) / 0.12) });
+          if (T > o.tAns) {
+            const u = T - o.tAns, p = spring(u, 0.5, 14), abw = 640, abh = 138, x0 = ax - abw;
+            g.save(); g.translate(ax, ay + abh); g.scale(lerp(0.4, 1, p), lerp(0.4, 1, p)); g.translate(-ax, -(ay + abh)); g.globalAlpha *= clamp(u / 0.1);
+            bubble(g, x0, ay, abw, abh, { fill: C.blue, shadow: "rgba(37,99,235,0.35)" });
+            const bl = o.blur ?? 11, th = HK.thumb;
+            g.save(); rr(g, x0, ay, abw, abh, 34); g.clip(); if (bl > 0.3) g.filter = `blur(${bl.toFixed(1)}px)`;
+            const cv = pic("cover", th.s);
+            if (cv && (o.thumbA ?? 1) > 0) { g.save(); g.globalAlpha *= o.thumbA ?? 1; g.drawImage(cv, th.x, th.y, th.s, th.s); g.restore(); }
+            text(g, FACTS.product.replace(" & Lab", ""), x0 + 162, ay + 60, { size: 34, c: C.white });
+            text(g, "& Lab · " + FACTS.pages + " pages", x0 + 162, ay + 102, { size: 30, c: "rgba(255,255,255,0.85)" });
+            g.filter = "none"; g.restore();
+            if (bl > 0.3) { g.save(); rr(g, x0, ay, abw, abh, 34); g.fillStyle = `rgba(255,255,255,${(0.12 * bl / 11).toFixed(3)})`; g.fill(); g.restore(); }
+            const kl = clamp((u - 0.1) / 0.3) * (o.lockA ?? 1), ls = back(clamp((u - 0.1) / 0.3), 2.4) * (1 + 0.35 * (1 - (o.lockA ?? 1))), lx = x0 + abw / 2, ly = ay + abh / 2;
+            if (kl > 0) {
+              g.save(); g.globalAlpha *= kl; g.translate(lx, ly); g.scale(ls, ls);
+              g.save(); g.shadowColor = "rgba(13,21,38,0.3)"; g.shadowBlur = 16; g.shadowOffsetY = 6;
+              g.beginPath(); g.arc(0, 0, 44, 0, Math.PI * 2); g.fillStyle = C.white; g.fill(); g.restore();
+              lock(g, 0, -4, 52, { col: C.ink, open: o.lockOpen || 0 });
+              g.restore();
+              const q = ((u - 0.4) % 1.2) / 1.2;
+              if (u > 0.4 && (o.lockOpen || 0) === 0) { g.save(); g.strokeStyle = rgba(C.white, 0.7 * (1 - q)); g.lineWidth = 4; g.beginPath(); g.arc(lx, ly, 46 + 26 * eo(q), 0, Math.PI * 2); g.stroke(); g.restore(); }
+            }
+            g.restore();
+          }
+          g.restore();
+          // the curiosity pill, straddling the two cards
+          const kp = clamp((T - o.tPill) / 0.3) * (o.pillA ?? 1);
+          if (kp > 0) {
+            const py = Y + H + 2;
+            g.save(); apply(g, 540, py, o.PP || o.P || still);
+            const s1 = "Built one?", s2 = "Let's see", fs = 36, w1 = tw(g, s1, fs), w2 = tw(g, s2, fs), pw = w1 + w2 + 16 + 64, phh = 72;
+            const sc = lerp(0.5, 1, back(clamp((T - o.tPill) / 0.3), 2.4));
+            g.translate(540, py); g.scale(sc, sc); g.translate(-540, -py); g.globalAlpha *= clamp(kp * 3);
+            card(g, 540 - pw / 2, py - phh / 2, pw, phh, { r: phh / 2, fill: C.ink, shadow: "rgba(13,21,38,0.35)", blur: 22, dy: 10, stroke: false });
+            text(g, s1, 540 - pw / 2 + 32, py + fs * 0.36, { size: fs, c: C.white });
+            text(g, s2, 540 - pw / 2 + 32 + w1 + 16, py + fs * 0.36, { size: fs, c: "#ff8a8a" });
+            g.restore();
+          }
+        }
+
+        return { C, F, clamp, lerp, eo, ei, eio, back, spring, rnd, mix, rgba, MINUS, fmt, comma, blueAt, beatAt, shake,
+          IMG, load, ok, pic, texLoad, tex, texSize, rr, card, font, tw, text, enter, leave, still, combine, life, apply, bob,
+          odometer, count, chip, prov, stamp, cursor, cursorAt, check, bookmark, heart, plane, avatar, pathLen, subPath, poly, pipe,
+          collar, flapCell, flapState, flapRow, frame, axes, line, area, candles, hline, dot, smooth,
+          field, button, slider, toggle, ball, highlight, lock, typingDots, photo, pdfView, T4, pnlHist, tickBadge, bubble, HK, hook };
+      })();
+
+      // ---- ov: the spoken subtitle, low (band y ~1380-1500, above Instagram's caption zone). Bold D2QSans 56 px, centred,
+      // built word by word on each word's spoken onset; a page is one phrase (one or two lines) and turns at the phrase end.
+      // One or two keywords per phrase sit in solid accent pills (red, white type; yellow with ink type only for "50% off")
+      // that pop in as the word is said. Ink on paper, white on the brand-blue block. The hook's first phrase (page 0) is on
+      // screen from frame 1, faint, and each word lights up (with a small lift) as it is spoken.
+      const g = document.getElementById("ov-cv").getContext("2d");
+      const { C, clamp, lerp, eo, back, mix } = K;
+      const st = { t: 0 };
+      const FS = 56, LH = 76, MAXW = 880, CY = 1454, PX = 13;
+      const PUNCT = /[.,:;!?]+$/;
+      // lines: the fewest that fit MAXW, broken so their widths are as even as possible; a token in P.br starts a new line
+      function layout(P) {
+        g.save(); K.font(g, FS, false, -0.5);
+        const sp = g.measureText(" ").width;
+        const CORE = P.tok.map((tk) => g.measureText(tk.s.replace(PUNCT, "")).width);
+        const W = P.tok.map((tk, i) => g.measureText(tk.s).width + (tk.k ? 2 * PX : 0));
+        g.restore();
+        const segs = []; let cur = [];
+        P.tok.forEach((_, i) => { if (P.br.includes(i) && cur.length) { segs.push(cur); cur = []; } cur.push(i); });
+        segs.push(cur);
+        const lineW = (a, b) => { let x = 0; for (let i = a; i <= b; i++) x += W[i] + (i > a ? sp : 0); return x; };
+        const rows = [];
+        for (const sg of segs) {
+          const n = sg.length;
+          let lines = 1; while (true) {
+            const best = Array.from({ length: n + 1 }, () => Array(lines + 1).fill(null)); best[0][0] = [0, -1];
+            for (let i = 1; i <= n; i++) for (let l = 1; l <= lines; l++) for (let j = 0; j < i; j++) {
+              if (!best[j][l - 1]) continue;
+              const w = lineW(sg[j], sg[i - 1]); if (w > MAXW && i - j > 1) continue;
+              const cost = Math.max(best[j][l - 1][0], w);
+              if (!best[i][l] || cost < best[i][l][0]) best[i][l] = [cost, j];
+            }
+            if (best[n][lines]) {
+              const cuts = []; let i = n, l = lines; while (i > 0) { const j = best[i][l][1]; cuts.unshift([j, i]); i = j; l--; }
+              cuts.forEach(([j, i]) => { const row = []; let x = 0; for (let q = j; q < i; q++) { row.push({ i: sg[q], w: W[sg[q]], core: CORE[sg[q]], x }); x += W[sg[q]] + sp; } rows.push(row); });
+              break;
+            }
+            lines++;
+          }
+        }
+        const widths = rows.map((r) => { const l = r[r.length - 1]; return l.x + l.w; });
+        return { rows, widths, h: rows.length * LH };
+      }
+      const LAY = {};
+      function draw() {
+        const t = st.t;
+        g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, 1080, 1920);
+        let pi = 0; for (let i = 0; i < PAGES.length; i++) if (t >= PAGES[i].start) pi = i;
+        const P = PAGES[pi];
+        const ready = document.fonts && document.fonts.check(`700 ${FS}px D2QSans`);
+        const lay = LAY[pi] || (ready ? (LAY[pi] = layout(P)) : layout(P));
+        const top = CY - lay.h / 2;
+        const bl = K.blueAt(t, B, THEME), ink = mix(C.ink, C.white, bl);
+        g.save(); K.font(g, FS, false, -0.5); g.textBaseline = "alphabetic"; g.textAlign = "left";
+        lay.rows.forEach((row, r) => {
+          const off = (1080 - lay.widths[r]) / 2, base = top + r * LH + FS * 0.86;
+          row.forEach((c) => {
+            const tk = P.tok[c.i];
+            const k = P.pre ? 1 : clamp((t - (tk.on - 0.07)) / 0.09);
+            if (k <= 0) return;
+            let dy = 16 * (1 - eo(k));
+            const lit = P.pre ? clamp((t - (tk.on - 0.05)) / 0.12) : 1;
+            if (P.pre) { const u = t - (tk.on - 0.05); if (u > 0 && u < 0.26) dy -= 7 * Math.sin(Math.PI * u / 0.26); }
+            const x = off + c.x + (tk.k ? PX : 0);
+            const core = tk.s.replace(PUNCT, ""), tail = tk.s.slice(core.length);
+            g.globalAlpha = clamp(k * 1.4);
+            if (P.pre && lit < 1 && !(tk.k && lit > 0)) {
+              // not yet spoken: faint
+              g.fillStyle = mix(C.ink, C.paper, 0.78 - 0.78 * lit); g.fillText(tk.s, x, base + dy); return;
+            }
+            if (tk.k) {
+              // the pill pops in on the word (a small overshoot), the word turns white (ink on yellow)
+              const u = clamp((t - (tk.on - 0.05)) / 0.26), s = lerp(0.55, 1, back(u, 2.2));
+              const cx = x + c.core / 2, cy = base - FS * 0.33;
+              const fill = tk.k === "y" ? C.yel : C.red, tc = tk.k === "y" ? C.ink : C.white;
+              g.save(); g.translate(cx, cy + dy); g.scale(s, s); g.translate(-cx, -cy);
+              g.save(); g.shadowColor = tk.k === "y" ? "rgba(120,90,0,0.3)" : "rgba(170,20,20,0.32)"; g.shadowBlur = 14; g.shadowOffsetY = 6;
+              K.rr(g, x - PX, base - FS * 0.83, c.core + 2 * PX, FS * 1.08, 14); g.fillStyle = fill; g.fill(); g.restore();
+              g.fillStyle = tc; g.fillText(core, x, base);
+              g.restore();
+              if (tail) { g.fillStyle = ink; g.fillText(tail, x + c.core + PX + 2, base + dy); }
+            } else {
+              g.fillStyle = ink; g.fillText(tk.s, x, base + dy);
+            }
+          });
+        });
+        g.restore();
+      }
+      if (typeof init === "function") init();     // before the tween: fromTo renders (and draws) at once
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo(st, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: draw }, 0);
+      draw();
+      window.__timelines["ov"] = tl;
+    })();
+  </script>
+</template>

@@ -1,0 +1,30 @@
+{
+ "model": "~/vox2",
+ "threads": 4,
+ "jobs": [
+  {
+   "out": "voice/takes/p3b_a11.wav",
+   "text": "Project one. Var and expected shortfall for a rates and F X desk, backtested over four thousand, nine hundred and nineteen days of real data. Koo-pyets, Christoffersen, traffic lights.",
+   "ref": "/home/user/Films/d2q-day11/voice/takes/p1_s11.wav",
+   "seed": 11
+  },
+  {
+   "out": "voice/takes/p3b_a13.wav",
+   "text": "Project one. Var and expected shortfall for a rates and F X desk, backtested over four thousand, nine hundred and nineteen days of real data. Koo-pyets, Christoffersen, traffic lights.",
+   "ref": "/home/user/Films/d2q-day11/voice/takes/p1_s11.wav",
+   "seed": 13
+  },
+  {
+   "out": "voice/takes/p3b_b11.wav",
+   "text": "Project one. Var and expected shortfall for a rates and F X desk, backtested over four thousand, nine hundred and nineteen days of real data. Kupiets, Christoffersen, traffic lights.",
+   "ref": "/home/user/Films/d2q-day11/voice/takes/p1_s11.wav",
+   "seed": 11
+  },
+  {
+   "out": "voice/takes/p3b_b13.wav",
+   "text": "Project one. Var and expected shortfall for a rates and F X desk, backtested over four thousand, nine hundred and nineteen days of real data. Kupiets, Christoffersen, traffic lights.",
+   "ref": "/home/user/Films/d2q-day11/voice/takes/p1_s11.wav",
+   "seed": 13
+  }
+ ]
+}

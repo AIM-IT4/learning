@@ -1,0 +1,13 @@
+💬 Comment RISK and we'll DM you 50% off the Market Risk Quant Notes & Lab (valid 7 days) 📉
+
+Every market risk interview asks about VaR. This pack lets you show one you've actually built:
+
+1️⃣ VaR & ES for a rates and FX desk, backtested over 4,919 days of real data (Kupiec, Christoffersen, traffic lights)
+2️⃣ An FX options desk: full revaluation vs delta-gamma-vega, stressed through the GFC, COVID, 2022 and the 2024 yen unwind
+3️⃣ FRTB: SA vs IMA for five desks, all the way to the capital number
+
+141 pages · 19 modules · 64 interview Q&As · executed notebooks · a Python risk library · 14 regression tests
+
+➡️ Save this for your next risk interview, and send it to a friend preparing for one.
+
+#quantfinance #marketrisk #valueatrisk #frtb #riskmanagement #quantinterview #python #desk2quant

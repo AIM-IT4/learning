@@ -1,0 +1,65 @@
+{
+  "_source": "desk2quant.com product page: Market Risk Quant Notes & Lab (VaR, ES, Backtesting & FRTB), as quoted in BRIEF.md. Every fact on screen comes from here.",
+  "product": "Market Risk Quant Notes & Lab",
+  "topics": "VaR · ES · Backtesting · FRTB",
+  "pages": 141,
+  "modules": 19,
+  "qa": 64,
+  "projects": 3,
+  "p1_desk": "Rates & FX desk",
+  "p1_days": 4919,
+  "p1_tests": [
+    "Kupiec",
+    "Christoffersen",
+    "Traffic light"
+  ],
+  "p2_desk": "FX options desk",
+  "p2_methods": [
+    "Full revaluation",
+    "Delta-gamma-vega"
+  ],
+  "p2_stress": [
+    [
+      "GFC",
+      "2008"
+    ],
+    [
+      "COVID",
+      "2020"
+    ],
+    [
+      "",
+      "2022"
+    ],
+    [
+      "YEN UNWIND",
+      "2024"
+    ]
+  ],
+  "p3_desks": 5,
+  "p3_parts": [
+    "SBM",
+    "DRC",
+    "RRAO",
+    "PLA",
+    "IMCC",
+    "SES"
+  ],
+  "library": [
+    "market",
+    "curves",
+    "instruments",
+    "risk",
+    "backtest",
+    "frtb"
+  ],
+  "tests": 14,
+  "offer_pct": 50,
+  "offer_days": 7,
+  "handle": "@desk2quant",
+  "site": "desk2quant.com",
+  "pdf_name": "market-risk-quant-notes.pdf",
+  "page_contents": "4 / 141",
+  "page_backtest": "67 / 141",
+  "page_frtb": "86 / 141"
+}

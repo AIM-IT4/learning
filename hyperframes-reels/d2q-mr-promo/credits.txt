@@ -1,0 +1,31 @@
+"Comment RISK": Market Risk Quant Notes & Lab promo (Desk2Quant reel, 46.75 s, 1080 x 1920, 24 fps): credits
+
+Voice: assets/vo.wav (= voice/out/vo.wav), placed at t = 0.12 s. An English narrator designed from a text description
+  (not a real person) and spoken by VoxCPM2 (openbmb/VoxCPM2, Apache-2.0) on CPU, in the timbre of the Day 11 narrator
+  take (voice/vox_jobs.json); the picked takes are in voice/pick.json. Word timings: voice/out/words.json.
+Product facts: every fact on screen comes from the desk2quant.com product page for the Market Risk Quant Notes & Lab, as
+  quoted in BRIEF.md (work/facts.json): 141 pages, 19 modules, 64 interview Q&As, 3 real-data projects, the 4,919-day
+  walk-forward backtest (Kupiec, Christoffersen, traffic lights), the FX options desk (full revaluation vs
+  delta-gamma-vega; stress library GFC, COVID, 2022, 2024 yen unwind), FRTB SA vs IMA for five desks (SBM, DRC, RRAO,
+  PLA, IMCC, SES; the capital comparison), the notes PDF, executed notebooks + HTML exports, the Python library
+  (market, curves, instruments, risk, backtest, frtb) and the 14-test regression suite. No prices; no capital numbers;
+  the offer is shown as "50% OFF" and "valid 7 days" only, and the code only as a blurred "•••••" chip.
+Desk2Quant's own assets (copied into assets/img): the product cover (desk2quant/assets/images/covers/
+  market-risk-quant-notes-lab.jpg), the notes' sample pages 2 (contents) and 4 (backtesting: the Basel traffic light)
+  from desk2quant/assets/samples/market-risk-quant/, and the notes' figure c_pla_plane.png (PLA zones) from
+  notes-kit/src/fig. Sample pages 1 and 3 and fig_bt.png are not used, per the brief.
+Logo: Desk2Quant's own (assets/logo.png, the same file as in d2q-day11-hud).
+Illustrative drawings, each labelled ILLUSTRATIVE on screen: the daily-P&L histogram (Student-t, 4 d.f., its 1% tail,
+  the 99% VaR at the t4 quantile and the ES marker at the mean beyond it) in chapters 01 and 03; the long at-the-money
+  straddle's P&L against a spot shock, revalued in full vs by its delta-gamma expansion (Black-Scholes, 10% vol,
+  3 months) in chapter 04. All other graphics are drawn in code (work/kit.js, work/scenes/); no character or presenter.
+Type: D2QSans (Inter Bold, SIL OFL 1.1) for big type and subtitles; Share Tech Mono (SIL OFL 1.1,
+  assets/fonts/OFL-sharetechmono.txt) for small data.
+Music: an original bed synthesised in numpy (tools/bed_mr.py with tools/bed_synth.py, both from d2q-free10; "pop":
+  C major, 112 BPM); no samples. Ducked under the voice and held at least 10 dB under it while it speaks (ceiling()).
+Sound effects: CC0 1.0, from the uisfx library bundled with Real SFX, as picked for d2q-day11-hud (assets/sfx/PICKS.json):
+  studio/send (cards and pages arriving), minimal/check (the lock, the stamps, totals landing), minimal/select (clicks),
+  minimal/typing (ticks, counters), zen/complete (the close). No CC BY, NC or ND material.
+Look: Desk2Quant's Ripping-style template (d2q-day11-rip), with the chapter tag, progress line, chapter titles and
+  keyword-pill subtitles studied from @madetoscale2026 reference sheets only; no MadeToScale wording, brand or layout is
+  reproduced. Made with HyperFrames 0.9.39.
