@@ -1,0 +1,19 @@
+You can define CVA. Then the interviewer asks: why does a swap's exposure peak a third of the way through its life? 🎯
+
+Day 12/30 · Making Quant Easy
+
+1️⃣ The 2008 lesson: in the 2008 crisis, roughly two-thirds of the losses banks put down to counterparty credit risk were CVA losses (the price of default risk going up). Only about one-third were actual defaults (Basel Committee, 2011).
+2️⃣ Simulate: a 5-year swap on $100m where we receive fixed, 10,000 rate paths. Rates up, we owe the client. Rates down, the client owes us.
+3️⃣ Exposure: keep only what the client owes us and average it over the paths. The expected exposure peaks at $1.74m, 20 months in.
+4️⃣ Default: a 120 bp credit spread and 40% recovery give a hazard rate of 2% a year (the credit triangle, λ = S / (1 − R)), so a 9.5% chance of default within 5 years.
+5️⃣ Add it up, month by month: CVA = (1 − R) × Σ DF × EE × ΔPD = $64,563 on $100m, about 1.4 bp a year on the swap rate.
+
+🎤 Quant interview line: "Exposure is how far rates can have moved, which grows like √t, times the payments left, which shrink like (T − t). (T − t)·√t peaks at T/3, so a 5-year swap's expected exposure peaks around month 20."
+
+📅 Day 13 tomorrow.
+💬 Comment CVA and we'll DM you the notebook: the 16 lines, every number checked, and 8 interview follow-ups with answers
+➡️ Save this, share it with a friend, and follow @desk2quant for all 30 days
+
+Illustrative model with simulated rates: a receive-fixed swap at par valued as notional × years left × rate move, 1% a year rate volatility, a flat hazard rate and 3% discounting; no netting, collateral or wrong-way risk; 10,000 paths with a fixed seed. Not investment advice.
+
+#quantfinance #cva #xva #counterpartyrisk #creditrisk #python #quantinterview #makingquanteasy #desk2quant

@@ -1,0 +1,10 @@
+{
+  "name": "d2q-day12-cva",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "npx --yes hyperframes@0.9.39 preview",
+    "check": "npx --yes hyperframes@0.9.39 check",
+    "render": "npx --yes hyperframes@0.9.39 render"
+  }
+}
