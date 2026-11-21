@@ -1,0 +1,90 @@
+{
+ "model": "~/vox2",
+ "threads": 4,
+ "jobs": [
+  {
+   "out": "voice/takes/p1_r11.wav",
+   "text": "Every market risk interview asks about var. Can you show one you've actually built?",
+   "ref": "/home/user/Films/d2q-day11/voice/takes/p1_s11.wav",
+   "seed": 11
+  },
+  {
+   "out": "voice/takes/p1_r12.wav",
+   "text": "Every market risk interview asks about var. Can you show one you've actually built?",
+   "ref": "/home/user/Films/d2q-day11/voice/takes/p1_s11.wav",
+   "seed": 12
+  },
+  {
+   "out": "voice/takes/p2_r11.wav",
+   "text": "This is the Market Risk Quant Notes and Lab. A hundred and forty-one pages, nineteen modules, sixty-four interview answers.",
+   "ref": "/home/user/Films/d2q-day11/voice/takes/p1_s11.wav",
+   "seed": 11
+  },
+  {
+   "out": "voice/takes/p2_r12.wav",
+   "text": "This is the Market Risk Quant Notes and Lab. A hundred and forty-one pages, nineteen modules, sixty-four interview answers.",
+   "ref": "/home/user/Films/d2q-day11/voice/takes/p1_s11.wav",
+   "seed": 12
+  },
+  {
+   "out": "voice/takes/p3_r11.wav",
+   "text": "Project one: var and expected shortfall for a rates and F X desk, backtested over four thousand, nine hundred and nineteen days of real data. Koopyets, Christoffersen, traffic lights.",
+   "ref": "/home/user/Films/d2q-day11/voice/takes/p1_s11.wav",
+   "seed": 11
+  },
+  {
+   "out": "voice/takes/p3_r12.wav",
+   "text": "Project one: var and expected shortfall for a rates and F X desk, backtested over four thousand, nine hundred and nineteen days of real data. Koopyets, Christoffersen, traffic lights.",
+   "ref": "/home/user/Films/d2q-day11/voice/takes/p1_s11.wav",
+   "seed": 12
+  },
+  {
+   "out": "voice/takes/p4_r11.wav",
+   "text": "Project two: an F X options desk. Full revaluation against delta-gamma-vega, stressed through the financial crisis, COVID and the twenty twenty-four yen unwind.",
+   "ref": "/home/user/Films/d2q-day11/voice/takes/p1_s11.wav",
+   "seed": 11
+  },
+  {
+   "out": "voice/takes/p4_r12.wav",
+   "text": "Project two: an F X options desk. Full revaluation against delta-gamma-vega, stressed through the financial crisis, COVID and the twenty twenty-four yen unwind.",
+   "ref": "/home/user/Films/d2q-day11/voice/takes/p1_s11.wav",
+   "seed": 12
+  },
+  {
+   "out": "voice/takes/p5_r11.wav",
+   "text": "Project three: F R T B. Standardised versus internal models for five desks, all the way to the capital number.",
+   "ref": "/home/user/Films/d2q-day11/voice/takes/p1_s11.wav",
+   "seed": 11
+  },
+  {
+   "out": "voice/takes/p5_r12.wav",
+   "text": "Project three: F R T B. Standardised versus internal models for five desks, all the way to the capital number.",
+   "ref": "/home/user/Films/d2q-day11/voice/takes/p1_s11.wav",
+   "seed": 12
+  },
+  {
+   "out": "voice/takes/p6_r11.wav",
+   "text": "You get the notes, executed notebooks, a Python risk library and fourteen regression tests.",
+   "ref": "/home/user/Films/d2q-day11/voice/takes/p1_s11.wav",
+   "seed": 11
+  },
+  {
+   "out": "voice/takes/p6_r12.wav",
+   "text": "You get the notes, executed notebooks, a Python risk library and fourteen regression tests.",
+   "ref": "/home/user/Films/d2q-day11/voice/takes/p1_s11.wav",
+   "seed": 12
+  },
+  {
+   "out": "voice/takes/p7_r11.wav",
+   "text": "Comment RISK, and we'll DM you fifty percent off. The code works for seven days. Save this for your next risk interview.",
+   "ref": "/home/user/Films/d2q-day11/voice/takes/p1_s11.wav",
+   "seed": 11
+  },
+  {
+   "out": "voice/takes/p7_r12.wav",
+   "text": "Comment RISK, and we'll DM you fifty percent off. The code works for seven days. Save this for your next risk interview.",
+   "ref": "/home/user/Films/d2q-day11/voice/takes/p1_s11.wav",
+   "seed": 12
+  }
+ ]
+}

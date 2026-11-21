@@ -1,0 +1,47 @@
+{
+ "parts": [
+  [
+   "voice/takes/p1_r11.wav",
+   0,
+   null
+  ],
+  [
+   "voice/takes/p2_r12.wav",
+   0,
+   null
+  ],
+  [
+   "voice/takes/p3b_b13.wav",
+   0,
+   null
+  ],
+  [
+   "voice/takes/p4_r12.wav",
+   0,
+   null
+  ],
+  [
+   "voice/takes/p5_r11.wav",
+   0,
+   null
+  ],
+  [
+   "voice/takes/p6_r11.wav",
+   0,
+   null
+  ],
+  [
+   "voice/takes/p7_r12.wav",
+   0,
+   null
+  ]
+ ],
+ "gaps": [
+  0.4,
+  0.4,
+  0.4,
+  0.4,
+  0.4,
+  0.45
+ ]
+}

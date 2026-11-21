@@ -1,0 +1,18 @@
+{
+ "model": "~/vox2",
+ "threads": 4,
+ "jobs": [
+  {
+   "out": "voice/takes/full_k1.wav",
+   "text": "Every market risk interview asks about var. Can you show one you've actually built? This is the Market Risk Quant Notes and Lab. A hundred and forty-one pages, nineteen modules, sixty-four interview answers. Project one. Var and expected shortfall for a rates and F X desk, backtested over four thousand, nine hundred and nineteen days of real data. Koo-pee-ets, Christoffersen, traffic lights. Project two: an F X options desk. Full revaluation against delta-gamma-vega, stressed through the financial crisis, COVID and the twenty twenty-four yen unwind. Project three: F R T B. Standardised versus internal models for five desks, all the way to the capital number. You get the notes, executed notebooks, a Python risk library and fourteen regression tests. Comment RISK, and we will DM you fifty percent off. The code works for seven days. Save this for your next risk interview.",
+   "ref": "/home/user/Films/d2q-day11/voice/takes/p1_s11.wav",
+   "seed": 11
+  },
+  {
+   "out": "voice/takes/full_k2.wav",
+   "text": "Every market risk interview asks about var. Can you show one you've actually built? This is the Market Risk Quant Notes and Lab. A hundred and forty-one pages, nineteen modules, sixty-four interview answers. Project one. Var and expected shortfall for a rates and F X desk, backtested over four thousand, nine hundred and nineteen days of real data. Kupietz, Christoffersen, traffic lights. Project two: an F X options desk. Full revaluation against delta-gamma-vega, stressed through the financial crisis, COVID and the twenty twenty-four yen unwind. Project three: F R T B. Standardised versus internal models for five desks, all the way to the capital number. You get the notes, executed notebooks, a Python risk library and fourteen regression tests. Comment RISK, and we will DM you fifty percent off. The code works for seven days. Save this for your next risk interview.",
+   "ref": "/home/user/Films/d2q-day11/voice/takes/p1_s11.wav",
+   "seed": 11
+  }
+ ]
+}

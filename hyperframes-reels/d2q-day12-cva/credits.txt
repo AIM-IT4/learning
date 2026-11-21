@@ -1,0 +1,35 @@
+Day 12/30 · Making Quant Easy: "CVA in 16 lines" (Desk2Quant code-along lesson reel, 103.2 s, 1080 x 1920, 24 fps): credits
+
+Voice: assets/vo.wav (= voice/out/vo_tight.wav, 101.10 s, loudnormed), placed at t = 0.12 s: ElevenLabs text-to-speech,
+  the stock voice "Eric" (not a clone of a real person), tightened as supplied (every pause over 0.36 s cut to 0.30 s;
+  same words and speed); not regenerated or edited here. Word timings: voice/out/words.json. The natural take is kept as
+  voice/out/vo_v1_natural.wav (words_v1_natural.json).
+Code on screen: work/cva_reel.py (16 lines), shown character for character (inlined by tools/compose.py).
+Numbers on screen: work/numbers.json, written by work/numbers.py, which runs work/cva_reel.py (10,000 simulated paths,
+  seed 7, monthly grid). Illustrative model, labelled "simulated" / "illustrative" on screen: receive-fixed 5-year swap
+  at par, value = -N x (T - t) x (rate move), Brownian rate moves with 1% a year normal vol, flat hazard from the credit
+  triangle, flat 3% discounting, no netting, collateral or wrong-way risk (work/facts.json, model_note).
+The 2008 statistic: Basel Committee on Banking Supervision, press release of 1 June 2011
+  (https://www.bis.org/press/p110601.htm): "During the financial crisis, roughly two-thirds of losses attributed to
+  counterparty credit risk were due to CVA losses and only about one-third were due to actual defaults." Shown as
+  2/3 and 1/3 with the source line "Source: Basel Committee (BCBS), June 2011" (work/facts.json).
+Illustrative drawing: the small rising credit-spread sparkline in the hook (a made-up shape with no numbers), labelled
+  "illustrative". The b10 chart draws shapes only (√t, T − t and their product, each as a share of its maximum).
+Logo: Desk2Quant's own (assets/logo.png, the same file as in d2q-mr-promo), in the brand pill and as the DM sender.
+  No other brand, bank or employer name or logo; no character or presenter. Everything else is drawn in code
+  (work/kit.js, work/scenes/).
+Type: D2QSans (Inter Bold, SIL OFL 1.1) for titles and big numbers; JetBrains Mono 400/700 (SIL OFL 1.1,
+  assets/fonts/LICENSE-JetBrainsMono.txt, latin and latin-ext subsets) for code, tags and labels; two symbols (∝, ✕)
+  from DejaVu Sans Bold (assets/fonts/DejaVuSansBold-symbols.ttf, a two-glyph subset; Bitstream Vera / DejaVu licence,
+  assets/fonts/LICENSE-DejaVu.txt), which neither brand font has.
+Music: an original bed synthesised in numpy (tools/bed_day12.py with tools/bed_synth.py, both adapted from
+  d2q-mr-promo; the "lofi" style: Rhodes 9th chords, a soft sub, swung soft drums, a little vinyl crackle, D dorian,
+  78 BPM); no samples. Ducked under the voice and held at least 10.6 dB under it while it speaks (ceiling(), then
+  block_ceiling() over 400 ms blocks); faded out over the last 1.5 s.
+Sound effects: CC0 1.0, from the uisfx library bundled with Real SFX, as picked for d2q-day11-hud and copied from
+  d2q-mr-promo/assets/sfx (assets/sfx/PICKS.json): minimal/select (chip: cards and chips docking), minimal/check (lock:
+  the peak marker, the sum landing), studio/send (send: the comment send), zen/complete (end: the close),
+  minimal/typing (type: very soft ticks at the start of typed lines). No CC BY, NC or ND material.
+Look: Desk2Quant's light paper kit (d2q-mr-promo/work/kit.js). The code-along format (chart over code, code typed on
+  the words, a numbered series, a payoff-first hook, a recap) was studied from @quantfinancetogo reference sheets only;
+  none of their wording, colours, terminal-cursor kicker or episode-chip row is reproduced. Made with HyperFrames 0.9.39.

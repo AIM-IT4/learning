@@ -1,0 +1,20 @@
+{
+ "picks": [
+  "p1_r11",
+  "p2_r12",
+  "p3b_b13",
+  "p4_r12",
+  "p5_r11",
+  "p6_r11",
+  "p7_r12"
+ ],
+ "why": {
+  "p1": "r11 WER 0.00",
+  "p2": "r12 tighter pace",
+  "p3": "p3b_b13: VaR clear, Kupiec ~ 'Koo-piets', 8.9 s",
+  "p4": "r12 clear phrasing",
+  "p5": "r11 clean FRTB",
+  "p6": "r11 natural pitch",
+  "p7": "r12 WER 0.00 ('we'll DM')"
+ }
+}

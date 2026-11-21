@@ -1,0 +1,9 @@
+{
+  "bcbs_2011": {
+    "claim": "During the financial crisis, roughly two-thirds of losses attributed to counterparty credit risk were due to CVA losses and only about one-third were due to actual defaults.",
+    "source": "Basel Committee on Banking Supervision, press release, 1 June 2011",
+    "url": "https://www.bis.org/press/p110601.htm",
+    "on_screen_source_line": "Source: Basel Committee (BCBS), June 2011"
+  },
+  "model_note": "Illustrative model: receive-fixed 5y swap at par, value = -N x (T - t) x (rate move); rate moves are Brownian with 1% a year normal vol; flat hazard from the credit triangle; flat 3% discounting; no netting, collateral or wrong-way risk. 10,000 paths, seed 7, monthly grid."
+}

@@ -1,0 +1,23 @@
+Day 11/30 · Making Quant Easy (the volatility smile), Ripping-style rebuild with no character: credits
+
+Voice: unchanged from Day 11 (the same assets/vo.wav as d2q-day11-hud; its credit is in d2q-day11-hud/credits.txt).
+Music: original score, unchanged from Day 11 (d2q-day11-hud/assets/bgm.wav), synthesised in numpy; no samples.
+Sound effects: CC0 1.0, from the uisfx library bundled with Real SFX (assets/sfx/PICKS.json): studio/send,
+  minimal/check, minimal/select, minimal/typing, scifi/blocked, dreamy/achievement, zen/complete. No CC BY, NC or ND
+  material.
+Type: D2QSans (Inter Bold, SIL OFL 1.1) for big type and captions; Share Tech Mono (SIL OFL 1.1,
+  assets/fonts/OFL-sharetechmono.txt) for small data labels.
+Formulas: typeset from TeX to SVG with MathJax 3 (mathjax-full 3.2.2, Apache-2.0) in d2q-day11-hud
+  (work/formulas.json, copied unchanged); every number in them comes from work/numbers.json.
+Data (work/numbers.json, copied unchanged from d2q-day11-hud):
+  - REAL: the S&P 500's daily open, high, low and close, 1 Sep - 30 Oct 1987 (S&P Dow Jones Indices' index levels,
+    via Yahoo Finance ^GSPC), including the closes 282.70 (16 Oct) and 224.84 (19 Oct).
+  - ILLUSTRATIVE: the fat-tailed curve (Student-t, 3 degrees of freedom, same 1.26% daily spread); the option quotes on
+    the tickets in the question.
+  - SIMULATED: the crash model (15% volatility plus a fixed -20% crash at 0.1 a year, zero rates), 1,000,000 paths,
+    seed 11; the 40-path fan, seed 2.
+  Each is labelled on screen (REAL DATA, ILLUSTRATIVE, SIMULATED with its seed) and in the caption.
+Logo and the Quant Formula Sheet cover: Desk2Quant's own.
+Look: Ripping-style motion-graphics grammar (marker-box captions, one big hero per beat, light paper with brand-blue
+  colour blocks), studied from reference sheets only; no Ripping text, brand or layout is reproduced. All graphics are
+  drawn in code (work/kit.js and work/scenes/).

@@ -1,0 +1,34 @@
+[
+ [
+  "p1",
+  "Every market risk interview asks about var. Can you show one you've actually built?"
+ ],
+ [
+  "p2",
+  "This is the Market Risk Quant Notes and Lab. A hundred and forty-one pages, nineteen modules, sixty-four interview answers."
+ ],
+ [
+  "p3",
+  "Project one: var and expected shortfall for a rates and F X desk, backtested over four thousand, nine hundred and nineteen days of real data. Koopyets, Christoffersen, traffic lights."
+ ],
+ [
+  "p4",
+  "Project two: an F X options desk. Full revaluation against delta-gamma-vega, stressed through the financial crisis, COVID and the twenty twenty-four yen unwind."
+ ],
+ [
+  "p5",
+  "Project three: F R T B. Standardised versus internal models for five desks, all the way to the capital number."
+ ],
+ [
+  "p6",
+  "You get the notes, executed notebooks, a Python risk library and fourteen regression tests."
+ ],
+ [
+  "p7",
+  "Comment RISK, and we'll DM you fifty percent off. The code works for seven days. Save this for your next risk interview."
+ ],
+ [
+  "p3b",
+  "Project one. Var and expected shortfall for a rates and F X desk, backtested over four thousand, nine hundred and nineteen days of real data. Kupiec, Christoffersen, traffic lights."
+ ]
+]
