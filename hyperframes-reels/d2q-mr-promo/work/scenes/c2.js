@@ -51,8 +51,8 @@
         // the tags (facts: the notes PDF; 3 real-data projects in the lab)
         const k1 = clamp((t - tTagN) / 0.3), k2 = clamp((t - tTagL) / 0.3);
         // (they straddle the cover's bottom edge, clear of its title)
-        if (k1 > 0) K.chip(g, "NOTES · PDF", x - 14, y + s + 2, { k: k1, size: 26, mono: true, fill: C.ink, col: C.white, stroke: "rgba(0,0,0,0)", h: 50, padX: 18, rot: -0.03, shadow: "rgba(13,21,38,0.3)" });
-        if (k2 > 0) K.chip(g, "LAB · " + FACTS.projects + " PROJECTS", x + s + 14, y + s + 2, { k: k2, size: 26, mono: true, align: "right", fill: C.red, col: C.white, stroke: "rgba(0,0,0,0)", h: 50, padX: 18, rot: 0.03, shadow: "rgba(224,49,49,0.35)" });
+        if (k1 > 0) K.chip(g, "NOTES · PDF", x + 12, y + s + 2, { k: k1, size: 26, mono: true, fill: C.ink, col: C.white, stroke: "rgba(0,0,0,0)", h: 50, padX: 18, rot: -0.03, shadow: "rgba(13,21,38,0.3)" });
+        if (k2 > 0) K.chip(g, "LAB · " + FACTS.projects + " PROJECTS", x + s - 12, y + s + 2, { k: k2, size: 26, mono: true, align: "right", fill: C.red, col: C.white, stroke: "rgba(0,0,0,0)", h: 50, padX: 18, rot: 0.03, shadow: "rgba(224,49,49,0.35)" });
         g.restore();
       }
       function page(t, out) {
@@ -79,7 +79,7 @@
         g.restore();
       }
       function chips(t, out) {
-        const Y = 1104, H = 226, cw = 316, gap = 26;
+        const Y = 1104, H = 226, cw = 284, gap = 24;      // x 40-940 (clear of the right-hand buttons)
         CNT.forEach((c, i) => {
           const x = 40 + i * (cw + gap), u = t - (tChips + 0.07 * i); if (u <= 0) return;
           const P = K.combine(K.combine(K.enter(u, { dy: 120, pitch: 0.4, yaw: 0, rot: 0.02, sc: 0.9 }), { dx: 0, dy: K.bob(T0 + t, i * 1.7, 2.5), rot: 0, sc: 1, yaw: 0, pitch: 0, a: 1 }), out);
@@ -91,7 +91,7 @@
           const v = c.v * eio(clamp((t - c.t0) / (c.t1 - c.t0)));
           if (t < c.t0) K.text(g, "–", x + 34, Y + 134, { size: 112, c: "#c3cad6" });
           else K.odometer(g, v, String(c.v).length, x + 30, Y + 140, 112, C.ink, 1);
-          icon(c.icon, x + cw - 44, Y + 52, on > 0.5 ? C.red : "#b3bcc9");
+          icon(c.icon, x + cw - 32, Y + 38, on > 0.5 ? C.red : "#b3bcc9");
           const kl = clamp((t - c.tl) / 0.25);
           K.text(g, c.lab, x + 32, Y + 192, { size: 25, mono: true, ls: 2, c: mix("#9aa4b2", C.ink, kl), maxW: cw - 60 });
           g.restore();
@@ -99,7 +99,7 @@
       }
       function draw() {
         const t = st.t, T = T0 + t;
-        g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, 1080, 1920);
+        K.heroFrame(g);
         const out = t > NEXT ? K.leave(t - NEXT, { dy: -60, dur: 0.2, sc: 0.95 }) : K.still;
         // the hook, carried over from c1: the lock opens, the blur clears, then the cards drop away
         if (t < tOut + 0.5) {

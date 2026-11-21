@@ -810,13 +810,20 @@
           }
         }
 
-        // ---- the floor: a scene's pixels fade out between y 1352 and 1392 and are cleared below, so no hero card (resting,
-        // entering or leaving) ever sits over the subtitle zone or Instagram's caption zone. Call last in draw().
-        function floor(g, y0 = 1352, y1 = 1392) {
+        // ---- the floor: a scene's pixels fade out between y 1458 and 1488 (screen) and are cleared below, so no hero card
+        // (resting, entering or leaving) ever sits over the subtitle zone or Instagram's caption zone. Call last in draw().
+        function floor(g, y0 = 1458, y1 = 1488) {
           g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = "destination-out";
           const gr = g.createLinearGradient(0, y0, 0, y1); gr.addColorStop(0, "rgba(0,0,0,0)"); gr.addColorStop(1, "rgba(0,0,0,1)");
           g.fillStyle = gr; g.fillRect(0, y0, 1080, y1 - y0); g.fillStyle = "#000"; g.fillRect(0, y1, 1080, 1920 - y1);
           g.restore();
+        }
+        // ---- the hero frame: clear the canvas, then draw the chapter's layout (designed for cards at y 300-1340, x 40-1040)
+        // scaled 5% about x 540 and moved down, so the cards fill y 356-1448 under the title and above the subtitle
+        const HERO = { S: 1.05, TOP: 356 };
+        function heroFrame(g) {
+          g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, 1080, 1920);
+          g.setTransform(HERO.S, 0, 0, HERO.S, 540 - 540 * HERO.S, HERO.TOP - 300 * HERO.S);
         }
         // the hook's beats in film time (c1 and c2 share them): the VaR line on "VaR", the tail, the ES marker on "Can",
         // typing dots on "Can", the blurred answer on "you've", the pill on "built?" (all in place before 02 starts)
@@ -827,7 +834,7 @@
           IMG, load, ok, pic, texLoad, tex, texSize, rr, card, font, tw, text, enter, leave, still, combine, life, apply, bob,
           odometer, count, chip, prov, stamp, cursor, cursorAt, check, bookmark, heart, plane, avatar, pathLen, subPath, poly, pipe,
           collar, flapCell, flapState, flapRow, frame, axes, line, area, candles, hline, dot, smooth,
-          field, button, slider, toggle, ball, highlight, lock, typingDots, photo, pdfView, T4, pnlHist, tickBadge, bubble, HK, hook, floor, hookBeats };
+          field, button, slider, toggle, ball, highlight, lock, typingDots, photo, pdfView, T4, pnlHist, tickBadge, bubble, HK, hook, floor, hookBeats, HERO, heroFrame };
       })();
 
       // ---- hud: the brand pill top-centre (the real logo + "Desk2Quant · MARKET RISK · MAKING QUANT EASY"); under it, the
@@ -839,9 +846,9 @@
       const { C, clamp, lerp, eo, eio, back, mix, rgba } = K;
       const st = { t: 0 };
       function init() { K.load({ logo: "assets/logo.png" }, "hud-images", () => draw()); }
-      const N = CH.length, LY = 180, TY = 142, TB = 260, TFS = 66;
+      const N = CH.length, LY = 234, TY = 194, TB = 330, TFS = 66;
       function pill(bl) {
-        const cy = 80, h = 62, lgS = 42;
+        const cy = 132, h = 62, lgS = 42;
         const s1 = "Desk2Quant", s2 = "MARKET RISK", s3 = "MAKING QUANT EASY";
         const w1 = K.tw(g, s1, 29, false, 0), w2 = K.tw(g, s2, 26, false, 1), w3 = K.tw(g, s3, 24, true, 2.5);
         const w = 22 + lgS + 14 + w1 + 36 + w2 + 36 + w3 + 28, x = 540 - w / 2;

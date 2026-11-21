@@ -118,7 +118,7 @@
         const Y = 1014, H = 120;
         g.save(); K.apply(g, 540, Y + H / 2, dealt(t, 0.12, { dy: 60, pitch: 0.3 }));
         // send to a friend
-        const ks = clamp((t - tSend) / 0.22), sw = 708;
+        const ks = clamp((t - tSend) / 0.22), sw = 604;
         const ps = 1 + 0.06 * Math.sin(Math.PI * ks) * (ks < 1 ? 1 : 0);
         g.save(); g.translate(X + sw / 2, Y + H / 2); g.scale(ps, ps); g.translate(-(X + sw / 2), -(Y + H / 2));
         K.card(g, X, Y, sw, H, { r: 30, blur: 36, dy: 18, shadow: SH, fill: mix(C.white, C.ink, ks) });
@@ -128,12 +128,12 @@
         K.text(g, "preparing for risk interviews", X + 125, Y + 92, { size: 28, c: mix("#5d6678", "#c9d5ef", ks) });
         g.restore();
         // SAVE
-        const kv = clamp((t - tSave) / 0.2), bx = X + sw + 22, bw = W - sw - 22;
+        const kv = clamp((t - tSave) / 0.2), bx = X + sw + 20, bw = 276;          // SAVE: x 664-940 (clear of the right-hand buttons)
         const pb = 1 + 0.1 * Math.sin(Math.PI * kv) * (kv < 1 ? 1 : 0);
         g.save(); g.translate(bx + bw / 2, Y + H / 2); g.scale(pb, pb); g.translate(-(bx + bw / 2), -(Y + H / 2));
         K.card(g, bx, Y, bw, H, { r: 30, blur: 36, dy: 18, shadow: kv > 0.5 ? "rgba(150,20,20,0.45)" : SH, fill: kv > 0.5 ? C.red : C.white });
-        K.bookmark(g, bx + 74, Y + H / 2, 46, kv > 0.5 ? C.white : null, kv > 0.5 ? C.white : C.ink, 4.5);
-        K.text(g, "SAVE", bx + 118, Y + H / 2 + 14, { size: 40, c: kv > 0.5 ? C.white : C.ink });
+        K.bookmark(g, bx + 66, Y + H / 2, 46, kv > 0.5 ? C.white : null, kv > 0.5 ? C.white : C.ink, 4.5);
+        K.text(g, "SAVE", bx + 108, Y + H / 2 + 14, { size: 40, c: kv > 0.5 ? C.white : C.ink });
         if (kv > 0) { const q = t - tSave < 0.5 ? (t - tSave) / 0.5 : ((t - tSave - 0.5) % 1.4) / 1.4; g.save(); g.strokeStyle = rgba(C.white, 0.7 * (1 - q)); g.lineWidth = 4; K.rr(g, bx - 14 * q, Y - 14 * q, bw + 28 * q, H + 28 * q, 30 + 14 * q); g.stroke(); g.restore(); }
         g.restore();
         g.restore();
@@ -147,13 +147,13 @@
         K.text(g, "DESK2QUANT", X + 192, Y + 88, { size: 56, ls: 3 });
         K.text(g, FACTS.handle, X + 194, Y + 140, { size: 34, mono: true, ls: 1, c: C.blue });
         const sw = K.tw(g, FACTS.site, 32) + 52;
-        K.rr(g, X + W - 32 - sw, Y + 113, sw, 56, 18); g.fillStyle = C.blue; g.fill();
-        K.text(g, FACTS.site, X + W - 32 - sw / 2, Y + 152, { size: 32, align: "center", c: C.white });
+        K.rr(g, X + 890 - sw, Y + 113, sw, 56, 18); g.fillStyle = C.blue; g.fill();          // right edge at x 930
+        K.text(g, FACTS.site, X + 890 - sw / 2, Y + 152, { size: 32, align: "center", c: C.white });
         g.restore();
       }
       function draw() {
         const t = st.t;
-        g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, 1080, 1920);
+        K.heroFrame(g);
         plate(t);
         actions(t);
         dmCard(t);

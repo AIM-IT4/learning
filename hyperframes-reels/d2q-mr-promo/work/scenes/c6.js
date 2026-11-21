@@ -94,8 +94,8 @@
         K.text(g, "REGRESSION SUITE", x + 40, y + 66, { size: 27, mono: true, ls: 3, c: rgba(C.ink, 0.6) });
         const n = Math.max(0, Math.min(NT, Math.floor((t - tT0) / 0.04) + 1));
         const nn = t < tT0 ? 0 : n;
-        K.text(g, nn + " / " + NT, x + W - 40, y + 82, { size: 66, align: "right", c: nn === NT ? C.greenD : C.ink });
-        K.text(g, "TESTS", x + W - 42, y + 116, { size: 22, mono: true, ls: 3, align: "right", c: rgba(C.ink, 0.5) });
+        K.text(g, nn + " / " + NT, x + 890, y + 82, { size: 66, align: "right", c: nn === NT ? C.greenD : C.ink });     // right edge at x 930
+        K.text(g, "TESTS", x + 888, y + 116, { size: 22, mono: true, ls: 3, align: "right", c: rgba(C.ink, 0.5) });
         // the progress bar
         const bx = x + 40, by = y + 104, bw = 600;
         K.rr(g, bx, by, bw, 12, 6); g.fillStyle = "#e9edf2"; g.fill();
@@ -107,7 +107,7 @@
           g.fillStyle = sg; g.fillRect(sx - 50, by, 100, 12); g.restore();
         }
         // 14 checks, 7 x 2
-        const cw = 130, ch = 104, gx = x + (W - 7 * cw) / 2, gy = y + 150;
+        const cw = 118, ch = 104, gx = x + 37, gy = y + 150;          // the grid spans x 77-903
         for (let i = 0; i < NT; i++) {
           const cx = gx + (i % 7) * cw + cw / 2, cy = gy + Math.floor(i / 7) * ch + 38, k = clamp((t - tick(i)) / 0.22);
           if (k <= 0) { g.beginPath(); g.arc(cx, cy, 30, 0, Math.PI * 2); g.setLineDash([7, 7]); g.strokeStyle = rgba(C.ink, 0.2); g.lineWidth = 3; g.stroke(); g.setLineDash([]); }
@@ -118,7 +118,7 @@
       }
       function draw() {
         const t = st.t;
-        g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, 1080, 1920);
+        K.heroFrame(g);
         const out = t > NEXT ? K.leave(t - NEXT, { dy: -60, dur: 0.2, sc: 0.95 }) : K.still;
         suite(t, K.combine(dealt(t, 0.16, 2.6), out));
         library(t, K.combine(dealt(t, 0.12, 1.7), out));

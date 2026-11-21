@@ -86,13 +86,13 @@
       }
       function bottom(t, P) {
         // the figure card: the notes' real PLA-zones figure
-        g.save(); K.apply(g, 40 + 290, YB + HB / 2, P);
-        K.card(g, 40, YB, 580, HB, { r: 28, blur: 40, dy: 20 });
+        g.save(); K.apply(g, 40 + 276, YB + HB / 2, P);
+        K.card(g, 40, YB, 552, HB, { r: 28, blur: 40, dy: 20 });
         K.text(g, "FROM THE NOTES", 66, YB + 38, { size: 22, mono: true, ls: 3, c: rgba(C.ink, 0.55) });
-        if (K.ok("pla")) { const fw = 430, fh = fw * 617 / 1165; g.drawImage(K.pic("pla", fw), 40 + (580 - fw) / 2, YB + 52, fw, fh); }
+        if (K.ok("pla")) { const fw = 420, fh = fw * 617 / 1165; g.drawImage(K.pic("pla", fw), 40 + (552 - fw) / 2, YB + 56, fw, fh); }
         g.restore();
         // → CAPITAL
-        const kc = clamp((t - tCap) / 0.25), x = 644, cw = 396;
+        const kc = clamp((t - tCap) / 0.25), x = 612, cw = 328;      // x 612-940 (clear of the right-hand buttons)
         const pop = 1 + 0.08 * Math.sin(Math.PI * clamp((t - tCap) / 0.35)) * (t > tCap && t < tCap + 0.35 ? 1 : 0);
         g.save(); K.apply(g, x + cw / 2, YB + HB / 2, P); g.translate(x + cw / 2, YB + HB / 2); g.scale(pop, pop); g.translate(-(x + cw / 2), -(YB + HB / 2));
         K.card(g, x, YB, cw, HB, { r: 28, blur: 40, dy: 20, fill: kc > 0.5 ? C.red : C.white, shadow: kc > 0.5 ? "rgba(170,20,20,0.4)" : undefined });
@@ -100,14 +100,14 @@
         const ax = x + 46 + 30 * eo(kc);
         g.save(); g.strokeStyle = col; g.lineWidth = 12; g.lineCap = "round"; g.lineJoin = "round";
         g.beginPath(); g.moveTo(ax, YB + 112); g.lineTo(ax + 84, YB + 112); g.moveTo(ax + 56, YB + 82); g.lineTo(ax + 88, YB + 112); g.lineTo(ax + 56, YB + 142); g.stroke(); g.restore();
-        K.text(g, "CAPITAL", x + 34, YB + 222, { size: 64, ls: 1, c: col });
-        K.text(g, "SA vs IMA, COMPARED", x + 36, YB + 258, { size: 21, mono: true, ls: 2, c: kc > 0.5 ? "rgba(255,255,255,0.85)" : "#b3bcc9" });
+        K.text(g, "CAPITAL", x + 30, YB + 222, { size: 56, ls: 1, c: col, maxW: cw - 50 });
+        K.text(g, "SA vs IMA, COMPARED", x + 32, YB + 258, { size: 19, mono: true, ls: 2, c: kc > 0.5 ? "rgba(255,255,255,0.85)" : "#b3bcc9", maxW: cw - 50 });
         if (t > tNum) { const q = clamp((t - tNum) / 0.5); g.save(); g.strokeStyle = rgba(C.white, 0.7 * (1 - q)); g.lineWidth = 4; K.rr(g, x - 12 * q, YB - 12 * q, cw + 24 * q, HB + 24 * q, 28 + 12 * q); g.stroke(); g.restore(); }
         g.restore();
       }
       function draw() {
         const t = st.t;
-        g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, 1080, 1920);
+        K.heroFrame(g);
         const out = t > NEXT ? K.leave(t - NEXT, { dy: -60, dur: 0.2, sc: 0.95 }) : K.still;
         const bob = (ph) => ({ dx: 0, dy: K.bob(T0 + t, ph, 3), rot: 0, sc: 1, yaw: 0, pitch: 0, a: 1 });
         bottom(t, K.combine(K.combine(K.enter(t - tRow, { dy: 110, pitch: 0.35, yaw: 0, rot: 0.02, sc: 0.92 }), bob(2.4)), out));
@@ -118,7 +118,7 @@
         if (kf > 0 && kf < 1.25 && t < NEXT) {
           for (let i = 0; i < ND; i++) {
             const q = eio(clamp(kf - 0.06 * i)); if (q <= 0 || q >= 1) continue;
-            const x0 = X + 470 + i * 106, y0 = YS + HS / 2, x1 = 842, y1 = YB + 112;
+            const x0 = X + 470 + i * 106, y0 = YS + HS / 2, x1 = 776, y1 = YB + 112;
             const px = lerp(x0, x1, q), py = lerp(y0, y1, q) - 60 * Math.sin(Math.PI * q);
             g.save(); g.globalAlpha = 1 - clamp((q - 0.85) / 0.15);
             K.dot(g, px, py, { r: 10, c: C.red }); g.restore();

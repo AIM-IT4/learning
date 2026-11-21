@@ -134,7 +134,7 @@
         if (low > 0) strip(t, X + 60, Y + 560, W - 120);
         // the three steps of a walk-forward test, lit in turn as the window moves
         const steps = ["FIT ON THE WINDOW", "FORECAST VaR", "TEST NEXT DAY"], sy = Y + 790;
-        const sw = [326, 262, 266], gap = 33;
+        const sw = [300, 240, 244], gap = 26;              // ends at x ~930
         let sx = X + 44; const cyc = Math.floor(((t - tN0) * 3.2) % 3);
         steps.forEach((s, i) => {
           const on = t > tN0 && t < tC + 0.4 && cyc === i;
@@ -161,27 +161,27 @@
         g.translate(x + cw / 2, y + ch / 2); g.scale(s, s); g.translate(-(x + cw / 2), -(y + ch / 2));
         K.card(g, x, y, cw, ch, { r: 28, blur: 34, dy: 16, stroke: lit > 0.5 ? rgba(C.green, 0.6) : undefined });
         if (i < 2) {
-          if (lit <= 0) { g.beginPath(); g.arc(x + 62, y + ch / 2, 32, 0, Math.PI * 2); g.strokeStyle = rgba(C.ink, 0.18); g.lineWidth = 4; g.stroke(); }
-          K.tickBadge(g, x + 62, y + ch / 2, 32, clamp(u / 0.3));
-          K.text(g, TESTS[i], x + 112, y + ch / 2 + 4, { size: 40, c: lit > 0 ? C.ink : rgba(C.ink, 0.45), maxW: cw - 130 });
-          K.text(g, "RUN IN THE LAB", x + 114, y + ch / 2 + 42, { size: 23, mono: true, ls: 2, c: lit > 0 ? C.greenD : rgba(C.ink, 0.4) });
+          if (lit <= 0) { g.beginPath(); g.arc(x + 54, y + ch / 2, 29, 0, Math.PI * 2); g.strokeStyle = rgba(C.ink, 0.18); g.lineWidth = 4; g.stroke(); }
+          K.tickBadge(g, x + 54, y + ch / 2, 29, clamp(u / 0.3));
+          K.text(g, TESTS[i], x + 98, y + ch / 2 + 4, { size: 36, c: lit > 0 ? C.ink : rgba(C.ink, 0.45), maxW: cw - 112 });
+          K.text(g, "RUN IN THE LAB", x + 100, y + ch / 2 + 40, { size: 21, mono: true, ls: 2, c: lit > 0 ? C.greenD : rgba(C.ink, 0.4) });
         } else {
           const cols = [C.green, C.amber, C.red];
           for (let j = 0; j < 3; j++) {
             const on = clamp((u - 0.14 * j) / 0.15);
-            const cx = x + 40 + j * 46, cy = y + ch / 2 - 2;
-            g.beginPath(); g.arc(cx, cy, 18, 0, Math.PI * 2); g.fillStyle = on > 0 ? cols[j] : rgba(C.ink, 0.12); g.fill();
-            if (on > 0 && on < 1) { g.strokeStyle = rgba(cols[j], 0.6 * (1 - on)); g.lineWidth = 3; g.beginPath(); g.arc(cx, cy, 18 + 14 * on, 0, Math.PI * 2); g.stroke(); }
+            const cx = x + 28 + j * 31, cy = y + ch / 2 - 2;
+            g.beginPath(); g.arc(cx, cy, 12, 0, Math.PI * 2); g.fillStyle = on > 0 ? cols[j] : rgba(C.ink, 0.12); g.fill();
+            if (on > 0 && on < 1) { g.strokeStyle = rgba(cols[j], 0.6 * (1 - on)); g.lineWidth = 3; g.beginPath(); g.arc(cx, cy, 12 + 10 * on, 0, Math.PI * 2); g.stroke(); }
           }
-          K.text(g, TESTS[2], x + 182, y + ch / 2 + 4, { size: 40, c: lit > 0 ? C.ink : rgba(C.ink, 0.45), maxW: cw - 196 });
-          K.text(g, "BASEL ZONES", x + 184, y + ch / 2 + 42, { size: 23, mono: true, ls: 2, c: rgba(C.ink, lit > 0 ? 0.6 : 0.4) });
+          K.text(g, TESTS[2], x + 120, y + ch / 2 + 4, { size: 36, c: lit > 0 ? C.ink : rgba(C.ink, 0.45), maxW: cw - 134 });
+          K.text(g, "BASEL ZONES", x + 122, y + ch / 2 + 40, { size: 21, mono: true, ls: 2, c: rgba(C.ink, lit > 0 ? 0.6 : 0.4) });
         }
         g.restore();
       }
       function proof(t, P) {
         const u = t - tC; if (u <= 0) return;
         const Pp = K.combine(K.enter(u, { dx: -340, dy: 30, pitch: 0.1, yaw: 0.35, rot: -0.03, sc: 0.9 }), P);
-        const px = X, py = 794, pw = 562, ph = 546;
+        const px = X, py = 794, pw = 516, ph = 546;
         g.save(); K.apply(g, px + pw / 2, py + ph / 2, Pp);
         const sy = lerp(0.05, 0.33, eio(clamp((u - 0.3) / 1.9)));
         const ring = clamp((t - tRing) / 0.35);
@@ -192,13 +192,13 @@
           K.rr(gg, x0 + 62 * s, y0 + 540 * s, 782 * s * eo(ring), 370 * s, 14); gg.stroke(); gg.restore();
         } });
         g.restore();
-        testChip(0, 626, 794, 414, 176, t, P);
-        testChip(1, 626, 979, 414, 176, t, P);
-        testChip(2, 626, 1164, 414, 176, t, P);
+        testChip(0, 574, 794, 366, 176, t, P);           // x 574-940 (clear of the right-hand buttons)
+        testChip(1, 574, 979, 366, 176, t, P);
+        testChip(2, 574, 1164, 366, 176, t, P);
       }
       function draw() {
         const t = st.t;
-        g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, 1080, 1920);
+        K.heroFrame(g);
         const out = t > NEXT ? K.leave(t - NEXT, { dy: -60, dur: 0.2, sc: 0.95 }) : K.still;
         const bob = { dx: 0, dy: K.bob(t, 0.4, 3), rot: 0, sc: 1, yaw: 0, pitch: 0, a: 1 };
         if (t < tB + 0.4) projectCard(t, K.combine(K.combine(K.enter(t - tA, { dy: 150, pitch: 0.4, yaw: 0, rot: 0.02, sc: 0.92 }), bob),

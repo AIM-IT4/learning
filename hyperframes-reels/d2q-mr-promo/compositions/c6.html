@@ -810,13 +810,20 @@
           }
         }
 
-        // ---- the floor: a scene's pixels fade out between y 1352 and 1392 and are cleared below, so no hero card (resting,
-        // entering or leaving) ever sits over the subtitle zone or Instagram's caption zone. Call last in draw().
-        function floor(g, y0 = 1352, y1 = 1392) {
+        // ---- the floor: a scene's pixels fade out between y 1458 and 1488 (screen) and are cleared below, so no hero card
+        // (resting, entering or leaving) ever sits over the subtitle zone or Instagram's caption zone. Call last in draw().
+        function floor(g, y0 = 1458, y1 = 1488) {
           g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = "destination-out";
           const gr = g.createLinearGradient(0, y0, 0, y1); gr.addColorStop(0, "rgba(0,0,0,0)"); gr.addColorStop(1, "rgba(0,0,0,1)");
           g.fillStyle = gr; g.fillRect(0, y0, 1080, y1 - y0); g.fillStyle = "#000"; g.fillRect(0, y1, 1080, 1920 - y1);
           g.restore();
+        }
+        // ---- the hero frame: clear the canvas, then draw the chapter's layout (designed for cards at y 300-1340, x 40-1040)
+        // scaled 5% about x 540 and moved down, so the cards fill y 356-1448 under the title and above the subtitle
+        const HERO = { S: 1.05, TOP: 356 };
+        function heroFrame(g) {
+          g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, 1080, 1920);
+          g.setTransform(HERO.S, 0, 0, HERO.S, 540 - 540 * HERO.S, HERO.TOP - 300 * HERO.S);
         }
         // the hook's beats in film time (c1 and c2 share them): the VaR line on "VaR", the tail, the ES marker on "Can",
         // typing dots on "Can", the blurred answer on "you've", the pill on "built?" (all in place before 02 starts)
@@ -827,7 +834,7 @@
           IMG, load, ok, pic, texLoad, tex, texSize, rr, card, font, tw, text, enter, leave, still, combine, life, apply, bob,
           odometer, count, chip, prov, stamp, cursor, cursorAt, check, bookmark, heart, plane, avatar, pathLen, subPath, poly, pipe,
           collar, flapCell, flapState, flapRow, frame, axes, line, area, candles, hline, dot, smooth,
-          field, button, slider, toggle, ball, highlight, lock, typingDots, photo, pdfView, T4, pnlHist, tickBadge, bubble, HK, hook, floor, hookBeats };
+          field, button, slider, toggle, ball, highlight, lock, typingDots, photo, pdfView, T4, pnlHist, tickBadge, bubble, HK, hook, floor, hookBeats, HERO, heroFrame };
       })();
 
       // ---- c6, what you get: "You get the notes, executed notebooks, a Python risk library and fourteen regression tests."
@@ -926,8 +933,8 @@
         K.text(g, "REGRESSION SUITE", x + 40, y + 66, { size: 27, mono: true, ls: 3, c: rgba(C.ink, 0.6) });
         const n = Math.max(0, Math.min(NT, Math.floor((t - tT0) / 0.04) + 1));
         const nn = t < tT0 ? 0 : n;
-        K.text(g, nn + " / " + NT, x + W - 40, y + 82, { size: 66, align: "right", c: nn === NT ? C.greenD : C.ink });
-        K.text(g, "TESTS", x + W - 42, y + 116, { size: 22, mono: true, ls: 3, align: "right", c: rgba(C.ink, 0.5) });
+        K.text(g, nn + " / " + NT, x + 890, y + 82, { size: 66, align: "right", c: nn === NT ? C.greenD : C.ink });     // right edge at x 930
+        K.text(g, "TESTS", x + 888, y + 116, { size: 22, mono: true, ls: 3, align: "right", c: rgba(C.ink, 0.5) });
         // the progress bar
         const bx = x + 40, by = y + 104, bw = 600;
         K.rr(g, bx, by, bw, 12, 6); g.fillStyle = "#e9edf2"; g.fill();
@@ -939,7 +946,7 @@
           g.fillStyle = sg; g.fillRect(sx - 50, by, 100, 12); g.restore();
         }
         // 14 checks, 7 x 2
-        const cw = 130, ch = 104, gx = x + (W - 7 * cw) / 2, gy = y + 150;
+        const cw = 118, ch = 104, gx = x + 37, gy = y + 150;          // the grid spans x 77-903
         for (let i = 0; i < NT; i++) {
           const cx = gx + (i % 7) * cw + cw / 2, cy = gy + Math.floor(i / 7) * ch + 38, k = clamp((t - tick(i)) / 0.22);
           if (k <= 0) { g.beginPath(); g.arc(cx, cy, 30, 0, Math.PI * 2); g.setLineDash([7, 7]); g.strokeStyle = rgba(C.ink, 0.2); g.lineWidth = 3; g.stroke(); g.setLineDash([]); }
@@ -950,7 +957,7 @@
       }
       function draw() {
         const t = st.t;
-        g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, 1080, 1920);
+        K.heroFrame(g);
         const out = t > NEXT ? K.leave(t - NEXT, { dy: -60, dur: 0.2, sc: 0.95 }) : K.still;
         suite(t, K.combine(dealt(t, 0.16, 2.6), out));
         library(t, K.combine(dealt(t, 0.12, 1.7), out));

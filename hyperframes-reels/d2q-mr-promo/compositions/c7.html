@@ -810,13 +810,20 @@
           }
         }
 
-        // ---- the floor: a scene's pixels fade out between y 1352 and 1392 and are cleared below, so no hero card (resting,
-        // entering or leaving) ever sits over the subtitle zone or Instagram's caption zone. Call last in draw().
-        function floor(g, y0 = 1352, y1 = 1392) {
+        // ---- the floor: a scene's pixels fade out between y 1458 and 1488 (screen) and are cleared below, so no hero card
+        // (resting, entering or leaving) ever sits over the subtitle zone or Instagram's caption zone. Call last in draw().
+        function floor(g, y0 = 1458, y1 = 1488) {
           g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = "destination-out";
           const gr = g.createLinearGradient(0, y0, 0, y1); gr.addColorStop(0, "rgba(0,0,0,0)"); gr.addColorStop(1, "rgba(0,0,0,1)");
           g.fillStyle = gr; g.fillRect(0, y0, 1080, y1 - y0); g.fillStyle = "#000"; g.fillRect(0, y1, 1080, 1920 - y1);
           g.restore();
+        }
+        // ---- the hero frame: clear the canvas, then draw the chapter's layout (designed for cards at y 300-1340, x 40-1040)
+        // scaled 5% about x 540 and moved down, so the cards fill y 356-1448 under the title and above the subtitle
+        const HERO = { S: 1.05, TOP: 356 };
+        function heroFrame(g) {
+          g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, 1080, 1920);
+          g.setTransform(HERO.S, 0, 0, HERO.S, 540 - 540 * HERO.S, HERO.TOP - 300 * HERO.S);
         }
         // the hook's beats in film time (c1 and c2 share them): the VaR line on "VaR", the tail, the ES marker on "Can",
         // typing dots on "Can", the blurred answer on "you've", the pill on "built?" (all in place before 02 starts)
@@ -827,7 +834,7 @@
           IMG, load, ok, pic, texLoad, tex, texSize, rr, card, font, tw, text, enter, leave, still, combine, life, apply, bob,
           odometer, count, chip, prov, stamp, cursor, cursorAt, check, bookmark, heart, plane, avatar, pathLen, subPath, poly, pipe,
           collar, flapCell, flapState, flapRow, frame, axes, line, area, candles, hline, dot, smooth,
-          field, button, slider, toggle, ball, highlight, lock, typingDots, photo, pdfView, T4, pnlHist, tickBadge, bubble, HK, hook, floor, hookBeats };
+          field, button, slider, toggle, ball, highlight, lock, typingDots, photo, pdfView, T4, pnlHist, tickBadge, bubble, HK, hook, floor, hookBeats, HERO, heroFrame };
       })();
 
       // ---- c7, the call to action (brand-blue block): "Comment RISK, and we'll DM you fifty percent off. The code works for
@@ -950,7 +957,7 @@
         const Y = 1014, H = 120;
         g.save(); K.apply(g, 540, Y + H / 2, dealt(t, 0.12, { dy: 60, pitch: 0.3 }));
         // send to a friend
-        const ks = clamp((t - tSend) / 0.22), sw = 708;
+        const ks = clamp((t - tSend) / 0.22), sw = 604;
         const ps = 1 + 0.06 * Math.sin(Math.PI * ks) * (ks < 1 ? 1 : 0);
         g.save(); g.translate(X + sw / 2, Y + H / 2); g.scale(ps, ps); g.translate(-(X + sw / 2), -(Y + H / 2));
         K.card(g, X, Y, sw, H, { r: 30, blur: 36, dy: 18, shadow: SH, fill: mix(C.white, C.ink, ks) });
@@ -960,12 +967,12 @@
         K.text(g, "preparing for risk interviews", X + 125, Y + 92, { size: 28, c: mix("#5d6678", "#c9d5ef", ks) });
         g.restore();
         // SAVE
-        const kv = clamp((t - tSave) / 0.2), bx = X + sw + 22, bw = W - sw - 22;
+        const kv = clamp((t - tSave) / 0.2), bx = X + sw + 20, bw = 276;          // SAVE: x 664-940 (clear of the right-hand buttons)
         const pb = 1 + 0.1 * Math.sin(Math.PI * kv) * (kv < 1 ? 1 : 0);
         g.save(); g.translate(bx + bw / 2, Y + H / 2); g.scale(pb, pb); g.translate(-(bx + bw / 2), -(Y + H / 2));
         K.card(g, bx, Y, bw, H, { r: 30, blur: 36, dy: 18, shadow: kv > 0.5 ? "rgba(150,20,20,0.45)" : SH, fill: kv > 0.5 ? C.red : C.white });
-        K.bookmark(g, bx + 74, Y + H / 2, 46, kv > 0.5 ? C.white : null, kv > 0.5 ? C.white : C.ink, 4.5);
-        K.text(g, "SAVE", bx + 118, Y + H / 2 + 14, { size: 40, c: kv > 0.5 ? C.white : C.ink });
+        K.bookmark(g, bx + 66, Y + H / 2, 46, kv > 0.5 ? C.white : null, kv > 0.5 ? C.white : C.ink, 4.5);
+        K.text(g, "SAVE", bx + 108, Y + H / 2 + 14, { size: 40, c: kv > 0.5 ? C.white : C.ink });
         if (kv > 0) { const q = t - tSave < 0.5 ? (t - tSave) / 0.5 : ((t - tSave - 0.5) % 1.4) / 1.4; g.save(); g.strokeStyle = rgba(C.white, 0.7 * (1 - q)); g.lineWidth = 4; K.rr(g, bx - 14 * q, Y - 14 * q, bw + 28 * q, H + 28 * q, 30 + 14 * q); g.stroke(); g.restore(); }
         g.restore();
         g.restore();
@@ -979,13 +986,13 @@
         K.text(g, "DESK2QUANT", X + 192, Y + 88, { size: 56, ls: 3 });
         K.text(g, FACTS.handle, X + 194, Y + 140, { size: 34, mono: true, ls: 1, c: C.blue });
         const sw = K.tw(g, FACTS.site, 32) + 52;
-        K.rr(g, X + W - 32 - sw, Y + 113, sw, 56, 18); g.fillStyle = C.blue; g.fill();
-        K.text(g, FACTS.site, X + W - 32 - sw / 2, Y + 152, { size: 32, align: "center", c: C.white });
+        K.rr(g, X + 890 - sw, Y + 113, sw, 56, 18); g.fillStyle = C.blue; g.fill();          // right edge at x 930
+        K.text(g, FACTS.site, X + 890 - sw / 2, Y + 152, { size: 32, align: "center", c: C.white });
         g.restore();
       }
       function draw() {
         const t = st.t;
-        g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, 1080, 1920);
+        K.heroFrame(g);
         plate(t);
         actions(t);
         dmCard(t);

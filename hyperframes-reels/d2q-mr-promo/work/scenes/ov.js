@@ -6,7 +6,8 @@
       const g = document.getElementById("ov-cv").getContext("2d");
       const { C, clamp, lerp, eo, back, mix } = K;
       const st = { t: 0 };
-      const FS = 56, LH = 76, MAXW = 880, CY = 1454, PX = 13;
+      const FS0 = 56, MAXW = 840, CY = 1560, PX = 13;
+      let FS = FS0, LH = 76;
       const PUNCT = /[.,:;!?]+$/;
       // lines: the fewest that fit MAXW, broken so their widths are as even as possible; a token in P.br starts a new line
       function layout(P) {
@@ -47,8 +48,14 @@
         g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, 1080, 1920);
         let pi = 0; for (let i = 0; i < PAGES.length; i++) if (t >= PAGES[i].start) pi = i;
         const P = PAGES[pi];
-        const ready = document.fonts && document.fonts.check(`700 ${FS}px D2QSans`);
-        const lay = LAY[pi] || (ready ? (LAY[pi] = layout(P)) : layout(P));
+        const ready = document.fonts && document.fonts.check(`700 ${FS0}px D2QSans`);
+        let lay = LAY[pi];
+        if (!lay) {
+          for (FS = FS0; FS >= 44; FS -= 4) { LH = Math.round(FS * 76 / 56); lay = layout(P); if (lay.rows.length <= 2) break; }
+          lay.fs = FS; lay.lh = LH;
+          if (ready) LAY[pi] = lay;
+        }
+        FS = lay.fs; LH = lay.lh;
         const top = CY - lay.h / 2;
         const bl = K.blueAt(t, B, THEME), ink = mix(C.ink, C.white, bl);
         g.save(); K.font(g, FS, false, -0.5); g.textBaseline = "alphabetic"; g.textAlign = "left";

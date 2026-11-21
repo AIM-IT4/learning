@@ -7,9 +7,9 @@
       const { C, clamp, lerp, eo, eio, back, mix, rgba } = K;
       const st = { t: 0 };
       function init() { K.load({ logo: "assets/logo.png" }, "hud-images", () => draw()); }
-      const N = CH.length, LY = 180, TY = 142, TB = 260, TFS = 66;
+      const N = CH.length, LY = 234, TY = 194, TB = 330, TFS = 66;
       function pill(bl) {
-        const cy = 80, h = 62, lgS = 42;
+        const cy = 132, h = 62, lgS = 42;
         const s1 = "Desk2Quant", s2 = "MARKET RISK", s3 = "MAKING QUANT EASY";
         const w1 = K.tw(g, s1, 29, false, 0), w2 = K.tw(g, s2, 26, false, 1), w3 = K.tw(g, s3, 24, true, 2.5);
         const w = 22 + lgS + 14 + w1 + 36 + w2 + 36 + w3 + 28, x = 540 - w / 2;

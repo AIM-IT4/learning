@@ -810,13 +810,20 @@
           }
         }
 
-        // ---- the floor: a scene's pixels fade out between y 1352 and 1392 and are cleared below, so no hero card (resting,
-        // entering or leaving) ever sits over the subtitle zone or Instagram's caption zone. Call last in draw().
-        function floor(g, y0 = 1352, y1 = 1392) {
+        // ---- the floor: a scene's pixels fade out between y 1458 and 1488 (screen) and are cleared below, so no hero card
+        // (resting, entering or leaving) ever sits over the subtitle zone or Instagram's caption zone. Call last in draw().
+        function floor(g, y0 = 1458, y1 = 1488) {
           g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = "destination-out";
           const gr = g.createLinearGradient(0, y0, 0, y1); gr.addColorStop(0, "rgba(0,0,0,0)"); gr.addColorStop(1, "rgba(0,0,0,1)");
           g.fillStyle = gr; g.fillRect(0, y0, 1080, y1 - y0); g.fillStyle = "#000"; g.fillRect(0, y1, 1080, 1920 - y1);
           g.restore();
+        }
+        // ---- the hero frame: clear the canvas, then draw the chapter's layout (designed for cards at y 300-1340, x 40-1040)
+        // scaled 5% about x 540 and moved down, so the cards fill y 356-1448 under the title and above the subtitle
+        const HERO = { S: 1.05, TOP: 356 };
+        function heroFrame(g) {
+          g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, 1080, 1920);
+          g.setTransform(HERO.S, 0, 0, HERO.S, 540 - 540 * HERO.S, HERO.TOP - 300 * HERO.S);
         }
         // the hook's beats in film time (c1 and c2 share them): the VaR line on "VaR", the tail, the ES marker on "Can",
         // typing dots on "Can", the blurred answer on "you've", the pill on "built?" (all in place before 02 starts)
@@ -827,7 +834,7 @@
           IMG, load, ok, pic, texLoad, tex, texSize, rr, card, font, tw, text, enter, leave, still, combine, life, apply, bob,
           odometer, count, chip, prov, stamp, cursor, cursorAt, check, bookmark, heart, plane, avatar, pathLen, subPath, poly, pipe,
           collar, flapCell, flapState, flapRow, frame, axes, line, area, candles, hline, dot, smooth,
-          field, button, slider, toggle, ball, highlight, lock, typingDots, photo, pdfView, T4, pnlHist, tickBadge, bubble, HK, hook, floor, hookBeats };
+          field, button, slider, toggle, ball, highlight, lock, typingDots, photo, pdfView, T4, pnlHist, tickBadge, bubble, HK, hook, floor, hookBeats, HERO, heroFrame };
       })();
 
       // ---- ov: the spoken subtitle, low (band y ~1380-1500, above Instagram's caption zone). Bold D2QSans 56 px, centred,
@@ -838,7 +845,8 @@
       const g = document.getElementById("ov-cv").getContext("2d");
       const { C, clamp, lerp, eo, back, mix } = K;
       const st = { t: 0 };
-      const FS = 56, LH = 76, MAXW = 880, CY = 1454, PX = 13;
+      const FS0 = 56, MAXW = 840, CY = 1560, PX = 13;
+      let FS = FS0, LH = 76;
       const PUNCT = /[.,:;!?]+$/;
       // lines: the fewest that fit MAXW, broken so their widths are as even as possible; a token in P.br starts a new line
       function layout(P) {
@@ -879,8 +887,14 @@
         g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, 1080, 1920);
         let pi = 0; for (let i = 0; i < PAGES.length; i++) if (t >= PAGES[i].start) pi = i;
         const P = PAGES[pi];
-        const ready = document.fonts && document.fonts.check(`700 ${FS}px D2QSans`);
-        const lay = LAY[pi] || (ready ? (LAY[pi] = layout(P)) : layout(P));
+        const ready = document.fonts && document.fonts.check(`700 ${FS0}px D2QSans`);
+        let lay = LAY[pi];
+        if (!lay) {
+          for (FS = FS0; FS >= 44; FS -= 4) { LH = Math.round(FS * 76 / 56); lay = layout(P); if (lay.rows.length <= 2) break; }
+          lay.fs = FS; lay.lh = LH;
+          if (ready) LAY[pi] = lay;
+        }
+        FS = lay.fs; LH = lay.lh;
         const top = CY - lay.h / 2;
         const bl = K.blueAt(t, B, THEME), ink = mix(C.ink, C.white, bl);
         g.save(); K.font(g, FS, false, -0.5); g.textBaseline = "alphabetic"; g.textAlign = "left";

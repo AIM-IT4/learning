@@ -10,7 +10,7 @@
         if (y1 <= y0) return;
         g.save(); g.beginPath(); g.rect(0, y0, 1080, y1 - y0); g.clip();
         g.fillStyle = blue ? C.blue : C.paper; g.fillRect(0, 0, 1080, 1920);
-        let rg = g.createRadialGradient(540, 860, 60, 540, 860, 980);
+        let rg = g.createRadialGradient(540, 920, 60, 540, 920, 1000);
         rg.addColorStop(0, blue ? "rgba(255,255,255,0.16)" : "rgba(255,255,255,0.62)"); rg.addColorStop(1, "rgba(255,255,255,0)");
         g.fillStyle = rg; g.fillRect(0, 0, 1080, 1920);
         if (!blue) {
@@ -40,7 +40,7 @@
           else { const q = eio(clamp((t - B[k]) / 0.35)); dy = 130 * q; a = 1 - q; }
           if (a <= 0) continue;
           g.save(); g.globalAlpha = a;
-          K.text(g, String(j + 1).padStart(2, "0"), 540, 2046 + dy, { size: 560, align: "center", ls: -26, c: isB(k) ? "rgba(255,255,255,0.10)" : "rgba(13,21,38,0.05)" });
+          K.text(g, String(j + 1).padStart(2, "0"), 540, 2072 + dy, { size: 560, align: "center", ls: -26, c: isB(k) ? "rgba(255,255,255,0.10)" : "rgba(13,21,38,0.05)" });
           g.restore();
         }
       }

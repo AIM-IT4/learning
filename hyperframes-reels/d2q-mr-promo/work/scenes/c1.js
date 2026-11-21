@@ -15,7 +15,7 @@
       const HB = K.hookBeats(WA);
       function draw() {
         const t = st.t, T = T0 + t;
-        g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, 1080, 1920);
+        K.heroFrame(g);
         if (t >= NEXT) return;                      // c2 takes the picture over from here
         const bob = (ph) => ({ dx: 0, dy: K.bob(T, ph, 3), rot: 0, sc: 1, yaw: 0, pitch: 0, a: 1 });
         K.hook(g, T, Object.assign({ P: bob(0.2), PH: bob(1.2) }, HB));

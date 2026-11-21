@@ -24,11 +24,20 @@ upgrades from `BRIEF.md`. There is no presenter.
 
 - `out/mr_promo.mp4`: the mastered reel (−14.0 LUFS integrated, true peak −1.9 dBTP, LRA 1.6 LU).
 - `out/raw.mp4`: the unmastered render.
-- `out/cover.jpg`: the cover. It is the 4.1 s hook frame, just before 02 (the blurred answer with its lock and the "Built one? Let's see" pill), with the title moved inside the profile grid's 3:4 crop (`tools/make_cover.sh`); `out/cover_3x4.jpg` is that crop.
+- `out/cover.jpg`: the cover. It is the 4.1 s hook frame, just before 02 (the blurred answer with its lock and the "Built one? Let's see" pill), taken as it is: the title, hero and subtitle all sit inside the profile grid's 3:4 crop (`tools/make_cover.sh`); `out/cover_3x4.jpg` is that crop.
 - `out/stills/`: stills of every chapter, and of every chapter change mid-transition (`change-mid`, 0.10 s in) and as its first word lands (`change-landed`, 0.24 s in), plus `_contact-sheet-*.jpg`.
 - `out/pilot/`: the checkpoint stills (from the first cut, with the joined VoxCPM voice).
 - `caption.txt`: the Instagram caption.
 - `dm_risk.txt`: the DM text, for the auto-DM. It holds the coupon code and is never shown on screen.
+
+## Layout (Instagram-safe)
+
+- **Top bar:** the brand pill is centred at y 132, so its text clears Instagram's top overlay (y 0–120). The chapter tag and desk2quant.com sit at y 194, and the progress line at y 234.
+- **Chapter title:** baseline at y 330; it measures y 280–343.
+- **Hero:** each chapter is still drawn in its own 1080 × 1920 layout, with cards at y 300–1340. `K.heroFrame()` scales that layout 5% about x 540 and moves it down, so the cards run y 357–1448.
+- **Subtitle:** centred on y 1560, at most two lines (a longer page is set smaller), and x 120–960. It measures y 1486–1621. `K.floor()` clears every card below y 1458–1488.
+- **Bottom band (y > 1650):** decoration only: the faint giant chapter number.
+- **Right edge:** in the lower half, key text and numbers stay left of x 960, clear of Instagram's like, comment and share buttons. Only small axis labels and card edges go further right.
 
 ## How it is built
 
